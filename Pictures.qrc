@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/new/prefix1">
         <file>desimoneresearchgroup.PNG</file>
+        <file>dummygraph.png</file>
     </qresource>
 </RCC>
