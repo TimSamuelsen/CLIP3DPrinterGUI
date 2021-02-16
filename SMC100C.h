@@ -107,7 +107,7 @@ class SMC100C
                 const char* Code;
                 StatusType Type;
             };
-            void SMC100CInit();
+            bool SMC100CInit(const char*);
             void Home(void);
             bool QueryHardware();
             void SetVelocity(float VelocityToSet);
@@ -117,7 +117,9 @@ class SMC100C
             void GetError();
             void GetMotionTime();
             void StopMotion();
-
+            void SetPositiveLimit(float Limit);
+            void SetNegativeLimit(float Limit);
+            void SetAcceleration(float AccelerationToSet);
     private:
             static const char GetCharacter;
             //void Home(void);

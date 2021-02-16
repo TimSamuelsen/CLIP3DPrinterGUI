@@ -1,4 +1,3 @@
-
 /**************************************************************************************************************************************
 Module: 
     SMC100C.cpp
@@ -217,12 +216,18 @@ const char* SMC100C::ConvertToErrorString(char ErrorChar)
 };
 
 //Serial Port initialization (May be removed)
-void SMC100C::SMC100CInit()
+bool SMC100C::SMC100CInit(const char* COMPORT)
 {
     serialib serial;
-    serial.openDevice("COM3",57600);
-    printf("Serial Port initiated");
-
+   if (serial.openDevice(COMPORT,57600) == 1)
+   {
+       printf("Serial Port initiated");
+       return true;
+   }
+   else
+   {
+        return false;
+   }
 };
 /**************************************************************************************************************************************
 Function: 
@@ -265,7 +270,29 @@ void SMC100C::SetVelocity(float VelocityToSet)
     char CommandParam[25];
     sprintf(CommandParam,"Set Velocity : %f \r\n",VelocityToSet);
     printf(CommandParam);
-    SetCommand(CommandType::MoveRel, VelocityToSet, CommandGetSetType::Set);
+    SetCommand(CommandType::Velocity, VelocityToSet, CommandGetSetType::Set);
+    SendCurrentCommand();
+};
+/**************************************************************************************************************************************
+Function:
+    SetAcceleration
+Parameters:
+    float : Acceleration to set
+Returns:
+    void
+Description:
+    Set stage acceleration
+Notes:
+    See SMC100CC User Manual p.66
+Author:
+    TimS, 2/6/2021
+***************************************************************************************************************************************/
+void SMC100C::SetAcceleration(float AccelerationToSet)
+{
+    char CommandParam[25];
+    sprintf(CommandParam,"Set Velocity : %f \r\n",AccelerationToSet);
+    printf(CommandParam);
+    SetCommand(CommandType::Acceleration, AccelerationToSet, CommandGetSetType::Set);
     SendCurrentCommand();
 };
 /**************************************************************************************************************************************
@@ -329,7 +356,7 @@ void SMC100C::AbsoluteMove(float AbsoluteDistanceToMove)
     char CommandParam[25];
     sprintf(CommandParam,"Absolute Move : %f \r\n",AbsoluteDistanceToMove);
     printf(CommandParam);
-    SetCommand(CommandType::MoveRel, AbsoluteDistanceToMove, CommandGetSetType::Set);
+    SetCommand(CommandType::MoveAbs, AbsoluteDistanceToMove, CommandGetSetType::Set);
     SendCurrentCommand();
 };
 /**************************************************************************************************************************************
@@ -414,6 +441,46 @@ void SMC100C::GetPosition()
     printf(CurrentPosition);
 };
 /**************************************************************************************************************************************
+Function:
+    SetPositiveLimit
+Parameters:
+    float Limit (Limit to be set)
+Returns:
+
+Description:
+    Set the max end of run
+Notes:
+    Based on SMC100CC User Manual p.57
+Author:
+    TimS, 2/6/21
+***************************************************************************************************************************************/
+void SMC100C::SetPositiveLimit(float Limit)
+{
+    printf("Set Posistive Limit");
+    SetCommand(CommandType::PositiveSoftwareLim, Limit, CommandGetSetType::Set);
+    SendCurrentCommand();
+}
+/**************************************************************************************************************************************
+Function:
+    SetNegativeLimit
+Parameters:
+    float Limit (Limit to be set)
+Returns:
+
+Description:
+    Set the max end of run
+Notes:
+    Based on SMC100CC User Manual p.57
+Author:
+    TimS, 2/6/21
+***************************************************************************************************************************************/
+void SMC100C::SetNegativeLimit(float Limit)
+{
+    printf("Set Negative Limit");
+    SetCommand(CommandType::NegativeSoftwareLim, Limit, CommandGetSetType::Set);
+    SendCurrentCommand();
+}
+/**************************************************************************************************************************************
                             private functions
  *************************************************************************************************************************************/
 /**************************************************************************************************************************************
@@ -434,7 +501,7 @@ Author:
 ***************************************************************************************************************************************/
 void SMC100C::SetCommand(CommandType Type, float Parameter, CommandGetSetType GetOrSet)
 {
-    printf("Setting Command \r\n");
+    //printf("Setting Command \r\n");
     CommandToPrint.Command = &CommandLibrary[static_cast<int>(Type)];
     CommandToPrint.Parameter = Parameter;
     CommandToPrint.GetOrSet = GetOrSet;
@@ -455,19 +522,19 @@ Author:
 ***************************************************************************************************************************************/
 bool SMC100C::SendCurrentCommand()
 {
-    printf("Sending Command \r\n");
+    //printf("Sending Command \r\n");
     serialib serial;
     //Will move GetCharacter, CarriageReturnChar and NewLineChar out of this function eventually
     static const char* GetCharacter = "?";
-    static const char* CarriageReturnChar = "\r";
-    static const char* NewLineChar = "\n";
+    //static const char* CarriageReturnChar = "\r";
+    //static const char* NewLineChar = "\n";
     //Establishing Status Variable
     bool Status = true;
     //Reading the parameter and GetOrSet type from CommandToPrint (This step may not be needed)
     CurrentCommandParameter = CommandToPrint.Parameter;
     CurrentCommandGetOrSet = CommandToPrint.GetOrSet;
     //Open Serial Port
-    serial.openDevice("COM3",115200);
+    serial.openDevice("COM4",57600);
     //Write Adress
     serial.writeString(ControllerAdress);
     //Write ASCII characters to Serial (Also printed to output)
@@ -520,6 +587,7 @@ bool SMC100C::SendCurrentCommand()
         //Error Check
         Status = false;
     }
+    serial.writeString("\r\n");
     return Status;
 };
 /**************************************************************************************************************************************
@@ -565,11 +633,11 @@ Author:
 char* SMC100C::SerialRead()
 {
     serialib Read;
-    char receivedString;
+    char* receivedString;
     char finalChar;
     unsigned int maxNbBytes = 100;
-    Read.readString(&receivedString,finalChar,maxNbBytes);
-    return &receivedString;
+    Read.readString(receivedString,finalChar,maxNbBytes);
+    return receivedString;
 }
 /*----------------------------------------------------- Work in Progress Code -------------------------------------------------------*/
 /**************************************************************************************************************************************
