@@ -194,6 +194,11 @@ void MainWindow::on_SelectFile_clicked()
     }
 }
 
+void MainWindow::on_ClearImageFiles_clicked()
+{
+    ui->FileList->clear();
+}
+
 void MainWindow::on_InitializeAndSynchronize_clicked()
 {
 
@@ -201,7 +206,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
     QStringList imageList;
     for(int i = 0; i < ui->FileList->count(); i++)
     {
-        item = ui->FileList->takeItem(i);
+        item = ui->FileList->item(i);
         imageList << item->text();
     }
     DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
@@ -306,55 +311,63 @@ bool MainWindow::ValidateSettings(void)
     //Validate Slicethickness
     if (SliceThickness <= 0)
     {
+        showError("Invalid Slice Thickness");
         ui->ProgramPrints->append("Invalid Slice Thickness");
         return false;
     }
     //Validate StageVelocity
     else if (StageVelocity <= 0)
     {
+        showError("Invalid Stage Velocity");
         ui->ProgramPrints->append("Invalid Stage Velocity");
         return false;
     }
     //Validate StageAcceleration
     else if (StageAcceleration <= 0)
     {
-        ui->ProgramPrints->append("Invalid Stag Acceleration");
+        showError("Invalid Stage Acceleration");
+        ui->ProgramPrints->append("Invalid Stage Acceleration");
         return false;
     }
     //Validate MaxEndOfRun
     else if (MaxEndOfRun <= 0)
     {
+        showError("Invalid Max End Of Run");
         ui->ProgramPrints->append("Invalid Max End Of Run");
         return false;
     }
     //Validate StageMinEndOfRun
     else if (MinEndOfRun <= 0)
     {
+        showError("Invalid Min End Of Run");
         ui->ProgramPrints->append("Invalid Min End Of Run");
         return false;
     }
     //Validate DarkTime
     else if (DarkTime <= 0)
     {
+        showError("Invalid Dark Time");
         ui->ProgramPrints->append("Invalid Dark Time");
         return false;
     }
     //Validate ExposureTime
     else if (ExposureTime <= 0)
     {
+        showError("Invalid Exposure Time");
         ui->ProgramPrints->append("Invalid Exposure Time");
         return false;
     }
     //Validate UVIntensity
     else if (UVIntensity < 1 || UVIntensity > 255)
     {
+        showError("Invalid UV Intensity");
         ui->ProgramPrints->append("Invalid UVIntensity");
         return false;
     }
     ui->ProgramPrints->append("All Settings Valid");
     return true;
 }
-#if 0
+
 /**
  * @brief MainWindow::showError
  * helper function to show the appropriate API Error message
@@ -372,7 +385,7 @@ void MainWindow::showError(QString errMsg)
 
     errMsgBox.exec();
 }
-#endif
+
 /*************************************************************
  * ********************OUTSIDE CODE***************************
  * ***********************************************************/
@@ -401,6 +414,15 @@ bool MainWindow::nanosleep(double ns)
      /* Slept without problems */
      return TRUE;
 }
+
+/*
+void CallError(QString Error)
+{
+    MainWindow Main;
+    Main.showError(Error);
+}
+*/
+
 
 
 

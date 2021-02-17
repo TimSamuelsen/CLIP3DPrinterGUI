@@ -18,6 +18,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     bool nanosleep(double ns);
+    void PrintToTerminal(QString StringToPrint);
+
+public slots:
+    void showError(QString errMsg);
 
 private slots:
     void on_ManualStage_clicked();
@@ -62,6 +66,8 @@ private slots:
 
     void on_SelectFile_clicked();
 
+
+    void on_ClearImageFiles_clicked();
 
 private:
     Ui::MainWindow *ui;

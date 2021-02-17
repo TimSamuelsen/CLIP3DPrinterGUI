@@ -226,7 +226,7 @@
         <x>-5</x>
         <y>-9</y>
         <width>251</width>
-        <height>291</height>
+        <height>281</height>
        </rect>
       </property>
       <property name="html">
@@ -277,7 +277,17 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background:rgb(0, 255, 0); border: 1px solid black;</string>
+     <string notr="true">QPushButton#StartPrint {
+    background-color: rgb(35, 255, 35);
+    border-style: outset;
+    border-width: 1px;
+    border-color: black;
+}
+
+QPushButton#StartPrint:pressed {
+    background-color: rgb(0, 200, 0);
+    border-style: inset;
+}</string>
     </property>
     <property name="text">
      <string>Start Print</string>
@@ -455,7 +465,7 @@ Light Engine Control</string>
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Current Stage Position (mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QToolButton" name="SetImageFiles">
+   <widget class="QToolButton" name="ClearImageFiles">
     <property name="geometry">
      <rect>
       <x>240</x>
@@ -465,7 +475,7 @@ Light Engine Control</string>
      </rect>
     </property>
     <property name="text">
-     <string>Set</string>
+     <string>Clear</string>
     </property>
    </widget>
    <widget class="QLabel" name="CurrentPositionIndicator">
@@ -485,7 +495,7 @@ Light Engine Control</string>
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="StartPrint_2">
+   <widget class="QPushButton" name="AbortPrint">
     <property name="geometry">
      <rect>
       <x>340</x>
@@ -495,7 +505,17 @@ Light Engine Control</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background:rgb(255, 0, 0);border: 1px solid black;</string>
+     <string notr="true">QPushButton#AbortPrint {
+    background-color: red;
+    border-style: outset;
+    border-width: 1px;
+    border-color: black;
+}
+
+QPushButton#AbortPrint:pressed {
+    background-color: rgb(200, 0, 0);
+    border-style: inset;
+}</string>
     </property>
     <property name="text">
      <string>Abort</string>
@@ -1246,9 +1266,9 @@ Selection</string>
    <zorder>ManualStage</zorder>
    <zorder>CurrentStagePos</zorder>
    <zorder>CurrentStagePosition</zorder>
-   <zorder>SetImageFiles</zorder>
+   <zorder>ClearImageFiles</zorder>
    <zorder>CurrentPositionIndicator</zorder>
-   <zorder>StartPrint_2</zorder>
+   <zorder>AbortPrint</zorder>
    <zorder>StageVelocity_2</zorder>
    <zorder>StageAccelParam</zorder>
    <zorder>SetStageAcceleration</zorder>

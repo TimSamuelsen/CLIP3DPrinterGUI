@@ -38,6 +38,8 @@ static const char* ControllerAdress = "1";
 static SMC100C::StatusType Status;
 static char* HardwareError;
 static char LastError;
+const char* SelectedCOM;
+static bool initFlag;
 //May convert these to int or float eventually
 static char* MotionTime;
 static char* CurrentPosition;
@@ -221,6 +223,8 @@ bool SMC100C::SMC100CInit(const char* COMPORT)
     serialib serial;
    if (serial.openDevice(COMPORT,57600) == 1)
    {
+       SelectedCOM = COMPORT;
+       initFlag = true;
        printf("Serial Port initiated");
        return true;
    }
@@ -534,7 +538,14 @@ bool SMC100C::SendCurrentCommand()
     CurrentCommandParameter = CommandToPrint.Parameter;
     CurrentCommandGetOrSet = CommandToPrint.GetOrSet;
     //Open Serial Port
-    serial.openDevice("COM4",57600);
+    if (initFlag)
+    {
+        serial.openDevice(SelectedCOM, 57600);
+    }
+    else
+    {
+        serial.openDevice("COM4",57600);
+    }
     //Write Adress
     serial.writeString(ControllerAdress);
     //Write ASCII characters to Serial (Also printed to output)
