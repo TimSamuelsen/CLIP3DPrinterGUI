@@ -221,10 +221,10 @@ const char* SMC100C::ConvertToErrorString(char ErrorChar)
 bool SMC100C::SMC100CInit(const char* COMPORT)
 {
     serialib serial;
-   if (serial.openDevice(COMPORT,57600) == 1)
+   if (serial.openDevice("COM4",57600) == 1)
    {
        SelectedCOM = COMPORT;
-       initFlag = true;
+       //initFlag = true;
        printf("Serial Port initiated");
        return true;
    }
@@ -362,6 +362,7 @@ void SMC100C::AbsoluteMove(float AbsoluteDistanceToMove)
     printf(CommandParam);
     SetCommand(CommandType::MoveAbs, AbsoluteDistanceToMove, CommandGetSetType::Set);
     SendCurrentCommand();
+
 };
 /**************************************************************************************************************************************
 Function: 
@@ -544,7 +545,7 @@ bool SMC100C::SendCurrentCommand()
     }
     else
     {
-        serial.openDevice("COM4",57600);
+        serial.openDevice("COM3",57600);
     }
     //Write Adress
     serial.writeString(ControllerAdress);

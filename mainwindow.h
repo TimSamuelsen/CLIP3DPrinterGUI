@@ -69,6 +69,10 @@ private slots:
 
     void on_ClearImageFiles_clicked();
 
+    void ExposureTimeSlot();
+
+    void DarkTimeSlot();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;

@@ -50,6 +50,7 @@ HEADERS += \
     HiresLib/pattern.h \
     HiresLib/batchfile.h \
     HiresLib/API.h
+
 SOURCES += \
     HiresLib/flashloader.c \
     HiresLib/batchfile.c \
@@ -76,7 +77,6 @@ INCLUDEPATH += $$PWD/HiresLib
 DEPENDPATH += $$PWD/HiresLib
 
 win32: LIBS += -lSetupAPI
-
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/hidapi-master/lib4QT/ -lhidapi
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/hidapi-master/lib4QT/ -lhidapi

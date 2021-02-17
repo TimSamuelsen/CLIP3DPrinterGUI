@@ -10,6 +10,7 @@
 #include <QTextStream>
 #include <QInputDialog>
 #include <QDesktopServices>
+#include <time.h>
 
 #include "BMPParser.h"
 #include "API.h"
@@ -52,7 +53,10 @@ static double ExposureTime;
 static double DarkTime;
 static int UVIntensity;
 
-static uint32_t nSlice;
+
+static bool ExposureTimeFlag;
+static bool DarkTimeFlag;
+static uint32_t nSlice = 10;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -72,6 +76,7 @@ void MainWindow::on_ManualStage_clicked()
 {
     ManualStageUI = new ManualStageControl();
     ManualStageUI->show();
+    SMC.Home();
 }
 
 void MainWindow::on_SetSliceThickness_clicked()
@@ -260,17 +265,16 @@ void MainWindow::on_StartPrint_clicked()
         PrintFlag = true;
         ui->ProgramPrints->append("Entering Printing Procedure");
         QElapsedTimer Timer;
-#ifdef NormalTime
         //Initialize Exposure Timer
         QTimer *ExposureTimer = new QTimer(this);
         ExposureTimer->setSingleShot(true);
         ExposureTimer->setTimerType(Qt::PreciseTimer);
+        //connect(ExposureTimer, &QTimer::timeout, this, ExposureTimeSlot());
 
         //Initialize Dark Time Timer
         QTimer *DarkTimer = new QTimer(this);
         DarkTimer->setSingleShot(true);
         DarkTimer->setTimerType(Qt::PreciseTimer);
-#endif
         //Initialize
         //Turn on printer
         //Send build platform to start
@@ -280,22 +284,26 @@ void MainWindow::on_StartPrint_clicked()
 
             //Turn on exposure
 
-
+            //Start the exposure timer
+            ExposureTimer->start(ExposureTime/1000);
+            while(ExposureTimeFlag);
+            ExposureTimeFlag = false;
             //Start exposure timer (needs to be modified for nanosleep)
-#ifdef QuickTime
-            nanosleep(ExposureTime);
-#endif
-            //Turn off exposure
 
+            //Turn off exposure
             //Start dark time timer
-            Timer.start();
+            DarkTimer->start(DarkTime/1000);
             //Move stage up one slice thickness,
             //also divide by 1000 to convert from um to mm for stage
             SMC.RelativeMove(SliceThickness/1000);
             //Wait for move to be completed
-            uint32_t ElapsedTime = Timer.elapsed();
+            while (DarkTimeFlag);
+            DarkTimeFlag = false;
+            //uint32_t ElapsedTime = Timer.elapsed();
+
+
 #ifdef QuickTime
-            nanosleep(DarkTime - ElapsedTime);
+            //nanosleep(DarkTime - ElapsedTime);
 #endif
             //Make sure stage has finished moving, if not keep waiting till move is complete
         }
@@ -304,6 +312,18 @@ void MainWindow::on_StartPrint_clicked()
 
 
 }
+
+void ExposureTimeSlot()
+{
+    ExposureTimeFlag = true;
+}
+
+void DarkTimeSlot()
+{
+    DarkTimeFlag = true;
+}
+
+
 
 //Validate all settings
 bool MainWindow::ValidateSettings(void)
@@ -337,7 +357,7 @@ bool MainWindow::ValidateSettings(void)
         return false;
     }
     //Validate StageMinEndOfRun
-    else if (MinEndOfRun <= 0)
+    else if (MinEndOfRun <= -6)
     {
         showError("Invalid Min End Of Run");
         ui->ProgramPrints->append("Invalid Min End Of Run");
