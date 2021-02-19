@@ -62,7 +62,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
             if(m_elements.size()==0)
             {
                 pattern.bits = 1;
-                pattern.color = PatternElement::RED;
+                pattern.color = PatternElement::BLUE;
                 pattern.exposure = ExposureTime;
                 pattern.darkPeriod = DarkTime;
                 pattern.trigIn = false;
@@ -159,8 +159,7 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
         PtnImage merge_image_slave(m_ptnWidth, m_ptnHeight,24, PTN_RGB24);
         merge_image_master = merge_image;
         merge_image_slave = merge_image;
-        if (m_dualAsic)
-        {
+
 
             merge_image_master.crop(0, 0, m_ptnWidth/2, m_ptnHeight);
             merge_image_slave.crop(m_ptnWidth/2, 0, m_ptnWidth/2, m_ptnHeight);
@@ -173,14 +172,24 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
                 int splashSizeSlave = merge_image_slave.toSplash(&splash_block_slave,SPL_COMP_AUTO);
 
                 if(splashSizeMaster <= 0 || splashSizeSlave <= 0)
+                {
+                    Main.showError("splashSize <= 0");
                     return -1;
+                }
 
                 if(uploadPatternToEVM(true, splashImageCount, splashSizeMaster, splash_block_master) == -1)
+                {
+                    Main.showError("Master Upload Pattern to EVM failed");
                     return -1;
+                }
 
                 if(uploadPatternToEVM(false, splashImageCount, splashSizeSlave, splash_block_slave) == -1)
+                {
+                    Main.showError("Slave Upload Pattern to EVM failed");
                     return -1;
-        }
+                }
+
+        /*
         else
         {
                 int splashSize = merge_image.toSplash(&splash_block,SPL_COMP_AUTO);
@@ -195,6 +204,7 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
                     return -1;
                 }
         }
+        */
     }
 
 
