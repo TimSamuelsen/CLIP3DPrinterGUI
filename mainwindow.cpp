@@ -213,19 +213,36 @@ void MainWindow::on_ClearImageFiles_clicked()
 
 void MainWindow::on_InitializeAndSynchronize_clicked()
 {
-
-    QListWidgetItem * item;
-    QStringList imageList;
-    for(int i = 0; i < ui->FileList->count(); i++)
+    if (ui->FileList->count() > 0)
     {
-        item = ui->FileList->item(i);
-        imageList << item->text();
+        QListWidgetItem * item;
+        QStringList imageList;
+        for(int i = 0; i < ui->FileList->count(); i++)
+        {
+            item = ui->FileList->item(i);
+            imageList << item->text();
+        }
+        QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
+        ui->ProgramPrints->append(dir.absolutePath());
+        LCR_SetMode(PTN_MODE_OTF);
+        DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
+        DLP.updateLUT();
+        unsigned int NumLutEntries;
+        BOOL Repeat;
+        unsigned int NumPatsForTrigOut2;
+        unsigned int NumSplash;
+        LCR_GetPatternConfig(&NumLutEntries,&Repeat,&NumPatsForTrigOut2, &NumSplash);
+        ui->ProgramPrints->append(QString::number(NumLutEntries));
+        ui->ProgramPrints->append(QString::number(NumSplash));
+        if (Repeat)
+        {
+            ui->ProgramPrints->append("Repeat is set to true");
+        }
+        else
+        {
+            ui->ProgramPrints->append("Repeat is set to true");
+        }
     }
-    QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
-    ui->ProgramPrints->append(dir.absolutePath());
-
-    DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
-    DLP.updateLUT();
 }
 
 

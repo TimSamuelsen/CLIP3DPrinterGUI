@@ -150,6 +150,7 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
             int bitdepth = m_elements[i].bits;
             PtnImage image(m_elements[i].name);
             merge_image.merge(image,bitpos,bitdepth);
+
         }
 
         merge_image.swapColors(PTN_COLOR_RED, PTN_COLOR_BLUE, PTN_COLOR_GREEN);
