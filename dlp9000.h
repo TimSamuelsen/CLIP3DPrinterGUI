@@ -13,7 +13,7 @@ public:
     int UpdatePatternMemory(int totalSplashImages, bool firmware );
     int uploadPatternToEVM(bool master, int splashImageCount, int splash_size, uint8_t* splash_block);
     void updateLUT();
-    void startPatSequence();
+    void startPatSequence(void);
 
 private:
     bool m_dualAsic;

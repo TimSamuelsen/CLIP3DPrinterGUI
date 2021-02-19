@@ -37,10 +37,14 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
 {
     int i;
     int numPatAdded = 0;
+    MainWindow Main;
 
 
         if(fileNames.isEmpty())
+        {
+            Main.showError("No image file found");
             return;
+        }
 
         fileNames.sort();
 
@@ -124,7 +128,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
  */
 int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
 {
-
+    MainWindow Main;
     for(int image = 0; image < totalSplashImages; image++)
     {
 
@@ -181,9 +185,15 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
         {
                 int splashSize = merge_image.toSplash(&splash_block,SPL_COMP_AUTO);
                 if(splashSize <= 0)
+                {
+                    Main.showError("splashSize <= 0");
                     return -1;
+                }
                 if(uploadPatternToEVM(true, splashImageCount, splashSize, splash_block) < 0)
+                {
+                    Main.showError("Upload Pattern to EVM failed");
                     return -1;
+                }
         }
     }
 
@@ -203,7 +213,7 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
 int DLP9000::uploadPatternToEVM(bool master, int splashImageCount, int splash_size, uint08* splash_block)
 {
     int origSize = splash_size;
-
+    MainWindow Main;
     LCR_InitPatternMemLoad(master, splashImageCount, splash_size);
 
     QProgressDialog imgDataDownload("Image data download", "Abort", 0, splash_size);
@@ -225,6 +235,7 @@ int DLP9000::uploadPatternToEVM(bool master, int splashImageCount, int splash_si
             //usbPollTimer->start();
             imgDataDownload.close();
             return -1;
+            Main.showError("Downloading failed");
         }
 
         splash_size -= dnldSize;
@@ -239,6 +250,7 @@ int DLP9000::uploadPatternToEVM(bool master, int splashImageCount, int splash_si
         {
             imgDataDownload.setValue(splash_size);
             imgDataDownload.close();
+            Main.showError("imgDataDownLoad was canceled");
             return -1;
         }
     }
@@ -319,7 +331,7 @@ void DLP9000::updateLUT()
 /**
  * @brief MainWindow::on_startPatSequence_Button_clicked
  */
-void startPatSequence()
+void DLP9000::startPatSequence(void)
 {
     MainWindow Main;
 

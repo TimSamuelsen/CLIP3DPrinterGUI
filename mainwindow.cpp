@@ -221,6 +221,9 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         item = ui->FileList->item(i);
         imageList << item->text();
     }
+    QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
+    ui->ProgramPrints->append(dir.absolutePath());
+
     DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
     DLP.updateLUT();
 }
@@ -273,6 +276,7 @@ void MainWindow::on_StartPrint_clicked()
         //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
         LCR_SetLedCurrents(0, 0, UVIntensity);
         PrintProcess();
+        DLP.startPatSequence();
     }
 }
 
