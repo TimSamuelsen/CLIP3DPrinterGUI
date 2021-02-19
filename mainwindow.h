@@ -73,6 +73,12 @@ private slots:
 
     void DarkTimeSlot();
 
+    void PrintProcess();
+
+    void CheckDLPStatus();
+
+    void PreviewImageLoad();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;

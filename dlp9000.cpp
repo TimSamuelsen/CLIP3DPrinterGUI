@@ -18,6 +18,7 @@ bool DLP9000::InitProjector(void)
 {
     if (USB_Open() == 0)
     {
+        LCR_SetMode(PTN_MODE_OTF);
         return true;
     }
     else

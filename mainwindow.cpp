@@ -54,9 +54,14 @@ static double DarkTime;
 static int UVIntensity;
 
 
-static bool ExposureTimeFlag;
-static bool DarkTimeFlag;
+static bool ExposureFlag = false;
+static bool DarkTimeFlag = false;
 static uint32_t nSlice = 10;
+static uint32_t layerCount = 0;
+
+
+
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -64,7 +69,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui = (new Ui::MainWindow);
     ui->setupUi(this);
-    USB_Init();
 }
 
 MainWindow::~MainWindow()
@@ -77,6 +81,9 @@ void MainWindow::on_ManualStage_clicked()
     ManualStageUI = new ManualStageControl();
     ManualStageUI->show();
     SMC.Home();
+    ui->SliceThicknessParam->setValue(50);
+    ui->StageVelocityParam->setValue(5);
+
 }
 
 void MainWindow::on_SetSliceThickness_clicked()
@@ -142,14 +149,14 @@ void MainWindow::on_SetExposureTime_clicked()
     ExposureTime = (ui->ExposureTimeParam->value());
     QString ExposureTimeString = "Set Exposure Time to: ";
     ExposureTimeString += QString::number(ExposureTime);
-    ExposureTimeString += " μs";
+    ExposureTimeString += " ms";
     ui->ProgramPrints->append(ExposureTimeString);
 }
 
 void MainWindow::on_SetUVIntensity_clicked()
 {
     UVIntensity = (ui->UVIntensityParam->value());
-    QString UVIntensityString = "Set Stage Acceleration to: ";
+    QString UVIntensityString = "Set UV Intensity to: ";
     UVIntensityString += QString::number(UVIntensity);
     ui->ProgramPrints->append(UVIntensityString);
 }
@@ -216,7 +223,6 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
     }
     DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
     DLP.updateLUT();
-
 }
 
 
@@ -264,64 +270,95 @@ void MainWindow::on_StartPrint_clicked()
         //Set PrintFlag to true
         PrintFlag = true;
         ui->ProgramPrints->append("Entering Printing Procedure");
-        QElapsedTimer Timer;
-        //Initialize Exposure Timer
-        QTimer *ExposureTimer = new QTimer(this);
-        ExposureTimer->setSingleShot(true);
-        ExposureTimer->setTimerType(Qt::PreciseTimer);
-        //connect(ExposureTimer, &QTimer::timeout, this, ExposureTimeSlot());
+        //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
+        LCR_SetLedCurrents(0, 0, UVIntensity);
+        PrintProcess();
+    }
+}
 
-        //Initialize Dark Time Timer
-        QTimer *DarkTimer = new QTimer(this);
-        DarkTimer->setSingleShot(true);
-        DarkTimer->setTimerType(Qt::PreciseTimer);
-        //Initialize
-        //Turn on printer
-        //Send build platform to start
-        //Start Loop
-        for (uint32_t i = 0; i < nSlice; i++)
+void MainWindow::PrintProcess(void)
+{
+    if (layerCount <= nSlice)
+    {
+        QTimer::singleShot(ExposureTime, this, SLOT(ExposureTimeSlot()));
+        ExposureFlag = true;
+        layerCount++;
+
+        //QListWidget item = ui->FileList->item(layerCount);
+        //QString filename = item <<item->text();
+
+        ui->ProgramPrints->append("Exposing");
+        return;
+    }
+    else
+    {
+        return;
+    }
+}
+
+void MainWindow::PreviewImageLoad()
+{
+    QListWidgetItem* item = ui->FileList->item(layerCount);
+    //QString filename = item << item->text();
+}
+
+/*
+ *
+ *
+ *
+ *
+ * bool ImageViewer::loadFile(const QString &fileName)
+{
+    QImageReader reader(fileName);
+    reader.setAutoTransform(true);
+    const QImage newImage = reader.read();
+    }
+ * */
+
+
+
+
+
+void MainWindow::ExposureTimeSlot(void)
+{
+    QTimer::singleShot(DarkTime, this, SLOT(DarkTimeSlot()));
+    SMC.RelativeMove(SliceThickness/1000);
+    ui->ProgramPrints->append("Dark Time");
+}
+
+void MainWindow::DarkTimeSlot(void)
+{
+    PrintProcess();
+    //QTimer::singleShot(10, this, SLOT(PrintProcess()));
+}
+
+void MainWindow::CheckDLPStatus(void)
+{
+    //If GUI is in exposure state
+    if (ExposureFlag == true && DarkTimeFlag == false)
+    {
+        //Query DLP status
+        if (true) //If DLP has changed to dark time
         {
 
-            //Turn on exposure
-
-            //Start the exposure timer
-            ExposureTimer->start(ExposureTime/1000);
-            while(ExposureTimeFlag);
-            ExposureTimeFlag = false;
-            //Start exposure timer (needs to be modified for nanosleep)
-
-            //Turn off exposure
-            //Start dark time timer
-            DarkTimer->start(DarkTime/1000);
-            //Move stage up one slice thickness,
-            //also divide by 1000 to convert from um to mm for stage
-            SMC.RelativeMove(SliceThickness/1000);
-            //Wait for move to be completed
-            while (DarkTimeFlag);
-            DarkTimeFlag = false;
-            //uint32_t ElapsedTime = Timer.elapsed();
-
-
-#ifdef QuickTime
-            //nanosleep(DarkTime - ElapsedTime);
-#endif
-            //Make sure stage has finished moving, if not keep waiting till move is complete
+        }
+        else //If DLP has not changed states
+        {
+            //Wait 20 ms and repeat this call
+            QTimer::singleShot(20, this, SLOT(CheckDLPStatus()));
         }
     }
-    //Set PrintFlag to false
-
-
+    else if (ExposureFlag == false && DarkTimeFlag == true)
+    {
+        //Query DLP status
+    }
+    else
+    {
+        showError("Flag error");
+        return;
+    }
 }
 
-void ExposureTimeSlot()
-{
-    ExposureTimeFlag = true;
-}
-
-void DarkTimeSlot()
-{
-    DarkTimeFlag = true;
-}
 
 
 
