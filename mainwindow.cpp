@@ -213,6 +213,7 @@ void MainWindow::on_ClearImageFiles_clicked()
 
 void MainWindow::on_InitializeAndSynchronize_clicked()
 {
+    LCR_PatternDisplay(0);
     if (ui->FileList->count() > 0)
     {
         QListWidgetItem * item;
@@ -232,15 +233,15 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         unsigned int NumPatsForTrigOut2;
         unsigned int NumSplash;
         LCR_GetPatternConfig(&NumLutEntries,&Repeat,&NumPatsForTrigOut2, &NumSplash);
-        ui->ProgramPrints->append(QString::number(NumLutEntries));
-        ui->ProgramPrints->append(QString::number(NumSplash));
+        ui->ProgramPrints->append("Number of LUT Entries: " + QString::number(NumLutEntries));
+        ui->ProgramPrints->append("Number of Splash Images: " + QString::number(NumSplash));
         if (Repeat)
         {
             ui->ProgramPrints->append("Repeat is set to true");
         }
         else
         {
-            ui->ProgramPrints->append("Repeat is set to true");
+            ui->ProgramPrints->append("Repeat is set to false");
         }
     }
 }
@@ -272,6 +273,15 @@ void MainWindow::on_LightEngineConnectButton_clicked()
         ui->ProgramPrints->append("Light Engine Connected");
         ui->LightEngineIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
         ui->LightEngineIndicator->setText("Connected");
+        uint Code;
+        if (LCR_ReadErrorCode(&Code) >= 0)
+        {
+            ui->ProgramPrints->append("Last Error Code" + QString::number(Code));
+        }
+        else
+        {
+            ui->ProgramPrints->append("Failed to get last error code");
+        }
     }
     else
     {
@@ -292,8 +302,9 @@ void MainWindow::on_StartPrint_clicked()
         ui->ProgramPrints->append("Entering Printing Procedure");
         //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
         LCR_SetLedCurrents(0, 0, UVIntensity);
-        PrintProcess();
+        //LCR_PatternDisplay(0);
         DLP.startPatSequence();
+        PrintProcess();
     }
 }
 
@@ -504,3 +515,89 @@ void CallError(QString Error)
 
 
 
+
+void MainWindow::on_ManualLightEngine_clicked()
+{
+    uint Code = 100;
+
+    if (LCR_ReadErrorCode(&Code) >= 0)
+    {
+        ui->ProgramPrints->append("Last Error Code: " + QString::number(Code));
+    }
+    else
+    {
+        ui->ProgramPrints->append("Failed to get Error Code");
+    }
+    ui->ProgramPrints->append("Last Error Code: " + QString::number(Code));
+    unsigned char HWStatus, SysStatus, MainStatus;
+    if (LCR_GetStatus(&HWStatus, &SysStatus, &MainStatus) == 0)
+    {
+        if(SysStatus & BIT0)
+                   ui->ProgramPrints->append("Internal Memory Test Passed");
+        else
+                    ui->ProgramPrints->append("Internal Memory Test Failed");
+
+        if(HWStatus & BIT0)
+                    ui->ProgramPrints->append("Internal Initialization Succesful");
+        else
+                    ui->ProgramPrints->append("Internal Initialization Failed");
+        if(HWStatus & BIT1)
+                    ui->ProgramPrints->append("Incompatible Controller");
+        else
+                    ui->ProgramPrints->append("Controller is Compatible");
+
+        if(HWStatus & BIT4)
+                    ui->ProgramPrints->append("Slave Controller Ready and Present");
+        else
+                    ui->ProgramPrints->append("No Slave Controller Present");
+
+        if(HWStatus & BIT2)
+                    ui->ProgramPrints->append("DMD Reset Controller Error");
+        else
+                    ui->ProgramPrints->append("No DMD Reset Controller Error");
+
+        if(HWStatus & BIT3)
+                    ui->ProgramPrints->append("Forced Swap Error");
+        else
+                    ui->ProgramPrints->append("No Forced Swap Error");
+
+        if(HWStatus & BIT6)
+                    ui->ProgramPrints->append("Sequencer has detected an error condition causing an Abort");
+        else
+                    ui->ProgramPrints->append("No Sequencer Errors have Occured");
+
+        if(HWStatus & BIT7)
+                    ui->ProgramPrints->append("Sequencer has detected an error");
+        else
+                    ui->ProgramPrints->append("No Sequencer Error has Occurred");
+
+        if(MainStatus & BIT0)
+                    ui->ProgramPrints->append("DMD Micromirrors Parked");
+        else
+                    ui->ProgramPrints->append("DMD Micromirrors Not Parked");
+
+        if(MainStatus & BIT1)
+                    ui->ProgramPrints->append("Sequencer is Running Normally");
+        else
+                    ui->ProgramPrints->append("Sequencer is Stopped");
+
+        if(MainStatus & BIT2)
+                    ui->ProgramPrints->append("Video is Frozen (Display Single Frame)");
+        else
+                    ui->ProgramPrints->append("Video is Running (Normal Frame Change");
+
+        if(MainStatus & BIT3)
+                    ui->ProgramPrints->append("External Video Source Locked");
+        else
+                    ui->ProgramPrints->append("External Video Source Not Locked");
+    }
+    //else if(LCR_GetBLStatus(&BLStatus) == 0)
+    //{
+        //This means the device is in boot mode
+    //}
+    else
+    {
+        ui->ProgramPrints->append("Failed to get Status");
+    }
+
+}

@@ -149,7 +149,6 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
             int bitpos = m_elements[i].splashImageBitPos;
             int bitdepth = m_elements[i].bits;
             PtnImage image(m_elements[i].name);
-            Main.showError(m_elements[i].name);
             merge_image.merge(image,bitpos,bitdepth);
 
         }
@@ -190,6 +189,7 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
                     Main.showError("Slave Upload Pattern to EVM failed");
                     return -1;
                 }
+
 
         /*
         else
@@ -246,8 +246,15 @@ int DLP9000::uploadPatternToEVM(bool master, int splashImageCount, int splash_si
             //showCriticalError("Downloading failed");
             //usbPollTimer->start();
             imgDataDownload.close();
+            if (master)
+            {
+                Main.showError("Master Downloading Failed");
+            }
+            else
+            {
+                Main.showError("Slave Downloading Failed");
+            }
             return -1;
-            Main.showError("Downloading failed");
         }
 
         splash_size -= dnldSize;
@@ -351,7 +358,7 @@ void DLP9000::startPatSequence(void)
 {
     MainWindow Main;
 
-    if (LCR_PatternDisplay(0x2) < 0)
+    if (LCR_PatternDisplay(2) < 0)
         Main.showError("Unable to start pattern display");
 }
 

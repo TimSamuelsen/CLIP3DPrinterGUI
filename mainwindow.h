@@ -79,6 +79,8 @@ private slots:
 
     void PreviewImageLoad();
 
+    void on_ManualLightEngine_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
