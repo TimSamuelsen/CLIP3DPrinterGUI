@@ -20,6 +20,7 @@ private:
     uint32_t m_ptnWidth, m_ptnHeight;
     QString m_ptnImagePath;
     QList<PatternElement> m_elements;
+    int calculateSplashImageDetails(int *totalSplashImages, bool firmware);
 };
 
 

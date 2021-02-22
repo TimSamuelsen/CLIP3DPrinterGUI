@@ -149,6 +149,7 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
             int bitpos = m_elements[i].splashImageBitPos;
             int bitdepth = m_elements[i].bits;
             PtnImage image(m_elements[i].name);
+            Main.showError(m_elements[i].name);
             merge_image.merge(image,bitpos,bitdepth);
 
         }
@@ -295,6 +296,9 @@ void DLP9000::updateLUT()
         return;
     }
 
+    if (calculateSplashImageDetails(&totalSplashImages,FALSE))
+        return;
+
     LCR_ClearPatLut();
 
     for(int i = 0; i < m_elements.size(); i++)
@@ -314,7 +318,7 @@ void DLP9000::updateLUT()
     if (LCR_SendPatLut() < 0)
     {
         Main.showError("Sending pattern LUT failed!");
-        printf("Sending pattern LUT failed");
+        //printf("Sending pattern LUT failed");
         return;
     }
 
@@ -330,6 +334,7 @@ void DLP9000::updateLUT()
     //{
         if(UpdatePatternMemory(totalSplashImages, false) == 0)
         {
+              printf("Total splash images: %d",totalSplashImages);
       //      m_patternImageChange = false;
         }
         else
@@ -351,3 +356,84 @@ void DLP9000::startPatSequence(void)
 }
 
 
+/**
+ * @brief MainWindow::calculateSplashImageDetails
+ * for each of the pattern image on the pattern settings page, calculates the
+ * total number of splash images of bit depth 24 based on the bit depth of each image
+ * Also calculates the bitposition of each pattern element in the splash Image
+ * and the index of the Splash image for each Pattern element
+ * @param totalSplashImages - O - Total number of splash images to be created from
+ *                                the available Pattern images
+ * @return - 0 - success
+ *          -1 - failure
+ */
+int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware)
+{
+    MainWindow Main;
+    int maxbits = 400;
+    int imgCount = 0;
+    int bits = 0;
+    int totalBits = 0;
+    for(int elemCount = 0; elemCount < m_elements.size(); elemCount++)
+    {
+        if (m_elements[elemCount].bits > 16)
+        {
+            char dispStr[255];
+            sprintf(dispStr, "Error:Bit depth not selected for pattern=%d\n", elemCount);
+            //showStatus(dispStr);
+            return -1;
+        }
+
+        totalBits = totalBits + m_elements[elemCount].bits;
+
+        if(firmware == TRUE)
+            maxbits = 3984;
+        if(totalBits > maxbits)
+        {
+            char dispStr[255];
+            if(firmware == FALSE)
+                sprintf(dispStr, "Error:Total Bit Depth cannot exceed 400");
+            else
+                sprintf(dispStr, "Error:Total Bit Depth cannot exceed 3984");
+            Main.showError(dispStr);
+            return -1;
+        }
+
+        /* Check if the same pattern is used already */
+        int i;
+        for(i = 0; i < elemCount; i++)
+        {
+            /* Only if file name and bit depth matches */
+            if(m_elements[i].bits == m_elements[elemCount].bits &&
+                    m_elements[i].name == m_elements[elemCount].name)
+            {
+                break;
+            }
+        }
+
+        /* Match found. use the same splash image */
+        if(i < elemCount)
+        {
+            m_elements[elemCount].splashImageIndex = m_elements[i].splashImageIndex;
+            m_elements[elemCount].splashImageBitPos = m_elements[i].splashImageBitPos;
+            continue;
+        }
+
+        /* If it is the last image or cant fit in the current image */
+        if(elemCount == m_elements.size() ||
+                (bits + m_elements[elemCount].bits) > 24)
+        {
+            /* Goto next image */
+            imgCount++;
+            bits = 0;
+        }
+
+        m_elements[elemCount].splashImageIndex = imgCount;
+        m_elements[elemCount].splashImageBitPos = bits;
+        bits += m_elements[elemCount].bits;
+    }
+
+    *totalSplashImages = imgCount + 1;
+
+    return 0;
+}
