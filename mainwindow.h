@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "manualstagecontrol.h"
+#include "manualprojcontrol.h"
 #include "patternelement.h"
 
 
@@ -84,6 +85,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
+    manualLEcontrol *ManualProjUI;
     bool ValidateSettings(void);
 
 };

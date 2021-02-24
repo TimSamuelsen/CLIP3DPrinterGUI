@@ -35,6 +35,7 @@
 #include "SMC100C.h"
 #include "dlp9000.h"
 #include "manualstagecontrol.h"
+#include "manualprojcontrol.h"
 
 #define NormalTime
 #define QuickTime
@@ -225,7 +226,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         }
         QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
         ui->ProgramPrints->append(dir.absolutePath());
-        LCR_SetMode(PTN_MODE_OTF);
+        //LCR_SetMode(PTN_MODE_OTF);
         DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
         DLP.updateLUT();
         unsigned int NumLutEntries;
@@ -270,6 +271,8 @@ void MainWindow::on_LightEngineConnectButton_clicked()
 {
     if (DLP.InitProjector())
     {
+        //Set to pattern otf mode
+        LCR_SetMode(PTN_MODE_OTF);
         ui->ProgramPrints->append("Light Engine Connected");
         ui->LightEngineIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
         ui->LightEngineIndicator->setText("Connected");
@@ -518,6 +521,9 @@ void CallError(QString Error)
 
 void MainWindow::on_ManualLightEngine_clicked()
 {
+    ManualProjUI = new manualLEcontrol();
+    ManualProjUI->show();
+    /*
     uint Code = 100;
 
     if (LCR_ReadErrorCode(&Code) >= 0)
@@ -599,5 +605,6 @@ void MainWindow::on_ManualLightEngine_clicked()
     {
         ui->ProgramPrints->append("Failed to get Status");
     }
+    */
 
 }

@@ -17,6 +17,7 @@ SOURCES += \
     dlp9000.cpp \
     main.cpp \
     mainwindow.cpp \
+    manualprojcontrol.cpp \
     manualstagecontrol.cpp \
     serialib.cpp
 
@@ -25,6 +26,7 @@ HEADERS += \
     SMC100C.h \
     dlp9000.h \
     mainwindow.h \
+    manualprojcontrol.h \
     manualstagecontrol.h \
     patternelement.h \
     serialib.h
@@ -32,6 +34,7 @@ HEADERS += \
 
 FORMS += \
     mainwindow.ui \
+    manualprojcontrol.ui \
     manualstagecontrol.ui
 
 #For Lightcrafter API
