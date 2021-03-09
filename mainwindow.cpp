@@ -70,12 +70,23 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui = (new Ui::MainWindow);
     ui->setupUi(this);
+    usbPollTimer = new QTimer(this);
+    usbPollTimer->setInterval(2000);
+    connect(usbPollTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));
+    usbPollTimer->start();
+}
+
+void MainWindow::timerTimeout(void)
+{
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+
 
 void MainWindow::on_ManualStage_clicked()
 {
@@ -317,12 +328,15 @@ void MainWindow::PrintProcess(void)
     {
         QTimer::singleShot(ExposureTime, this, SLOT(ExposureTimeSlot()));
         ExposureFlag = true;
-        layerCount++;
 
-        //QListWidget item = ui->FileList->item(layerCount);
-        //QString filename = item <<item->text();
+        //QListWidgetItem item = ui->FileList->item(layerCount);
+        QString filename =ui->FileList->item(layerCount)->text();
+        QPixmap img(filename);
+        QPixmap img2 = img.scaled(560,350, Qt::KeepAspectRatio);
+        ui->PrintImage->setPixmap(img2);
 
         ui->ProgramPrints->append("Exposing");
+        layerCount++;
         return;
     }
     else
@@ -349,10 +363,6 @@ void MainWindow::PreviewImageLoad()
     const QImage newImage = reader.read();
     }
  * */
-
-
-
-
 
 void MainWindow::ExposureTimeSlot(void)
 {

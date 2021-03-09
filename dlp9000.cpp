@@ -133,7 +133,7 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
     {
 
         int splashImageCount;
-            splashImageCount = totalSplashImages - 1 - image;
+        splashImageCount = totalSplashImages - 1 - image;
 
         PtnImage merge_image(m_ptnWidth, m_ptnHeight,24, PTN_RGB24);
 

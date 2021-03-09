@@ -25,6 +25,8 @@ public slots:
     void showError(QString errMsg);
 
 private slots:
+    void timerTimeout(void);
+
     void on_ManualStage_clicked();
 
     void on_SetSliceThickness_clicked();
@@ -86,6 +88,7 @@ private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
     manualLEcontrol *ManualProjUI;
+    QTimer *usbPollTimer;
     bool ValidateSettings(void);
 
 };

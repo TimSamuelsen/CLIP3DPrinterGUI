@@ -4,6 +4,8 @@
 #include "patternelement.h"
 #include "mainwindow.h"
 
+#define PTN_WIDTH_WQXGA     2560
+#define PTN_HEIGHT_WQXGA    1600
 
 class DLP9000
 {
@@ -16,8 +18,9 @@ public:
     void startPatSequence(void);
 
 private:
-    bool m_dualAsic;
-    uint32_t m_ptnWidth, m_ptnHeight;
+    bool m_dualAsic = true;
+    uint32_t m_ptnWidth = PTN_WIDTH_WQXGA;
+    uint32_t m_ptnHeight = PTN_HEIGHT_WQXGA;
     QString m_ptnImagePath;
     QList<PatternElement> m_elements;
     int calculateSplashImageDetails(int *totalSplashImages, bool firmware);
