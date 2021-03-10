@@ -149,7 +149,7 @@ void MainWindow::on_SetMinEndOfRun_clicked()
 
 void MainWindow::on_SetDarkTime_clicked()
 {
-    DarkTime = (ui->DarkTimeParam->value());
+    DarkTime = (ui->DarkTimeParam->value()*1000);
     QString DarkTimeString = "Set Dark Time to: ";
     DarkTimeString += QString::number(DarkTime);
     DarkTimeString += " μs";
@@ -158,7 +158,7 @@ void MainWindow::on_SetDarkTime_clicked()
 
 void MainWindow::on_SetExposureTime_clicked()
 {
-    ExposureTime = (ui->ExposureTimeParam->value());
+    ExposureTime = (ui->ExposureTimeParam->value()*1000);
     QString ExposureTimeString = "Set Exposure Time to: ";
     ExposureTimeString += QString::number(ExposureTime);
     ExposureTimeString += " ms";
@@ -326,7 +326,7 @@ void MainWindow::PrintProcess(void)
 {
     if (layerCount <= nSlice)
     {
-        QTimer::singleShot(ExposureTime, this, SLOT(ExposureTimeSlot()));
+        QTimer::singleShot(ExposureTime/1000, this, SLOT(ExposureTimeSlot()));
         ExposureFlag = true;
 
         //QListWidgetItem item = ui->FileList->item(layerCount);
@@ -366,8 +366,8 @@ void MainWindow::PreviewImageLoad()
 
 void MainWindow::ExposureTimeSlot(void)
 {
-    QTimer::singleShot(DarkTime, this, SLOT(DarkTimeSlot()));
-    SMC.RelativeMove(SliceThickness/1000);
+    QTimer::singleShot(DarkTime/1000, this, SLOT(DarkTimeSlot()));
+    SMC.RelativeMove(SliceThickness);
     ui->ProgramPrints->append("Dark Time");
 }
 
