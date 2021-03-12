@@ -88,12 +88,16 @@ private slots:
 
     void on_pushButton_clicked();
 
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
     manualLEcontrol *ManualProjUI;
     QTimer *usbPollTimer;
     bool ValidateSettings(void);
+    void loadSettings();
+    void saveSettings();
+    void initSettings();
 
 };
 #endif // MAINWINDOW_H

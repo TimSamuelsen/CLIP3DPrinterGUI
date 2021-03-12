@@ -11,6 +11,7 @@
 #include <QInputDialog>
 #include <QDesktopServices>
 #include <QDateTime>
+#include <QSettings>
 #include <time.h>
 
 #include "BMPParser.h"
@@ -58,12 +59,12 @@ static int UVIntensity;
 
 static bool ExposureFlag = false;
 static bool DarkTimeFlag = false;
-static uint32_t nSlice = 10;
+static uint32_t nSlice = 0;
 static uint32_t layerCount = 0;
 
 static QDateTime CurrentDateTime;
 static QString LogFileDestination;
-
+static QString ImageFileDirectory = "C://";
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -76,6 +77,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(usbPollTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));
     usbPollTimer->start();
     CurrentDateTime = QDateTime::currentDateTime();
+    loadSettings();
+    initSettings();
 }
 
 void MainWindow::timerTimeout(void)
@@ -88,7 +91,7 @@ MainWindow::~MainWindow()
     USB_Close();
     USB_Exit();
     saveText();
-
+    saveSettings();
 
     delete ui;
 }
@@ -219,7 +222,7 @@ void MainWindow::on_ResinSelect_activated(const QString &arg1)
 void MainWindow::on_SelectFile_clicked()
 {
     QStringList file_name = QFileDialog::getOpenFileNames(this,"Open Object Image Files","C://","*.bmp *.png *.tiff *.tif");
-    for (uint16_t i = 0; i < file_name.size(); i++)
+    for (uint16_t i = 0; i < file_name.count(); i++)
     {
        ui->FileList->addItem(file_name.at(i));
     }
@@ -324,6 +327,7 @@ void MainWindow::on_StartPrint_clicked()
     {
         //Set PrintFlag to true
         PrintFlag = true;
+        nSlice = ui->FileList->count();
         ui->ProgramPrints->append("Entering Printing Procedure");
         //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
         LCR_SetLedCurrents(0, 0, UVIntensity);
@@ -337,7 +341,7 @@ void MainWindow::PrintProcess(void)
 {
     if (layerCount <= nSlice)
     {
-        QTimer::singleShot(ExposureTime/1000, this, SLOT(ExposureTimeSlot()));
+        QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
         ExposureFlag = true;
 
         //QListWidgetItem item = ui->FileList->item(layerCount);
@@ -361,7 +365,7 @@ void MainWindow::PrintProcess(void)
 
 void MainWindow::ExposureTimeSlot(void)
 {
-    QTimer::singleShot(DarkTime/1000, this, SLOT(DarkTimeSlot()));
+    QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
     SMC.RelativeMove(SliceThickness);
     ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTime/1000) + " ms");
     ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness) + " um");
@@ -502,12 +506,53 @@ void MainWindow::saveText()
      }
 
 }
+
+void MainWindow::saveSettings()
+{
+    QSettings settings;
+    settings.setValue("ExposureTime", ExposureTime);
+    settings.setValue("DarkTime", DarkTime);
+    settings.setValue("UVIntensity", UVIntensity);
+    settings.setValue("SliceThickness", SliceThickness);
+    settings.setValue("StageVelocity", StageVelocity);
+    settings.setValue("StageAcceleration", StageAcceleration);
+    settings.setValue("MaxEndOfRun", MaxEndOfRun);
+    settings.setValue("MinEndOfRun", MinEndOfRun);
+
+    settings.setValue("LogFileDestination", LogFileDestination);
+}
+
+void MainWindow::loadSettings()
+{
+    QSettings settings;
+    ExposureTime = settings.value("ExposureTime", 1000).toDouble();
+    DarkTime = settings.value("DarkTime", 1000).toDouble();
+    UVIntensity = settings.value("UVIntensity", 12).toDouble();
+    SliceThickness = settings.value("SliceThickness", 200).toDouble();
+    StageVelocity = settings.value("StageVelocity", 10).toDouble();
+    StageAcceleration = settings.value("StageAcceleration", 5).toDouble();
+    MaxEndOfRun = settings.value("MaxEndOfRun", 60).toDouble();
+    MinEndOfRun = settings.value("MinEndOfRun", 0).toDouble();
+
+    LogFileDestination = settings.value("LogFileDestination", "C://").toString();
+}
+
+void MainWindow::initSettings()
+{
+    ui->ExposureTimeParam->setValue(ExposureTime/1000);
+    ui->DarkTimeParam->setValue(DarkTime/1000);
+    ui->UVIntensityParam->setValue(UVIntensity);
+    ui->SliceThicknessParam->setValue(SliceThickness*1000);
+    ui->StageVelocityParam->setValue(StageVelocity);
+    ui->StageAccelParam->setValue(StageAcceleration);
+    ui->MaxEndOfRun->setValue(MaxEndOfRun);
+    ui->MinEndOfRunParam->setValue(MinEndOfRun);
+
+    ui->LogFileLocation->setText(LogFileDestination);
+}
 /*************************************************************
  * ********************OUTSIDE CODE***************************
  * ***********************************************************/
-
-/************************DLP9000 CODE**************************/
-
 
 bool MainWindow::nanosleep(double ns)
 {
@@ -545,9 +590,8 @@ void CallError(QString Error)
 
 void MainWindow::on_ManualLightEngine_clicked()
 {
-    ManualProjUI = new manualLEcontrol();
-    ManualProjUI->show();
-    /*
+    //ManualProjUI = new manualLEcontrol();
+    //ManualProjUI->show();
     uint Code = 100;
 
     if (LCR_ReadErrorCode(&Code) >= 0)
@@ -629,7 +673,6 @@ void MainWindow::on_ManualLightEngine_clicked()
     {
         ui->ProgramPrints->append("Failed to get Status");
     }
-    */
 
 }
 
