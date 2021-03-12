@@ -108,7 +108,7 @@ class SMC100C
                 StatusType Type;
             };
             bool SMC100CInit(const char*);
-            void Home(void);
+            bool Home(void);
             bool QueryHardware();
             void SetVelocity(float VelocityToSet);
             void RelativeMove(float CommandParameter);

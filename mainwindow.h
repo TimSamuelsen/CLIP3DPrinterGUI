@@ -80,9 +80,13 @@ private slots:
 
     void CheckDLPStatus();
 
-    void PreviewImageLoad();
-
     void on_ManualLightEngine_clicked();
+
+    void saveText();
+
+    void on_LogFileBrowse_clicked();
+
+    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1362</width>
-    <height>734</height>
+    <width>1399</width>
+    <height>767</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -215,9 +215,9 @@
     <property name="geometry">
      <rect>
       <x>1100</x>
-      <y>390</y>
-      <width>241</width>
-      <height>271</height>
+      <y>460</y>
+      <width>291</width>
+      <height>251</height>
      </rect>
     </property>
     <property name="widgetResizable">
@@ -228,17 +228,17 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>239</width>
-       <height>269</height>
+       <width>289</width>
+       <height>249</height>
       </rect>
      </property>
      <widget class="QTextBrowser" name="ProgramPrints">
       <property name="geometry">
        <rect>
-        <x>-5</x>
-        <y>-9</y>
-        <width>251</width>
-        <height>281</height>
+        <x>0</x>
+        <y>0</y>
+        <width>291</width>
+        <height>251</height>
        </rect>
       </property>
       <property name="html">
@@ -270,8 +270,8 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>1100</x>
-      <y>360</y>
-      <width>251</width>
+      <y>440</y>
+      <width>291</width>
       <height>21</height>
      </rect>
     </property>
@@ -766,9 +766,9 @@ Selection</string>
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>1090</x>
+      <x>1100</x>
       <y>110</y>
-      <width>241</width>
+      <width>301</width>
       <height>20</height>
      </rect>
     </property>
@@ -779,8 +779,8 @@ Selection</string>
    <widget class="QLabel" name="LiveValue1">
     <property name="geometry">
      <rect>
-      <x>1260</x>
-      <y>130</y>
+      <x>1300</x>
+      <y>140</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -796,8 +796,8 @@ Selection</string>
    <widget class="QLabel" name="LiveValue2">
     <property name="geometry">
      <rect>
-      <x>1260</x>
-      <y>170</y>
+      <x>1300</x>
+      <y>180</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -813,8 +813,8 @@ Selection</string>
    <widget class="QLabel" name="LiveValue3">
     <property name="geometry">
      <rect>
-      <x>1260</x>
-      <y>210</y>
+      <x>1300</x>
+      <y>220</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -830,8 +830,8 @@ Selection</string>
    <widget class="QLabel" name="LiveValue4">
     <property name="geometry">
      <rect>
-      <x>1260</x>
-      <y>250</y>
+      <x>1300</x>
+      <y>260</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -847,8 +847,8 @@ Selection</string>
    <widget class="QLabel" name="LiveValue5">
     <property name="geometry">
      <rect>
-      <x>1260</x>
-      <y>290</y>
+      <x>1300</x>
+      <y>300</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -877,8 +877,8 @@ Selection</string>
    <widget class="QLabel" name="LiveValue6">
     <property name="geometry">
      <rect>
-      <x>1260</x>
-      <y>330</y>
+      <x>1300</x>
+      <y>340</y>
       <width>71</width>
       <height>21</height>
      </rect>
@@ -894,8 +894,8 @@ Selection</string>
    <widget class="QComboBox" name="LiveValueList1">
     <property name="geometry">
      <rect>
-      <x>1100</x>
-      <y>130</y>
+      <x>1140</x>
+      <y>140</y>
       <width>131</width>
       <height>22</height>
      </rect>
@@ -939,8 +939,8 @@ Selection</string>
    <widget class="QComboBox" name="LiveValueList2">
     <property name="geometry">
      <rect>
-      <x>1100</x>
-      <y>170</y>
+      <x>1140</x>
+      <y>180</y>
       <width>131</width>
       <height>22</height>
      </rect>
@@ -984,8 +984,8 @@ Selection</string>
    <widget class="QComboBox" name="LiveValueList3">
     <property name="geometry">
      <rect>
-      <x>1100</x>
-      <y>210</y>
+      <x>1140</x>
+      <y>220</y>
       <width>131</width>
       <height>22</height>
      </rect>
@@ -1029,8 +1029,8 @@ Selection</string>
    <widget class="QComboBox" name="LiveValueList4">
     <property name="geometry">
      <rect>
-      <x>1100</x>
-      <y>250</y>
+      <x>1140</x>
+      <y>260</y>
       <width>131</width>
       <height>22</height>
      </rect>
@@ -1074,8 +1074,8 @@ Selection</string>
    <widget class="QComboBox" name="LiveValueList5">
     <property name="geometry">
      <rect>
-      <x>1100</x>
-      <y>290</y>
+      <x>1140</x>
+      <y>300</y>
       <width>131</width>
       <height>22</height>
      </rect>
@@ -1119,8 +1119,8 @@ Selection</string>
    <widget class="QComboBox" name="LiveValueList6">
     <property name="geometry">
      <rect>
-      <x>1100</x>
-      <y>330</y>
+      <x>1140</x>
+      <y>340</y>
       <width>131</width>
       <height>22</height>
      </rect>
@@ -1288,6 +1288,71 @@ Selection</string>
      <string>Connect</string>
     </property>
    </widget>
+   <widget class="QLabel" name="ProgramOutputLabel_2">
+    <property name="geometry">
+     <rect>
+      <x>1090</x>
+      <y>370</y>
+      <width>301</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Set Log File Destination&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="LogFileBrowse">
+    <property name="geometry">
+     <rect>
+      <x>1320</x>
+      <y>400</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Browse</string>
+    </property>
+   </widget>
+   <widget class="QScrollArea" name="scrollArea">
+    <property name="geometry">
+     <rect>
+      <x>1100</x>
+      <y>400</y>
+      <width>211</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="widgetResizable">
+     <bool>true</bool>
+    </property>
+    <widget class="QWidget" name="scrollAreaWidgetContents_3">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>209</width>
+       <height>29</height>
+      </rect>
+     </property>
+     <widget class="QLabel" name="LogFileLocation">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>211</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background:white; border: 1px solid black;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </widget>
+   </widget>
    <zorder>label</zorder>
    <zorder>ExposureTime</zorder>
    <zorder>SliceThickness</zorder>
@@ -1355,13 +1420,16 @@ Selection</string>
    <zorder>StageConnectionIndicator</zorder>
    <zorder>LightEngineConnectButton</zorder>
    <zorder>StageConnectButton</zorder>
+   <zorder>ProgramOutputLabel_2</zorder>
+   <zorder>LogFileBrowse</zorder>
+   <zorder>scrollArea</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1362</width>
+     <width>1399</width>
      <height>26</height>
     </rect>
    </property>

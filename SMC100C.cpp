@@ -247,13 +247,22 @@ Notes:
 Author:
     TimS, 1/17/21
 ***************************************************************************************************************************************/
-void SMC100C::Home()
+bool SMC100C::Home()
 {
+    bool returnVal;
     printf("Request For Home \r\n");
     //Set command to home
     SetCommand(CommandType::HomeSearch, 0.0, CommandGetSetType::None);
     //Send command
-    SendCurrentCommand();
+    if (SendCurrentCommand() == true)
+    {
+        returnVal = true;
+    }
+    else
+    {
+        returnVal = false;
+    }
+    return returnVal;
 };
 /**************************************************************************************************************************************
 Function: 

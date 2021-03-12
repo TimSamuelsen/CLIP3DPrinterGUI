@@ -10,6 +10,7 @@
 #include <QTextStream>
 #include <QInputDialog>
 #include <QDesktopServices>
+#include <QDateTime>
 #include <time.h>
 
 #include "BMPParser.h"
@@ -60,8 +61,8 @@ static bool DarkTimeFlag = false;
 static uint32_t nSlice = 10;
 static uint32_t layerCount = 0;
 
-
-
+static QDateTime CurrentDateTime;
+static QString LogFileDestination;
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -74,6 +75,7 @@ MainWindow::MainWindow(QWidget *parent) :
     usbPollTimer->setInterval(2000);
     connect(usbPollTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));
     usbPollTimer->start();
+    CurrentDateTime = QDateTime::currentDateTime();
 }
 
 void MainWindow::timerTimeout(void)
@@ -83,6 +85,11 @@ void MainWindow::timerTimeout(void)
 
 MainWindow::~MainWindow()
 {
+    USB_Close();
+    USB_Exit();
+    saveText();
+
+
     delete ui;
 }
 
@@ -100,9 +107,9 @@ void MainWindow::on_ManualStage_clicked()
 
 void MainWindow::on_SetSliceThickness_clicked()
 {
-    SliceThickness = (ui->SliceThicknessParam->value());
+    SliceThickness = (ui->SliceThicknessParam->value()/1000);
     QString ThicknessString = "Set Slice Thickness to: ";
-    ThicknessString += QString::number(SliceThickness);
+    ThicknessString += QString::number(SliceThickness*1000);
     ThicknessString += " μm";
     ui->ProgramPrints->append(ThicknessString);
 }
@@ -151,7 +158,7 @@ void MainWindow::on_SetDarkTime_clicked()
 {
     DarkTime = (ui->DarkTimeParam->value()*1000);
     QString DarkTimeString = "Set Dark Time to: ";
-    DarkTimeString += QString::number(DarkTime);
+    DarkTimeString += QString::number(DarkTime/1000);
     DarkTimeString += " μs";
     ui->ProgramPrints->append(DarkTimeString);
 }
@@ -160,7 +167,7 @@ void MainWindow::on_SetExposureTime_clicked()
 {
     ExposureTime = (ui->ExposureTimeParam->value()*1000);
     QString ExposureTimeString = "Set Exposure Time to: ";
-    ExposureTimeString += QString::number(ExposureTime);
+    ExposureTimeString += QString::number(ExposureTime/1000);
     ExposureTimeString += " ms";
     ui->ProgramPrints->append(ExposureTimeString);
 }
@@ -218,6 +225,12 @@ void MainWindow::on_SelectFile_clicked()
     }
 }
 
+void MainWindow::on_LogFileBrowse_clicked()
+{
+    LogFileDestination = QFileDialog::getExistingDirectory(this, "Open Log File Destination");
+    ui->LogFileLocation->setText(LogFileDestination);
+}
+
 void MainWindow::on_ClearImageFiles_clicked()
 {
     ui->FileList->clear();
@@ -264,7 +277,7 @@ void MainWindow::on_StageConnectButton_clicked()
     QString COMSelect = ui->COMPortSelect->currentText();
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
-    if (SMC.SMC100CInit(COM) == true)
+    if (SMC.SMC100CInit(COM) == true && SMC.Home() == true)
     {
         ui->ProgramPrints->append("Stage Connected");
         ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
@@ -282,15 +295,13 @@ void MainWindow::on_LightEngineConnectButton_clicked()
 {
     if (DLP.InitProjector())
     {
-        //Set to pattern otf mode
-        LCR_SetMode(PTN_MODE_OTF);
         ui->ProgramPrints->append("Light Engine Connected");
         ui->LightEngineIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
         ui->LightEngineIndicator->setText("Connected");
         uint Code;
         if (LCR_ReadErrorCode(&Code) >= 0)
         {
-            ui->ProgramPrints->append("Last Error Code" + QString::number(Code));
+            ui->ProgramPrints->append("Last Error Code: " + QString::number(Code));
         }
         else
         {
@@ -335,40 +346,25 @@ void MainWindow::PrintProcess(void)
         QPixmap img2 = img.scaled(560,350, Qt::KeepAspectRatio);
         ui->PrintImage->setPixmap(img2);
 
-        ui->ProgramPrints->append("Exposing");
+        ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
+        ui->ProgramPrints->append("Image File: " + filename);
         layerCount++;
         return;
     }
     else
     {
+        USB_Close();
+        ui->ProgramPrints->append("Print Complete");
         return;
     }
 }
-
-void MainWindow::PreviewImageLoad()
-{
-    QListWidgetItem* item = ui->FileList->item(layerCount);
-    //QString filename = item << item->text();
-}
-
-/*
- *
- *
- *
- *
- * bool ImageViewer::loadFile(const QString &fileName)
-{
-    QImageReader reader(fileName);
-    reader.setAutoTransform(true);
-    const QImage newImage = reader.read();
-    }
- * */
 
 void MainWindow::ExposureTimeSlot(void)
 {
     QTimer::singleShot(DarkTime/1000, this, SLOT(DarkTimeSlot()));
     SMC.RelativeMove(SliceThickness);
-    ui->ProgramPrints->append("Dark Time");
+    ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTime/1000) + " ms");
+    ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness) + " um");
 }
 
 void MainWindow::DarkTimeSlot(void)
@@ -488,6 +484,24 @@ void MainWindow::showError(QString errMsg)
     errMsgBox.exec();
 }
 
+void MainWindow::saveText()
+{
+     QString Log = ui->ProgramPrints->toPlainText();
+     QString LogDate = CurrentDateTime.toString("yyyy-MM-dd");
+     QString LogTime = CurrentDateTime.toString("hh.mm.ss");
+     QString FileDirectory;
+     QString LogTitle = LogFileDestination + "/CLIPGUITEST_" + LogDate + "_" + LogTime + ".txt";
+     ui->ProgramPrints->append(LogTitle);
+     QFile file(LogTitle);
+     if (file.open(QIODevice::WriteOnly | QFile::Text))
+     {
+         QTextStream out(&file);
+         out << Log;
+         file.flush();
+         file.close();
+     }
+
+}
 /*************************************************************
  * ********************OUTSIDE CODE***************************
  * ***********************************************************/
@@ -617,4 +631,11 @@ void MainWindow::on_ManualLightEngine_clicked()
     }
     */
 
+}
+
+
+
+void MainWindow::on_pushButton_clicked()
+{
+    saveText();
 }
