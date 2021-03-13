@@ -189,27 +189,7 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
                     Main.showError("Slave Upload Pattern to EVM failed");
                     return -1;
                 }
-
-
-        /*
-        else
-        {
-                int splashSize = merge_image.toSplash(&splash_block,SPL_COMP_AUTO);
-                if(splashSize <= 0)
-                {
-                    Main.showError("splashSize <= 0");
-                    return -1;
-                }
-                if(uploadPatternToEVM(true, splashImageCount, splashSize, splash_block) < 0)
-                {
-                    Main.showError("Upload Pattern to EVM failed");
-                    return -1;
-                }
-        }
-        */
     }
-
-
     return 0;
 }
 

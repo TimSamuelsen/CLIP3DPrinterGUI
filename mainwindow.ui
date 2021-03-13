@@ -30,8 +30,8 @@
    <widget class="QLabel" name="SliceThickness">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>130</y>
+      <x>160</x>
+      <y>190</y>
       <width>141</width>
       <height>16</height>
      </rect>
@@ -82,8 +82,8 @@
    <widget class="QPushButton" name="SetSliceThickness">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>150</y>
+      <x>250</x>
+      <y>210</y>
       <width>51</width>
       <height>31</height>
      </rect>
@@ -162,8 +162,8 @@
    <widget class="QDoubleSpinBox" name="SliceThicknessParam">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>150</y>
+      <x>170</x>
+      <y>210</y>
       <width>71</width>
       <height>31</height>
      </rect>
@@ -308,8 +308,8 @@ QPushButton#StartPrint:pressed {
    <widget class="QLabel" name="StageVelocity">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>190</y>
+      <x>170</x>
+      <y>250</y>
       <width>131</width>
       <height>16</height>
      </rect>
@@ -343,8 +343,8 @@ QPushButton#StartPrint:pressed {
    <widget class="QDoubleSpinBox" name="StageVelocityParam">
     <property name="geometry">
      <rect>
-      <x>181</x>
-      <y>210</y>
+      <x>171</x>
+      <y>270</y>
       <width>71</width>
       <height>31</height>
      </rect>
@@ -356,8 +356,8 @@ QPushButton#StartPrint:pressed {
    <widget class="QPushButton" name="SetStageVelocity">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>210</y>
+      <x>250</x>
+      <y>270</y>
       <width>51</width>
       <height>31</height>
      </rect>
@@ -369,7 +369,7 @@ QPushButton#StartPrint:pressed {
    <widget class="QLabel" name="MinEndOfRun">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>10</x>
       <y>370</y>
       <width>131</width>
       <height>20</height>
@@ -382,8 +382,8 @@ QPushButton#StartPrint:pressed {
    <widget class="QLabel" name="MaxEndOfRun_2">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>310</y>
+      <x>170</x>
+      <y>370</y>
       <width>131</width>
       <height>16</height>
      </rect>
@@ -395,7 +395,7 @@ QPushButton#StartPrint:pressed {
    <widget class="QDoubleSpinBox" name="MinEndOfRunParam">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>10</x>
       <y>390</y>
       <width>71</width>
       <height>31</height>
@@ -405,7 +405,7 @@ QPushButton#StartPrint:pressed {
    <widget class="QPushButton" name="SetMinEndOfRun">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>90</x>
       <y>390</y>
       <width>51</width>
       <height>31</height>
@@ -418,8 +418,8 @@ QPushButton#StartPrint:pressed {
    <widget class="QDoubleSpinBox" name="MaxEndOfRun">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>330</y>
+      <x>170</x>
+      <y>390</y>
       <width>71</width>
       <height>31</height>
      </rect>
@@ -431,8 +431,8 @@ QPushButton#StartPrint:pressed {
    <widget class="QPushButton" name="SetMaxEndOfRun">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>330</y>
+      <x>250</x>
+      <y>390</y>
       <width>51</width>
       <height>31</height>
      </rect>
@@ -554,8 +554,8 @@ QPushButton#AbortPrint:pressed {
    <widget class="QLabel" name="StageVelocity_2">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>250</y>
+      <x>170</x>
+      <y>310</y>
       <width>141</width>
       <height>16</height>
      </rect>
@@ -567,8 +567,8 @@ QPushButton#AbortPrint:pressed {
    <widget class="QDoubleSpinBox" name="StageAccelParam">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>270</y>
+      <x>170</x>
+      <y>330</y>
       <width>71</width>
       <height>31</height>
      </rect>
@@ -580,8 +580,8 @@ QPushButton#AbortPrint:pressed {
    <widget class="QPushButton" name="SetStageAcceleration">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>270</y>
+      <x>250</x>
+      <y>330</y>
       <width>51</width>
       <height>31</height>
      </rect>
@@ -672,7 +672,7 @@ Selection</string>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">

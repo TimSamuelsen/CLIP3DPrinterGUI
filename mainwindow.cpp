@@ -64,7 +64,7 @@ static uint32_t layerCount = 0;
 
 static QDateTime CurrentDateTime;
 static QString LogFileDestination;
-static QString ImageFileDirectory = "C://";
+static QString ImageFileDirectory;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -222,6 +222,8 @@ void MainWindow::on_ResinSelect_activated(const QString &arg1)
 void MainWindow::on_SelectFile_clicked()
 {
     QStringList file_name = QFileDialog::getOpenFileNames(this,"Open Object Image Files","C://","*.bmp *.png *.tiff *.tif");
+    //QDir ImageDirectory = QFileInfo(file_name.at(1)).absoluteDir();
+    //ImageFileDirectory = ImageDirectory.filePath(file_name.at(1));
     for (uint16_t i = 0; i < file_name.count(); i++)
     {
        ui->FileList->addItem(file_name.at(i));
@@ -260,9 +262,9 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         BOOL Repeat;
         unsigned int NumPatsForTrigOut2;
         unsigned int NumSplash;
-        LCR_GetPatternConfig(&NumLutEntries,&Repeat,&NumPatsForTrigOut2, &NumSplash);
-        ui->ProgramPrints->append("Number of LUT Entries: " + QString::number(NumLutEntries));
-        ui->ProgramPrints->append("Number of Splash Images: " + QString::number(NumSplash));
+        //LCR_GetPatternConfig(&NumLutEntries,&Repeat,&NumPatsForTrigOut2, &NumSplash);
+        //ui->ProgramPrints->append("Number of LUT Entries: " + QString::number(NumLutEntries));
+        //ui->ProgramPrints->append("Number of Splash Images: " + QString::number(NumSplash));
         if (Repeat)
         {
             ui->ProgramPrints->append("Repeat is set to true");
@@ -302,6 +304,7 @@ void MainWindow::on_LightEngineConnectButton_clicked()
         ui->LightEngineIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
         ui->LightEngineIndicator->setText("Connected");
         uint Code;
+        //Their GUI does not call reader Errorcode
         if (LCR_ReadErrorCode(&Code) >= 0)
         {
             ui->ProgramPrints->append("Last Error Code: " + QString::number(Code));
@@ -339,7 +342,7 @@ void MainWindow::on_StartPrint_clicked()
 
 void MainWindow::PrintProcess(void)
 {
-    if (layerCount <= nSlice)
+    if (layerCount +1 <= nSlice)
     {
         QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
         ExposureFlag = true;
@@ -520,6 +523,7 @@ void MainWindow::saveSettings()
     settings.setValue("MinEndOfRun", MinEndOfRun);
 
     settings.setValue("LogFileDestination", LogFileDestination);
+    settings.setValue("ImageFileDirectory", ImageFileDirectory);
 }
 
 void MainWindow::loadSettings()
@@ -535,6 +539,7 @@ void MainWindow::loadSettings()
     MinEndOfRun = settings.value("MinEndOfRun", 0).toDouble();
 
     LogFileDestination = settings.value("LogFileDestination", "C://").toString();
+    //ImageFileDirectory = settings.value("ImageFileDirectory", "C://").toString();
 }
 
 void MainWindow::initSettings()
@@ -549,6 +554,7 @@ void MainWindow::initSettings()
     ui->MinEndOfRunParam->setValue(MinEndOfRun);
 
     ui->LogFileLocation->setText(LogFileDestination);
+
 }
 /*************************************************************
  * ********************OUTSIDE CODE***************************
