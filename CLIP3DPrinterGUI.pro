@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,6 +19,7 @@ SOURCES += \
     mainwindow.cpp \
     manualprojcontrol.cpp \
     manualstagecontrol.cpp \
+    qcustomplot.cpp \
     serialib.cpp
 
 HEADERS += \
@@ -29,6 +30,7 @@ HEADERS += \
     manualprojcontrol.h \
     manualstagecontrol.h \
     patternelement.h \
+    qcustomplot.h \
     serialib.h
 
 

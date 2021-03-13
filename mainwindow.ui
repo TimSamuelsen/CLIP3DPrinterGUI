@@ -181,7 +181,7 @@
       <x>10</x>
       <y>510</y>
       <width>301</width>
-      <height>161</height>
+      <height>181</height>
      </rect>
     </property>
    </widget>
@@ -254,8 +254,8 @@ p, li { white-space: pre-wrap; }
    <widget class="QPushButton" name="InitializeAndSynchronize">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>530</y>
+      <x>480</x>
+      <y>560</y>
       <width>141</width>
       <height>61</height>
      </rect>
@@ -282,8 +282,8 @@ p, li { white-space: pre-wrap; }
    <widget class="QPushButton" name="StartPrint">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>530</y>
+      <x>330</x>
+      <y>560</y>
       <width>141</width>
       <height>61</height>
      </rect>
@@ -444,8 +444,8 @@ QPushButton#StartPrint:pressed {
    <widget class="QPushButton" name="ManualLightEngine">
     <property name="geometry">
      <rect>
-      <x>640</x>
-      <y>600</y>
+      <x>630</x>
+      <y>630</y>
       <width>141</width>
       <height>61</height>
      </rect>
@@ -458,8 +458,8 @@ Light Engine Control</string>
    <widget class="QPushButton" name="ManualStage">
     <property name="geometry">
      <rect>
-      <x>640</x>
-      <y>530</y>
+      <x>630</x>
+      <y>560</y>
       <width>141</width>
       <height>61</height>
      </rect>
@@ -528,8 +528,8 @@ Light Engine Control</string>
    <widget class="QPushButton" name="AbortPrint">
     <property name="geometry">
      <rect>
-      <x>340</x>
-      <y>600</y>
+      <x>330</x>
+      <y>630</y>
       <width>141</width>
       <height>61</height>
      </rect>
@@ -609,8 +609,8 @@ QPushButton#AbortPrint:pressed {
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>600</y>
+      <x>480</x>
+      <y>630</y>
       <width>141</width>
       <height>61</height>
      </rect>
@@ -668,7 +668,7 @@ Selection</string>
       <x>340</x>
       <y>110</y>
       <width>741</width>
-      <height>411</height>
+      <height>441</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -678,30 +678,14 @@ Selection</string>
      <attribute name="title">
       <string>Print Progress</string>
      </attribute>
-     <widget class="QLabel" name="label_3">
+     <widget class="QCustomPlot" name="LivePlot" native="true">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>10</x>
         <y>10</y>
-        <width>641</width>
-        <height>341</height>
+        <width>701</width>
+        <height>391</height>
        </rect>
-      </property>
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/new/prefix1/dummygraph.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_6">
-      <property name="geometry">
-       <rect>
-        <x>550</x>
-        <y>90</y>
-        <width>71</width>
-        <height>71</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Dummy&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;Placeholder&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;Graph&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </widget>
@@ -717,8 +701,8 @@ Selection</string>
      <widget class="QLabel" name="PrintImage">
       <property name="geometry">
        <rect>
-        <x>90</x>
-        <y>10</y>
+        <x>80</x>
+        <y>20</y>
         <width>561</width>
         <height>351</height>
        </rect>
@@ -1164,8 +1148,8 @@ Selection</string>
    <widget class="QLabel" name="label_9">
     <property name="geometry">
      <rect>
-      <x>790</x>
-      <y>560</y>
+      <x>780</x>
+      <y>590</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -1177,8 +1161,8 @@ Selection</string>
    <widget class="QLabel" name="label_13">
     <property name="geometry">
      <rect>
-      <x>780</x>
-      <y>600</y>
+      <x>770</x>
+      <y>630</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -1190,8 +1174,8 @@ Selection</string>
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>790</x>
-      <y>530</y>
+      <x>780</x>
+      <y>560</y>
       <width>301</width>
       <height>20</height>
      </rect>
@@ -1203,8 +1187,8 @@ Selection</string>
    <widget class="QComboBox" name="COMPortSelect">
     <property name="geometry">
      <rect>
-      <x>800</x>
-      <y>630</y>
+      <x>790</x>
+      <y>660</y>
       <width>91</width>
       <height>21</height>
      </rect>
@@ -1233,8 +1217,8 @@ Selection</string>
    <widget class="QLabel" name="LightEngineIndicator">
     <property name="geometry">
      <rect>
-      <x>910</x>
-      <y>560</y>
+      <x>900</x>
+      <y>590</y>
       <width>91</width>
       <height>31</height>
      </rect>
@@ -1249,8 +1233,8 @@ Selection</string>
    <widget class="QLabel" name="StageConnectionIndicator">
     <property name="geometry">
      <rect>
-      <x>910</x>
-      <y>610</y>
+      <x>900</x>
+      <y>640</y>
       <width>91</width>
       <height>31</height>
      </rect>
@@ -1265,8 +1249,8 @@ Selection</string>
    <widget class="QPushButton" name="LightEngineConnectButton">
     <property name="geometry">
      <rect>
-      <x>1010</x>
-      <y>560</y>
+      <x>1000</x>
+      <y>590</y>
       <width>61</width>
       <height>31</height>
      </rect>
@@ -1278,8 +1262,8 @@ Selection</string>
    <widget class="QPushButton" name="StageConnectButton">
     <property name="geometry">
      <rect>
-      <x>1010</x>
-      <y>610</y>
+      <x>1000</x>
+      <y>640</y>
       <width>61</width>
       <height>31</height>
      </rect>
@@ -1353,6 +1337,42 @@ Selection</string>
      </widget>
     </widget>
    </widget>
+   <widget class="QLabel" name="StartingPositionLabel">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>130</y>
+      <width>131</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Starting Position (mm)</string>
+    </property>
+   </widget>
+   <widget class="QDoubleSpinBox" name="StartingPositionParam">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>151</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="SetStartingPosButton">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>150</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set</string>
+    </property>
+   </widget>
    <zorder>label</zorder>
    <zorder>ExposureTime</zorder>
    <zorder>SliceThickness</zorder>
@@ -1423,6 +1443,9 @@ Selection</string>
    <zorder>ProgramOutputLabel_2</zorder>
    <zorder>LogFileBrowse</zorder>
    <zorder>scrollArea</zorder>
+   <zorder>StartingPositionLabel</zorder>
+   <zorder>StartingPositionParam</zorder>
+   <zorder>SetStartingPosButton</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -1436,6 +1459,14 @@ Selection</string>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

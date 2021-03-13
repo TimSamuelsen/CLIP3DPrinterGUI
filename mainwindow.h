@@ -86,8 +86,7 @@ private slots:
 
     void on_LogFileBrowse_clicked();
 
-    void on_pushButton_clicked();
-
+    void on_SetStartingPosButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -98,6 +97,9 @@ private:
     void loadSettings();
     void saveSettings();
     void initSettings();
-
+    void initPlot();
+    void updatePlot();
+    void addPlotData();
+    QVector<double> qv_x, qv_y;
 };
 #endif // MAINWINDOW_H

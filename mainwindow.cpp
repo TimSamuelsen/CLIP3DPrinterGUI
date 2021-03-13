@@ -50,6 +50,7 @@ static bool PrintFlag = 0;
 static double SliceThickness;
 static double StageVelocity;
 static double StageAcceleration;
+static double StartingPosition;
 static double MaxEndOfRun;
 static double MinEndOfRun;
 static double ExposureTime;
@@ -62,9 +63,12 @@ static bool DarkTimeFlag = false;
 static uint32_t nSlice = 0;
 static uint32_t layerCount = 0;
 
+static bool loadSettingsFlag = false;
 static QDateTime CurrentDateTime;
 static QString LogFileDestination;
 static QString ImageFileDirectory;
+static QTime PrintStartTime;
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -79,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent) :
     CurrentDateTime = QDateTime::currentDateTime();
     loadSettings();
     initSettings();
+    initPlot();
 }
 
 void MainWindow::timerTimeout(void)
@@ -106,6 +111,18 @@ void MainWindow::on_ManualStage_clicked()
     ui->SliceThicknessParam->setValue(50);
     ui->StageVelocityParam->setValue(5);
 
+}
+/*********************************************Print Parameters*********************************************/
+void MainWindow::on_ResinSelect_activated(const QString &arg1)
+{
+    ui->ProgramPrints->append(arg1 + " Selected");
+}
+
+void MainWindow::on_SetStartingPosButton_clicked()
+{
+    StartingPosition = (ui->StartingPositionParam->value());
+    QString StartingPositionString = "Set Starting Position to: " + QString::number(StageVelocity) + " mm";
+    ui->ProgramPrints->append(StartingPositionString);
 }
 
 void MainWindow::on_SetSliceThickness_clicked()
@@ -162,7 +179,7 @@ void MainWindow::on_SetDarkTime_clicked()
     DarkTime = (ui->DarkTimeParam->value()*1000);
     QString DarkTimeString = "Set Dark Time to: ";
     DarkTimeString += QString::number(DarkTime/1000);
-    DarkTimeString += " μs";
+    DarkTimeString += " ms";
     ui->ProgramPrints->append(DarkTimeString);
 }
 
@@ -213,11 +230,7 @@ void MainWindow::on_LiveValueList6_activated(const QString &arg1)
     ui->ProgramPrints->append("LV6: " + arg1);
 }
 
-void MainWindow::on_ResinSelect_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append(arg1 + " Selected");
-}
-
+/*********************************************File Handling*********************************************/
 
 void MainWindow::on_SelectFile_clicked()
 {
@@ -241,42 +254,7 @@ void MainWindow::on_ClearImageFiles_clicked()
     ui->FileList->clear();
 }
 
-void MainWindow::on_InitializeAndSynchronize_clicked()
-{
-    LCR_PatternDisplay(0);
-    if (ui->FileList->count() > 0)
-    {
-        QListWidgetItem * item;
-        QStringList imageList;
-        for(int i = 0; i < ui->FileList->count(); i++)
-        {
-            item = ui->FileList->item(i);
-            imageList << item->text();
-        }
-        QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
-        ui->ProgramPrints->append(dir.absolutePath());
-        //LCR_SetMode(PTN_MODE_OTF);
-        DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
-        DLP.updateLUT();
-        unsigned int NumLutEntries;
-        BOOL Repeat;
-        unsigned int NumPatsForTrigOut2;
-        unsigned int NumSplash;
-        //LCR_GetPatternConfig(&NumLutEntries,&Repeat,&NumPatsForTrigOut2, &NumSplash);
-        //ui->ProgramPrints->append("Number of LUT Entries: " + QString::number(NumLutEntries));
-        //ui->ProgramPrints->append("Number of Splash Images: " + QString::number(NumSplash));
-        if (Repeat)
-        {
-            ui->ProgramPrints->append("Repeat is set to true");
-        }
-        else
-        {
-            ui->ProgramPrints->append("Repeat is set to false");
-        }
-    }
-}
-
-
+/*******************************************Peripheral Connections*********************************************/
 void MainWindow::on_StageConnectButton_clicked()
 {
     QString COMSelect = ui->COMPortSelect->currentText();
@@ -322,6 +300,44 @@ void MainWindow::on_LightEngineConnectButton_clicked()
     }
 }
 
+/***************************************Print Functionality*********************************************/
+void MainWindow::on_InitializeAndSynchronize_clicked()
+{
+    LCR_PatternDisplay(0);
+    if (ui->FileList->count() > 0)
+    {
+        QListWidgetItem * item;
+        QStringList imageList;
+        for(int i = 0; i < ui->FileList->count(); i++)
+        {
+            item = ui->FileList->item(i);
+            imageList << item->text();
+        }
+        QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
+        ui->ProgramPrints->append(dir.absolutePath());
+        nSlice = ui->FileList->count();
+        //LCR_SetMode(PTN_MODE_OTF);
+        DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
+        DLP.updateLUT();
+        initPlot();
+        updatePlot();
+        //unsigned int NumLutEntries;
+        //BOOL Repeat;
+        //unsigned int NumPatsForTrigOut2;
+        //unsigned int NumSplash;
+        //LCR_GetPatternConfig(&NumLutEntries,&Repeat,&NumPatsForTrigOut2, &NumSplash);
+        //ui->ProgramPrints->append("Number of LUT Entries: " + QString::number(NumLutEntries));
+        //ui->ProgramPrints->append("Number of Splash Images: " + QString::number(NumSplash));
+        //if (Repeat)
+        //{
+        //    ui->ProgramPrints->append("Repeat is set to true");
+        //}
+        //else
+        //{
+        //    ui->ProgramPrints->append("Repeat is set to false");
+        //}
+    }
+}
 
 void MainWindow::on_StartPrint_clicked()
 {
@@ -335,6 +351,7 @@ void MainWindow::on_StartPrint_clicked()
         //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
         LCR_SetLedCurrents(0, 0, UVIntensity);
         //LCR_PatternDisplay(0);
+        PrintStartTime = QTime::currentTime();
         DLP.startPatSequence();
         PrintProcess();
     }
@@ -356,6 +373,7 @@ void MainWindow::PrintProcess(void)
         ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
         ui->ProgramPrints->append("Image File: " + filename);
         layerCount++;
+        updatePlot();
         return;
     }
     else
@@ -369,7 +387,7 @@ void MainWindow::PrintProcess(void)
 void MainWindow::ExposureTimeSlot(void)
 {
     QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
-    SMC.RelativeMove(SliceThickness);
+    SMC.RelativeMove(-SliceThickness);
     ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTime/1000) + " ms");
     ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness) + " um");
 }
@@ -379,36 +397,6 @@ void MainWindow::DarkTimeSlot(void)
     PrintProcess();
     //QTimer::singleShot(10, this, SLOT(PrintProcess()));
 }
-
-void MainWindow::CheckDLPStatus(void)
-{
-    //If GUI is in exposure state
-    if (ExposureFlag == true && DarkTimeFlag == false)
-    {
-        //Query DLP status
-        if (true) //If DLP has changed to dark time
-        {
-
-        }
-        else //If DLP has not changed states
-        {
-            //Wait 20 ms and repeat this call
-            QTimer::singleShot(20, this, SLOT(CheckDLPStatus()));
-        }
-    }
-    else if (ExposureFlag == false && DarkTimeFlag == true)
-    {
-        //Query DLP status
-    }
-    else
-    {
-        showError("Flag error");
-        return;
-    }
-}
-
-
-
 
 //Validate all settings
 bool MainWindow::ValidateSettings(void)
@@ -472,7 +460,7 @@ bool MainWindow::ValidateSettings(void)
     ui->ProgramPrints->append("All Settings Valid");
     return true;
 }
-
+/*******************************************Helper Functions********************************************/
 /**
  * @brief MainWindow::showError
  * helper function to show the appropriate API Error message
@@ -509,6 +497,7 @@ void MainWindow::saveText()
      }
 
 }
+/*******************************************Settings Functions*********************************************/
 
 void MainWindow::saveSettings()
 {
@@ -521,6 +510,7 @@ void MainWindow::saveSettings()
     settings.setValue("StageAcceleration", StageAcceleration);
     settings.setValue("MaxEndOfRun", MaxEndOfRun);
     settings.setValue("MinEndOfRun", MinEndOfRun);
+    settings.setValue("StartingPosition", StartingPosition);
 
     settings.setValue("LogFileDestination", LogFileDestination);
     settings.setValue("ImageFileDirectory", ImageFileDirectory);
@@ -528,6 +518,8 @@ void MainWindow::saveSettings()
 
 void MainWindow::loadSettings()
 {
+    if (loadSettingsFlag == false)
+    {
     QSettings settings;
     ExposureTime = settings.value("ExposureTime", 1000).toDouble();
     DarkTime = settings.value("DarkTime", 1000).toDouble();
@@ -537,9 +529,14 @@ void MainWindow::loadSettings()
     StageAcceleration = settings.value("StageAcceleration", 5).toDouble();
     MaxEndOfRun = settings.value("MaxEndOfRun", 60).toDouble();
     MinEndOfRun = settings.value("MinEndOfRun", 0).toDouble();
+    StartingPosition = settings.value("StartingPosition", 5).toDouble();
+
 
     LogFileDestination = settings.value("LogFileDestination", "C://").toString();
     //ImageFileDirectory = settings.value("ImageFileDirectory", "C://").toString();
+
+    loadSettingsFlag = true;
+    }
 }
 
 void MainWindow::initSettings()
@@ -552,10 +549,86 @@ void MainWindow::initSettings()
     ui->StageAccelParam->setValue(StageAcceleration);
     ui->MaxEndOfRun->setValue(MaxEndOfRun);
     ui->MinEndOfRunParam->setValue(MinEndOfRun);
+    ui->StartingPositionParam->setValue(StartingPosition);
 
     ui->LogFileLocation->setText(LogFileDestination);
 
 }
+/*******************************************Plot Functions*********************************************/
+
+void MainWindow::initPlot()
+{
+    ui->LivePlot->addGraph();
+    ui->LivePlot->graph(0)->setName("Print Progress");
+    ui->LivePlot->xAxis->setLabel("Time (s)");
+    ui->LivePlot->yAxis->setLabel("Position (mm)");
+    ui->LivePlot->xAxis->setRange(0, (1.1*nSlice*(ExposureTime+DarkTime)/(1000*1000)));
+    ui->LivePlot->yAxis->setRange(0.9*(StartingPosition - nSlice*SliceThickness),1.1*StartingPosition);
+
+    //Add Time Remaining Label
+    static QCPItemText *textLabel1 = new QCPItemText(ui->LivePlot);
+    textLabel1->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
+    textLabel1->position->setType(QCPItemPosition::ptAxisRectRatio);
+    textLabel1->position->setCoords(0.9, 0.1); // place position at center/top of axis rect
+    textLabel1->setText(" Layer: ");
+    textLabel1->setFont(QFont(font().family(), 12)); // make font a bit larger
+    textLabel1->setPen(QPen(Qt::black)); // show black border around text
+
+    //Add Layer Label
+    static QCPItemText *textLabel2 = new QCPItemText(ui->LivePlot);
+    textLabel2->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
+    textLabel2->position->setType(QCPItemPosition::ptAxisRectRatio);
+    textLabel2->position->setCoords(0.9, 0.0); // place position at center/top of axis rect
+    textLabel2->setText(" Remaining Time: ");
+    textLabel2->setFont(QFont(font().family(), 12)); // make font a bit larger
+    textLabel2->setPen(QPen(Qt::black)); // show black border around text
+
+
+    ui->LivePlot->replot();
+}
+
+void MainWindow::updatePlot()
+{
+    if (layerCount > 0)
+    {
+        QTime updateTime = QTime::currentTime();
+        int TimeElapsed = PrintStartTime.secsTo(updateTime);
+
+        double CurrentPos = StartingPosition - (layerCount*SliceThickness);
+
+        qv_x.append(TimeElapsed);
+        qv_y.append(CurrentPos);
+
+        ui->LivePlot->graph(0)->setData(qv_x,qv_y);
+    }
+
+
+    ui->LivePlot->clearItems();
+
+    //Update Time Remaining Label
+    QString Layer = " Layer: " + QString::number(layerCount) + "/" + QString::number(nSlice);
+    QCPItemText *textLabel1 = new QCPItemText(ui->LivePlot);
+    textLabel1->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
+    textLabel1->position->setType(QCPItemPosition::ptAxisRectRatio);
+    textLabel1->position->setCoords(0.98, 0.1); // place position at center/top of axis rect
+    textLabel1->setText(Layer);
+    textLabel1->setFont(QFont(font().family(), 12)); // make font a bit larger
+    textLabel1->setPen(QPen(Qt::black)); // show black border around text
+
+    //Update Layer Label
+    //Add Layer Label
+    QString RemainingTime = " Remaining Time: " + QString::number(((ExposureTime+DarkTime)/(1000*1000))*(nSlice-layerCount)) + "s";
+    QCPItemText *textLabel2 = new QCPItemText(ui->LivePlot);
+    textLabel2->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
+    textLabel2->position->setType(QCPItemPosition::ptAxisRectRatio);
+    textLabel2->position->setCoords(0.98, 0.0); // place position at center/top of axis rect
+    textLabel2->setText(RemainingTime);
+    textLabel2->setFont(QFont(font().family(), 12)); // make font a bit larger
+    textLabel2->setPen(QPen(Qt::black)); // show black border around text
+
+    ui->LivePlot->replot();
+}
+
 /*************************************************************
  * ********************OUTSIDE CODE***************************
  * ***********************************************************/
@@ -682,9 +755,31 @@ void MainWindow::on_ManualLightEngine_clicked()
 
 }
 
-
-
-void MainWindow::on_pushButton_clicked()
+void MainWindow::CheckDLPStatus(void)
 {
-    saveText();
+    //If GUI is in exposure state
+    if (ExposureFlag == true && DarkTimeFlag == false)
+    {
+        //Query DLP status
+        if (true) //If DLP has changed to dark time
+        {
+
+        }
+        else //If DLP has not changed states
+        {
+            //Wait 20 ms and repeat this call
+            QTimer::singleShot(20, this, SLOT(CheckDLPStatus()));
+        }
+    }
+    else if (ExposureFlag == false && DarkTimeFlag == true)
+    {
+        //Query DLP status
+    }
+    else
+    {
+        showError("Flag error");
+        return;
+    }
 }
+
+
