@@ -93,8 +93,8 @@ void MainWindow::timerTimeout(void)
 
 MainWindow::~MainWindow()
 {
-    USB_Close();
-    USB_Exit();
+    //USB_Close();
+    //USB_Exit();
     saveText();
     saveSettings();
 
@@ -378,7 +378,7 @@ void MainWindow::PrintProcess(void)
     }
     else
     {
-        USB_Close();
+        //USB_Close();
         ui->ProgramPrints->append("Print Complete");
         return;
     }
@@ -566,22 +566,22 @@ void MainWindow::initPlot()
     ui->LivePlot->yAxis->setRange(0.9*(StartingPosition - nSlice*SliceThickness),1.1*StartingPosition);
 
     //Add Time Remaining Label
-    static QCPItemText *textLabel1 = new QCPItemText(ui->LivePlot);
-    textLabel1->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
-    textLabel1->position->setType(QCPItemPosition::ptAxisRectRatio);
-    textLabel1->position->setCoords(0.9, 0.1); // place position at center/top of axis rect
-    textLabel1->setText(" Layer: ");
-    textLabel1->setFont(QFont(font().family(), 12)); // make font a bit larger
-    textLabel1->setPen(QPen(Qt::black)); // show black border around text
+    //static QCPItemText *textLabel1 = new QCPItemText(ui->LivePlot);
+    //textLabel1->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
+    //textLabel1->position->setType(QCPItemPosition::ptAxisRectRatio);
+    //textLabel1->position->setCoords(0.9, 0.1); // place position at center/top of axis rect
+    //textLabel1->setText(" Layer: ");
+    //textLabel1->setFont(QFont(font().family(), 12)); // make font a bit larger
+    //textLabel1->setPen(QPen(Qt::black)); // show black border around text
 
     //Add Layer Label
-    static QCPItemText *textLabel2 = new QCPItemText(ui->LivePlot);
-    textLabel2->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
-    textLabel2->position->setType(QCPItemPosition::ptAxisRectRatio);
-    textLabel2->position->setCoords(0.9, 0.0); // place position at center/top of axis rect
-    textLabel2->setText(" Remaining Time: ");
-    textLabel2->setFont(QFont(font().family(), 12)); // make font a bit larger
-    textLabel2->setPen(QPen(Qt::black)); // show black border around text
+    //static QCPItemText *textLabel2 = new QCPItemText(ui->LivePlot);
+    //textLabel2->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
+    //textLabel2->position->setType(QCPItemPosition::ptAxisRectRatio);
+    //textLabel2->position->setCoords(0.9, 0.0); // place position at center/top of axis rect
+    //textLabel2->setText(" Remaining Time: ");
+    //textLabel2->setFont(QFont(font().family(), 12)); // make font a bit larger
+    //textLabel2->setPen(QPen(Qt::black)); // show black border around text
 
 
     ui->LivePlot->replot();
