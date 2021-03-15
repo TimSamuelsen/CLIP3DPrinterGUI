@@ -113,7 +113,7 @@ class SMC100C
             void SetVelocity(float VelocityToSet);
             void RelativeMove(float CommandParameter);
             void AbsoluteMove(float AbsoluteDistanceToMove);
-            void GetPosition();
+            char* GetPosition();
             void GetError();
             void GetMotionTime();
             void StopMotion();

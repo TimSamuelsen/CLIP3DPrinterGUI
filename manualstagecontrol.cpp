@@ -69,3 +69,9 @@ void ManualStageControl::on_SetAcceleration_clicked()
     ui->TerminalOut->append("Set Acceleration: " + AccelerationString + "mm/s^2");
     ui->CurrentAcceleration->setText(AccelerationString);
 }
+
+void ManualStageControl::on_pushButton_clicked()
+{
+    QString CurrentPosition = SMC.GetPosition();
+    ui->TerminalOut->append("Stage is at: " + CurrentPosition);
+}

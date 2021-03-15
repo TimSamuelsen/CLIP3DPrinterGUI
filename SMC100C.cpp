@@ -32,6 +32,7 @@ History:
 #include "SMC100C.h"
 #include "serialib.h"
 #include <stdio.h>
+#include <string.h>
 /*-------------------------------------------------- Module Variables and Libraries---------------------------------------------------*/
 //Change if you need to use a different Controller Adress
 static const char* ControllerAdress = "1";
@@ -43,6 +44,7 @@ static bool initFlag;
 //May convert these to int or float eventually
 static char* MotionTime;
 static char* CurrentPosition;
+
 
 //Many of these functions will likely not be needed and can be removed at a later date after testing
 //Command Libarary (Based on SMC100C User Manual p. 22-70)
@@ -221,7 +223,7 @@ const char* SMC100C::ConvertToErrorString(char ErrorChar)
 bool SMC100C::SMC100CInit(const char* COMPORT)
 {
     serialib serial;
-   if (serial.openDevice("COM4",57600) == 1)
+   if (serial.openDevice("COM3",57600) == 1)
    {
        SelectedCOM = COMPORT;
        //initFlag = true;
@@ -440,19 +442,25 @@ Notes:
 Author:
     TimS, 1/25/21
 ***************************************************************************************************************************************/
-void SMC100C::GetPosition()
+char* SMC100C::GetPosition()
 { 
+    char* PositionOutput;
     SetCommand(CommandType::PositionReal, 0.0, CommandGetSetType::Get);
     SendCurrentCommand();
-    char* PositionOutput;
     PositionOutput = SerialRead();
-    char* POut;
+    //char* PositionOutput;
+    //PositionOutput = SerialRead();
+    //char* POut;
+    /*
     for (uint8_t index = 3; index < strlen(PositionOutput);index++)
     {
         strcat(POut,&PositionOutput[index]);
     }
    CurrentPosition = POut;
-    printf(CurrentPosition);
+   printf(CurrentPosition);
+   return CurrentPosition;
+   */
+   return PositionOutput;
 };
 /**************************************************************************************************************************************
 Function:
@@ -656,9 +664,32 @@ char* SMC100C::SerialRead()
     serialib Read;
     char* receivedString;
     char finalChar;
-    unsigned int maxNbBytes = 100;
-    Read.readString(receivedString,finalChar,maxNbBytes);
-    return receivedString;
+    unsigned int maxNbBytes = 1000;
+    int ReadStatus = Read.readString(receivedString,finalChar,maxNbBytes, 5000);
+    if (ReadStatus > 0)
+    {
+        return receivedString;
+    }
+    else if(ReadStatus == 0)
+    {
+        char* errString = "Timeout Reached";
+        return  errString;
+    }
+    else if(ReadStatus == -1)
+    {
+        char* errString = "Error Setting Timeout";
+        return  errString;
+    }
+    else if(ReadStatus == -2)
+    {
+        char* errString = "Error while reading byte";
+        return  errString;
+    }
+    else if(ReadStatus == -3)
+    {
+        char* errString = "Max N bytes reached";
+        return  errString;
+    }
 }
 /*----------------------------------------------------- Work in Progress Code -------------------------------------------------------*/
 /**************************************************************************************************************************************

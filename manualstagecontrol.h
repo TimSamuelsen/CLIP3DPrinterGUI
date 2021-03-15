@@ -28,6 +28,8 @@ private slots:
 
     void on_SetAcceleration_clicked();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::ManualStageControl *ui;
 };
