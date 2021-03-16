@@ -2,6 +2,7 @@
 #define SMC100C_h
 
 #include <stdint.h>
+#include "serialib.h"
 
 class SMC100C
 {
@@ -108,6 +109,7 @@ class SMC100C
                 StatusType Type;
             };
             bool SMC100CInit(const char*);
+            void SMC100CClose();
             bool Home(void);
             bool QueryHardware();
             void SetVelocity(float VelocityToSet);
@@ -134,6 +136,7 @@ class SMC100C
             void SetCommand(CommandType Type, float Parameter, CommandGetSetType GetOrSet);
             StatusType ConvertStatus(char* StatusChar);
             char* SerialRead();
+            serialib serial;
 };
 
 #endif

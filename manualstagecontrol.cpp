@@ -1,9 +1,11 @@
 #include "manualstagecontrol.h"
 #include "ui_manualstagecontrol.h"
 #include "SMC100C.h"
+#include "mainwindow.h"
+
+//static SMC100C SMC;
 
 //Module variables
-SMC100C SMC;
 ManualStageControl::ManualStageControl(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ManualStageControl)

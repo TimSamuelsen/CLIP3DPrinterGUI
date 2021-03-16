@@ -2,6 +2,7 @@
 #define MANUALSTAGECONTROL_H
 
 #include <QWidget>
+#include "SMC100C.h"
 
 namespace Ui {
 class ManualStageControl;
@@ -14,7 +15,7 @@ class ManualStageControl : public QWidget
 public:
     explicit ManualStageControl(QWidget *parent = nullptr);
     ~ManualStageControl();
-
+    SMC100C SMC;
 private slots:
     void on_MoveRelative_clicked();
 

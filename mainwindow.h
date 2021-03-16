@@ -5,7 +5,8 @@
 #include "manualstagecontrol.h"
 #include "manualprojcontrol.h"
 #include "patternelement.h"
-
+#include "SMC100C.h"
+#include "dlp9000.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,6 +21,8 @@ public:
     ~MainWindow();
     bool nanosleep(double ns);
     void PrintToTerminal(QString StringToPrint);
+    SMC100C SMC;
+    //DLP9000 DLP;
 
 public slots:
     void showError(QString errMsg);

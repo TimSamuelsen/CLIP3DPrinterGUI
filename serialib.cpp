@@ -16,7 +16,7 @@ This is a licence-free software, it can be used by anyone who try to build a bet
  */
 
 #include "serialib.h"
-
+#include <stdlib.h>
 
 
 //_____________________________________
@@ -43,6 +43,7 @@ serialib::serialib()
 serialib::~serialib()
 {
     closeDevice();
+    //put("Class desctructed!!!");
 }
 
 
@@ -426,7 +427,7 @@ int serialib::readStringNoTimeOut(char *receivedString,char finalChar,unsigned i
         if (charRead<0) return charRead;
     }
     // Buffer is full : return -3
-    return -3;
+    //return -3;
 }
 
 

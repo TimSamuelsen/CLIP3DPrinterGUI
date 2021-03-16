@@ -42,9 +42,8 @@
 #define NormalTime
 #define QuickTime
 
-//Module level variables
-static SMC100C SMC;
 static DLP9000 DLP;
+//Module level variables
 static bool PrintFlag = 0;
 //Settings are static so they can be accessed from outside anywhere in this module
 static double SliceThickness;
@@ -97,6 +96,7 @@ MainWindow::~MainWindow()
     //USB_Exit();
     saveText();
     saveSettings();
+    //SMC.SMC100CClose();
 
     delete ui;
 }
@@ -108,9 +108,6 @@ void MainWindow::on_ManualStage_clicked()
     ManualStageUI = new ManualStageControl();
     ManualStageUI->show();
     SMC.Home();
-    ui->SliceThicknessParam->setValue(50);
-    ui->StageVelocityParam->setValue(5);
-
 }
 /*********************************************Print Parameters*********************************************/
 void MainWindow::on_ResinSelect_activated(const QString &arg1)
@@ -121,8 +118,11 @@ void MainWindow::on_ResinSelect_activated(const QString &arg1)
 void MainWindow::on_SetStartingPosButton_clicked()
 {
     StartingPosition = (ui->StartingPositionParam->value());
-    QString StartingPositionString = "Set Starting Position to: " + QString::number(StageVelocity) + " mm";
+    QString StartingPositionString = "Set Starting Position to: " + QString::number(StartingPosition) + " mm";
     ui->ProgramPrints->append(StartingPositionString);
+    QString CurrentPosition = SMC.GetPosition();
+    //CurrentPosition = CurrentPosition.chopped(3);
+    ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
 }
 
 void MainWindow::on_SetSliceThickness_clicked()
@@ -304,6 +304,7 @@ void MainWindow::on_LightEngineConnectButton_clicked()
 void MainWindow::on_InitializeAndSynchronize_clicked()
 {
     LCR_PatternDisplay(0);
+    SMC.AbsoluteMove(StartingPosition);
     if (ui->FileList->count() > 0)
     {
         QListWidgetItem * item;

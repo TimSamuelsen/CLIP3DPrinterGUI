@@ -44,7 +44,7 @@ static bool initFlag;
 //May convert these to int or float eventually
 static char* MotionTime;
 static char* CurrentPosition;
-
+static serialib serial;
 
 //Many of these functions will likely not be needed and can be removed at a later date after testing
 //Command Libarary (Based on SMC100C User Manual p. 22-70)
@@ -222,7 +222,7 @@ const char* SMC100C::ConvertToErrorString(char ErrorChar)
 //Serial Port initialization (May be removed)
 bool SMC100C::SMC100CInit(const char* COMPORT)
 {
-    serialib serial;
+    //serialib serial;
    if (serial.openDevice("COM3",57600) == 1)
    {
        SelectedCOM = COMPORT;
@@ -235,6 +235,11 @@ bool SMC100C::SMC100CInit(const char* COMPORT)
         return false;
    }
 };
+
+void SMC100C::SMC100CClose()
+{
+    serial.closeDevice();
+}
 /**************************************************************************************************************************************
 Function: 
     Home
@@ -444,23 +449,19 @@ Author:
 ***************************************************************************************************************************************/
 char* SMC100C::GetPosition()
 { 
-    char* PositionOutput;
     SetCommand(CommandType::PositionReal, 0.0, CommandGetSetType::Get);
     SendCurrentCommand();
-    PositionOutput = SerialRead();
-    //char* PositionOutput;
-    //PositionOutput = SerialRead();
-    //char* POut;
-    /*
-    for (uint8_t index = 3; index < strlen(PositionOutput);index++)
-    {
-        strcat(POut,&PositionOutput[index]);
-    }
-   CurrentPosition = POut;
-   printf(CurrentPosition);
-   return CurrentPosition;
-   */
-   return PositionOutput;
+    char* Read = SerialRead();
+    char* POut;
+
+    //for (uint8_t index = 3; index < strlen(PositionOutput);index++)
+    //{
+        //strcat(POut,&PositionOutput[index]);
+   // }
+   //CurrentPosition = POut;
+   //printf(CurrentPosition);
+   //return CurrentPosition;
+   return Read;
 };
 /**************************************************************************************************************************************
 Function:
@@ -545,7 +546,7 @@ Author:
 bool SMC100C::SendCurrentCommand()
 {
     //printf("Sending Command \r\n");
-    serialib serial;
+    //serialib serial;
     //Will move GetCharacter, CarriageReturnChar and NewLineChar out of this function eventually
     static const char* GetCharacter = "?";
     //static const char* CarriageReturnChar = "\r";
@@ -558,12 +559,12 @@ bool SMC100C::SendCurrentCommand()
     //Open Serial Port
     if (initFlag)
     {
-        serial.openDevice(SelectedCOM, 57600);
+        //serial.openDevice(SelectedCOM, 57600);
     }
     else
     {
-        char test = serial.openDevice("COM3",57600);
-        printf("serial open test: %d",test);
+        //char test = serial.openDevice("COM3",57600);
+        //printf("serial open test: %d",test);
     }
     //Write Adress
     serial.writeString(ControllerAdress);
@@ -662,11 +663,13 @@ Author:
 ***************************************************************************************************************************************/
 char* SMC100C::SerialRead()
 {
-    serialib Read;
+    //serialib Read;
     char* receivedString;
     char finalChar;
-    unsigned int maxNbBytes = 1000;
-    int ReadStatus = Read.readString(receivedString,finalChar,maxNbBytes);
+    unsigned int maxNbBytes = 13;
+    int ReadStatus = serial.readString(receivedString,finalChar,maxNbBytes);
+
+    char ReadChar;
     if (ReadStatus > 0)
     {
         return receivedString;
@@ -689,7 +692,7 @@ char* SMC100C::SerialRead()
     else if(ReadStatus == -3)
     {
         char* errString = "Max N bytes reached";
-        return  errString;
+        return  receivedString;
     }
 }
 /*----------------------------------------------------- Work in Progress Code -------------------------------------------------------*/
@@ -719,7 +722,7 @@ bool SMC100C::QueryHardware()
     //Send command
     SendCurrentCommand();
 
-    serialib serial;
+    //serialib serial;
     //Have no idea whether this is a good value for this, will need some finetuning
     unsigned int maxNbBytes = 100;
     serial.readString(receivedString,finalChar,maxNbBytes);
