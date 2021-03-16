@@ -562,7 +562,8 @@ bool SMC100C::SendCurrentCommand()
     }
     else
     {
-        serial.openDevice("COM3",57600);
+        char test = serial.openDevice("COM3",57600);
+        printf("serial open test: %d",test);
     }
     //Write Adress
     serial.writeString(ControllerAdress);
@@ -665,7 +666,7 @@ char* SMC100C::SerialRead()
     char* receivedString;
     char finalChar;
     unsigned int maxNbBytes = 1000;
-    int ReadStatus = Read.readString(receivedString,finalChar,maxNbBytes, 5000);
+    int ReadStatus = Read.readString(receivedString,finalChar,maxNbBytes);
     if (ReadStatus > 0)
     {
         return receivedString;
