@@ -31,6 +31,8 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_ConnectButton_clicked();
+
 private:
     Ui::ManualStageControl *ui;
 };

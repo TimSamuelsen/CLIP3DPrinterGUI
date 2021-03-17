@@ -11,6 +11,7 @@ ManualStageControl::ManualStageControl(QWidget *parent) :
     ui(new Ui::ManualStageControl)
 {
     ui->setupUi(this);
+    SMC.SMC100CInit("COM3");
 
 }
 
@@ -19,9 +20,24 @@ ManualStageControl::~ManualStageControl()
     delete ui;
 }
 
+void ManualStageControl::on_ConnectButton_clicked()
+{
+    bool connectTest = SMC.SMC100CInit("COM3");
+    if (connectTest)
+    {
+        ui->TerminalOut->append("Stage Connected");
+    }
+    else
+    {
+        ui->TerminalOut->append("Stage Connection Failed");
+    }
+}
+
+
 
 void ManualStageControl::on_MoveRelative_clicked()
 {
+    MainWindow Main;
     double RelativeMoveDistance = (ui->RelativeMoveParam->value());
     SMC.RelativeMove(RelativeMoveDistance);
     QString RelativeMoveString = "Relative Move: " + QString::number(RelativeMoveDistance) + "mm";
@@ -77,3 +93,4 @@ void ManualStageControl::on_pushButton_clicked()
     QString CurrentPosition = SMC.GetPosition();
     ui->TerminalOut->append("Stage is at: " + CurrentPosition);
 }
+

@@ -87,7 +87,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::timerTimeout(void)
 {
-
+    QString CurrentPosition = SMC.GetPosition();
+    CurrentPosition = CurrentPosition.remove(0,3);
+    if ()
+    ui->CurrentPositionIndicator->setText(CurrentPosition);
 }
 
 MainWindow::~MainWindow()
@@ -108,6 +111,10 @@ void MainWindow::on_ManualStage_clicked()
     ManualStageUI = new ManualStageControl();
     ManualStageUI->show();
     SMC.Home();
+    SMC.SMC100CClose();
+    ui->ProgramPrints->append("Manual Control Entered");
+    ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 255); border: 1px solid black;");
+    ui->StageConnectionIndicator->setText("Manual Control");
 }
 /*********************************************Print Parameters*********************************************/
 void MainWindow::on_ResinSelect_activated(const QString &arg1)
@@ -121,7 +128,7 @@ void MainWindow::on_SetStartingPosButton_clicked()
     QString StartingPositionString = "Set Starting Position to: " + QString::number(StartingPosition) + " mm";
     ui->ProgramPrints->append(StartingPositionString);
     QString CurrentPosition = SMC.GetPosition();
-    //CurrentPosition = CurrentPosition.chopped(3);
+    CurrentPosition = CurrentPosition.remove(0,3);
     ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
 }
 
@@ -260,6 +267,7 @@ void MainWindow::on_StageConnectButton_clicked()
     QString COMSelect = ui->COMPortSelect->currentText();
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
+    SMC.SMC100CClose();
     if (SMC.SMC100CInit(COM) == true && SMC.Home() == true)
     {
         ui->ProgramPrints->append("Stage Connected");
@@ -782,5 +790,4 @@ void MainWindow::CheckDLPStatus(void)
         return;
     }
 }
-
 
