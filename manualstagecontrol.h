@@ -35,6 +35,7 @@ private slots:
 
 private:
     Ui::ManualStageControl *ui;
+    void GetValues();
 };
 
 #endif // MANUALSTAGECONTROL_H

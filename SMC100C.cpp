@@ -463,6 +463,38 @@ char* SMC100C::GetPosition()
    //return CurrentPosition;
    return Read;
 };
+
+char* SMC100C::GetVelocity()
+{
+    SetCommand(CommandType::Velocity, 0.0, CommandGetSetType::Get);
+    SendCurrentCommand();
+    char* Read = SerialRead();
+    return Read;
+}
+
+char* SMC100C::GetAcceleration()
+{
+    SetCommand(CommandType::Acceleration, 0.0, CommandGetSetType::Get);
+    SendCurrentCommand();
+    char* Read = SerialRead();
+    return Read;
+}
+
+char* SMC100C::GetPositiveLimit()
+{
+    SetCommand(CommandType::PositiveSoftwareLim, 0.0, CommandGetSetType::Get);
+    SendCurrentCommand();
+    char* Read = SerialRead();
+    return Read;
+}
+
+char* SMC100C::GetNegativeLimit()
+{
+    SetCommand(CommandType::NegativeSoftwareLim, 0.0, CommandGetSetType::Get);
+    SendCurrentCommand();
+    char* Read = SerialRead();
+    return Read;
+}
 /**************************************************************************************************************************************
 Function:
     SetPositiveLimit
@@ -667,7 +699,7 @@ char* SMC100C::SerialRead()
     char* receivedString;
     char finalChar;
     unsigned int maxNbBytes = 13;
-    int ReadStatus = serial.readString(receivedString,finalChar,maxNbBytes);
+    int ReadStatus = serial.readString(receivedString,finalChar,maxNbBytes,1000);
 
     char ReadChar;
     if (ReadStatus > 0)

@@ -116,12 +116,17 @@ class SMC100C
             void RelativeMove(float CommandParameter);
             void AbsoluteMove(float AbsoluteDistanceToMove);
             char* GetPosition();
+            char* GetVelocity();
+            char* GetAcceleration();
+            char* GetPositiveLimit();
+            char* GetNegativeLimit();
             void GetError();
             void GetMotionTime();
             void StopMotion();
             void SetPositiveLimit(float Limit);
             void SetNegativeLimit(float Limit);
             void SetAcceleration(float AccelerationToSet);
+
     private:
             static const char GetCharacter;
             //void Home(void);

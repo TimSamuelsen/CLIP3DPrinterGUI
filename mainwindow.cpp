@@ -87,10 +87,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::timerTimeout(void)
 {
-    QString CurrentPosition = SMC.GetPosition();
-    CurrentPosition = CurrentPosition.remove(0,3);
-    if ()
-    ui->CurrentPositionIndicator->setText(CurrentPosition);
+    //QString CurrentPosition = SMC.GetPosition();
+    //CurrentPosition = CurrentPosition.remove(0,3);
+    //ui->CurrentPositionIndicator->setText(CurrentPosition);
 }
 
 MainWindow::~MainWindow()

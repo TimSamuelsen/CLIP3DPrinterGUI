@@ -33,6 +33,24 @@ void ManualStageControl::on_ConnectButton_clicked()
     }
 }
 
+void ManualStageControl::GetValues()
+{
+    //QString CurrentVelocity = SMC.GetVelocity();
+    //CurrentVelocity = CurrentVelocity.remove(0,3);
+    //ui->CurrentVelocity->setText(CurrentVelocity);
+
+    //QString CurrentAcceleration = SMC.GetAcceleration();
+    //CurrentAcceleration = CurrentVelocity.remove(0,3);
+    //ui->CurrentAcceleration->setText(CurrentAcceleration);
+
+    //QString CurrentPositiveLimit = SMC.GetPositiveLimit();
+    //CurrentPositiveLimit = CurrentPositiveLimit.remove(0,3);
+    //ui->CurrentMaxEndOfRun->setText(CurrentPositiveLimit);
+
+   // QString CurrentNegativeLimit = SMC.GetNegativeLimit();
+    //CurrentNegativeLimit = CurrentNegativeLimit.remove(0,3);
+    //ui->CurrentMinEndOfRun->setText(CurrentNegativeLimit);
+}
 
 
 void ManualStageControl::on_MoveRelative_clicked()
@@ -91,6 +109,8 @@ void ManualStageControl::on_SetAcceleration_clicked()
 void ManualStageControl::on_pushButton_clicked()
 {
     QString CurrentPosition = SMC.GetPosition();
+    CurrentPosition = CurrentPosition.remove(0,3);
     ui->TerminalOut->append("Stage is at: " + CurrentPosition);
+    ui->CurrentPositionIndicator->setText(CurrentPosition);
 }
 

@@ -17,7 +17,7 @@ This is a licence-free software, it can be used by anyone who try to build a bet
 
 #include "serialib.h"
 #include <stdlib.h>
-
+#include <stdio.h>
 
 //_____________________________________
 // ::: Constructors and destructors :::
@@ -492,6 +492,7 @@ int serialib::readString(char *receivedString,char finalChar,unsigned int maxNbB
         // Check if timeout is reached
         if (timer.elapsedTime_ms()>timeOut_ms)
         {
+            printf("Timer: %d", timer.elapsedTime_ms());
             // Add the end caracter
             receivedString[nbBytes]=0;
             // Return 0 (timeout reached)
