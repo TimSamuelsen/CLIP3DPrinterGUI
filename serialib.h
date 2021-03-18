@@ -22,7 +22,7 @@ This is a licence-free software, it can be used by anyone who try to build a bet
 
 
 // Used for TimeOut operations
-//#include <sys/time.h>
+#include <sys/time.h>
 #include <time.h>
 // Include for windows
 #if defined (_WIN32) || defined (_WIN64)

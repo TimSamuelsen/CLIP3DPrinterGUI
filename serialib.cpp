@@ -18,7 +18,7 @@ This is a licence-free software, it can be used by anyone who try to build a bet
 #include "serialib.h"
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <time.h>
 //_____________________________________
 // ::: Constructors and destructors :::
 
@@ -924,7 +924,7 @@ timeOut::timeOut()
 //Initialize the timer
 void timeOut::initTimer()
 {
-    //gettimeofday(&previousTime, NULL);
+    gettimeofday(&previousTime, NULL);
 }
 
 /*!
@@ -941,7 +941,7 @@ unsigned long int timeOut::elapsedTime_ms()
     int sec,usec;
 
     // Get current time
-    //gettimeofday(&CurrentTime, NULL);
+    gettimeofday(&CurrentTime, NULL);
 
     // Compute the number of seconds and microseconds elapsed since last call
     sec=CurrentTime.tv_sec-previousTime.tv_sec;
