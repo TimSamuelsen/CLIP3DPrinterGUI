@@ -790,3 +790,9 @@ void MainWindow::CheckDLPStatus(void)
     }
 }
 
+
+void MainWindow::on_AbortPrint_clicked()
+{
+    LCR_PatternDisplay(0);
+    SMC.StopMotion();
+}

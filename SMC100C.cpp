@@ -699,7 +699,8 @@ char* SMC100C::SerialRead()
     char* receivedString;
     char finalChar;
     unsigned int maxNbBytes = 13;
-    int ReadStatus = serial.readString(receivedString,finalChar,maxNbBytes,1000);
+    int ReadStatus;
+    ReadStatus = serial.readString(receivedString,finalChar,maxNbBytes,1000);
 
     char ReadChar;
     if (ReadStatus > 0)

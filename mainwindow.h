@@ -91,6 +91,8 @@ private slots:
 
     void on_SetStartingPosButton_clicked();
 
+    void on_AbortPrint_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
