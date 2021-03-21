@@ -347,6 +347,14 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
     }
 }
 
+void MainWindow::on_AbortPrint_clicked()
+{
+    LCR_PatternDisplay(0);
+    SMC.StopMotion();
+    //Set layer count high to stop print process
+    layerCount = 0xFFFF;
+}
+
 void MainWindow::on_StartPrint_clicked()
 {
     //If settings are validated successfully and Initialization has been completed
@@ -573,25 +581,6 @@ void MainWindow::initPlot()
     ui->LivePlot->xAxis->setRange(0, (1.1*nSlice*(ExposureTime+DarkTime)/(1000*1000)));
     ui->LivePlot->yAxis->setRange(0.9*(StartingPosition - nSlice*SliceThickness),1.1*StartingPosition);
 
-    //Add Time Remaining Label
-    //static QCPItemText *textLabel1 = new QCPItemText(ui->LivePlot);
-    //textLabel1->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
-    //textLabel1->position->setType(QCPItemPosition::ptAxisRectRatio);
-    //textLabel1->position->setCoords(0.9, 0.1); // place position at center/top of axis rect
-    //textLabel1->setText(" Layer: ");
-    //textLabel1->setFont(QFont(font().family(), 12)); // make font a bit larger
-    //textLabel1->setPen(QPen(Qt::black)); // show black border around text
-
-    //Add Layer Label
-    //static QCPItemText *textLabel2 = new QCPItemText(ui->LivePlot);
-    //textLabel2->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
-    //textLabel2->position->setType(QCPItemPosition::ptAxisRectRatio);
-    //textLabel2->position->setCoords(0.9, 0.0); // place position at center/top of axis rect
-    //textLabel2->setText(" Remaining Time: ");
-    //textLabel2->setFont(QFont(font().family(), 12)); // make font a bit larger
-    //textLabel2->setPen(QPen(Qt::black)); // show black border around text
-
-
     ui->LivePlot->replot();
 }
 
@@ -791,8 +780,3 @@ void MainWindow::CheckDLPStatus(void)
 }
 
 
-void MainWindow::on_AbortPrint_clicked()
-{
-    LCR_PatternDisplay(0);
-    SMC.StopMotion();
-}

@@ -26,10 +26,14 @@ void ManualStageControl::on_ConnectButton_clicked()
     if (connectTest)
     {
         ui->TerminalOut->append("Stage Connected");
+        ui->ConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
+        ui->ConnectionIndicator->setText("Connected");
     }
     else
     {
         ui->TerminalOut->append("Stage Connection Failed");
+        ui->ConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
+        ui->ConnectionIndicator->setText("Disconnected");
     }
 }
 
@@ -114,3 +118,35 @@ void ManualStageControl::on_pushButton_clicked()
     ui->CurrentPositionIndicator->setText(CurrentPosition);
 }
 
+
+void ManualStageControl::on_GetMinEndOfRun_clicked()
+{
+    QString CurrentMinEndOfRun = SMC.GetNegativeLimit();
+    CurrentMinEndOfRun = CurrentMinEndOfRun.remove(0,3);
+    ui->TerminalOut->append("Current Min End of Run: " + CurrentMinEndOfRun);
+    ui->CurrentMinEndOfRun->setText(CurrentMinEndOfRun);
+}
+
+void ManualStageControl::on_GetMaxEndOfRun_clicked()
+{
+    QString CurrentMaxEndOfRun  = SMC.GetPositiveLimit();
+    CurrentMaxEndOfRun = CurrentMaxEndOfRun.remove(0,3);
+    ui->TerminalOut->append("Current Max End of Run: " + CurrentMaxEndOfRun );
+    ui->CurrentMaxEndOfRun->setText(CurrentMaxEndOfRun );
+}
+
+void ManualStageControl::on_GetVelocity_clicked()
+{
+    QString CurrentVelocity  = SMC.GetVelocity();
+    CurrentVelocity = CurrentVelocity.remove(0,3);
+    ui->TerminalOut->append("Current Velocity: " + CurrentVelocity);
+    ui->CurrentVelocity->setText(CurrentVelocity);
+}
+
+void ManualStageControl::on_GetAcceleration_clicked()
+{
+    QString CurrentAcceleration  = SMC.GetAcceleration();
+    CurrentAcceleration = CurrentAcceleration.remove(0,3);
+    ui->TerminalOut->append("Current Acceleration: " + CurrentAcceleration);
+    ui->CurrentAcceleration->setText(CurrentAcceleration);
+}

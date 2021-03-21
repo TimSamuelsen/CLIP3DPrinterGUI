@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>764</width>
-    <height>719</height>
+    <width>508</width>
+    <height>737</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>4</x>
-     <y>110</y>
+     <y>140</y>
      <width>511</width>
      <height>20</height>
     </rect>
@@ -29,10 +29,10 @@
   <widget class="QLabel" name="CurrentVelocity">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>410</y>
-     <width>61</width>
-     <height>21</height>
+     <x>50</x>
+     <y>440</y>
+     <width>71</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -47,7 +47,7 @@
    <property name="geometry">
     <rect>
      <x>390</x>
-     <y>390</y>
+     <y>420</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -60,7 +60,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>270</y>
+     <y>300</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -72,10 +72,10 @@
   <widget class="QLabel" name="CurrentMinEndOfRun">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>290</y>
-     <width>61</width>
-     <height>21</height>
+     <x>50</x>
+     <y>320</y>
+     <width>71</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -90,7 +90,7 @@
    <property name="geometry">
     <rect>
      <x>260</x>
-     <y>140</y>
+     <y>170</y>
      <width>261</width>
      <height>20</height>
     </rect>
@@ -102,22 +102,22 @@
   <widget class="QLabel" name="CurrentStagePosition">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>49</y>
+     <x>0</x>
+     <y>70</y>
      <width>291</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Current Stage Position (mm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Current Stage Position (mm)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QPushButton" name="SetAcceleration">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>440</y>
-     <width>61</width>
+     <x>400</x>
+     <y>480</y>
+     <width>71</width>
      <height>31</height>
     </rect>
    </property>
@@ -129,7 +129,7 @@
    <property name="geometry">
     <rect>
      <x>4</x>
-     <y>250</y>
+     <y>280</y>
      <width>251</width>
      <height>20</height>
     </rect>
@@ -142,7 +142,7 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>270</y>
+     <y>300</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -155,8 +155,8 @@
    <property name="geometry">
     <rect>
      <x>400</x>
-     <y>170</y>
-     <width>61</width>
+     <y>200</y>
+     <width>71</width>
      <height>31</height>
     </rect>
    </property>
@@ -167,29 +167,29 @@
   <widget class="QDoubleSpinBox" name="AbsoluteMoveParam">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>170</y>
-     <width>62</width>
+     <x>310</x>
+     <y>200</y>
+     <width>71</width>
      <height>31</height>
     </rect>
    </property>
    <property name="decimals">
-    <number>8</number>
+    <number>5</number>
    </property>
    <property name="minimum">
     <double>-99.989999999999995</double>
    </property>
    <property name="value">
-    <double>-1.000000000000000</double>
+    <double>0.000000000000000</double>
    </property>
   </widget>
   <widget class="QDoubleSpinBox" name="NewAccelParam">
    <property name="geometry">
     <rect>
      <x>400</x>
-     <y>410</y>
-     <width>62</width>
-     <height>22</height>
+     <y>440</y>
+     <width>71</width>
+     <height>31</height>
     </rect>
    </property>
   </widget>
@@ -197,7 +197,7 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>170</y>
+     <y>200</y>
      <width>61</width>
      <height>31</height>
     </rect>
@@ -210,7 +210,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>0</y>
+     <y>10</y>
      <width>511</width>
      <height>31</height>
     </rect>
@@ -223,7 +223,7 @@
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>390</y>
+     <y>420</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -235,9 +235,9 @@
   <widget class="QPushButton" name="SetMinEndOfRun">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>320</y>
-     <width>61</width>
+     <x>140</x>
+     <y>360</y>
+     <width>71</width>
      <height>31</height>
     </rect>
    </property>
@@ -249,7 +249,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>140</y>
+     <y>170</y>
      <width>261</width>
      <height>20</height>
     </rect>
@@ -262,7 +262,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>220</y>
+     <y>250</y>
      <width>511</width>
      <height>20</height>
     </rect>
@@ -271,27 +271,11 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Movement Configuration&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QSlider" name="CurrentPositionSlider">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>70</y>
-     <width>361</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <property name="maximum">
-    <number>65</number>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>270</y>
+     <y>300</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -304,7 +288,7 @@
    <property name="geometry">
     <rect>
      <x>254</x>
-     <y>250</y>
+     <y>280</y>
      <width>271</width>
      <height>20</height>
     </rect>
@@ -317,19 +301,19 @@
    <property name="geometry">
     <rect>
      <x>400</x>
-     <y>290</y>
-     <width>62</width>
-     <height>22</height>
+     <y>320</y>
+     <width>71</width>
+     <height>31</height>
     </rect>
    </property>
   </widget>
   <widget class="QLabel" name="CurrentMaxEndOfRun">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>290</y>
-     <width>61</width>
-     <height>21</height>
+     <x>310</x>
+     <y>320</y>
+     <width>71</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -343,9 +327,9 @@
   <widget class="QPushButton" name="SetMaxEndOfRun">
    <property name="geometry">
     <rect>
-     <x>360</x>
-     <y>320</y>
-     <width>61</width>
+     <x>400</x>
+     <y>360</y>
+     <width>71</width>
      <height>31</height>
     </rect>
    </property>
@@ -356,10 +340,10 @@
   <widget class="QLabel" name="CurrentAcceleration">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>410</y>
-     <width>61</width>
-     <height>21</height>
+     <x>310</x>
+     <y>440</y>
+     <width>71</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -374,7 +358,7 @@
    <property name="geometry">
     <rect>
      <x>390</x>
-     <y>270</y>
+     <y>300</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -387,9 +371,9 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>410</y>
-     <width>62</width>
-     <height>22</height>
+     <y>440</y>
+     <width>71</width>
+     <height>31</height>
     </rect>
    </property>
   </widget>
@@ -397,7 +381,7 @@
    <property name="geometry">
     <rect>
      <x>260</x>
-     <y>370</y>
+     <y>400</y>
      <width>261</width>
      <height>20</height>
     </rect>
@@ -410,9 +394,9 @@
    <property name="geometry">
     <rect>
      <x>140</x>
-     <y>290</y>
-     <width>62</width>
-     <height>22</height>
+     <y>320</y>
+     <width>71</width>
+     <height>31</height>
     </rect>
    </property>
   </widget>
@@ -420,7 +404,7 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>370</y>
+     <y>400</y>
      <width>251</width>
      <height>20</height>
     </rect>
@@ -433,7 +417,7 @@
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>390</y>
+     <y>420</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -445,9 +429,9 @@
   <widget class="QPushButton" name="SetVelocity">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>440</y>
-     <width>61</width>
+     <x>140</x>
+     <y>480</y>
+     <width>71</width>
      <height>31</height>
     </rect>
    </property>
@@ -458,9 +442,9 @@
   <widget class="QLabel" name="CurrentPositionIndicator">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>70</y>
-     <width>61</width>
+     <x>40</x>
+     <y>100</y>
+     <width>81</width>
      <height>31</height>
     </rect>
    </property>
@@ -476,7 +460,7 @@
    <property name="geometry">
     <rect>
      <x>310</x>
-     <y>390</y>
+     <y>420</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -489,10 +473,13 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>170</y>
+     <y>200</y>
      <width>71</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="decimals">
+    <number>5</number>
    </property>
    <property name="minimum">
     <double>-99.000000000000000</double>
@@ -502,7 +489,7 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>520</y>
+     <y>550</y>
      <width>401</width>
      <height>181</height>
     </rect>
@@ -535,7 +522,7 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>490</y>
+     <y>520</y>
      <width>391</width>
      <height>20</height>
     </rect>
@@ -557,26 +544,13 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Movement Controls&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_18">
+  <widget class="QPushButton" name="GetPosition">
    <property name="geometry">
     <rect>
-     <x>510</x>
-     <y>190</y>
-     <width>221</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Queries&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>580</x>
-     <y>260</y>
+     <x>140</x>
+     <y>100</y>
      <width>93</width>
-     <height>28</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -586,10 +560,10 @@
   <widget class="QPushButton" name="ConnectButton">
    <property name="geometry">
     <rect>
-     <x>530</x>
-     <y>110</y>
+     <x>290</x>
+     <y>100</y>
      <width>93</width>
-     <height>28</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
@@ -599,33 +573,82 @@
   <widget class="QLabel" name="label_19">
    <property name="geometry">
     <rect>
-     <x>520</x>
+     <x>280</x>
      <y>70</y>
      <width>221</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Connect To Stage&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Connect To Stage&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="ConnectionCheckbox">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
+  <widget class="QPushButton" name="GetMinEndOfRun">
    <property name="geometry">
     <rect>
-     <x>640</x>
-     <y>110</y>
-     <width>21</width>
-     <height>20</height>
+     <x>50</x>
+     <y>360</y>
+     <width>71</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="text">
-    <string/>
+    <string>Get</string>
    </property>
-   <property name="checkable">
-    <bool>false</bool>
+  </widget>
+  <widget class="QPushButton" name="GetMaxEndOfRun">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>360</y>
+     <width>71</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Get</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="GetAcceleration">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>480</y>
+     <width>71</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Get</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="GetVelocity">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>480</y>
+     <width>71</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Get</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ConnectionIndicator">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>100</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:rgb(255, 0, 0); border: 1px solid black;</string>
+   </property>
+   <property name="text">
+    <string>Disconnected</string>
    </property>
   </widget>
  </widget>
