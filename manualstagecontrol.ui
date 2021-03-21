@@ -29,9 +29,15 @@
   <widget class="QLabel" name="CurrentVelocity">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>50</x>
      <y>440</y>
      <width>71</width>
+=======
+     <x>60</x>
+     <y>410</y>
+     <width>61</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
    </property>
@@ -72,9 +78,15 @@
   <widget class="QLabel" name="CurrentMinEndOfRun">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>50</x>
      <y>320</y>
      <width>71</width>
+=======
+     <x>60</x>
+     <y>290</y>
+     <width>61</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
    </property>
@@ -115,9 +127,15 @@
   <widget class="QPushButton" name="SetAcceleration">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>400</x>
      <y>480</y>
      <width>71</width>
+=======
+     <x>360</x>
+     <y>450</y>
+     <width>61</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
    </property>
@@ -167,11 +185,20 @@
   <widget class="QDoubleSpinBox" name="AbsoluteMoveParam">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>310</x>
      <y>200</y>
      <width>71</width>
+=======
+     <x>311</x>
+     <y>170</y>
+     <width>81</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
+   </property>
+   <property name="toolTipDuration">
+    <number>-2</number>
    </property>
    <property name="decimals">
     <number>5</number>
@@ -187,10 +214,18 @@
    <property name="geometry">
     <rect>
      <x>400</x>
+<<<<<<< HEAD
      <y>440</y>
      <width>71</width>
+=======
+     <y>410</y>
+     <width>62</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
+   </property>
+   <property name="decimals">
+    <number>5</number>
    </property>
   </widget>
   <widget class="QPushButton" name="MoveRelative">
@@ -235,9 +270,15 @@
   <widget class="QPushButton" name="SetMinEndOfRun">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>140</x>
      <y>360</y>
      <width>71</width>
+=======
+     <x>100</x>
+     <y>330</y>
+     <width>61</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
    </property>
@@ -301,18 +342,38 @@
    <property name="geometry">
     <rect>
      <x>400</x>
+<<<<<<< HEAD
      <y>320</y>
      <width>71</width>
+=======
+     <y>290</y>
+     <width>61</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
+   </property>
+   <property name="decimals">
+    <number>5</number>
+   </property>
+   <property name="minimum">
+    <double>-5.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>65.000000000000000</double>
    </property>
   </widget>
   <widget class="QLabel" name="CurrentMaxEndOfRun">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>310</x>
      <y>320</y>
      <width>71</width>
+=======
+     <x>320</x>
+     <y>290</y>
+     <width>61</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
    </property>
@@ -327,9 +388,15 @@
   <widget class="QPushButton" name="SetMaxEndOfRun">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>400</x>
      <y>360</y>
      <width>71</width>
+=======
+     <x>360</x>
+     <y>330</y>
+     <width>61</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
    </property>
@@ -340,9 +407,15 @@
   <widget class="QLabel" name="CurrentAcceleration">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>310</x>
      <y>440</y>
      <width>71</width>
+=======
+     <x>320</x>
+     <y>410</y>
+     <width>61</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
    </property>
@@ -371,10 +444,18 @@
    <property name="geometry">
     <rect>
      <x>140</x>
+<<<<<<< HEAD
      <y>440</y>
      <width>71</width>
+=======
+     <y>410</y>
+     <width>62</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
+   </property>
+   <property name="decimals">
+    <number>5</number>
    </property>
   </widget>
   <widget class="QLabel" name="label_15">
@@ -394,10 +475,24 @@
    <property name="geometry">
     <rect>
      <x>140</x>
+<<<<<<< HEAD
      <y>320</y>
      <width>71</width>
+=======
+     <y>290</y>
+     <width>61</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
+   </property>
+   <property name="decimals">
+    <number>5</number>
+   </property>
+   <property name="minimum">
+    <double>-5.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>65.000000000000000</double>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">
@@ -429,9 +524,15 @@
   <widget class="QPushButton" name="SetVelocity">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>140</x>
      <y>480</y>
      <width>71</width>
+=======
+     <x>100</x>
+     <y>450</y>
+     <width>61</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
    </property>
@@ -472,14 +573,24 @@
   <widget class="QDoubleSpinBox" name="RelativeMoveParam">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>60</x>
      <y>200</y>
      <width>71</width>
+=======
+     <x>50</x>
+     <y>170</y>
+     <width>81</width>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
      <height>31</height>
     </rect>
    </property>
    <property name="decimals">
+<<<<<<< HEAD
     <number>5</number>
+=======
+    <number>8</number>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
    </property>
    <property name="minimum">
     <double>-99.000000000000000</double>
@@ -547,14 +658,34 @@
   <widget class="QPushButton" name="GetPosition">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>140</x>
      <y>100</y>
      <width>93</width>
      <height>31</height>
+=======
+     <x>510</x>
+     <y>190</y>
+     <width>221</width>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Get Position</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Queries&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>260</y>
+     <width>121</width>
+     <height>51</height>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
+    </rect>
+   </property>
+   <property name="text">
+    <string>Get All</string>
    </property>
   </widget>
   <widget class="QPushButton" name="ConnectButton">
@@ -599,6 +730,7 @@
   <widget class="QPushButton" name="GetMaxEndOfRun">
    <property name="geometry">
     <rect>
+<<<<<<< HEAD
      <x>310</x>
      <y>360</y>
      <width>71</width>
@@ -616,11 +748,18 @@
      <y>480</y>
      <width>71</width>
      <height>31</height>
+=======
+     <x>700</x>
+     <y>70</y>
+     <width>21</width>
+     <height>20</height>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
     </rect>
    </property>
    <property name="text">
     <string>Get</string>
    </property>
+<<<<<<< HEAD
   </widget>
   <widget class="QPushButton" name="GetVelocity">
    <property name="geometry">
@@ -649,6 +788,39 @@
    </property>
    <property name="text">
     <string>Disconnected</string>
+=======
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_2">
+   <property name="geometry">
+    <rect>
+     <x>590</x>
+     <y>370</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>STOP</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_3">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>150</y>
+     <width>93</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Disconnect</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
    </property>
   </widget>
  </widget>

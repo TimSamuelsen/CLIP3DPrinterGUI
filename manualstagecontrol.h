@@ -33,6 +33,7 @@ private slots:
 
     void on_ConnectButton_clicked();
 
+<<<<<<< HEAD
     void on_GetMinEndOfRun_clicked();
 
     void on_GetMaxEndOfRun_clicked();
@@ -40,6 +41,11 @@ private slots:
     void on_GetVelocity_clicked();
 
     void on_GetAcceleration_clicked();
+=======
+    void on_pushButton_2_clicked();
+
+    void on_pushButton_3_clicked();
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
 
 private:
     Ui::ManualStageControl *ui;

@@ -96,8 +96,8 @@ MainWindow::~MainWindow()
 {
     //USB_Close();
     //USB_Exit();
-    saveText();
-    saveSettings();
+    //saveText();
+    //saveSettings();
     //SMC.SMC100CClose();
 
     delete ui;
@@ -129,6 +129,7 @@ void MainWindow::on_SetStartingPosButton_clicked()
     QString CurrentPosition = SMC.GetPosition();
     CurrentPosition = CurrentPosition.remove(0,3);
     ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
+    ui->CurrentPositionIndicator->setText(CurrentPosition);
 }
 
 void MainWindow::on_SetSliceThickness_clicked()
@@ -360,6 +361,7 @@ void MainWindow::on_StartPrint_clicked()
     //If settings are validated successfully and Initialization has been completed
     if (ValidateSettings() == true)
     {
+        usbPollTimer->stop();
         //Set PrintFlag to true
         PrintFlag = true;
         nSlice = ui->FileList->count();
@@ -396,6 +398,8 @@ void MainWindow::PrintProcess(void)
     {
         //USB_Close();
         ui->ProgramPrints->append("Print Complete");
+        saveText();
+        saveSettings();
         return;
     }
 }

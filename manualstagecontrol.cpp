@@ -26,8 +26,12 @@ void ManualStageControl::on_ConnectButton_clicked()
     if (connectTest)
     {
         ui->TerminalOut->append("Stage Connected");
+<<<<<<< HEAD
         ui->ConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
         ui->ConnectionIndicator->setText("Connected");
+=======
+        ui->ConnectionCheckbox->setChecked(true);
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
     }
     else
     {
@@ -39,6 +43,9 @@ void ManualStageControl::on_ConnectButton_clicked()
 
 void ManualStageControl::GetValues()
 {
+   // QString CurrentPosition = SMC.GetPosition();
+   // CurrentPosition = CurrentPosition.remove(0,3);
+   // ui->CurrentPositionIndicator->setText(CurrentPosition);
     //QString CurrentVelocity = SMC.GetVelocity();
     //CurrentVelocity = CurrentVelocity.remove(0,3);
     //ui->CurrentVelocity->setText(CurrentVelocity);
@@ -116,9 +123,31 @@ void ManualStageControl::on_pushButton_clicked()
     CurrentPosition = CurrentPosition.remove(0,3);
     ui->TerminalOut->append("Stage is at: " + CurrentPosition);
     ui->CurrentPositionIndicator->setText(CurrentPosition);
+/*
+    Sleep(50);
+
+    QString CurrentMinEndOfRun = Main.SMC.GetNegativeLimit();
+    ui->CurrentMinEndOfRun->setText(CurrentMinEndOfRun.remove(0,3));
+
+    Sleep(50);
+
+    QString CurrentMaxEndOfRun = Main.SMC.GetPositiveLimit();
+    ui->CurrentMaxEndOfRun->setText(CurrentMaxEndOfRun.remove(0,3));
+
+    Sleep(50);
+
+    QString CurrentVelocity = Main.SMC.GetVelocity();
+    ui->CurrentVelocity->setText(CurrentVelocity.remove(0,3));
+
+    Sleep(50);
+
+    QString CurrentAcceleration = Main.SMC.GetAcceleration();
+    ui->CurrentAcceleration->setText(CurrentAcceleration.remove(0,3));
+    */
 }
 
 
+<<<<<<< HEAD
 void ManualStageControl::on_GetMinEndOfRun_clicked()
 {
     QString CurrentMinEndOfRun = SMC.GetNegativeLimit();
@@ -149,4 +178,15 @@ void ManualStageControl::on_GetAcceleration_clicked()
     CurrentAcceleration = CurrentAcceleration.remove(0,3);
     ui->TerminalOut->append("Current Acceleration: " + CurrentAcceleration);
     ui->CurrentAcceleration->setText(CurrentAcceleration);
+=======
+void ManualStageControl::on_pushButton_2_clicked()
+{
+    SMC.StopMotion();
+}
+
+void ManualStageControl::on_pushButton_3_clicked()
+{
+    SMC.SMC100CClose();
+    ui->ConnectionCheckbox->setChecked(false);
+>>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
 }
