@@ -264,10 +264,10 @@ void MainWindow::on_ClearImageFiles_clicked()
 /*******************************************Peripheral Connections*********************************************/
 void MainWindow::on_StageConnectButton_clicked()
 {
+    SMC.SMC100CClose();
     QString COMSelect = ui->COMPortSelect->currentText();
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
-    SMC.SMC100CClose();
     if (SMC.SMC100CInit(COM) == true && SMC.Home() == true)
     {
         ui->ProgramPrints->append("Stage Connected");
@@ -312,7 +312,20 @@ void MainWindow::on_LightEngineConnectButton_clicked()
 void MainWindow::on_InitializeAndSynchronize_clicked()
 {
     LCR_PatternDisplay(0);
+
+    //Prepare stage for print
+    SMC.SetVelocity(1);
+    Sleep(50);
     SMC.AbsoluteMove(StartingPosition);
+    Sleep(50);
+    SMC.SetVelocity(StageVelocity);
+    Sleep(50);
+    SMC.SetAcceleration(StageAcceleration);
+    Sleep(50);
+    SMC.SetNegativeLimit(MinEndOfRun);
+    Sleep(50);
+    SMC.SetPositiveLimit(MaxEndOfRun);
+
     if (ui->FileList->count() > 0)
     {
         QListWidgetItem * item;
@@ -330,21 +343,6 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         DLP.updateLUT();
         initPlot();
         updatePlot();
-        //unsigned int NumLutEntries;
-        //BOOL Repeat;
-        //unsigned int NumPatsForTrigOut2;
-        //unsigned int NumSplash;
-        //LCR_GetPatternConfig(&NumLutEntries,&Repeat,&NumPatsForTrigOut2, &NumSplash);
-        //ui->ProgramPrints->append("Number of LUT Entries: " + QString::number(NumLutEntries));
-        //ui->ProgramPrints->append("Number of Splash Images: " + QString::number(NumSplash));
-        //if (Repeat)
-        //{
-        //    ui->ProgramPrints->append("Repeat is set to true");
-        //}
-        //else
-        //{
-        //    ui->ProgramPrints->append("Repeat is set to false");
-        //}
     }
 }
 
@@ -429,28 +427,28 @@ bool MainWindow::ValidateSettings(void)
         return false;
     }
     //Validate StageVelocity
-    else if (StageVelocity <= 0)
+    else if (StageVelocity <= 0 || StageVelocity > 10)
     {
         showError("Invalid Stage Velocity");
         ui->ProgramPrints->append("Invalid Stage Velocity");
         return false;
     }
     //Validate StageAcceleration
-    else if (StageAcceleration <= 0)
+    else if (StageAcceleration <= 0 || StageAcceleration > 10)
     {
         showError("Invalid Stage Acceleration");
         ui->ProgramPrints->append("Invalid Stage Acceleration");
         return false;
     }
     //Validate MaxEndOfRun
-    else if (MaxEndOfRun <= 0)
+    else if (MaxEndOfRun < -5 || MaxEndOfRun > 65 || MinEndOfRun >= MaxEndOfRun)
     {
         showError("Invalid Max End Of Run");
         ui->ProgramPrints->append("Invalid Max End Of Run");
         return false;
     }
     //Validate StageMinEndOfRun
-    else if (MinEndOfRun <= -6)
+    else if (MinEndOfRun < -5 || MinEndOfRun > 65 || MinEndOfRun >= MaxEndOfRun)
     {
         showError("Invalid Min End Of Run");
         ui->ProgramPrints->append("Invalid Min End Of Run");

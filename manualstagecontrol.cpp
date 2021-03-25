@@ -4,65 +4,54 @@
 #include "mainwindow.h"
 
 //static SMC100C SMC;
+static bool ConnectionFlag = false;
 
-//Module variables
 ManualStageControl::ManualStageControl(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ManualStageControl)
 {
     ui->setupUi(this);
-    SMC.SMC100CInit("COM3");
 
 }
 
 ManualStageControl::~ManualStageControl()
 {
+    SMC.SMC100CClose();
     delete ui;
 }
 
 void ManualStageControl::on_ConnectButton_clicked()
 {
-    bool connectTest = SMC.SMC100CInit("COM3");
-    if (connectTest)
+    if (ConnectionFlag == false)
     {
-        ui->TerminalOut->append("Stage Connected");
-<<<<<<< HEAD
-        ui->ConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
-        ui->ConnectionIndicator->setText("Connected");
-=======
-        ui->ConnectionCheckbox->setChecked(true);
->>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
+        bool connectTest = SMC.SMC100CInit("COM3");
+        if (connectTest)
+        {
+            ui->TerminalOut->append("Stage Connected");
+            ui->ConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
+            ui->ConnectionIndicator->setText("Connected");
+            ui->ConnectButton->setText("Disconnect");
+            ConnectionFlag = true;
+        }
+        else
+        {
+            ui->TerminalOut->append("Stage Connection Failed");
+            ui->ConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
+            ui->ConnectionIndicator->setText("Disconnected");
+            ui->ConnectButton->setText("Connect");
+            ConnectionFlag = false;
+    }
     }
     else
     {
-        ui->TerminalOut->append("Stage Connection Failed");
+        SMC.SMC100CClose();
+        ui->TerminalOut->append("Stage Connection Closed");
         ui->ConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
         ui->ConnectionIndicator->setText("Disconnected");
+        ui->ConnectButton->setText("Connect");
+        ConnectionFlag = false;
     }
 }
-
-void ManualStageControl::GetValues()
-{
-   // QString CurrentPosition = SMC.GetPosition();
-   // CurrentPosition = CurrentPosition.remove(0,3);
-   // ui->CurrentPositionIndicator->setText(CurrentPosition);
-    //QString CurrentVelocity = SMC.GetVelocity();
-    //CurrentVelocity = CurrentVelocity.remove(0,3);
-    //ui->CurrentVelocity->setText(CurrentVelocity);
-
-    //QString CurrentAcceleration = SMC.GetAcceleration();
-    //CurrentAcceleration = CurrentVelocity.remove(0,3);
-    //ui->CurrentAcceleration->setText(CurrentAcceleration);
-
-    //QString CurrentPositiveLimit = SMC.GetPositiveLimit();
-    //CurrentPositiveLimit = CurrentPositiveLimit.remove(0,3);
-    //ui->CurrentMaxEndOfRun->setText(CurrentPositiveLimit);
-
-   // QString CurrentNegativeLimit = SMC.GetNegativeLimit();
-    //CurrentNegativeLimit = CurrentNegativeLimit.remove(0,3);
-    //ui->CurrentMinEndOfRun->setText(CurrentNegativeLimit);
-}
-
 
 void ManualStageControl::on_MoveRelative_clicked()
 {
@@ -117,37 +106,6 @@ void ManualStageControl::on_SetAcceleration_clicked()
     ui->CurrentAcceleration->setText(AccelerationString);
 }
 
-void ManualStageControl::on_pushButton_clicked()
-{
-    QString CurrentPosition = SMC.GetPosition();
-    CurrentPosition = CurrentPosition.remove(0,3);
-    ui->TerminalOut->append("Stage is at: " + CurrentPosition);
-    ui->CurrentPositionIndicator->setText(CurrentPosition);
-/*
-    Sleep(50);
-
-    QString CurrentMinEndOfRun = Main.SMC.GetNegativeLimit();
-    ui->CurrentMinEndOfRun->setText(CurrentMinEndOfRun.remove(0,3));
-
-    Sleep(50);
-
-    QString CurrentMaxEndOfRun = Main.SMC.GetPositiveLimit();
-    ui->CurrentMaxEndOfRun->setText(CurrentMaxEndOfRun.remove(0,3));
-
-    Sleep(50);
-
-    QString CurrentVelocity = Main.SMC.GetVelocity();
-    ui->CurrentVelocity->setText(CurrentVelocity.remove(0,3));
-
-    Sleep(50);
-
-    QString CurrentAcceleration = Main.SMC.GetAcceleration();
-    ui->CurrentAcceleration->setText(CurrentAcceleration.remove(0,3));
-    */
-}
-
-
-<<<<<<< HEAD
 void ManualStageControl::on_GetMinEndOfRun_clicked()
 {
     QString CurrentMinEndOfRun = SMC.GetNegativeLimit();
@@ -178,15 +136,12 @@ void ManualStageControl::on_GetAcceleration_clicked()
     CurrentAcceleration = CurrentAcceleration.remove(0,3);
     ui->TerminalOut->append("Current Acceleration: " + CurrentAcceleration);
     ui->CurrentAcceleration->setText(CurrentAcceleration);
-=======
-void ManualStageControl::on_pushButton_2_clicked()
-{
-    SMC.StopMotion();
 }
 
-void ManualStageControl::on_pushButton_3_clicked()
+void ManualStageControl::on_GetPosition_clicked()
 {
-    SMC.SMC100CClose();
-    ui->ConnectionCheckbox->setChecked(false);
->>>>>>> 4eba622b96c90ed5107ce0989500dbdb0b5c5c0a
+    QString CurrentPosition = SMC.GetPosition();
+    CurrentPosition = CurrentPosition.remove(0,3);
+    ui->TerminalOut->append("Stage is at: " + CurrentPosition);
+    ui->CurrentPositionIndicator->setText(CurrentPosition);
 }
