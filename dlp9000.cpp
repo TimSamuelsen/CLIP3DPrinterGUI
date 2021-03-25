@@ -342,6 +342,11 @@ void DLP9000::startPatSequence(void)
         Main.showError("Unable to start pattern display");
 }
 
+void DLP9000::clearElements(void)
+{
+    m_elements.clear();
+}
+
 
 /**
  * @brief MainWindow::calculateSplashImageDetails

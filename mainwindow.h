@@ -93,6 +93,8 @@ private slots:
 
     void on_AbortPrint_clicked();
 
+    void on_SetIntialAdhesionTimeButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
@@ -106,5 +108,6 @@ private:
     void updatePlot();
     void addPlotData();
     QVector<double> qv_x, qv_y;
+    void printParameters();
 };
 #endif // MAINWINDOW_H
