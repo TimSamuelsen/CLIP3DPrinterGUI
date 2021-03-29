@@ -311,17 +311,18 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
     LCR_PatternDisplay(0);
 
     //Prepare stage for print
-    SMC.SetVelocity(1);
+    SMC.SetVelocity(3);
     Sleep(50);
     SMC.AbsoluteMove(StartingPosition);
-    Sleep(50);
-    SMC.SetVelocity(StageVelocity);
+
+    /*
     Sleep(50);
     SMC.SetAcceleration(StageAcceleration);
     Sleep(50);
     SMC.SetNegativeLimit(MinEndOfRun);
     Sleep(50);
     SMC.SetPositiveLimit(MaxEndOfRun);
+    */
 
     if (ui->FileList->count() > 0)
     {
@@ -374,6 +375,7 @@ void MainWindow::on_StartPrint_clicked()
     //If settings are validated successfully and Initialization has been completed
     if (ValidateSettings() == true)
     {
+        SMC.SetVelocity(StageVelocity);
 
         usbPollTimer->stop();
         //Set PrintFlag to true
