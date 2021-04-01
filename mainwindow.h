@@ -95,6 +95,8 @@ private slots:
 
     void on_SetIntialAdhesionTimeButton_clicked();
 
+    void on_AutoCheckBox_stateChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;

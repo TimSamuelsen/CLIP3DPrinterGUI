@@ -68,6 +68,9 @@ SOURCES += \
     HiresLib/pattern.c \
     HiresLib/splash.c \
 
+#For Slic3r
+INCLUDEPATH += "slic3r"
+INCLUDEPATH += "slic3r\\libslic3r"
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -82,6 +85,8 @@ INCLUDEPATH += $$PWD/HiresLib
 DEPENDPATH += $$PWD/HiresLib
 
 win32: LIBS += -lSetupAPI
+
+win32: INCLUDEPATH += C:/DEV/boost_1_75_0
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/hidapi-master/lib4QT/ -lhidapi
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/hidapi-master/lib4QT/ -lhidapi

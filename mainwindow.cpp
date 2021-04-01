@@ -435,7 +435,7 @@ void MainWindow::PrintProcess(void)
         ExposureFlag = true;
         QString filename =ui->FileList->item(layerCount)->text();
         QPixmap img(filename);
-        QPixmap img2 = img.scaled(560,350, Qt::KeepAspectRatio);
+        QPixmap img2 = img.scaled(890,490, Qt::KeepAspectRatio);
         ui->PrintImage->setPixmap(img2);
 
         ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
@@ -818,3 +818,22 @@ void MainWindow::CheckDLPStatus(void)
 }
 
 
+void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
+{
+    if (arg1 == 2)
+    {
+        ui->SetExposureTime->setEnabled(false);
+        ui->ExposureTimeParam->setEnabled(false);
+
+        ui->DarkTimeParam->setEnabled(false);
+        ui->SetDarkTime->setEnabled(false);
+    }
+    else
+    {
+        ui->SetExposureTime->setEnabled(true);
+        ui->ExposureTimeParam->setEnabled(true);
+
+        ui->SetDarkTime->setEnabled(true);
+        ui->DarkTimeParam->setEnabled(true);
+    }
+}
