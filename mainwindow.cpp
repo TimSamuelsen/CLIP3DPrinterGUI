@@ -827,6 +827,9 @@ void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
 
         ui->DarkTimeParam->setEnabled(false);
         ui->SetDarkTime->setEnabled(false);
+
+        ui->PrintSpeedParam->setEnabled(true);
+        ui->setPrintSpeed->setEnabled(true);
     }
     else
     {
@@ -835,5 +838,8 @@ void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
 
         ui->SetDarkTime->setEnabled(true);
         ui->DarkTimeParam->setEnabled(true);
+
+        ui->PrintSpeedParam->setEnabled(false);
+        ui->setPrintSpeed->setEnabled(false);
     }
 }

@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/new/prefix1">
-        <file>dummygraph.png</file>
-        <file>desimone_lab_wordmark.png</file>
+        <file>testicon.ico</file>
+        <file>desimone_lab_wordmark-nobg.png</file>
     </qresource>
+    <qresource prefix="/"/>
 </RCC>
