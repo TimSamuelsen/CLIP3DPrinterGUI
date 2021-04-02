@@ -115,5 +115,6 @@ private:
     void addPlotData();
     QVector<double> qv_x, qv_y;
     void printParameters();
+    void validateStartingPosition();
 };
 #endif // MAINWINDOW_H

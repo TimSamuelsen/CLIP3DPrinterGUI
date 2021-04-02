@@ -140,6 +140,9 @@ void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
         ui->PrintSpeedParam->setEnabled(true);
         ui->setPrintSpeed->setEnabled(true);
 
+        ui->ExposureDarkRatioParam->setEnabled(true);
+        ui->setExpDarkRatio->setEnabled(true);
+
         AutoExpDarkFlag = true;
     }
     else
@@ -152,12 +155,17 @@ void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
 
         ui->PrintSpeedParam->setEnabled(false);
         ui->setPrintSpeed->setEnabled(false);
+
+        ui->ExposureDarkRatioParam->setEnabled(true);
+        ui->setExpDarkRatio->setEnabled(true);
     }
 }
 
 void MainWindow::on_setExpDarkRatio_clicked()
 {
-    //ExpDarkRatio =
+    ExpDarkRatio = ui->ExposureDarkRatioParam->value();
+    QString ExpDarkRatioString = "Set Exp/Dark Ratio to: " + QString::number(ExpDarkRatio);
+    ui->ProgramPrints->append(ExpDarkRatioString);
 }
 
 void MainWindow::on_setPrintSpeed_clicked()
@@ -369,6 +377,18 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
     */
     if (AutoExpDarkFlag)
     {
+        //Convert mm/h to um/s
+        double PrintSpeedUm = PrintSpeed/3.6;
+        //Divide by slice thickness to get frame rate in Hz
+        double FrameRate = PrintSpeedUm / SliceThickness;
+        //Invert frame rate to get duration per frame
+        double FrameLength = 1/FrameRate;
+        //Multiply by Exp/Dark Ratio for Exposure Time
+        ExposureTime = FrameRate * ExpDarkRatio;
+        DarkTime = FrameRate * (1-ExpDarkRatio);
+
+        ui->ExposureTimeParam->setValue(ExposureTime);
+        ui->DarkTimeParam->setValue(DarkTime);
 
     }
     if (ui->FileList->count() > 0)
@@ -410,6 +430,8 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
 
         initPlot();
         updatePlot();
+        //validateStartingPosition();
+        ui->StartPrint->setEnabled(true);
     }
 }
 
@@ -626,6 +648,21 @@ void MainWindow::printParameters()
 {
 
 }
+
+void MainWindow::validateStartingPosition()
+{
+    QString CurrentPosition = SMC.GetPosition();
+    CurrentPosition = CurrentPosition.remove(0,3);
+    if (CurrentPosition.toInt() > (StartingPosition - 0.1) && CurrentPosition.toInt() < (StartingPosition +0.1))
+    {
+        ui->ProgramPrints->append("Stage has reached Starting Position");
+        ui->StartPrint->setEnabled(true);
+    }
+    else
+    {
+        QTimer::singleShot(1000, this, SLOT(validateStartingPosition));
+    }
+}
 /*******************************************Settings Functions*********************************************/
 
 void MainWindow::saveSettings()
@@ -634,13 +671,18 @@ void MainWindow::saveSettings()
     settings.setValue("ExposureTime", ExposureTime);
     settings.setValue("DarkTime", DarkTime);
     settings.setValue("UVIntensity", UVIntensity);
+
     settings.setValue("SliceThickness", SliceThickness);
     settings.setValue("StageVelocity", StageVelocity);
     settings.setValue("StageAcceleration", StageAcceleration);
     settings.setValue("MaxEndOfRun", MaxEndOfRun);
     settings.setValue("MinEndOfRun", MinEndOfRun);
+
+    settings.setValue("SliceThickness", SliceThickness);
     settings.setValue("StartingPosition", StartingPosition);
     settings.setValue("InitialExposure", InitialExposure);
+    settings.setValue("PrintSpeed", PrintSpeed);
+    settings.setValue("ExpDarkRatio",ExpDarkRatio);
 
     settings.setValue("LogFileDestination", LogFileDestination);
     settings.setValue("ImageFileDirectory", ImageFileDirectory);
@@ -654,13 +696,18 @@ void MainWindow::loadSettings()
     ExposureTime = settings.value("ExposureTime", 1000).toDouble();
     DarkTime = settings.value("DarkTime", 1000).toDouble();
     UVIntensity = settings.value("UVIntensity", 12).toDouble();
-    SliceThickness = settings.value("SliceThickness", 200).toDouble();
+
     StageVelocity = settings.value("StageVelocity", 10).toDouble();
     StageAcceleration = settings.value("StageAcceleration", 5).toDouble();
     MaxEndOfRun = settings.value("MaxEndOfRun", 60).toDouble();
     MinEndOfRun = settings.value("MinEndOfRun", 0).toDouble();
+
+
     StartingPosition = settings.value("StartingPosition", 5).toDouble();
     InitialExposure = settings.value("InitialExposure", 10).toDouble();
+    SliceThickness = settings.value("SliceThickness", 200).toDouble();
+    PrintSpeed = settings.value("PrintSpeed", 40).toDouble();
+    ExpDarkRatio = settings.value("ExpDarkRatio", 0.5).toDouble();
 
     LogFileDestination = settings.value("LogFileDestination", "C://").toString();
     ImageFileDirectory = settings.value("ImageFileDirectory", "C://").toString();
@@ -674,13 +721,17 @@ void MainWindow::initSettings()
     ui->ExposureTimeParam->setValue(ExposureTime/1000);
     ui->DarkTimeParam->setValue(DarkTime/1000);
     ui->UVIntensityParam->setValue(UVIntensity);
-    ui->SliceThicknessParam->setValue(SliceThickness*1000);
+
     ui->StageVelocityParam->setValue(StageVelocity);
     ui->StageAccelParam->setValue(StageAcceleration);
     ui->MaxEndOfRun->setValue(MaxEndOfRun);
     ui->MinEndOfRunParam->setValue(MinEndOfRun);
+
+    ui->SliceThicknessParam->setValue(SliceThickness*1000);
     ui->StartingPositionParam->setValue(StartingPosition);
     ui->InitialAdhesionParameter->setValue(InitialExposure);
+    ui->PrintSpeedParam->setValue(PrintSpeed);
+    ui->ExposureDarkRatioParam->setValue(ExpDarkRatio);
 
     ui->LogFileLocation->setText(LogFileDestination);
 }
@@ -722,7 +773,7 @@ void MainWindow::updatePlot()
     QCPItemText *textLabel1 = new QCPItemText(ui->LivePlot);
     textLabel1->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
     textLabel1->position->setType(QCPItemPosition::ptAxisRectRatio);
-    textLabel1->position->setCoords(0.98, 0.1); // place position at center/top of axis rect
+    textLabel1->position->setCoords(0.98, 0.05); // place position at center/top of axis rect
     textLabel1->setText(Layer);
     textLabel1->setFont(QFont(font().family(), 12)); // make font a bit larger
     textLabel1->setPen(QPen(Qt::black)); // show black border around text

@@ -18,6 +18,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     manualprojcontrol.cpp \
+    manualpumpcontrol.cpp \
     manualstagecontrol.cpp \
     qcustomplot.cpp \
     serialib.cpp
@@ -28,6 +29,7 @@ HEADERS += \
     dlp9000.h \
     mainwindow.h \
     manualprojcontrol.h \
+    manualpumpcontrol.h \
     manualstagecontrol.h \
     patternelement.h \
     qcustomplot.h \
@@ -37,6 +39,7 @@ HEADERS += \
 FORMS += \
     mainwindow.ui \
     manualprojcontrol.ui \
+    manualpumpcontrol.ui \
     manualstagecontrol.ui
 
 #For Lightcrafter API
