@@ -97,6 +97,10 @@ private slots:
 
     void on_AutoCheckBox_stateChanged(int arg1);
 
+    void on_setExpDarkRatio_clicked();
+
+    void on_setPrintSpeed_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;

@@ -57,10 +57,14 @@ static double ExposureTime;
 static double DarkTime;
 static uint InitialExposure;
 static int UVIntensity;
+static double PrintSpeed;
+static double ExpDarkRatio;
+
 static int remainingImages;
 
 static bool ExposureFlag = false;
 static bool DarkTimeFlag = false;
+static bool AutoExpDarkFlag = false;
 static uint32_t nSlice = 0;
 static uint32_t layerCount = 0;
 
@@ -121,6 +125,46 @@ void MainWindow::on_ManualStage_clicked()
 void MainWindow::on_ResinSelect_activated(const QString &arg1)
 {
     ui->ProgramPrints->append(arg1 + " Selected");
+}
+
+void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
+{
+    if (arg1 == 2)
+    {
+        ui->SetExposureTime->setEnabled(false);
+        ui->ExposureTimeParam->setEnabled(false);
+
+        ui->DarkTimeParam->setEnabled(false);
+        ui->SetDarkTime->setEnabled(false);
+
+        ui->PrintSpeedParam->setEnabled(true);
+        ui->setPrintSpeed->setEnabled(true);
+
+        AutoExpDarkFlag = true;
+    }
+    else
+    {
+        ui->SetExposureTime->setEnabled(true);
+        ui->ExposureTimeParam->setEnabled(true);
+
+        ui->SetDarkTime->setEnabled(true);
+        ui->DarkTimeParam->setEnabled(true);
+
+        ui->PrintSpeedParam->setEnabled(false);
+        ui->setPrintSpeed->setEnabled(false);
+    }
+}
+
+void MainWindow::on_setExpDarkRatio_clicked()
+{
+    //ExpDarkRatio =
+}
+
+void MainWindow::on_setPrintSpeed_clicked()
+{
+    PrintSpeed = (ui->PrintSpeedParam->value());
+    QString PrintSpeedString = "Set Print Speed to: " + QString::number(PrintSpeed) + " mm/h";
+    ui->ProgramPrints->append(PrintSpeedString);
 }
 
 void MainWindow::on_SetIntialAdhesionTimeButton_clicked()
@@ -323,7 +367,10 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
     Sleep(50);
     SMC.SetPositiveLimit(MaxEndOfRun);
     */
+    if (AutoExpDarkFlag)
+    {
 
+    }
     if (ui->FileList->count() > 0)
     {
         //Upload images for initial exposure
@@ -348,6 +395,10 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
                 {
                     break;
                 }
+        }
+        if (AutoExpDarkFlag)
+        {
+
         }
         DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
         DLP.updateLUT();
@@ -814,32 +865,5 @@ void MainWindow::CheckDLPStatus(void)
     {
         showError("Flag error");
         return;
-    }
-}
-
-
-void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
-{
-    if (arg1 == 2)
-    {
-        ui->SetExposureTime->setEnabled(false);
-        ui->ExposureTimeParam->setEnabled(false);
-
-        ui->DarkTimeParam->setEnabled(false);
-        ui->SetDarkTime->setEnabled(false);
-
-        ui->PrintSpeedParam->setEnabled(true);
-        ui->setPrintSpeed->setEnabled(true);
-    }
-    else
-    {
-        ui->SetExposureTime->setEnabled(true);
-        ui->ExposureTimeParam->setEnabled(true);
-
-        ui->SetDarkTime->setEnabled(true);
-        ui->DarkTimeParam->setEnabled(true);
-
-        ui->PrintSpeedParam->setEnabled(false);
-        ui->setPrintSpeed->setEnabled(false);
     }
 }
