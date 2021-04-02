@@ -18,8 +18,13 @@ public:
 private slots:
     void on_ConnectButton_clicked();
 
+    void on_GetInfuseRate_clicked();
+
+    void on_SetInfuseRate_clicked();
+
 private:
     Ui::manualpumpcontrol *ui;
+    char* SerialRead();
 };
 
 #endif // MANUALPUMPCONTROL_H

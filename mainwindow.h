@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "manualstagecontrol.h"
 #include "manualprojcontrol.h"
+#include "manualpumpcontrol.h"
 #include "patternelement.h"
 #include "SMC100C.h"
 #include "dlp9000.h"
@@ -101,10 +102,13 @@ private slots:
 
     void on_setPrintSpeed_clicked();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
     manualLEcontrol *ManualProjUI;
+    manualpumpcontrol *ManualPumpUI;
     QTimer *usbPollTimer;
     bool ValidateSettings(void);
     void loadSettings();

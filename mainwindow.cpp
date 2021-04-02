@@ -38,6 +38,7 @@
 #include "dlp9000.h"
 #include "manualstagecontrol.h"
 #include "manualprojcontrol.h"
+#include "manualpumpcontrol.h"
 
 #define NormalTime
 #define QuickTime
@@ -117,9 +118,16 @@ void MainWindow::on_ManualStage_clicked()
     ManualStageUI->show();
     SMC.Home();
     SMC.SMC100CClose();
-    ui->ProgramPrints->append("Manual Control Entered");
+    ui->ProgramPrints->append("Manual Stage Control Entered");
     ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 255); border: 1px solid black;");
     ui->StageConnectionIndicator->setText("Manual Control");
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    ManualPumpUI = new manualpumpcontrol();
+    ManualPumpUI->show();
+    ui->ProgramPrints->append("Manual Pump Control Entered");
 }
 /*********************************************Print Parameters*********************************************/
 void MainWindow::on_ResinSelect_activated(const QString &arg1)
@@ -918,3 +926,4 @@ void MainWindow::CheckDLPStatus(void)
         return;
     }
 }
+
