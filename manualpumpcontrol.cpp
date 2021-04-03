@@ -2,9 +2,6 @@
 #include "ui_manualpumpcontrol.h"
 
 #include "serialib.h"
-#include "SMC100C.h"
-
-SMC100C SMC;
 
 static bool ConnectionFlag;
 
@@ -24,8 +21,7 @@ manualpumpcontrol::~manualpumpcontrol()
 
 void manualpumpcontrol::on_ConnectButton_clicked()
 {
-
-    if (SMC.serial.openDevice("COM3",57600) == 1)
+    if (PSerial.openDevice("COM3",57600) == 1)
     {
         ui->TerminalOut->append("Serial Port Connected");
 
@@ -45,16 +41,6 @@ void manualpumpcontrol::on_ConnectButton_clicked()
     }
 }
 
-
-
- /*
-void manualPumpControl::setInfusionRate(double InfusionRate)
-{
-
-}
-*/
-
-
 void manualpumpcontrol::on_GetInfuseRate_clicked()
 {
     InfusionRate = ui->NewInfuseRateParam->value();
@@ -63,13 +49,18 @@ void manualpumpcontrol::on_GetInfuseRate_clicked()
 
     QString Command = "irate.";
     const char* CommandToSend = Command.toLatin1().data();
-    SMC.serial.writeString(CommandToSend);
+    PSerial.writeString(CommandToSend);
+    Sleep(5);
     QString ReadVal = SerialRead();
-
-    ui->NewInfuseRateParam->setValue(ReadVal.toDouble());
-    ui->TerminalOut->append("Current Infusion Rate: " + ReadVal);
-
-
+    if (ReadVal != "non")
+    {
+        ui->NewInfuseRateParam->setValue(ReadVal.toDouble());
+        ui->TerminalOut->append("Current Infusion Rate: " + ReadVal);
+    }
+    else
+    {
+        ui->TerminalOut->append("Serial Read Failed");
+    }
 }
 
 void manualpumpcontrol::on_SetInfuseRate_clicked()
@@ -80,18 +71,17 @@ void manualpumpcontrol::on_SetInfuseRate_clicked()
 
     QString Command = "irate " + QString::number(InfusionRate) + "ul/s.";
     const char* CommandToSend = Command.toLatin1().data();
-    SMC.serial.writeString(CommandToSend);
+    PSerial.writeString(CommandToSend);
 }
 
 char* manualpumpcontrol::SerialRead()
 {
-    char* receivedString;
+    char* receivedString = "non";
     char finalChar;
     unsigned int maxNbBytes = 13;
     int ReadStatus;
-    ReadStatus = SMC.serial.readString(receivedString,finalChar,maxNbBytes,250);
+    ReadStatus = PSerial.readString(receivedString,finalChar,maxNbBytes,250);
 /*
-    char ReadChar;
     if (ReadStatus > 0)
     {
         return receivedString;
@@ -117,5 +107,6 @@ char* manualpumpcontrol::SerialRead()
         return  receivedString;
     }
     */
+
    return receivedString;
 }

@@ -128,6 +128,7 @@ void MainWindow::on_pushButton_clicked()
     ManualPumpUI = new manualpumpcontrol();
     ManualPumpUI->show();
     ui->ProgramPrints->append("Manual Pump Control Entered");
+    Pump.PSerial.closeDevice();
 }
 /*********************************************Print Parameters*********************************************/
 void MainWindow::on_ResinSelect_activated(const QString &arg1)
@@ -367,7 +368,22 @@ void MainWindow::on_StageConnectButton_clicked()
 
 void MainWindow::on_PumpConnectButton_clicked()
 {
-
+    Pump.PSerial.closeDevice();
+    QString COMSelect = ui->COMPortSelectPump->currentText();
+    QByteArray array = COMSelect.toLocal8Bit();
+    char* COM = array.data();
+    if (Pump.PSerial.openDevice(COM,57600) == 1)
+    {
+        ui->ProgramPrints->append("Pump Connected");
+        ui->PumpConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
+        ui->PumpConnectionIndicator->setText("Connected");
+    }
+    else
+    {
+        ui->ProgramPrints->append("Pump Connection Failed");
+        ui->PumpConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
+        ui->PumpConnectionIndicator->setText("Disconnected");
+    }
 }
 
 

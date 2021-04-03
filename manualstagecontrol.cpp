@@ -3,7 +3,6 @@
 #include "SMC100C.h"
 #include "mainwindow.h"
 
-//static SMC100C SMC;
 static bool ConnectionFlag = false;
 
 ManualStageControl::ManualStageControl(QWidget *parent) :
@@ -43,7 +42,7 @@ void ManualStageControl::on_ConnectButton_clicked()
             ui->ConnectionIndicator->setText("Disconnected");
             ui->ConnectButton->setText("Connect");
             ConnectionFlag = false;
-    }
+        }
     }
     else
     {

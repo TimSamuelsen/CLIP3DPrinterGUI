@@ -24,6 +24,7 @@ public:
     void PrintToTerminal(QString StringToPrint);
     SMC100C SMC;
     //DLP9000 DLP;
+    manualpumpcontrol Pump;
 
 public slots:
     void showError(QString errMsg);

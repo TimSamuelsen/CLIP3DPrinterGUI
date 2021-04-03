@@ -2,6 +2,7 @@
 #define MANUALPUMPCONTROL_H
 
 #include <QWidget>
+#include "serialib.h"
 
 namespace Ui {
 class manualpumpcontrol;
@@ -14,6 +15,7 @@ class manualpumpcontrol : public QWidget
 public:
     explicit manualpumpcontrol(QWidget *parent = nullptr);
     ~manualpumpcontrol();
+    serialib PSerial;
 
 private slots:
     void on_ConnectButton_clicked();
@@ -21,8 +23,6 @@ private slots:
     void on_GetInfuseRate_clicked();
 
     void on_SetInfuseRate_clicked();
-
-
 
 private:
     Ui::manualpumpcontrol *ui;
