@@ -336,7 +336,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Target Time (s)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="NewInfuseRateParam_2">
+  <widget class="QDoubleSpinBox" name="NewTargetTime">
    <property name="geometry">
     <rect>
      <x>140</x>
@@ -349,7 +349,7 @@
     <number>5</number>
    </property>
   </widget>
-  <widget class="QPushButton" name="GetInfuseRate_2">
+  <widget class="QPushButton" name="GetTargetTime">
    <property name="geometry">
     <rect>
      <x>50</x>
@@ -362,7 +362,7 @@
     <string>Get</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="SetInfuseRate_2">
+  <widget class="QPushButton" name="SetTargetTime">
    <property name="geometry">
     <rect>
      <x>140</x>
@@ -375,7 +375,7 @@
     <string>Set</string>
    </property>
   </widget>
-  <widget class="QLabel" name="CurrentInfuseRate_2">
+  <widget class="QLabel" name="CurrentTargetTime">
    <property name="geometry">
     <rect>
      <x>50</x>
@@ -431,7 +431,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Target Volume (ul)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="NewInfuseRateParam_3">
+  <widget class="QDoubleSpinBox" name="NewTargetVolume">
    <property name="geometry">
     <rect>
      <x>410</x>
@@ -444,7 +444,7 @@
     <number>5</number>
    </property>
   </widget>
-  <widget class="QPushButton" name="GetInfuseRate_3">
+  <widget class="QPushButton" name="GetTargetVolume">
    <property name="geometry">
     <rect>
      <x>320</x>
@@ -457,7 +457,7 @@
     <string>Get</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="SetInfuseRate_3">
+  <widget class="QPushButton" name="SetTargetVolume">
    <property name="geometry">
     <rect>
      <x>410</x>
@@ -470,7 +470,7 @@
     <string>Set</string>
    </property>
   </widget>
-  <widget class="QLabel" name="CurrentInfuseRate_3">
+  <widget class="QLabel" name="CurrentTargetVolume">
    <property name="geometry">
     <rect>
      <x>320</x>
@@ -512,6 +512,46 @@
    <property name="text">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Current&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox">
+   <property name="geometry">
+    <rect>
+     <x>392</x>
+     <y>130</y>
+     <width>81</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>COM3</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>COM4</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>COM5</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>COM6</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>COM7</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>COM8</string>
+    </property>
+   </item>
   </widget>
  </widget>
  <resources/>

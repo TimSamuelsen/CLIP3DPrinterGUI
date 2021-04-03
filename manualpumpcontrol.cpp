@@ -4,9 +4,9 @@
 #include "serialib.h"
 #include "SMC100C.h"
 
+SMC100C SMC;
 
 static bool ConnectionFlag;
-static serialib serial;
 
 static double InfusionRate;
 
@@ -24,7 +24,8 @@ manualpumpcontrol::~manualpumpcontrol()
 
 void manualpumpcontrol::on_ConnectButton_clicked()
 {
-    if (serial.openDevice("COM3",57600) == 1)
+
+    if (SMC.serial.openDevice("COM3",57600) == 1)
     {
         ui->TerminalOut->append("Serial Port Connected");
 
@@ -60,6 +61,15 @@ void manualpumpcontrol::on_GetInfuseRate_clicked()
     QString ExpDarkRatioString = "Set Infusion Rate to: " + QString::number(InfusionRate);
     ui->TerminalOut->append(ExpDarkRatioString);
 
+    QString Command = "irate.";
+    const char* CommandToSend = Command.toLatin1().data();
+    SMC.serial.writeString(CommandToSend);
+    QString ReadVal = SerialRead();
+
+    ui->NewInfuseRateParam->setValue(ReadVal.toDouble());
+    ui->TerminalOut->append("Current Infusion Rate: " + ReadVal);
+
+
 }
 
 void manualpumpcontrol::on_SetInfuseRate_clicked()
@@ -70,16 +80,16 @@ void manualpumpcontrol::on_SetInfuseRate_clicked()
 
     QString Command = "irate " + QString::number(InfusionRate) + "ul/s.";
     const char* CommandToSend = Command.toLatin1().data();
-    serial.writeString(CommandToSend);
+    SMC.serial.writeString(CommandToSend);
 }
 
-char* SerialRead()
+char* manualpumpcontrol::SerialRead()
 {
     char* receivedString;
     char finalChar;
     unsigned int maxNbBytes = 13;
     int ReadStatus;
-    ReadStatus = serial.readString(receivedString,finalChar,maxNbBytes,250);
+    ReadStatus = SMC.serial.readString(receivedString,finalChar,maxNbBytes,250);
 /*
     char ReadChar;
     if (ReadStatus > 0)

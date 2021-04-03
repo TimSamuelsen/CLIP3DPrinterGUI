@@ -126,6 +126,7 @@ class SMC100C
             void SetPositiveLimit(float Limit);
             void SetNegativeLimit(float Limit);
             void SetAcceleration(float AccelerationToSet);
+            serialib serial;
 
     private:
             static const char GetCharacter;
@@ -141,7 +142,6 @@ class SMC100C
             void SetCommand(CommandType Type, float Parameter, CommandGetSetType GetOrSet);
             StatusType ConvertStatus(char* StatusChar);
             char* SerialRead();
-            serialib serial;
 };
 
 #endif

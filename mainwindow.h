@@ -104,6 +104,8 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_PumpConnectButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;

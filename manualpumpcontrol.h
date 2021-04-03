@@ -22,6 +22,8 @@ private slots:
 
     void on_SetInfuseRate_clicked();
 
+
+
 private:
     Ui::manualpumpcontrol *ui;
     char* SerialRead();

@@ -223,7 +223,7 @@ const char* SMC100C::ConvertToErrorString(char ErrorChar)
 bool SMC100C::SMC100CInit(const char* COMPORT)
 {
     //serialib serial;
-   if (serial.openDevice("COM3",57600) == 1)
+   if (serial.openDevice(COMPORT,57600) == 1)
    {
        SelectedCOM = COMPORT;
        //initFlag = true;

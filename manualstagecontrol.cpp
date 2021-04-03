@@ -24,7 +24,10 @@ void ManualStageControl::on_ConnectButton_clicked()
 {
     if (ConnectionFlag == false)
     {
-        bool connectTest = SMC.SMC100CInit("COM3");
+        QString COMSelect = ui->COMPortSelect->currentText();
+        QByteArray array = COMSelect.toLocal8Bit();
+        char* COM = array.data();
+        bool connectTest = SMC.SMC100CInit(COM);
         if (connectTest)
         {
             ui->TerminalOut->append("Stage Connected");

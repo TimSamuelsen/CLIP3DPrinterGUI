@@ -319,26 +319,6 @@ void MainWindow::on_ClearImageFiles_clicked()
 }
 
 /*******************************************Peripheral Connections*********************************************/
-void MainWindow::on_StageConnectButton_clicked()
-{
-    SMC.SMC100CClose();
-    QString COMSelect = ui->COMPortSelect->currentText();
-    QByteArray array = COMSelect.toLocal8Bit();
-    char* COM = array.data();
-    if (SMC.SMC100CInit(COM) == true && SMC.Home() == true)
-    {
-        ui->ProgramPrints->append("Stage Connected");
-        ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
-        ui->StageConnectionIndicator->setText("Connected");
-    }
-    else
-    {
-        ui->ProgramPrints->append("Stage Connection Failed");
-        ui->StageConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
-        ui->StageConnectionIndicator->setText("Disconnected");
-    }
-}
-
 void MainWindow::on_LightEngineConnectButton_clicked()
 {
     if (DLP.InitProjector())
@@ -364,6 +344,32 @@ void MainWindow::on_LightEngineConnectButton_clicked()
         ui->LightEngineIndicator->setText("Disconnected");
     }
 }
+
+void MainWindow::on_StageConnectButton_clicked()
+{
+    SMC.SMC100CClose();
+    QString COMSelect = ui->COMPortSelect->currentText();
+    QByteArray array = COMSelect.toLocal8Bit();
+    char* COM = array.data();
+    if (SMC.SMC100CInit(COM) == true && SMC.Home() == true)
+    {
+        ui->ProgramPrints->append("Stage Connected");
+        ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
+        ui->StageConnectionIndicator->setText("Connected");
+    }
+    else
+    {
+        ui->ProgramPrints->append("Stage Connection Failed");
+        ui->StageConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
+        ui->StageConnectionIndicator->setText("Disconnected");
+    }
+}
+
+void MainWindow::on_PumpConnectButton_clicked()
+{
+
+}
+
 
 /***************************************Print Functionality*********************************************/
 void MainWindow::on_InitializeAndSynchronize_clicked()
@@ -926,4 +932,3 @@ void MainWindow::CheckDLPStatus(void)
         return;
     }
 }
-
