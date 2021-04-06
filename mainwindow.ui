@@ -209,6 +209,15 @@ Light Engine Control</string>
       <height>31</height>
      </rect>
     </property>
+    <property name="minimum">
+     <number>-5</number>
+    </property>
+    <property name="maximum">
+     <number>65</number>
+    </property>
+    <property name="sliderPosition">
+     <number>0</number>
+    </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
     </property>
@@ -1953,6 +1962,19 @@ QPushButton#AbortPrint:hover:!pressed {
      <string>Connect</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="GetPosition">
+    <property name="geometry">
+     <rect>
+      <x>1690</x>
+      <y>120</y>
+      <width>61</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Get</string>
+    </property>
+   </widget>
    <zorder>frame_5</zorder>
    <zorder>FileList</zorder>
    <zorder>SelectFile</zorder>
@@ -2010,6 +2032,7 @@ QPushButton#AbortPrint:hover:!pressed {
    <zorder>COMPortSelectPump</zorder>
    <zorder>PumpConnectionIndicator</zorder>
    <zorder>PumpConnectButton</zorder>
+   <zorder>GetPosition</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -2017,7 +2040,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <x>0</x>
      <y>0</y>
      <width>1774</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

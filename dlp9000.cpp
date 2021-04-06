@@ -72,6 +72,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
             }
             else
             {
+                /*
                 pattern.bits = m_elements[m_elements.size()-1].bits;
                 pattern.color = m_elements[m_elements.size()-1].color;
                 pattern.exposure = m_elements[m_elements.size()-1].exposure;
@@ -79,6 +80,14 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                 pattern.trigIn = m_elements[m_elements.size()-1].trigIn;
                 pattern.trigOut2 = m_elements[m_elements.size()-1].trigOut2;
                 pattern.clear = m_elements[m_elements.size()-1].clear;
+                */
+                pattern.bits = 1;
+                pattern.color = PatternElement::BLUE;
+                pattern.exposure = ExposureTime;
+                pattern.darkPeriod = DarkTime;
+                pattern.trigIn = false;
+                pattern.trigOut2 = true;
+                pattern.clear = true;
 
                     pattern.splashImageIndex = m_elements[m_elements.size()-1].splashImageIndex;
                     pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos;

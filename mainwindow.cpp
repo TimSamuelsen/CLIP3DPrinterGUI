@@ -74,6 +74,7 @@ static QDateTime CurrentDateTime;
 static QString LogFileDestination;
 static QString ImageFileDirectory;
 static QTime PrintStartTime;
+static double GetPosition;
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -82,10 +83,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui = (new Ui::MainWindow);
     ui->setupUi(this);
-    usbPollTimer = new QTimer(this);
-    usbPollTimer->setInterval(2000);
-    connect(usbPollTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));
-    usbPollTimer->start();
+    //usbPollTimer = new QTimer(this);
+    //usbPollTimer->setInterval(2000);
+    //connect(usbPollTimer, SIGNAL(timeout()), this, SLOT(timerTimeout()));
+    //usbPollTimer->start();
+    timerTimeout();
     CurrentDateTime = QDateTime::currentDateTime();
     loadSettings();
     initSettings();
@@ -94,9 +96,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::timerTimeout(void)
 {
-    //QString CurrentPosition = SMC.GetPosition();
-    //CurrentPosition = CurrentPosition.remove(0,3);
-    //ui->CurrentPositionIndicator->setText(CurrentPosition);
+    //emit(on_GetPosition_clicked());
+
 }
 
 MainWindow::~MainWindow()
@@ -121,6 +122,20 @@ void MainWindow::on_ManualStage_clicked()
     ui->ProgramPrints->append("Manual Stage Control Entered");
     ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 255); border: 1px solid black;");
     ui->StageConnectionIndicator->setText("Manual Control");
+}
+
+void MainWindow::on_GetPosition_clicked()
+{
+    for (int i = 0; i<5; i++)
+    {
+        QString delay = "This delay is needed for the serial read";
+    }
+    QString CurrentPosition = SMC.GetPosition();
+    CurrentPosition = CurrentPosition.remove(0,3);
+    ui->CurrentPositionIndicator->setText(CurrentPosition);
+    ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
+    ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
+    GetPosition = CurrentPosition.toDouble();
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -430,9 +445,9 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         {
             firstImage << firstItem->text();
         }
-        DLP.AddPatterns(firstImage, 1, 0, UVIntensity);
-        DLP.updateLUT();
-        DLP.clearElements();
+        DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity);
+        //DLP.updateLUT();
+        //DLP.clearElements();
         nSlice = ui->FileList->count();
         ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
         QListWidgetItem * item;
@@ -457,7 +472,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
 
         QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
         ui->ProgramPrints->append(dir.absolutePath());
-
+        emit(on_GetPosition_clicked());
         initPlot();
         updatePlot();
         //validateStartingPosition();
@@ -480,7 +495,7 @@ void MainWindow::on_StartPrint_clicked()
     {
         SMC.SetVelocity(StageVelocity);
 
-        usbPollTimer->stop();
+        //usbPollTimer->stop();
         //Set PrintFlag to true
         PrintFlag = true;
         nSlice = ui->FileList->count();
@@ -545,6 +560,7 @@ void MainWindow::PrintProcess(void)
         ui->ProgramPrints->append("Image File: " + filename);
         layerCount++;
         remainingImages--;
+        emit(on_GetPosition_clicked());
         updatePlot();
 
         }
@@ -774,7 +790,7 @@ void MainWindow::initPlot()
     ui->LivePlot->graph(0)->setName("Print Progress");
     ui->LivePlot->xAxis->setLabel("Time (s)");
     ui->LivePlot->yAxis->setLabel("Position (mm)");
-    ui->LivePlot->xAxis->setRange(0, (1.1*nSlice*(ExposureTime+DarkTime)/(1000*1000))+InitialExposure);
+    ui->LivePlot->xAxis->setRange(0, InitialExposure+5+(1.1*(nSlice*(ExposureTime+DarkTime))/(1000*1000)));
     ui->LivePlot->yAxis->setRange(0.9*(StartingPosition - nSlice*SliceThickness),1.1*StartingPosition);
 
     ui->LivePlot->replot();
@@ -782,18 +798,18 @@ void MainWindow::initPlot()
 
 void MainWindow::updatePlot()
 {
-    if (layerCount > 0)
-    {
+    //if (layerCount > 0)
+    //{
         QTime updateTime = QTime::currentTime();
         int TimeElapsed = PrintStartTime.secsTo(updateTime);
 
-        double CurrentPos = StartingPosition - (layerCount*SliceThickness);
+        double CurrentPos = GetPosition;//StartingPosition - (layerCount*SliceThickness);
 
         qv_x.append(TimeElapsed);
         qv_y.append(CurrentPos);
 
         ui->LivePlot->graph(0)->setData(qv_x,qv_y);
-    }
+    //}
 
 
     ui->LivePlot->clearItems();
@@ -810,7 +826,7 @@ void MainWindow::updatePlot()
 
     //Update Layer Label
     //Add Layer Label
-    QString RemainingTime = " Remaining Time: " + QString::number(((ExposureTime+DarkTime)/(1000*1000))*(nSlice-layerCount)) + "s";
+    QString RemainingTime = " Remaining Time: " + QString::number(((ExposureTime+DarkTime)/(1000*1000))*(nSlice-layerCount)+InitialExposure) + "s";
     QCPItemText *textLabel2 = new QCPItemText(ui->LivePlot);
     textLabel2->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
     textLabel2->position->setType(QCPItemPosition::ptAxisRectRatio);
@@ -948,3 +964,5 @@ void MainWindow::CheckDLPStatus(void)
         return;
     }
 }
+
+

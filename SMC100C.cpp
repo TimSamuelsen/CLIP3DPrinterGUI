@@ -591,12 +591,11 @@ bool SMC100C::SendCurrentCommand()
     //Open Serial Port
     if (initFlag)
     {
-        //serial.openDevice(SelectedCOM, 57600);
+
     }
     else
     {
-        //char test = serial.openDevice("COM3",57600);
-        //printf("serial open test: %d",test);
+
     }
     //Write Adress
     serial.writeString(ControllerAdress);
@@ -710,7 +709,8 @@ char* SMC100C::SerialRead()
     else if(ReadStatus == 0)
     {
         char* errString = "Timeout Reached";
-        return  receivedString;
+        return errString;
+        //return  receivedString;
     }
     else if(ReadStatus == -1)
     {
@@ -720,7 +720,7 @@ char* SMC100C::SerialRead()
     else if(ReadStatus == -2)
     {
         char* errString = "Error while reading byte";
-        return  receivedString;
+        return errString;
     }
     else if(ReadStatus == -3)
     {

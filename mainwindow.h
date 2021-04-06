@@ -107,6 +107,8 @@ private slots:
 
     void on_PumpConnectButton_clicked();
 
+    void on_GetPosition_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
