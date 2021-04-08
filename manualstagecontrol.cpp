@@ -147,3 +147,9 @@ void ManualStageControl::on_GetPosition_clicked()
     ui->TerminalOut->append("Stage is at: " + CurrentPosition);
     ui->CurrentPositionIndicator->setText(CurrentPosition);
 }
+
+void ManualStageControl::on_StopMotion_clicked()
+{
+    SMC.StopMotion();
+    ui->TerminalOut->append("Stopping Motion");
+}

@@ -41,6 +41,8 @@ private slots:
 
     void on_GetPosition_clicked();
 
+    void on_StopMotion_clicked();
+
 private:
     Ui::ManualStageControl *ui;
     void GetValues();

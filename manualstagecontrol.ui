@@ -691,7 +691,7 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Stop Motion&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="StopMotion">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -708,7 +708,7 @@
     border-color: black;
 }
 
-QPushButton#StopMotiont:pressed {
+QPushButton#StopMotion:pressed {
     background-color: rgb(200, 0, 0);
     border-style: inset;
 }</string>
