@@ -60,6 +60,7 @@ static uint InitialExposure;
 static int UVIntensity;
 static double PrintSpeed;
 static double ExpDarkRatio;
+static int MaxImageUpload = 399;
 
 static int remainingImages;
 
@@ -130,12 +131,16 @@ void MainWindow::on_GetPosition_clicked()
     {
         QString delay = "This delay is needed for the serial read";
     }
-    QString CurrentPosition = SMC.GetPosition();
-    CurrentPosition = CurrentPosition.remove(0,3);
-    ui->CurrentPositionIndicator->setText(CurrentPosition);
-    ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
-    ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
-    GetPosition = CurrentPosition.toDouble();
+    char* ReadPosition = SMC.GetPosition();
+    if (strlen(ReadPosition) > 2)
+    {
+        QString CurrentPosition = ReadPosition;
+        CurrentPosition = CurrentPosition.remove(0,3);
+        ui->CurrentPositionIndicator->setText(CurrentPosition);
+        ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
+        ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
+        GetPosition = CurrentPosition.toDouble();
+    }
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -468,7 +473,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
         DLP.updateLUT();
         DLP.clearElements();
-        remainingImages = 400-InitialExposure;
+        remainingImages = 400 - InitialExposure;
 
         QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
         ui->ProgramPrints->append(dir.absolutePath());
@@ -524,7 +529,7 @@ void MainWindow::PrintProcess(void)
                     item = ui->FileList->item(i);
                     imageList << item->text();
                     count++;
-                    if (i > layerCount + 399)
+                    if (i > layerCount + 390)
                     {
                         break;
                     }
@@ -533,14 +538,15 @@ void MainWindow::PrintProcess(void)
             DLP.updateLUT();
             DLP.clearElements();
             remainingImages = count - 1;
+            layerCount++;
+            Sleep(500);
             DLP.startPatSequence();
             QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
             updatePlot();
-            layerCount++;
             ui->ProgramPrints->append("Reupload succesful, current layer: " + QString::number(layerCount));
             ui->ProgramPrints->append(QString::number(remainingImages + 1) + " images uploaded");
         }
-        if (InitialExposureFlag == true)
+        else if (InitialExposureFlag == true)
         {
             updatePlot();
             QTimer::singleShot((InitialExposure*1000), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
@@ -550,18 +556,18 @@ void MainWindow::PrintProcess(void)
         else
         {
         QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+        ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
         ExposureFlag = true;
         QString filename =ui->FileList->item(layerCount)->text();
         QPixmap img(filename);
         QPixmap img2 = img.scaled(890,490, Qt::KeepAspectRatio);
         ui->PrintImage->setPixmap(img2);
-
         ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
         ui->ProgramPrints->append("Image File: " + filename);
         layerCount++;
         remainingImages--;
-        emit(on_GetPosition_clicked());
         updatePlot();
+        emit(on_GetPosition_clicked());
 
         }
         return;
@@ -572,6 +578,7 @@ void MainWindow::PrintProcess(void)
         ui->ProgramPrints->append("Print Complete");
         saveText();
         saveSettings();
+
         return;
     }
 }
@@ -790,7 +797,7 @@ void MainWindow::initPlot()
     ui->LivePlot->graph(0)->setName("Print Progress");
     ui->LivePlot->xAxis->setLabel("Time (s)");
     ui->LivePlot->yAxis->setLabel("Position (mm)");
-    ui->LivePlot->xAxis->setRange(0, InitialExposure+5+(1.1*(nSlice*(ExposureTime+DarkTime))/(1000*1000)));
+    ui->LivePlot->xAxis->setRange(0, InitialExposure+5+(1.3*(nSlice*(ExposureTime+DarkTime))/(1000*1000)));
     ui->LivePlot->yAxis->setRange(0.9*(StartingPosition - nSlice*SliceThickness),1.1*StartingPosition);
 
     ui->LivePlot->replot();
@@ -824,8 +831,10 @@ void MainWindow::updatePlot()
     textLabel1->setFont(QFont(font().family(), 12)); // make font a bit larger
     textLabel1->setPen(QPen(Qt::black)); // show black border around text
 
+
     //Update Layer Label
     //Add Layer Label
+
     QString RemainingTime = " Remaining Time: " + QString::number(((ExposureTime+DarkTime)/(1000*1000))*(nSlice-layerCount)+InitialExposure) + "s";
     QCPItemText *textLabel2 = new QCPItemText(ui->LivePlot);
     textLabel2->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
@@ -836,6 +845,7 @@ void MainWindow::updatePlot()
     textLabel2->setPen(QPen(Qt::black)); // show black border around text
 
     ui->LivePlot->replot();
+
 }
 
 /*************************************************************
