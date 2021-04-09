@@ -699,7 +699,7 @@ char* SMC100C::SerialRead()
     char finalChar = '\n';
     unsigned int maxNbBytes = 13;
     int ReadStatus;
-    ReadStatus = serial.readString(receivedString,finalChar,maxNbBytes,50);
+    ReadStatus = serial.readString(receivedString,finalChar,maxNbBytes,10);
 
     char ReadChar;
     if (ReadStatus > 0)
@@ -709,18 +709,18 @@ char* SMC100C::SerialRead()
     else if(ReadStatus == 0)
     {
         char* errString = "Timeout Reached";
-        return errString;
+        return "A";
         //return  receivedString;
     }
     else if(ReadStatus == -1)
     {
         char* errString = "Error Setting Timeout";
-        return  errString;
+        return  "B";
     }
     else if(ReadStatus == -2)
     {
         char* errString = "Error while reading byte";
-        return errString;
+        return "C";
     }
     else if(ReadStatus == -3)
     {

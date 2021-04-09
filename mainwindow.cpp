@@ -135,12 +135,19 @@ void MainWindow::on_GetPosition_clicked()
     char* ReadPosition = SMC.GetPosition();
     if (strlen(ReadPosition) > 2)
     {
-        QString CurrentPosition = ReadPosition;
-        CurrentPosition = CurrentPosition.remove(0,3);
-        ui->CurrentPositionIndicator->setText(CurrentPosition);
-        ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
-        ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
-        GetPosition = CurrentPosition.toDouble();
+        //if (ReadPosition != "A" && ReadPosition != "B" && ReadPosition != "C")
+        //{
+            printf("%s",ReadPosition);
+            QString CurrentPosition; // = ReadPosition;//QString::fromUtf16((ushort*)(ReadPosition));
+            CurrentPosition = QString::fromUtf8(ReadPosition);
+            //QTextStream(&CurrentPosition) << ReadPosition;
+            //CurrentPosition.asprintf("%s",ReadPosition);
+            CurrentPosition.remove(0,3);
+            ui->CurrentPositionIndicator->setText(CurrentPosition);
+            ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
+            ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
+            GetPosition = CurrentPosition.toDouble();
+        //}
     }
 */
 }
@@ -607,7 +614,7 @@ void MainWindow::PrintProcess(void)
         saveSettings();
 
         SMC.StopMotion();
-        /*
+
         Sleep(50);
         SMC.SetVelocity(2);
         Sleep(50);
@@ -619,7 +626,7 @@ void MainWindow::PrintProcess(void)
         {
            SMC.AbsoluteMove(0);
         }
-        */
+
 
         return;
     }
@@ -845,7 +852,7 @@ void MainWindow::initPlot()
     ui->LivePlot->graph(0)->setName("Print Progress");
     ui->LivePlot->xAxis->setLabel("Time (s)");
     ui->LivePlot->yAxis->setLabel("Position (mm)");
-    ui->LivePlot->xAxis->setRange(0, InitialExposure+5+(1.3*(nSlice*(ExposureTime+DarkTime))/(1000*1000)));
+    ui->LivePlot->xAxis->setRange(0, InitialExposure+5+0.1*nSlice+(1.1*(nSlice*(ExposureTime+DarkTime))/(1000*1000)));
     ui->LivePlot->yAxis->setRange(0.9*(StartingPosition - nSlice*SliceThickness),1.1*StartingPosition);
 
     ui->LivePlot->replot();
