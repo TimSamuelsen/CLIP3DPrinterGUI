@@ -711,6 +711,10 @@
 QPushButton#StopMotion:pressed {
     background-color: rgb(200, 0, 0);
     border-style: inset;
+}
+
+QPushButton#StopMotion:hover:!pressed {
+    background-color:rgb(215,35,35);
 }</string>
    </property>
    <property name="text">

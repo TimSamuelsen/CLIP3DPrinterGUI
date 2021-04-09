@@ -578,6 +578,20 @@ void MainWindow::PrintProcess(void)
         ui->ProgramPrints->append("Print Complete");
         saveText();
         saveSettings();
+        /*
+        SMC.StopMotion();
+        Sleep(50);
+        SMC.SetVelocity(1);
+        Sleep(50);
+        if (MinEndOfRun > 0)
+        {
+            SMC.AbsoluteMove(MinEndOfRun);
+        }
+        else
+        {
+           SMC.AbsoluteMove(0);
+        }
+        */
 
         return;
     }
