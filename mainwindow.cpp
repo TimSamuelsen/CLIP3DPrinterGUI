@@ -60,7 +60,7 @@ static uint InitialExposure;
 static int UVIntensity;
 static double PrintSpeed;
 static double ExpDarkRatio;
-static int MaxImageUpload = 399;
+static int MaxImageUpload = 20;
 
 static int remainingImages;
 
@@ -127,6 +127,7 @@ void MainWindow::on_ManualStage_clicked()
 
 void MainWindow::on_GetPosition_clicked()
 {
+/*
     for (int i = 0; i<5; i++)
     {
         QString delay = "This delay is needed for the serial read";
@@ -141,6 +142,7 @@ void MainWindow::on_GetPosition_clicked()
         ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
         GetPosition = CurrentPosition.toDouble();
     }
+*/
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -188,6 +190,26 @@ void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
         ui->ExposureDarkRatioParam->setEnabled(true);
         ui->setExpDarkRatio->setEnabled(true);
     }
+}
+
+void MainWindow::on_SetMaxImageUpload_clicked()
+{
+    int MaxImageVal = ui->MaxImageUpload->value();
+    if (MaxImageVal < (InitialExposure + 1))
+    {
+        MaxImageVal = InitialExposure + 1;
+    }
+    else if (MaxImageVal > 398)
+    {
+        MaxImageVal = 398;
+    }
+    else
+    {
+        MaxImageUpload = MaxImageVal;
+    }
+    MaxImageUpload = MaxImageVal;
+    QString MaxImageUploadString = "Set Max Image Upload to: " + QString::number(MaxImageUpload);
+    ui->ProgramPrints->append(MaxImageUploadString);
 }
 
 void MainWindow::on_setExpDarkRatio_clicked()
@@ -461,7 +483,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         {
                 item = ui->FileList->item(i);
                 imageList << item->text();
-                if ((i + InitialExposure) > 399)
+                if ((i + InitialExposure) > MaxImageUpload)
                 {
                     break;
                 }
@@ -473,7 +495,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
         DLP.updateLUT();
         DLP.clearElements();
-        remainingImages = 400 - InitialExposure;
+        remainingImages = MaxImageUpload - InitialExposure;
 
         QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
         ui->ProgramPrints->append(dir.absolutePath());
@@ -524,12 +546,17 @@ void MainWindow::PrintProcess(void)
             QListWidgetItem * item;
             QStringList imageList;
             uint count = 0;
+            int MaxImageReupload = MaxImageUpload;
+            if (MaxImageUpload > 390)
+            {
+                MaxImageReupload -= 5;
+            }
             for(int i = (layerCount); (i < ui->FileList->count()); i++)
             {
                     item = ui->FileList->item(i);
                     imageList << item->text();
                     count++;
-                    if (i > layerCount + 390)
+                    if (i > layerCount + MaxImageReupload)
                     {
                         break;
                     }
@@ -578,10 +605,11 @@ void MainWindow::PrintProcess(void)
         ui->ProgramPrints->append("Print Complete");
         saveText();
         saveSettings();
-        /*
+
         SMC.StopMotion();
+        /*
         Sleep(50);
-        SMC.SetVelocity(1);
+        SMC.SetVelocity(2);
         Sleep(50);
         if (MinEndOfRun > 0)
         {
@@ -751,6 +779,8 @@ void MainWindow::saveSettings()
     settings.setValue("PrintSpeed", PrintSpeed);
     settings.setValue("ExpDarkRatio",ExpDarkRatio);
 
+    settings.setValue("MaxImageUpload", MaxImageUpload);
+
     settings.setValue("LogFileDestination", LogFileDestination);
     settings.setValue("ImageFileDirectory", ImageFileDirectory);
 }
@@ -776,6 +806,8 @@ void MainWindow::loadSettings()
     PrintSpeed = settings.value("PrintSpeed", 40).toDouble();
     ExpDarkRatio = settings.value("ExpDarkRatio", 0.5).toDouble();
 
+    MaxImageUpload = settings.value("MaxImageUpload", 50).toDouble();
+
     LogFileDestination = settings.value("LogFileDestination", "C://").toString();
     ImageFileDirectory = settings.value("ImageFileDirectory", "C://").toString();
 
@@ -799,6 +831,8 @@ void MainWindow::initSettings()
     ui->InitialAdhesionParameter->setValue(InitialExposure);
     ui->PrintSpeedParam->setValue(PrintSpeed);
     ui->ExposureDarkRatioParam->setValue(ExpDarkRatio);
+
+    ui->MaxImageUpload->setValue(MaxImageUpload);
 
     ui->LogFileLocation->setText(LogFileDestination);
 }
@@ -988,5 +1022,4 @@ void MainWindow::CheckDLPStatus(void)
         return;
     }
 }
-
 

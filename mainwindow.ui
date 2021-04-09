@@ -1728,6 +1728,45 @@ QPushButton#AbortPrint:hover:!pressed {
  Based on Print Speed</string>
      </property>
     </widget>
+    <widget class="QSpinBox" name="MaxImageUpload">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>90</y>
+       <width>71</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <number>399</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="MaxImageLabel">
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>10</y>
+       <width>171</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Max Image Upload &lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;DO NOT GO BELOW INITIAL&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;EXP OR OVER 399&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="SetMaxImageUpload">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>90</y>
+       <width>51</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Set</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QFrame" name="frame_10">
     <property name="geometry">

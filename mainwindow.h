@@ -109,6 +109,8 @@ private slots:
 
     void on_GetPosition_clicked();
 
+    void on_SetMaxImageUpload_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
