@@ -3,6 +3,9 @@
 
 #include "serialib.h"
 
+#include "SMC100C.h"
+
+SMC100C SMC;
 static bool ConnectionFlag;
 static bool UseTargetTime;
 static bool UseTargetVolume;
@@ -28,7 +31,7 @@ manualpumpcontrol::~manualpumpcontrol()
 
 void manualpumpcontrol::on_ConnectButton_clicked()
 {
-    if (PSerial.openDevice("COM3",9600) == 1)
+    if (PSerial.openDevice("COM4",9600) == 1)
     {
         ui->TerminalOut->append("Serial Port Connected");
 
@@ -111,7 +114,7 @@ void manualpumpcontrol::on_SetTargetTime_clicked()
     QString TargetTimeString= "Set Target Time to: " + QString::number(TargetTime);
     ui->TerminalOut->append(TargetTimeString);
 
-    SetTargetVolume(TargetTime);
+    SetTargetTime(TargetTime);
 
     CommandBufferUpdate();
 }
@@ -182,6 +185,7 @@ int manualpumpcontrol::StartInfusion()
     QString Command = "irun.\r\n";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
+    CommandBufferUpdate();
     return returnval;
 }
 
@@ -190,6 +194,7 @@ int manualpumpcontrol::StartTargetInfusion() //Is this needed? Replace with with
     QString Command;
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
+    CommandBufferUpdate();
     return returnval;
 }
 
@@ -198,12 +203,13 @@ int manualpumpcontrol::Stop()
     QString Command = "stop.\r\n";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
+    CommandBufferUpdate();
     return returnval;
 }
 /******************************************Set Commands******************************************/
 int manualpumpcontrol::SetTargetTime(double T_Time)
 {
-    QString Command = "ttime" + QString::number(T_Time) + "s.\r\n";
+    QString Command = "ttime " + QString::number(T_Time) + " s.\r\n";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
     return returnval;
@@ -211,7 +217,7 @@ int manualpumpcontrol::SetTargetTime(double T_Time)
 
 int manualpumpcontrol::SetTargetVolume(double T_Vol)
 {
-    QString Command = "tvol" + QString::number(T_Vol) + "ul.\r\n";
+    QString Command = "tvol " + QString::number(T_Vol) + " ml.\r\n";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
     return returnval;
@@ -227,7 +233,7 @@ int manualpumpcontrol::SetSyringeVolume(double S_Vol)
 
 int manualpumpcontrol::SetInfuseRate(double I_Rate)
 {
-    QString Command = "irate" + QString::number(I_Rate) + "ul/s.\r\n";
+    QString Command = "irate " + QString::number(I_Rate) + " ul/s.\r\n";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
     return returnval;
@@ -235,7 +241,7 @@ int manualpumpcontrol::SetInfuseRate(double I_Rate)
 
 int manualpumpcontrol::SetWithdrawRate(double W_Rate)
 {
-    QString Command = "wrate." + QString::number(W_Rate) + "ul/s.\r\n";
+    QString Command = "wrate. " + QString::number(W_Rate) + " ul/s.\r\n";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
     return returnval;
@@ -364,11 +370,15 @@ char* manualpumpcontrol::SerialRead()
 
 void manualpumpcontrol::CommandBufferUpdate()
 {
-    Sleep(10);
+    Sleep(20);
+    QString BufferCommand3 = ".\r\n";
+    const char* CommandToSend3 = BufferCommand3.toLatin1().data();
+    PSerial.writeString(CommandToSend3);
+    Sleep(20);
     QString BufferCommand1 = "cmd.\r\n";
     const char* CommandToSend1 = BufferCommand1.toLatin1().data();
     PSerial.writeString(CommandToSend1);
-    Sleep(10);
+    Sleep(20);
     QString BufferCommand2 = "ver.\r\n";
     const char* CommandToSend2 = BufferCommand2.toLatin1().data();
     PSerial.writeString(CommandToSend2);
