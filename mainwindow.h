@@ -115,7 +115,6 @@ private:
     ManualStageControl *ManualStageUI;
     manualLEcontrol *ManualProjUI;
     manualpumpcontrol *ManualPumpUI;
-    QTimer *usbPollTimer;
     bool ValidateSettings(void);
     void loadSettings();
     void saveSettings();

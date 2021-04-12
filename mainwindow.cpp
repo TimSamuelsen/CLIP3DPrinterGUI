@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
+#include <cstring>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QProgressDialog>
@@ -133,22 +135,21 @@ void MainWindow::on_GetPosition_clicked()
         QString delay = "This delay is needed for the serial read";
     }
     char* ReadPosition = SMC.GetPosition();
-    if (strlen(ReadPosition) > 2)
-    {
-        //if (ReadPosition != "A" && ReadPosition != "B" && ReadPosition != "C")
-        //{
-            printf("%s",ReadPosition);
-            QString CurrentPosition; // = ReadPosition;//QString::fromUtf16((ushort*)(ReadPosition));
-            CurrentPosition = QString::fromUtf8(ReadPosition);
-            //QTextStream(&CurrentPosition) << ReadPosition;
-            //CurrentPosition.asprintf("%s",ReadPosition);
-            CurrentPosition.remove(0,3);
-            ui->CurrentPositionIndicator->setText(CurrentPosition);
-            ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
-            ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
-            GetPosition = CurrentPosition.toDouble();
-        //}
-    }
+    //if (strlen(ReadPosition) > 2)
+    //{
+        //printf("%s",ReadPosition);
+        QString CurrentPosition = QString::fromUtf8(ReadPosition);// = ReadPosition;//QString::fromUtf16((ushort*)(ReadPosition)); //CurrentPosition.asprintf("%s",ReadPosition); //CurrentPosition.asprintf("%s",ReadPosition);
+        CurrentPosition.remove(0,3);
+        CurrentPosition.chop(2);
+        ui->CurrentPositionIndicator->setText(CurrentPosition);
+        ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + " mm");
+        ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
+        GetPosition = CurrentPosition.toDouble();
+    //}
+    //else
+    //{
+    //    printf("%s",ReadPosition);
+    //}
 */
 }
 
@@ -446,64 +447,67 @@ void MainWindow::on_PumpConnectButton_clicked()
 /***************************************Print Functionality*********************************************/
 void MainWindow::on_InitializeAndSynchronize_clicked()
 {
-    LCR_PatternDisplay(0);
-
-    /*
-    Sleep(50);
-    SMC.SetAcceleration(StageAcceleration);
-    Sleep(50);
-    SMC.SetNegativeLimit(MinEndOfRun);
-    Sleep(50);
-    SMC.SetPositiveLimit(MaxEndOfRun);
-    */
-    //Test whether stacking commands will work?
-    //Prepare stage for print
-    SMC.SetVelocity(3);
-    Sleep(50);
-    SMC.AbsoluteMove(StartingPosition);
-    Sleep(50);
-    /*
-    Sleep(50);
-    SMC.SetAcceleration(StageAcceleration);
-    Sleep(50);
-    SMC.SetNegativeLimit(MinEndOfRun);
-    Sleep(50);
-    SMC.SetPositiveLimit(MaxEndOfRun);
-    */
-    if (ui->FileList->count() > 0)
+    if (initConfirmationScreen())
     {
-        //Upload images for initial exposure
-        QListWidgetItem * firstItem = ui->FileList->item(0);
-        QStringList firstImage;
-        for (uint i = 0; i < InitialExposure; i++)
-        {
-            firstImage << firstItem->text();
-        }
-        DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity);
-        nSlice = ui->FileList->count();
-        ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
-        QListWidgetItem * item;
-        QStringList imageList;
-        for(int i = 1; (i < (ui->FileList->count())); i++)
-        {
-                item = ui->FileList->item(i);
-                imageList << item->text();
-                if ((i + InitialExposure) > MaxImageUpload)
-                {
-                    break;
-                }
-        }
-        DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
-        DLP.updateLUT();
-        DLP.clearElements();
-        remainingImages = MaxImageUpload - InitialExposure;
+        LCR_PatternDisplay(0);
 
-        QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
-        ui->ProgramPrints->append(dir.absolutePath());
-        emit(on_GetPosition_clicked());
-        initPlot();
-        updatePlot();
-        ui->StartPrint->setEnabled(true);
+        /*
+        Sleep(50);
+        SMC.SetAcceleration(StageAcceleration);
+        Sleep(50);
+        SMC.SetNegativeLimit(MinEndOfRun);
+        Sleep(50);
+        SMC.SetPositiveLimit(MaxEndOfRun);
+        */
+        //Test whether stacking commands will work?
+        //Prepare stage for print
+        SMC.SetVelocity(3);
+        Sleep(50);
+        SMC.AbsoluteMove(StartingPosition);
+        Sleep(50);
+        /*
+        Sleep(50);
+        SMC.SetAcceleration(StageAcceleration);
+        Sleep(50);
+        SMC.SetNegativeLimit(MinEndOfRun);
+        Sleep(50);
+        SMC.SetPositiveLimit(MaxEndOfRun);
+        */
+        if (ui->FileList->count() > 0)
+        {
+            //Upload images for initial exposure
+            QListWidgetItem * firstItem = ui->FileList->item(0);
+            QStringList firstImage;
+            for (uint i = 0; i < InitialExposure; i++)
+            {
+                firstImage << firstItem->text();
+            }
+            DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity);
+            nSlice = ui->FileList->count();
+            ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
+            QListWidgetItem * item;
+            QStringList imageList;
+            for(int i = 1; (i < (ui->FileList->count())); i++)
+            {
+                    item = ui->FileList->item(i);
+                    imageList << item->text();
+                    if ((i + InitialExposure) > MaxImageUpload)
+                    {
+                        break;
+                    }
+            }
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
+            DLP.updateLUT();
+            DLP.clearElements();
+            remainingImages = MaxImageUpload - InitialExposure;
+
+            QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
+            ui->ProgramPrints->append(dir.absolutePath());
+            emit(on_GetPosition_clicked());
+            initPlot();
+            updatePlot();
+            ui->StartPrint->setEnabled(true);
+        }
     }
 }
 
@@ -819,7 +823,7 @@ bool MainWindow::initConfirmationScreen()
     }
     DetailedText += "Exposure Time: " + QString::number(ExposureTime) + " ms\n";
     DetailedText += "UV Intensity: " + QString::number(UVIntensity) + "\n";
-    DetailedText += "Dark Time " + QString::number(DarkTime) + " ms\n";
+    DetailedText += "Dark Time " + QString::number(DarkTime/1000) + " ms\n";
 
     DetailedText += "Stage Velocity: " + QString::number(StageVelocity) + " mm/s\n";
     DetailedText += "Stage Acceleration: " + QString::number(StageAcceleration) + " mm/s^2\n";
@@ -974,7 +978,7 @@ void MainWindow::updatePlot()
     textLabel2->setFont(QFont(font().family(), 12)); // make font a bit larger
     textLabel2->setPen(QPen(Qt::black)); // show black border around text
 
-    ui->LivePlot->replot();
+    ui->LivePlot->replot(QCustomPlot::rpQueuedReplot);
 }
 /*************************************************************
  * ********************OUTSIDE CODE***************************
