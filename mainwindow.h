@@ -74,7 +74,6 @@ private slots:
 
     void on_SelectFile_clicked();
 
-
     void on_ClearImageFiles_clicked();
 
     void ExposureTimeSlot();

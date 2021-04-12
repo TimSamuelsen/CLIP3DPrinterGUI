@@ -456,7 +456,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
     Sleep(50);
     SMC.SetPositiveLimit(MaxEndOfRun);
     */
-
+    //Test whether stacking commands will work?
     //Prepare stage for print
     SMC.SetVelocity(3);
     Sleep(50);
@@ -511,8 +511,7 @@ void MainWindow::on_AbortPrint_clicked()
 {
     LCR_PatternDisplay(0);
     SMC.StopMotion();
-    //Set layer count high to stop print process
-    layerCount = 0xFFFF;
+    layerCount = 0xFFFF; //Set layer count high to stop print process
 }
 
 void MainWindow::on_StartPrint_clicked()
@@ -595,7 +594,6 @@ void MainWindow::PrintProcess(void)
         remainingImages--;
         updatePlot();
         emit(on_GetPosition_clicked());
-
         }
         return;
     }
@@ -619,7 +617,6 @@ void MainWindow::PrintProcess(void)
         {
            SMC.AbsoluteMove(0);
         }
-
 
         return;
     }
@@ -737,11 +734,6 @@ void MainWindow::saveText()
          file.flush();
          file.close();
      }
-
-}
-
-void MainWindow::printParameters()
-{
 
 }
 

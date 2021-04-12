@@ -42,6 +42,7 @@ void manualpumpcontrol::on_ConnectButton_clicked()
         ui->ConnectionIndicator->setText("Connected");
 
         ConnectionFlag = true;
+        CommandBufferUpdate();
     }
     else
     {
@@ -90,14 +91,12 @@ void manualpumpcontrol::on_SelectTargetVolume_clicked() //Maybe add clear target
 void manualpumpcontrol::on_StartInfusion_clicked()
 {
     StartInfusion();
-    CommandBufferUpdate();
     ui->TerminalOut->append("Starting Infusion");
 }
 
 void manualpumpcontrol::on_StopInfusion_clicked()
 {
     Stop();
-    CommandBufferUpdate();
     ui->TerminalOut->append("Stopping Pump");
 }
 
@@ -118,8 +117,7 @@ void manualpumpcontrol::on_SetTargetTime_clicked()
     ui->TerminalOut->append(TargetTimeString);
 
     SetTargetTime(TargetTime);
-
-    CommandBufferUpdate();
+    SerialRead();
 }
 
 void manualpumpcontrol::on_GetTargetVolume_clicked()
@@ -138,8 +136,6 @@ void manualpumpcontrol::on_SetTargetVolume_clicked()
     ui->TerminalOut->append(TargetVolumeString);
 
     SetTargetVolume(TargetVolume);
-
-    CommandBufferUpdate();
 }
 
 void manualpumpcontrol::on_GetInfuseRate_clicked()
@@ -159,7 +155,7 @@ void manualpumpcontrol::on_SetInfuseRate_clicked()
 
     SetInfuseRate(InfusionRate);
 
-    CommandBufferUpdate();
+    SerialRead();
 }
 
 void manualpumpcontrol::on_GetWithdrawRate_clicked()
@@ -179,7 +175,7 @@ void manualpumpcontrol::on_SetWithdrawRate_clicked()
 
     SetWithdrawRate(WithdrawRate);
 
-    CommandBufferUpdate();
+    SerialRead();
 }
 
 /******************************************Active Commands******************************************/
@@ -188,6 +184,7 @@ int manualpumpcontrol::StartInfusion()
     QString Command = "irun.\r\n";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
+    SerialRead();
     CommandBufferUpdate();
     return returnval;
 }
@@ -206,7 +203,7 @@ int manualpumpcontrol::Stop()
     QString Command = "stop.\r\n";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
-    CommandBufferUpdate();
+    SerialRead();
     return returnval;
 }
 /******************************************Set Commands******************************************/
