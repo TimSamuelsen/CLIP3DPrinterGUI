@@ -116,6 +116,9 @@
    <property name="decimals">
     <number>5</number>
    </property>
+   <property name="maximum">
+    <double>5000.000000000000000</double>
+   </property>
   </widget>
   <widget class="QLabel" name="CurrentInfuseRate">
    <property name="geometry">
@@ -201,6 +204,9 @@
    <property name="decimals">
     <number>5</number>
    </property>
+   <property name="maximum">
+    <double>5000.000000000000000</double>
+   </property>
   </widget>
   <widget class="QLabel" name="label_5">
    <property name="geometry">
@@ -283,6 +289,9 @@
    <property name="decimals">
     <number>5</number>
    </property>
+   <property name="maximum">
+    <double>5000.000000000000000</double>
+   </property>
   </widget>
   <widget class="QPushButton" name="GetTargetTime">
    <property name="geometry">
@@ -364,6 +373,9 @@
    </property>
    <property name="decimals">
     <number>5</number>
+   </property>
+   <property name="maximum">
+    <double>100000.000000000000000</double>
    </property>
   </widget>
   <widget class="QPushButton" name="GetTargetVolume">
@@ -675,6 +687,9 @@ QPushButton#StopInfusion:hover:!pressed {
    </property>
    <property name="decimals">
     <number>5</number>
+   </property>
+   <property name="maximum">
+    <double>1009.899999999999977</double>
    </property>
   </widget>
   <widget class="QLabel" name="CurrentSyringeVolume">

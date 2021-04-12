@@ -105,8 +105,6 @@ void manualpumpcontrol::on_GetTargetTime_clicked()
 {
     QString T_Time = GetTargetTime();
 
-    CommandBufferUpdate();
-
     ui->CurrentInfuseRate->setText(T_Time);
 }
 
@@ -124,8 +122,6 @@ void manualpumpcontrol::on_GetTargetVolume_clicked()
 {
     QString T_Vol = GetTargetVolume();
 
-    CommandBufferUpdate();
-
     ui->CurrentInfuseRate->setText(T_Vol);
 }
 
@@ -136,13 +132,12 @@ void manualpumpcontrol::on_SetTargetVolume_clicked()
     ui->TerminalOut->append(TargetVolumeString);
 
     SetTargetVolume(TargetVolume);
+    SerialRead();
 }
 
 void manualpumpcontrol::on_GetInfuseRate_clicked()
 {
     QString I_Rate = GetInfuseRate();
-
-    CommandBufferUpdate();
 
     ui->CurrentInfuseRate->setText(I_Rate);
 }
@@ -154,15 +149,12 @@ void manualpumpcontrol::on_SetInfuseRate_clicked()
     ui->TerminalOut->append(InfuseRateString);
 
     SetInfuseRate(InfusionRate);
-
     SerialRead();
 }
 
 void manualpumpcontrol::on_GetWithdrawRate_clicked()
 {
     QString W_Rate = GetWithdrawRate();
-
-    CommandBufferUpdate();
 
     ui->CurrentInfuseRate->setText(W_Rate);
 }
@@ -174,7 +166,6 @@ void manualpumpcontrol::on_SetWithdrawRate_clicked()
     ui->TerminalOut->append(WithdrawRateString);
 
     SetWithdrawRate(WithdrawRate);
-
     SerialRead();
 }
 
@@ -217,7 +208,7 @@ int manualpumpcontrol::SetTargetTime(double T_Time)
 
 int manualpumpcontrol::SetTargetVolume(double T_Vol)
 {
-    QString Command = "tvol " + QString::number(T_Vol) + " ml.\r\n";
+    QString Command = "tvol " + QString::number(T_Vol) + " ul.\r\n";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
     return returnval;
@@ -301,12 +292,12 @@ QString manualpumpcontrol::GetInfuseRate()
 {
     QString InfuseRate;
 
-    QString Command = "irate.\r\n";
+    QString Command = "irate";
     const char* CommandToSend = Command.toLatin1().data();
     PSerial.writeString(CommandToSend);
 
     char* ReadInfuseRate = SerialRead();
-    if (strlen(ReadInfuseRate) > 1)
+    if (strlen(ReadInfuseRate) > 0)
     {
         InfuseRate = ReadInfuseRate;
     }
@@ -335,8 +326,8 @@ QString manualpumpcontrol::GetWithdrawRate()
 char* manualpumpcontrol::SerialRead()
 {
     char* receivedString = "non";
-    char finalChar = '\n';
-    unsigned int maxNbBytes = 13;
+    char finalChar;
+    unsigned int maxNbBytes = 20;
     int ReadStatus;
     ReadStatus = PSerial.readString(receivedString,finalChar,maxNbBytes,50);
 
@@ -351,12 +342,12 @@ char* manualpumpcontrol::SerialRead()
     }
     else if(ReadStatus == -1)
     {
-        char* errString = "Error Setting Timeout";
+        char* errString = "A";
         return  errString;
     }
     else if(ReadStatus == -2)
     {
-        char* errString = "Error while reading byte";
+        char* errString = "B";
         return  errString;
     }
     else if(ReadStatus == -3)
