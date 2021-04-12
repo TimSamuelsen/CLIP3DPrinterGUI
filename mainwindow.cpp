@@ -59,14 +59,14 @@ static double DarkTime;
 static uint InitialExposure;
 static int UVIntensity;
 static double PrintSpeed;
-static double ExpDarkRatio;
+static double PrintHeight;
 static int MaxImageUpload = 20;
 
 static int remainingImages;
 
 static bool ExposureFlag = false;
 static bool DarkTimeFlag = false;
-static bool AutoExpDarkFlag = false;
+static bool AutoModeFlag = false;
 static uint32_t nSlice = 0;
 static uint32_t layerCount = 0;
 
@@ -172,30 +172,33 @@ void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
         ui->SetExposureTime->setEnabled(false);
         ui->ExposureTimeParam->setEnabled(false);
 
-        ui->DarkTimeParam->setEnabled(false);
-        ui->SetDarkTime->setEnabled(false);
+        ui->SetSliceThickness->setEnabled(false);
+        ui->SliceThicknessParam->setEnabled(false);
 
         ui->PrintSpeedParam->setEnabled(true);
         ui->setPrintSpeed->setEnabled(true);
 
-        ui->ExposureDarkRatioParam->setEnabled(true);
-        ui->setExpDarkRatio->setEnabled(true);
+        ui->PrintHeightParam->setEnabled(true);
+        ui->SetPrintHeight->setEnabled(true);
 
-        AutoExpDarkFlag = true;
+        AutoModeFlag = true;
+        AutoMode();
     }
     else
     {
         ui->SetExposureTime->setEnabled(true);
         ui->ExposureTimeParam->setEnabled(true);
 
-        ui->SetDarkTime->setEnabled(true);
-        ui->DarkTimeParam->setEnabled(true);
+        ui->SetSliceThickness->setEnabled(true);
+        ui->SliceThicknessParam->setEnabled(true);
 
         ui->PrintSpeedParam->setEnabled(false);
         ui->setPrintSpeed->setEnabled(false);
 
-        ui->ExposureDarkRatioParam->setEnabled(true);
-        ui->setExpDarkRatio->setEnabled(true);
+        ui->PrintHeightParam->setEnabled(false);
+        ui->SetPrintHeight->setEnabled(false);
+
+        AutoModeFlag = false;
     }
 }
 
@@ -219,19 +222,22 @@ void MainWindow::on_SetMaxImageUpload_clicked()
     ui->ProgramPrints->append(MaxImageUploadString);
 }
 
-void MainWindow::on_setExpDarkRatio_clicked()
-{
-    ExpDarkRatio = ui->ExposureDarkRatioParam->value();
-    QString ExpDarkRatioString = "Set Exp/Dark Ratio to: " + QString::number(ExpDarkRatio);
-    ui->ProgramPrints->append(ExpDarkRatioString);
-}
-
 void MainWindow::on_setPrintSpeed_clicked()
 {
     PrintSpeed = (ui->PrintSpeedParam->value());
-    QString PrintSpeedString = "Set Print Speed to: " + QString::number(PrintSpeed) + " mm/h";
+    QString PrintSpeedString = "Set Print Speed to: " + QString::number(PrintSpeed) + " um/s";
     ui->ProgramPrints->append(PrintSpeedString);
+    AutoMode();
 }
+
+void MainWindow::on_SetPrintHeight_clicked()
+{
+    PrintHeight = (ui->PrintSpeedParam->value());
+    QString PrintHeightString = "Set Print Speed to: " + QString::number(PrintHeight) + "" ;
+    ui->ProgramPrints->append(PrintHeightString);
+    AutoMode();
+}
+
 
 void MainWindow::on_SetIntialAdhesionTimeButton_clicked()
 {
@@ -366,6 +372,7 @@ void MainWindow::on_LogFileBrowse_clicked()
 void MainWindow::on_ClearImageFiles_clicked()
 {
     ui->FileList->clear();
+    initConfirmationScreen();
 }
 
 /*******************************************Peripheral Connections*********************************************/
@@ -421,7 +428,7 @@ void MainWindow::on_PumpConnectButton_clicked()
     QString COMSelect = ui->COMPortSelectPump->currentText();
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
-    if (Pump.PSerial.openDevice(COM,57600) == 1)
+    if (Pump.PSerial.openDevice(COM,9600) == 1)
     {
         ui->ProgramPrints->append("Pump Connected");
         ui->PumpConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
@@ -441,11 +448,6 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
 {
     LCR_PatternDisplay(0);
 
-    //Prepare stage for print
-    SMC.SetVelocity(3);
-    Sleep(50);
-    SMC.AbsoluteMove(StartingPosition);
-
     /*
     Sleep(50);
     SMC.SetAcceleration(StageAcceleration);
@@ -454,22 +456,20 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
     Sleep(50);
     SMC.SetPositiveLimit(MaxEndOfRun);
     */
-    if (AutoExpDarkFlag)
-    {
-        //Convert mm/h to um/s
-        double PrintSpeedUm = PrintSpeed/3.6;
-        //Divide by slice thickness to get frame rate in Hz
-        double FrameRate = PrintSpeedUm / SliceThickness;
-        //Invert frame rate to get duration per frame
-        double FrameLength = 1/FrameRate;
-        //Multiply by Exp/Dark Ratio for Exposure Time
-        ExposureTime = FrameRate * ExpDarkRatio;
-        DarkTime = FrameRate * (1-ExpDarkRatio);
 
-        ui->ExposureTimeParam->setValue(ExposureTime);
-        ui->DarkTimeParam->setValue(DarkTime);
-
-    }
+    //Prepare stage for print
+    SMC.SetVelocity(3);
+    Sleep(50);
+    SMC.AbsoluteMove(StartingPosition);
+    Sleep(50);
+    /*
+    Sleep(50);
+    SMC.SetAcceleration(StageAcceleration);
+    Sleep(50);
+    SMC.SetNegativeLimit(MinEndOfRun);
+    Sleep(50);
+    SMC.SetPositiveLimit(MaxEndOfRun);
+    */
     if (ui->FileList->count() > 0)
     {
         //Upload images for initial exposure
@@ -480,8 +480,6 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             firstImage << firstItem->text();
         }
         DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity);
-        //DLP.updateLUT();
-        //DLP.clearElements();
         nSlice = ui->FileList->count();
         ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
         QListWidgetItem * item;
@@ -495,10 +493,6 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
                     break;
                 }
         }
-        if (AutoExpDarkFlag)
-        {
-
-        }
         DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
         DLP.updateLUT();
         DLP.clearElements();
@@ -509,7 +503,6 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         emit(on_GetPosition_clicked());
         initPlot();
         updatePlot();
-        //validateStartingPosition();
         ui->StartPrint->setEnabled(true);
     }
 }
@@ -643,7 +636,6 @@ void MainWindow::ExposureTimeSlot(void)
 void MainWindow::DarkTimeSlot(void)
 {
     PrintProcess();
-    //QTimer::singleShot(10, this, SLOT(PrintProcess()));
 }
 
 //Validate all settings
@@ -708,6 +700,8 @@ bool MainWindow::ValidateSettings(void)
     ui->ProgramPrints->append("All Settings Valid");
     return true;
 }
+
+
 /*******************************************Helper Functions********************************************/
 /**
  * @brief MainWindow::showError
@@ -765,6 +759,102 @@ void MainWindow::validateStartingPosition()
         QTimer::singleShot(1000, this, SLOT(validateStartingPosition));
     }
 }
+
+void MainWindow::initStageSlot(void)
+{
+    emit(on_GetPosition_clicked());
+
+    if (GetPosition < StartingPosition - 3)
+    {
+        SMC.SetVelocity(3);
+        Sleep(20);
+        SMC.AbsoluteMove(StartingPosition -3);
+        Sleep(20);
+        QString MoveTime = SMC.GetMotionTime();
+        MoveTime.remove(0,3);
+        QTimer::singleShot(1000, this, SLOT(initStageSlot()));
+    }
+    else
+    {
+        SMC.SetVelocity(0.3);
+        SMC.AbsoluteMove(3);
+    }
+}
+
+void MainWindow::AutoMode()
+{
+    if (AutoModeFlag)
+    {
+            int SliceCount = ui->FileList->count();
+
+            ui->ProgramPrints->append("WARNING: Auto Mode is not accurate if you have not selected all your object image files");
+            int TotalPrintTime = PrintHeight / PrintSpeed;  //  um/(um/s) = s
+            if (SliceCount > 0)
+            {
+                ExposureTime = (TotalPrintTime*1000) / SliceCount;
+            }
+            ui->ExposureTimeParam->setValue(ExposureTime);
+            ui->ProgramPrints->append("Calculated Exposure Time: " + QString::number(ExposureTime) + " ms");
+
+            SliceThickness = PrintHeight / SliceCount;
+            ui->SliceThicknessParam->setValue(SliceThickness);
+            ui->ProgramPrints->append("Calculated Slice Thickness: " + QString::number(SliceThickness) + " um");
+    }
+}
+
+bool MainWindow::initConfirmationScreen()
+{
+    bool retVal = false;
+    QMessageBox confScreen;
+    QPushButton *cancelButton = confScreen.addButton(QMessageBox::Cancel);
+    QPushButton *okButton = confScreen.addButton(QMessageBox::Ok);
+    confScreen.setStyleSheet("QLabel{min-width:300 px; font-size: 24px; text-align:center;} QPushButton{ width:150px; font-size: 18px; } QTextEdit{min-height:150px; font-size: 16px;}");
+    confScreen.setText("Please Confirm Print Parameters");
+
+    QString DetailedText;
+    DetailedText += "Initial Exposure Time: " + QString::number(InitialExposure) + "s\n";
+    DetailedText += "Starting Position: " + QString::number(StartingPosition) + " mm\n";
+    DetailedText += "Slice Thickness: " + QString::number(SliceThickness) + " μm\n";
+    if (AutoModeFlag)
+    {
+        DetailedText += "Auto Mode Active \n";
+        DetailedText += "Print Speed: " + QString::number(PrintSpeed) + " μm/s\n";
+        DetailedText += "Print Height: " + QString::number(PrintHeight) + " μm\n";
+    }
+    else
+    {
+        DetailedText += "Auto Mode Not Active\n";
+    }
+    DetailedText += "Exposure Time: " + QString::number(ExposureTime) + " ms\n";
+    DetailedText += "UV Intensity: " + QString::number(UVIntensity) + "\n";
+    DetailedText += "Dark Time " + QString::number(DarkTime) + " ms\n";
+
+    DetailedText += "Stage Velocity: " + QString::number(StageVelocity) + " mm/s\n";
+    DetailedText += "Stage Acceleration: " + QString::number(StageAcceleration) + " mm/s^2\n";
+    DetailedText += "Max End Of Run: " + QString::number(MaxEndOfRun) + " mm\n";
+    DetailedText += "Min End Of Run: " + QString::number(MinEndOfRun) + " mm";
+    confScreen.setDetailedText(DetailedText);
+
+    confScreen.exec();
+
+    if (confScreen.clickedButton() == cancelButton)
+    {
+        ui->ProgramPrints->append("Print Parameters Not Confirmed");
+        ui->ProgramPrints->append("Cancelling Print");
+    }
+    else if (confScreen.clickedButton() == okButton)
+    {
+        ui->ProgramPrints->append("Print Parameters Confirmed");
+        ui->ProgramPrints->append(DetailedText);
+        ui->ProgramPrints->append("Proceding to Stage Movement and Image Upload");
+        retVal = true;
+    }
+    else
+    {
+        ui->ProgramPrints->append("ConfScreen Error");
+    }
+    return retVal;
+}
 /*******************************************Settings Functions*********************************************/
 
 void MainWindow::saveSettings()
@@ -784,7 +874,7 @@ void MainWindow::saveSettings()
     settings.setValue("StartingPosition", StartingPosition);
     settings.setValue("InitialExposure", InitialExposure);
     settings.setValue("PrintSpeed", PrintSpeed);
-    settings.setValue("ExpDarkRatio",ExpDarkRatio);
+    settings.setValue("PrintHeight", PrintHeight);
 
     settings.setValue("MaxImageUpload", MaxImageUpload);
 
@@ -794,31 +884,31 @@ void MainWindow::saveSettings()
 
 void MainWindow::loadSettings()
 {
-    if (loadSettingsFlag == false)
+    if (loadSettingsFlag == false) //ensures that this only runs once
     {
-    QSettings settings;
-    ExposureTime = settings.value("ExposureTime", 1000).toDouble();
-    DarkTime = settings.value("DarkTime", 1000).toDouble();
-    UVIntensity = settings.value("UVIntensity", 12).toDouble();
+        QSettings settings;
+        ExposureTime = settings.value("ExposureTime", 1000).toDouble();
+        DarkTime = settings.value("DarkTime", 1000).toDouble();
+        UVIntensity = settings.value("UVIntensity", 12).toDouble();
 
-    StageVelocity = settings.value("StageVelocity", 10).toDouble();
-    StageAcceleration = settings.value("StageAcceleration", 5).toDouble();
-    MaxEndOfRun = settings.value("MaxEndOfRun", 60).toDouble();
-    MinEndOfRun = settings.value("MinEndOfRun", 0).toDouble();
+        StageVelocity = settings.value("StageVelocity", 10).toDouble();
+        StageAcceleration = settings.value("StageAcceleration", 5).toDouble();
+        MaxEndOfRun = settings.value("MaxEndOfRun", 60).toDouble();
+        MinEndOfRun = settings.value("MinEndOfRun", 0).toDouble();
 
 
-    StartingPosition = settings.value("StartingPosition", 5).toDouble();
-    InitialExposure = settings.value("InitialExposure", 10).toDouble();
-    SliceThickness = settings.value("SliceThickness", 200).toDouble();
-    PrintSpeed = settings.value("PrintSpeed", 40).toDouble();
-    ExpDarkRatio = settings.value("ExpDarkRatio", 0.5).toDouble();
+        StartingPosition = settings.value("StartingPosition", 5).toDouble();
+        InitialExposure = settings.value("InitialExposure", 10).toDouble();
+        SliceThickness = settings.value("SliceThickness", 200).toDouble();
+        PrintSpeed = settings.value("PrintSpeed", 40).toDouble();
+        PrintHeight = settings.value("PrintHeight", 5000).toDouble();
 
-    MaxImageUpload = settings.value("MaxImageUpload", 50).toDouble();
+        MaxImageUpload = settings.value("MaxImageUpload", 50).toDouble();
 
-    LogFileDestination = settings.value("LogFileDestination", "C://").toString();
-    ImageFileDirectory = settings.value("ImageFileDirectory", "C://").toString();
+        LogFileDestination = settings.value("LogFileDestination", "C://").toString();
+        ImageFileDirectory = settings.value("ImageFileDirectory", "C://").toString();
 
-    loadSettingsFlag = true;
+        loadSettingsFlag = true;
     }
 }
 
@@ -837,7 +927,7 @@ void MainWindow::initSettings()
     ui->StartingPositionParam->setValue(StartingPosition);
     ui->InitialAdhesionParameter->setValue(InitialExposure);
     ui->PrintSpeedParam->setValue(PrintSpeed);
-    ui->ExposureDarkRatioParam->setValue(ExpDarkRatio);
+    ui->PrintHeightParam->setValue(PrintHeight);
 
     ui->MaxImageUpload->setValue(MaxImageUpload);
 
@@ -860,20 +950,15 @@ void MainWindow::initPlot()
 
 void MainWindow::updatePlot()
 {
-    //if (layerCount > 0)
-    //{
-        QTime updateTime = QTime::currentTime();
-        int TimeElapsed = PrintStartTime.secsTo(updateTime);
+    QTime updateTime = QTime::currentTime();
+    int TimeElapsed = PrintStartTime.secsTo(updateTime);
 
-        double CurrentPos = GetPosition;//StartingPosition - (layerCount*SliceThickness);
+    double CurrentPos = GetPosition;//StartingPosition - (layerCount*SliceThickness);
 
-        qv_x.append(TimeElapsed);
-        qv_y.append(CurrentPos);
+    qv_x.append(TimeElapsed);
+    qv_y.append(CurrentPos);
 
-        ui->LivePlot->graph(0)->setData(qv_x,qv_y);
-    //}
-
-
+    ui->LivePlot->graph(0)->setData(qv_x,qv_y);
     ui->LivePlot->clearItems();
 
     //Update Time Remaining Label
@@ -886,10 +971,8 @@ void MainWindow::updatePlot()
     textLabel1->setFont(QFont(font().family(), 12)); // make font a bit larger
     textLabel1->setPen(QPen(Qt::black)); // show black border around text
 
-
     //Update Layer Label
     //Add Layer Label
-
     QString RemainingTime = " Remaining Time: " + QString::number(((ExposureTime+DarkTime)/(1000*1000))*(nSlice-layerCount)+InitialExposure) + "s";
     QCPItemText *textLabel2 = new QCPItemText(ui->LivePlot);
     textLabel2->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
@@ -900,9 +983,7 @@ void MainWindow::updatePlot()
     textLabel2->setPen(QPen(Qt::black)); // show black border around text
 
     ui->LivePlot->replot();
-
 }
-
 /*************************************************************
  * ********************OUTSIDE CODE***************************
  * ***********************************************************/
@@ -1029,4 +1110,3 @@ void MainWindow::CheckDLPStatus(void)
         return;
     }
 }
-

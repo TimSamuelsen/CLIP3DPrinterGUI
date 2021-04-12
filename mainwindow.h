@@ -99,8 +99,6 @@ private slots:
 
     void on_AutoCheckBox_stateChanged(int arg1);
 
-    void on_setExpDarkRatio_clicked();
-
     void on_setPrintSpeed_clicked();
 
     void on_pushButton_clicked();
@@ -110,6 +108,8 @@ private slots:
     void on_GetPosition_clicked();
 
     void on_SetMaxImageUpload_clicked();
+
+    void on_SetPrintHeight_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -127,5 +127,8 @@ private:
     QVector<double> qv_x, qv_y;
     void printParameters();
     void validateStartingPosition();
+    void initStageSlot();
+    bool initConfirmationScreen();
+    void AutoMode();
 };
 #endif // MAINWINDOW_H

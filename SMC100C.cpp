@@ -418,19 +418,13 @@ Notes:
 Author:
     TimS, 1/23/21
 ***************************************************************************************************************************************/
-void SMC100C::GetMotionTime()
+char* SMC100C::GetMotionTime()
 { 
     SetCommand(CommandType::MoveEstimate, 0.0, CommandGetSetType::Get);
     SendCurrentCommand();
     char* MotionOutput;
     MotionOutput = SerialRead();
-    char* MTime;
-    for (uint8_t index = 3; index < strlen(MotionOutput);index++)
-    {
-        strcat(MTime,&MotionOutput[index]);
-    }
-    MotionTime = MTime;
-    printf(MotionTime);
+    return MotionOutput;
 };
 /**************************************************************************************************************************************
 Function: 

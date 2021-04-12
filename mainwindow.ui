@@ -1580,7 +1580,7 @@ QPushButton#AbortPrint:hover:!pressed {
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Print Speed Auto (mm/h)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Print Speed Auto (um/s)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="PrintSpeedParam">
@@ -1609,10 +1609,10 @@ QPushButton#AbortPrint:hover:!pressed {
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Exposure/Dark Time Ratio&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Print Height (um)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QDoubleSpinBox" name="ExposureDarkRatioParam">
+    <widget class="QSpinBox" name="PrintHeightParam">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1624,8 +1624,11 @@ QPushButton#AbortPrint:hover:!pressed {
        <height>31</height>
       </rect>
      </property>
+     <property name="maximum">
+      <number>70000</number>
+     </property>
     </widget>
-    <widget class="QPushButton" name="setExpDarkRatio">
+    <widget class="QPushButton" name="SetPrintHeight">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1724,15 +1727,15 @@ QPushButton#AbortPrint:hover:!pressed {
       <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
      </property>
      <property name="text">
-      <string>Automate Exp/Dark Time 
- Based on Print Speed</string>
+      <string>Automate slice thickness 
+and exp. time</string>
      </property>
     </widget>
     <widget class="QSpinBox" name="MaxImageUpload">
      <property name="geometry">
       <rect>
        <x>320</x>
-       <y>90</y>
+       <y>40</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -1747,18 +1750,18 @@ QPushButton#AbortPrint:hover:!pressed {
        <x>300</x>
        <y>10</y>
        <width>171</width>
-       <height>71</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Max Image Upload &lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;DO NOT GO BELOW INITIAL&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;EXP OR OVER 399&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Max Image Upload&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QPushButton" name="SetMaxImageUpload">
      <property name="geometry">
       <rect>
        <x>400</x>
-       <y>90</y>
+       <y>40</y>
        <width>51</width>
        <height>28</height>
       </rect>
@@ -2079,7 +2082,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <x>0</x>
      <y>0</y>
      <width>1774</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

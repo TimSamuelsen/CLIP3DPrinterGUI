@@ -31,7 +31,10 @@ manualpumpcontrol::~manualpumpcontrol()
 
 void manualpumpcontrol::on_ConnectButton_clicked()
 {
-    if (PSerial.openDevice("COM4",9600) == 1)
+    QString COMSelect = ui->COMSelect->currentText();
+    QByteArray array = COMSelect.toLocal8Bit();
+    char* COM = array.data();
+    if (PSerial.openDevice(COM,9600) == 1)
     {
         ui->TerminalOut->append("Serial Port Connected");
 

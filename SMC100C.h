@@ -121,7 +121,7 @@ class SMC100C
             char* GetPositiveLimit();
             char* GetNegativeLimit();
             void GetError();
-            void GetMotionTime();
+            char* GetMotionTime();
             void StopMotion();
             void SetPositiveLimit(float Limit);
             void SetNegativeLimit(float Limit);
