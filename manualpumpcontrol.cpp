@@ -42,7 +42,6 @@ void manualpumpcontrol::on_ConnectButton_clicked()
         ui->ConnectionIndicator->setText("Connected");
 
         ConnectionFlag = true;
-        CommandBufferUpdate();
     }
     else
     {
@@ -87,11 +86,36 @@ void manualpumpcontrol::on_SelectTargetVolume_clicked() //Maybe add clear target
     ui->SetTargetVolume->setEnabled(true);
 }
 
+void manualpumpcontrol::on_ClearVolume_clicked()
+{
+    ClearVolume();
+    ui->TerminalOut->append("Clearing Infused and Withdrawn Volume");
+}
+
+void manualpumpcontrol::on_ClearTime_clicked()
+{
+    ClearTime();
+    ui->TerminalOut->append("Clearing Infused and Withdrawn Time");
+}
+
+void manualpumpcontrol::on_SendCustom_clicked()
+{
+   QString WrittenCommand = ui->CustomCommandLine->text();
+   CustomCommand(WrittenCommand);
+   ui->TerminalOut->append("Sending Custom Command: " + WrittenCommand);
+}
+
 /******************************************Active Controls******************************************/
 void manualpumpcontrol::on_StartInfusion_clicked()
 {
     StartInfusion();
     ui->TerminalOut->append("Starting Infusion");
+}
+
+void manualpumpcontrol::on_StartWithdraw_clicked()
+{
+    StartWithdraw();
+    ui->TerminalOut->append("Starting Withdraw");
 }
 
 void manualpumpcontrol::on_StopInfusion_clicked()
@@ -115,7 +139,7 @@ void manualpumpcontrol::on_SetTargetTime_clicked()
     ui->TerminalOut->append(TargetTimeString);
 
     SetTargetTime(TargetTime);
-    SerialRead();
+    //SerialRead();
 }
 
 void manualpumpcontrol::on_GetTargetVolume_clicked()
@@ -132,7 +156,7 @@ void manualpumpcontrol::on_SetTargetVolume_clicked()
     ui->TerminalOut->append(TargetVolumeString);
 
     SetTargetVolume(TargetVolume);
-    SerialRead();
+    //SerialRead();
 }
 
 void manualpumpcontrol::on_GetInfuseRate_clicked()
@@ -149,7 +173,7 @@ void manualpumpcontrol::on_SetInfuseRate_clicked()
     ui->TerminalOut->append(InfuseRateString);
 
     SetInfuseRate(InfusionRate);
-    SerialRead();
+    //SerialRead();
 }
 
 void manualpumpcontrol::on_GetWithdrawRate_clicked()
@@ -166,41 +190,38 @@ void manualpumpcontrol::on_SetWithdrawRate_clicked()
     ui->TerminalOut->append(WithdrawRateString);
 
     SetWithdrawRate(WithdrawRate);
-    SerialRead();
+    //SerialRead();
 }
 
 /******************************************Active Commands******************************************/
 int manualpumpcontrol::StartInfusion()
 {
-    QString Command = "irun.\r\n";
+    QString Command = "0irun\r";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
-    SerialRead();
-    CommandBufferUpdate();
     return returnval;
 }
 
-int manualpumpcontrol::StartTargetInfusion() //Is this needed? Replace with withdraw?
+int manualpumpcontrol::StartWithdraw()
 {
-    QString Command;
+    QString Command = "0wrun\r";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
-    CommandBufferUpdate();
     return returnval;
 }
+
 
 int manualpumpcontrol::Stop()
 {
-    QString Command = "stop.\r\n";
+    QString Command = "0stop\r";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
-    SerialRead();
     return returnval;
 }
 /******************************************Set Commands******************************************/
 int manualpumpcontrol::SetTargetTime(double T_Time)
 {
-    QString Command = "ttime " + QString::number(T_Time) + " s.\r\n";
+    QString Command = "0ttime " + QString::number(T_Time) + " s\r";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
     return returnval;
@@ -208,7 +229,7 @@ int manualpumpcontrol::SetTargetTime(double T_Time)
 
 int manualpumpcontrol::SetTargetVolume(double T_Vol)
 {
-    QString Command = "tvol " + QString::number(T_Vol) + " ul.\r\n";
+    QString Command = "0tvol " + QString::number(T_Vol) + " ul\r";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
     return returnval;
@@ -224,7 +245,7 @@ int manualpumpcontrol::SetSyringeVolume(double S_Vol)
 
 int manualpumpcontrol::SetInfuseRate(double I_Rate)
 {
-    QString Command = "irate " + QString::number(I_Rate) + " ul/s.\r\n";
+    QString Command = "0irate " + QString::number(I_Rate) + " ul/s\r";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
     return returnval;
@@ -232,7 +253,7 @@ int manualpumpcontrol::SetInfuseRate(double I_Rate)
 
 int manualpumpcontrol::SetWithdrawRate(double W_Rate)
 {
-    QString Command = "wrate. " + QString::number(W_Rate) + " ul/s.\r\n";
+    QString Command = "0wrate " + QString::number(W_Rate) + " ul/s\r";
     const char* CommandToSend = Command.toLatin1().data();
     int returnval = PSerial.writeString(CommandToSend);
     return returnval;
@@ -242,7 +263,7 @@ QString manualpumpcontrol::GetTargetTime()
 {
     QString TargetTime;
 
-    QString Command = "ttime.\r\n";
+    QString Command = "0ttime\r";
     const char* CommandToSend = Command.toLatin1().data();
     PSerial.writeString(CommandToSend);
 
@@ -258,7 +279,7 @@ QString manualpumpcontrol::GetTargetVolume()
 {
     QString TargetVolume;
 
-    QString Command = "tvolume.\r\n";
+    QString Command = "0tvolume\r";
     const char* CommandToSend = Command.toLatin1().data();
     PSerial.writeString(CommandToSend);
 
@@ -292,7 +313,7 @@ QString manualpumpcontrol::GetInfuseRate()
 {
     QString InfuseRate;
 
-    QString Command = "irate";
+    QString Command = "0irate\r";
     const char* CommandToSend = Command.toLatin1().data();
     PSerial.writeString(CommandToSend);
 
@@ -309,7 +330,7 @@ QString manualpumpcontrol::GetWithdrawRate()
 {
     QString WithdrawRate;
 
-    QString Command = "wrate.\r\n";
+    QString Command = "0wrate\r";
     const char* CommandToSend = Command.toLatin1().data();
     PSerial.writeString(CommandToSend);
 
@@ -320,6 +341,30 @@ QString manualpumpcontrol::GetWithdrawRate()
     }
 
     return WithdrawRate;
+}
+/******************************************Other Commands******************************************/
+int manualpumpcontrol::ClearTime()
+{
+    QString Command = "0ctime\r";
+    const char* CommandToSend = Command.toLatin1().data();
+    int returnval = PSerial.writeString(CommandToSend);
+    return returnval;
+}
+
+int manualpumpcontrol::ClearVolume()
+{
+    QString Command = "0cvolume\r";
+    const char* CommandToSend = Command.toLatin1().data();
+    int returnval = PSerial.writeString(CommandToSend);
+    return returnval;
+}
+
+int manualpumpcontrol::CustomCommand(QString NewCommand)
+{
+    QString Command = "0" + NewCommand + "\r";
+    const char* CommandToSend = Command.toLatin1().data();
+    int returnval = PSerial.writeString(CommandToSend);
+    return returnval;
 }
 
 /******************************************Helper Functions******************************************/
@@ -358,20 +403,3 @@ char* manualpumpcontrol::SerialRead()
 
    return receivedString;
 }
-
-void manualpumpcontrol::CommandBufferUpdate()
-{
-    Sleep(20);
-    QString BufferCommand3 = ".\r\n";
-    const char* CommandToSend3 = BufferCommand3.toLatin1().data();
-    PSerial.writeString(CommandToSend3);
-    Sleep(20);
-    QString BufferCommand1 = "cmd.\r\n";
-    const char* CommandToSend1 = BufferCommand1.toLatin1().data();
-    PSerial.writeString(CommandToSend1);
-    Sleep(20);
-    QString BufferCommand2 = "ver.\r\n";
-    const char* CommandToSend2 = BufferCommand2.toLatin1().data();
-    PSerial.writeString(CommandToSend2);
-}
-

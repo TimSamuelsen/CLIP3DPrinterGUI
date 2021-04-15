@@ -18,7 +18,7 @@ public:
     serialib PSerial;
 
     int StartInfusion();
-    int StartTargetInfusion();
+    int StartWithdraw();
     int Stop();
 
     int SetTargetTime(double T_Time);
@@ -26,6 +26,10 @@ public:
     int SetSyringeVolume(double S_Vol);
     int SetInfuseRate(double I_Rate);
     int SetWithdrawRate(double W_Rate);
+
+    int ClearTime();
+    int ClearVolume();
+    int CustomCommand(QString NewCommand);
 
     QString GetTargetTime();
     QString GetTargetVolume();
@@ -59,6 +63,14 @@ private slots:
     void on_StartInfusion_clicked();
 
     void on_StopInfusion_clicked();
+
+    void on_StartWithdraw_clicked();
+
+    void on_ClearVolume_clicked();
+
+    void on_ClearTime_clicked();
+
+    void on_SendCustom_clicked();
 
 private:
     Ui::manualpumpcontrol *ui;
