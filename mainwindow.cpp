@@ -129,15 +129,14 @@ void MainWindow::on_ManualStage_clicked()
 
 void MainWindow::on_GetPosition_clicked()
 {
-/*
     for (int i = 0; i<5; i++)
     {
         QString delay = "This delay is needed for the serial read";
     }
     char* ReadPosition = SMC.GetPosition();
-    //if (strlen(ReadPosition) > 2)
-    //{
-        //printf("%s",ReadPosition);
+    if (strlen(ReadPosition) > 1)
+    {
+        printf("at mainwindow %s\r\n",ReadPosition);
         QString CurrentPosition = QString::fromUtf8(ReadPosition);// = ReadPosition;//QString::fromUtf16((ushort*)(ReadPosition)); //CurrentPosition.asprintf("%s",ReadPosition); //CurrentPosition.asprintf("%s",ReadPosition);
         CurrentPosition.remove(0,3);
         CurrentPosition.chop(2);
@@ -145,12 +144,11 @@ void MainWindow::on_GetPosition_clicked()
         ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + " mm");
         ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
         GetPosition = CurrentPosition.toDouble();
-    //}
+    }
     //else
     //{
     //    printf("%s",ReadPosition);
     //}
-*/
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -170,20 +168,29 @@ void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
 {
     if (arg1 == 2)
     {
-        ui->SetExposureTime->setEnabled(false);
-        ui->ExposureTimeParam->setEnabled(false);
+        int SliceCount = ui->FileList->count();
+        if (SliceCount > 0)
+        {
+            ui->SetExposureTime->setEnabled(false);
+            ui->ExposureTimeParam->setEnabled(false);
 
-        ui->SetSliceThickness->setEnabled(false);
-        ui->SliceThicknessParam->setEnabled(false);
+            ui->SetSliceThickness->setEnabled(false);
+            ui->SliceThicknessParam->setEnabled(false);
 
-        ui->PrintSpeedParam->setEnabled(true);
-        ui->setPrintSpeed->setEnabled(true);
+            ui->PrintSpeedParam->setEnabled(true);
+            ui->setPrintSpeed->setEnabled(true);
 
-        ui->PrintHeightParam->setEnabled(true);
-        ui->SetPrintHeight->setEnabled(true);
+            ui->PrintHeightParam->setEnabled(true);
+            ui->SetPrintHeight->setEnabled(true);
 
-        AutoModeFlag = true;
-        AutoMode();
+            AutoModeFlag = true;
+            AutoMode();
+        }
+        else
+        {
+            ui->AutoCheckBox->setChecked(false);
+            ui->ProgramPrints->append("No Object Image Files Detected, Please Select Image Files First");
+        }
     }
     else
     {
@@ -199,9 +206,21 @@ void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
         ui->PrintHeightParam->setEnabled(false);
         ui->SetPrintHeight->setEnabled(false);
 
+        ui->AutoCheckBox->setChecked(false);
+
         AutoModeFlag = false;
     }
 }
+
+void MainWindow::on_AutoCheckBox_clicked()
+{
+    int SliceCount = ui->FileList->count();
+    if (SliceCount < 1)
+    {
+        ui->AutoCheckBox->setChecked(false);
+    }
+}
+
 
 void MainWindow::on_SetMaxImageUpload_clicked()
 {
@@ -233,7 +252,7 @@ void MainWindow::on_setPrintSpeed_clicked()
 
 void MainWindow::on_SetPrintHeight_clicked()
 {
-    PrintHeight = (ui->PrintSpeedParam->value());
+    PrintHeight = (ui->PrintHeightParam->value());
     QString PrintHeightString = "Set Print Speed to: " + QString::number(PrintHeight) + "" ;
     ui->ProgramPrints->append(PrintHeightString);
     AutoMode();
@@ -362,6 +381,8 @@ void MainWindow::on_SelectFile_clicked()
             ui->FileList->addItem(file_name.at(i));
         }
     }
+    int SliceCount = ui->FileList->count();
+    ui->ProgramPrints->append(QString::number(SliceCount) + " Images Currently Selected");
 }
 
 void MainWindow::on_LogFileBrowse_clicked()
@@ -414,6 +435,8 @@ void MainWindow::on_StageConnectButton_clicked()
         ui->ProgramPrints->append("Stage Connected");
         ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
         ui->StageConnectionIndicator->setText("Connected");
+        Sleep(10);
+        emit(on_GetPosition_clicked());
     }
     else
     {
@@ -516,6 +539,7 @@ void MainWindow::on_AbortPrint_clicked()
     LCR_PatternDisplay(0);
     SMC.StopMotion();
     layerCount = 0xFFFF; //Set layer count high to stop print process
+    ui->ProgramPrints->append("PRINT ABORTED");
 }
 
 void MainWindow::on_StartPrint_clicked()
@@ -524,7 +548,10 @@ void MainWindow::on_StartPrint_clicked()
     if (ValidateSettings() == true)
     {
         SMC.SetVelocity(StageVelocity);
-
+        Sleep(20);
+        emit(on_GetPosition_clicked());
+        Sleep(20);
+        emit(on_GetPosition_clicked());
         //usbPollTimer->stop();
         //Set PrintFlag to true
         PrintFlag = true;
@@ -781,20 +808,27 @@ void MainWindow::AutoMode()
 {
     if (AutoModeFlag)
     {
-            int SliceCount = ui->FileList->count();
-
+        int SliceCount = ui->FileList->count();
+        if (SliceCount > 0)
+        {
             ui->ProgramPrints->append("WARNING: Auto Mode is not accurate if you have not selected all your object image files");
             int TotalPrintTime = PrintHeight / PrintSpeed;  //  um/(um/s) = s
-            if (SliceCount > 0)
-            {
-                ExposureTime = (TotalPrintTime*1000) / SliceCount;
-            }
+            //ui->ProgramPrints->append("PrintHeight: " + QString::number(PrintHeight) + " PrintSpeed: " + QString::number(PrintSpeed) + "  TotalPrintTime: " + QString::number(TotalPrintTime));
+            ExposureTime = (TotalPrintTime*1000) / SliceCount;
+            //ui->ProgramPrints->append("Total Print Time: " + QString::number(TotalPrintTime) + " Slice Count" + QString::number(SliceCount) + "  ExposureTime: " + QString::number(ExposureTime));
             ui->ExposureTimeParam->setValue(ExposureTime);
             ui->ProgramPrints->append("Calculated Exposure Time: " + QString::number(ExposureTime) + " ms");
 
             SliceThickness = PrintHeight / SliceCount;
             ui->SliceThicknessParam->setValue(SliceThickness);
             ui->ProgramPrints->append("Calculated Slice Thickness: " + QString::number(SliceThickness) + " um");
+        }
+        else
+        {
+            ui->ProgramPrints->append("No Object Image Files Detected, Please Select Image Files First");
+            ui->AutoCheckBox->setChecked(false);
+            emit(on_AutoCheckBox_stateChanged(1));
+        }
     }
 }
 
@@ -810,7 +844,7 @@ bool MainWindow::initConfirmationScreen()
     QString DetailedText;
     DetailedText += "Initial Exposure Time: " + QString::number(InitialExposure) + "s\n";
     DetailedText += "Starting Position: " + QString::number(StartingPosition) + " mm\n";
-    DetailedText += "Slice Thickness: " + QString::number(SliceThickness) + " μm\n";
+    DetailedText += "Slice Thickness: " + QString::number(SliceThickness*1000) + " μm\n";
     if (AutoModeFlag)
     {
         DetailedText += "Auto Mode Active \n";
@@ -821,7 +855,7 @@ bool MainWindow::initConfirmationScreen()
     {
         DetailedText += "Auto Mode Not Active\n";
     }
-    DetailedText += "Exposure Time: " + QString::number(ExposureTime) + " ms\n";
+    DetailedText += "Exposure Time: " + QString::number(ExposureTime/1000) + " ms\n";
     DetailedText += "UV Intensity: " + QString::number(UVIntensity) + "\n";
     DetailedText += "Dark Time " + QString::number(DarkTime/1000) + " ms\n";
 
@@ -938,7 +972,7 @@ void MainWindow::initPlot()
     ui->LivePlot->graph(0)->setName("Print Progress");
     ui->LivePlot->xAxis->setLabel("Time (s)");
     ui->LivePlot->yAxis->setLabel("Position (mm)");
-    ui->LivePlot->xAxis->setRange(0, InitialExposure+5+0.1*nSlice+(1.1*(nSlice*(ExposureTime+DarkTime))/(1000*1000)));
+    ui->LivePlot->xAxis->setRange(0, InitialExposure+5+0.1*nSlice+(1.5*(nSlice*(ExposureTime+DarkTime))/(1000*1000)));
     ui->LivePlot->yAxis->setRange(0.9*(StartingPosition - nSlice*SliceThickness),1.1*StartingPosition);
 
     ui->LivePlot->replot();
@@ -1106,3 +1140,4 @@ void MainWindow::CheckDLPStatus(void)
         return;
     }
 }
+

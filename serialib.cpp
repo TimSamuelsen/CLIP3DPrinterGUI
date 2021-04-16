@@ -356,7 +356,11 @@ char serialib::readChar(char *pByte,unsigned int timeOut_ms)
     if(!SetCommTimeouts(hSerial, &timeouts)) return -1;
 
     // Read the byte, return -2 if an error occured
-    if(!ReadFile(hSerial,pByte, 1, &dwBytesRead, NULL)) return -2;
+    if(!ReadFile(hSerial,pByte, 1, &dwBytesRead, NULL))
+    {
+        printf("%lu", GetLastError());
+        return -2;
+    }
 
     // Return 0 if the timeout is reached
     if (dwBytesRead==0) return 0;

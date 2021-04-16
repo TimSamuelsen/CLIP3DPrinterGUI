@@ -446,6 +446,7 @@ char* SMC100C::GetPosition()
     SetCommand(CommandType::PositionReal, 0.0, CommandGetSetType::Get);
     SendCurrentCommand();
     char* Read = SerialRead();
+    printf("at SMC: %s\r\n", Read);
     char* POut;
 
     //for (uint8_t index = 3; index < strlen(PositionOutput);index++)
@@ -689,13 +690,16 @@ Author:
 char* SMC100C::SerialRead()
 {
     //serialib Read;
-    char* receivedString;
+    static char receivedString[] = "ThisIsMyTest";
     char finalChar = '\n';
     unsigned int maxNbBytes = 13;
     int ReadStatus;
     ReadStatus = serial.readString(receivedString,finalChar,maxNbBytes,10);
+    printf("at serialread: %s, status: %d\r\n", receivedString, ReadStatus);
 
-    char ReadChar;
+    //char* outputString = '\0';
+
+
     if (ReadStatus > 0)
     {
         return receivedString;

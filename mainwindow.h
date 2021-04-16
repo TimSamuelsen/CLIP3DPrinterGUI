@@ -110,6 +110,8 @@ private slots:
 
     void on_SetPrintHeight_clicked();
 
+    void on_AutoCheckBox_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
