@@ -128,8 +128,8 @@ void manualpumpcontrol::on_StopInfusion_clicked()
 void manualpumpcontrol::on_GetTargetTime_clicked()
 {
     QString T_Time = GetTargetTime();
-
-    ui->CurrentInfuseRate->setText(T_Time);
+    ui->TerminalOut->append(T_Time);
+    ui->CurrentTargetTime->setText(T_Time);
 }
 
 void manualpumpcontrol::on_SetTargetTime_clicked()
@@ -145,8 +145,8 @@ void manualpumpcontrol::on_SetTargetTime_clicked()
 void manualpumpcontrol::on_GetTargetVolume_clicked()
 {
     QString T_Vol = GetTargetVolume();
-
-    ui->CurrentInfuseRate->setText(T_Vol);
+    ui->TerminalOut->append(T_Vol);
+    ui->CurrentTargetVolume->setText(T_Vol);
 }
 
 void manualpumpcontrol::on_SetTargetVolume_clicked()
@@ -162,7 +162,7 @@ void manualpumpcontrol::on_SetTargetVolume_clicked()
 void manualpumpcontrol::on_GetInfuseRate_clicked()
 {
     QString I_Rate = GetInfuseRate();
-
+    ui->TerminalOut->append(I_Rate);
     ui->CurrentInfuseRate->setText(I_Rate);
 }
 
@@ -179,8 +179,8 @@ void manualpumpcontrol::on_SetInfuseRate_clicked()
 void manualpumpcontrol::on_GetWithdrawRate_clicked()
 {
     QString W_Rate = GetWithdrawRate();
-
-    ui->CurrentInfuseRate->setText(W_Rate);
+    ui->TerminalOut->append(W_Rate);
+    ui->CurrentWithdrawRate->setText(W_Rate);
 }
 
 void manualpumpcontrol::on_SetWithdrawRate_clicked()
@@ -370,12 +370,45 @@ int manualpumpcontrol::CustomCommand(QString NewCommand)
 /******************************************Helper Functions******************************************/
 char* manualpumpcontrol::SerialRead()
 {
-    char* receivedString = "non";
-    char finalChar;
-    unsigned int maxNbBytes = 20;
-    int ReadStatus;
-    ReadStatus = PSerial.readString(receivedString,finalChar,maxNbBytes,50);
+    //char* receivedString = "non";
+    //char finalChar;
+    //unsigned int maxNbBytes = 20;
+    //int ReadStatus;
+    //ReadStatus = PSerial.readString(receivedString,finalChar,maxNbBytes,50);
 
+    static char receivedString[] = "ThisIsMyTest";
+    char finalChar = '\r';
+    unsigned int maxNbBytes = 30;
+    int ReadStatus;
+    ReadStatus = PSerial.readString(receivedString,finalChar,maxNbBytes,10);
+    //printf("at serialread: %s, status: %d\r\n", receivedString, ReadStatus);
+
+    //char* outputString = '\0';
+    if (ReadStatus > 0)
+    {
+        return receivedString;
+    }
+    else if(ReadStatus == 0)
+    {
+        char* errString = "Timeout Reached";
+        return "A";
+        //return  receivedString;
+    }
+    else if(ReadStatus == -1)
+    {
+        char* errString = "Error Setting Timeout";
+        return  "B";
+    }
+    else if(ReadStatus == -2)
+    {
+        char* errString = "Error while reading byte";
+        return "C";
+    }
+    else if(ReadStatus == -3)
+    {
+        char* errString = "Max N bytes reached";
+        return  receivedString;
+    }
     if (ReadStatus > 0)
     {
         return receivedString;
