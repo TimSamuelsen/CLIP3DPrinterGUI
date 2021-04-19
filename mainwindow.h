@@ -112,6 +112,14 @@ private slots:
 
     void on_AutoCheckBox_clicked();
 
+    void initStageSlot();
+
+    void fineMovement();
+
+    void verifyStageParams();
+
+    void on_UsePrintScript_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
@@ -127,7 +135,6 @@ private:
     QVector<double> qv_x, qv_y;
     void printParameters();
     void validateStartingPosition();
-    void initStageSlot();
     bool initConfirmationScreen();
     void AutoMode();
 };

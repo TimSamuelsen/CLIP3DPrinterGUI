@@ -78,6 +78,8 @@ static QString LogFileDestination;
 static QString ImageFileDirectory;
 static QTime PrintStartTime;
 static double GetPosition;
+static bool StagePrep1 = false;
+static bool StagePrep2 = false;
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -397,6 +399,13 @@ void MainWindow::on_ClearImageFiles_clicked()
     initConfirmationScreen();
 }
 
+void MainWindow::on_UsePrintScript_clicked()
+{
+
+}
+
+
+
 /*******************************************Peripheral Connections*********************************************/
 void MainWindow::on_LightEngineConnectButton_clicked()
 {
@@ -484,10 +493,10 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         */
         //Test whether stacking commands will work?
         //Prepare stage for print
-        SMC.SetVelocity(3);
-        Sleep(50);
-        SMC.AbsoluteMove(StartingPosition);
-        Sleep(50);
+        //SMC.SetVelocity(3);
+        //Sleep(50);
+        //SMC.AbsoluteMove(StartingPosition);
+        //Sleep(50);
         /*
         Sleep(50);
         SMC.SetAcceleration(StageAcceleration);
@@ -496,6 +505,8 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         Sleep(50);
         SMC.SetPositiveLimit(MaxEndOfRun);
         */
+        initStageSlot();
+
         if (ui->FileList->count() > 0)
         {
             //Upload images for initial exposure
@@ -612,19 +623,19 @@ void MainWindow::PrintProcess(void)
         }
         else
         {
-        QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-        ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
-        ExposureFlag = true;
-        QString filename =ui->FileList->item(layerCount)->text();
-        QPixmap img(filename);
-        QPixmap img2 = img.scaled(890,490, Qt::KeepAspectRatio);
-        ui->PrintImage->setPixmap(img2);
-        ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
-        ui->ProgramPrints->append("Image File: " + filename);
-        layerCount++;
-        remainingImages--;
-        updatePlot();
-        emit(on_GetPosition_clicked());
+            QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+            ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
+            ExposureFlag = true;
+            QString filename =ui->FileList->item(layerCount)->text();
+            QPixmap img(filename);
+            QPixmap img2 = img.scaled(890,490, Qt::KeepAspectRatio);
+            ui->PrintImage->setPixmap(img2);
+            ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
+            ui->ProgramPrints->append("Image File: " + filename);
+            layerCount++;
+            remainingImages--;
+            updatePlot();
+            emit(on_GetPosition_clicked());
         }
         return;
     }
@@ -765,7 +776,6 @@ void MainWindow::saveText()
          file.flush();
          file.close();
      }
-
 }
 
 void MainWindow::validateStartingPosition()
@@ -787,21 +797,62 @@ void MainWindow::initStageSlot(void)
 {
     emit(on_GetPosition_clicked());
 
-    if (GetPosition < StartingPosition - 3)
+    if (GetPosition < (StartingPosition-3.01))
     {
-        SMC.SetVelocity(3);
-        Sleep(20);
-        SMC.AbsoluteMove(StartingPosition -3);
-        Sleep(20);
-        QString MoveTime = SMC.GetMotionTime();
-        MoveTime.remove(0,3);
+        if (StagePrep1 == false)
+        {
+            SMC.SetVelocity(3);
+            Sleep(20);
+            SMC.AbsoluteMove((StartingPosition-3));
+            Sleep(20);
+            QString MoveTime = SMC.GetMotionTime();
+            MoveTime.remove(0,3);
+            StagePrep1 = true;
+            ui->ProgramPrints->append("Performing Rough Stage Movement");
+        }
+
         QTimer::singleShot(1000, this, SLOT(initStageSlot()));
     }
     else
     {
-        SMC.SetVelocity(0.3);
-        SMC.AbsoluteMove(3);
+        fineMovement();
     }
+}
+
+void MainWindow::fineMovement()
+{
+    emit(on_GetPosition_clicked());
+
+    if (GetPosition > StartingPosition -0.01 && GetPosition < StartingPosition + 0.01)
+    {
+        verifyStageParams();
+    }
+    else
+    {
+        if (StagePrep2 == false)
+        {
+            Sleep(20);
+            SMC.SetVelocity(0.3);
+            Sleep(20);
+            SMC.AbsoluteMove(StartingPosition);
+            ui->ProgramPrints->append("Fine Stage Movement");
+            StagePrep2 = true;
+        }
+        QTimer::singleShot(1000, this, SLOT(fineMovement()));
+    }
+}
+
+void MainWindow::verifyStageParams()
+{
+    ui->ProgramPrints->append("Verifying Stage Parameters");
+    Sleep(50);
+    SMC.SetAcceleration(StageAcceleration);
+    Sleep(50);
+    SMC.SetNegativeLimit(MinEndOfRun);
+    Sleep(50);
+    SMC.SetPositiveLimit(MaxEndOfRun);
+    Sleep(50);
+    SMC.SetVelocity(StageVelocity);
 }
 
 void MainWindow::AutoMode()

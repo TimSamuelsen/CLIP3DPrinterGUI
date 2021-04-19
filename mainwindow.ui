@@ -33,9 +33,9 @@
     <property name="geometry">
      <rect>
       <x>1130</x>
-      <y>590</y>
+      <y>640</y>
       <width>301</width>
-      <height>181</height>
+      <height>131</height>
      </rect>
     </property>
    </widget>
@@ -43,7 +43,7 @@
     <property name="geometry">
      <rect>
       <x>1280</x>
-      <y>570</y>
+      <y>620</y>
       <width>81</width>
       <height>22</height>
      </rect>
@@ -56,8 +56,8 @@
     <property name="geometry">
      <rect>
       <x>1130</x>
-      <y>570</y>
-      <width>141</width>
+      <y>620</y>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
@@ -239,7 +239,7 @@ Light Engine Control</string>
     <property name="geometry">
      <rect>
       <x>1360</x>
-      <y>570</y>
+      <y>620</y>
       <width>71</width>
       <height>22</height>
      </rect>
@@ -1083,7 +1083,7 @@ QPushButton#AbortPrint:hover:!pressed {
       <number>12</number>
      </property>
      <property name="displayIntegerBase">
-      <number>9</number>
+      <number>10</number>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="DarkTimeParam">
@@ -2017,6 +2017,67 @@ and exp. time</string>
      <string>Get</string>
     </property>
    </widget>
+   <widget class="QLineEdit" name="PrintScriptFile">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>1130</x>
+      <y>580</y>
+      <width>301</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="SelectPrintScript">
+    <property name="geometry">
+     <rect>
+      <x>1280</x>
+      <y>560</y>
+      <width>81</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Select File</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="ClearPrintScript">
+    <property name="geometry">
+     <rect>
+      <x>1360</x>
+      <y>560</y>
+      <width>71</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clear</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="UsePrintScript">
+    <property name="geometry">
+     <rect>
+      <x>1130</x>
+      <y>560</y>
+      <width>141</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 10pt &quot;MS Shell Dlg 2&quot;;</string>
+    </property>
+    <property name="text">
+     <string>Use Print Script</string>
+    </property>
+   </widget>
    <zorder>frame_5</zorder>
    <zorder>FileList</zorder>
    <zorder>SelectFile</zorder>
@@ -2075,6 +2136,10 @@ and exp. time</string>
    <zorder>PumpConnectionIndicator</zorder>
    <zorder>PumpConnectButton</zorder>
    <zorder>GetPosition</zorder>
+   <zorder>PrintScriptFile</zorder>
+   <zorder>SelectPrintScript</zorder>
+   <zorder>ClearPrintScript</zorder>
+   <zorder>UsePrintScript</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -2082,7 +2147,7 @@ and exp. time</string>
      <x>0</x>
      <y>0</y>
      <width>1774</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
