@@ -421,7 +421,7 @@ void MainWindow::on_UsePrintScript_clicked()
 
 void MainWindow::on_SelectPrintScript_clicked()
 {
-    QString file_name = QFileDialog::getOpenFileName(this, "Open Print Script", "C://", "*.txt");
+    QString file_name = QFileDialog::getOpenFileName(this, "Open Print Script", "C://", "*.txt *.csv");
     ui->PrintScriptFile->setText(file_name);
     QFile file(file_name);
     if (!file.open(QIODevice::ReadOnly))
@@ -434,10 +434,13 @@ void MainWindow::on_SelectPrintScript_clicked()
             QByteArray line = file.readLine();
             PrintScriptList.append(line.split(',').at(1));
     }
+    /* //For testing
     for (uint i= 0; i < PrintScriptList.size(); i++)
     {
         ui->ProgramPrints->append(PrintScriptList.at(i));
+        //PrintScriptList.removeAt(0);
     }
+    */
 
 }
 
@@ -524,28 +527,6 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
     {
         LCR_PatternDisplay(0);
 
-        /*
-        Sleep(50);
-        SMC.SetAcceleration(StageAcceleration);
-        Sleep(50);
-        SMC.SetNegativeLimit(MinEndOfRun);
-        Sleep(50);
-        SMC.SetPositiveLimit(MaxEndOfRun);
-        */
-        //Test whether stacking commands will work?
-        //Prepare stage for print
-        //SMC.SetVelocity(3);
-        //Sleep(50);
-        //SMC.AbsoluteMove(StartingPosition);
-        //Sleep(50);
-        /*
-        Sleep(50);
-        SMC.SetAcceleration(StageAcceleration);
-        Sleep(50);
-        SMC.SetNegativeLimit(MinEndOfRun);
-        Sleep(50);
-        SMC.SetPositiveLimit(MaxEndOfRun);
-        */
         initStageSlot();
 
         if (ui->FileList->count() > 0)
@@ -557,7 +538,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             {
                 firstImage << firstItem->text();
             }
-            DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity, PrintScript, PrintScriptList);
+            DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity, 0, 0, PrintScriptList); //Printscript is set to 0 for initial exposure time, 0 for initial image
             nSlice = ui->FileList->count();
             ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
             QListWidgetItem * item;
@@ -571,7 +552,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
                         break;
                     }
             }
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, PrintScriptList);
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, 0, PrintScriptList); //Set initial image to 0
             DLP.updateLUT();
             DLP.clearElements();
             remainingImages = MaxImageUpload - InitialExposure;
@@ -596,8 +577,7 @@ void MainWindow::on_AbortPrint_clicked()
 
 void MainWindow::on_StartPrint_clicked()
 {
-    //If settings are validated successfully and Initialization has been completed
-    if (ValidateSettings() == true)
+    if (ValidateSettings() == true) //If settings are validated successfully and Initialization has been completed
     {
         SMC.SetVelocity(StageVelocity);
         Sleep(20);
@@ -606,7 +586,7 @@ void MainWindow::on_StartPrint_clicked()
         emit(on_GetPosition_clicked());
         //usbPollTimer->stop();
         //Set PrintFlag to true
-        PrintFlag = true;
+        PrintFlag = true; //Set PrintFlag True
         nSlice = ui->FileList->count();
         ui->ProgramPrints->append("Entering Printing Procedure");
         //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
@@ -643,7 +623,7 @@ void MainWindow::PrintProcess(void)
                         break;
                     }
             }
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, PrintScriptList);
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, layerCount, PrintScriptList); //Should it be layerCount + 1??
             DLP.updateLUT();
             DLP.clearElements();
             remainingImages = count - 1;
@@ -664,7 +644,14 @@ void MainWindow::PrintProcess(void)
         }
         else
         {
-            QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+            if (PrintScript == 1)
+            {
+                QTimer::singleShot(PrintScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //value from printscript will be in ms
+            }
+            else
+            {
+                QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //Value from exposuretime will be in us so /1000
+            }
             ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
             ExposureFlag = true;
             QString filename =ui->FileList->item(layerCount)->text();

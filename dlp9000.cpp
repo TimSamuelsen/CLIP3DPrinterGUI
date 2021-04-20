@@ -33,7 +33,7 @@ bool DLP9000::InitProjector(void)
  * @brief MainWindow::on_addPatternsButton_clicked
  */
 //Make sure that input comes from
-void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int UVIntensity, int PrintScript, QStringList ExposureTimeList)
+void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int UVIntensity, int PrintScript, int CurrentImage, QStringList ExposureTimeList)
 {
     int i;
     int numPatAdded = 0;
@@ -63,7 +63,15 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
             {
                 pattern.bits = 1;
                 pattern.color = PatternElement::BLUE;
-                pattern.exposure = ExposureTime;
+                if (PrintScript == 1)
+                {
+                    pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
+                    CurrentImage++; //Should this be done before?
+                }
+                else
+                {
+                    pattern.exposure = ExposureTime;
+                }
                 pattern.darkPeriod = DarkTime;
                 pattern.trigIn = false;
                 pattern.trigOut2 = true;
