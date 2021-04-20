@@ -33,7 +33,7 @@ bool DLP9000::InitProjector(void)
  * @brief MainWindow::on_addPatternsButton_clicked
  */
 //Make sure that input comes from
-void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int UVIntensity)
+void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int UVIntensity, int PrintScript, QStringList ExposureTimeList)
 {
     int i;
     int numPatAdded = 0;

@@ -11,7 +11,7 @@ class DLP9000
 {
 public:
     bool InitProjector(void);
-    void AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int UVIntensity);
+    void AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int UVIntensity, int PrintScript, QStringList ExposureTimeList);
     int UpdatePatternMemory(int totalSplashImages, bool firmware );
     int uploadPatternToEVM(bool master, int splashImageCount, int splash_size, uint8_t* splash_block);
     void updateLUT();

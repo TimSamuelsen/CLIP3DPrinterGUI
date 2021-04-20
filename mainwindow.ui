@@ -2019,7 +2019,7 @@ and exp. time</string>
    </widget>
    <widget class="QLineEdit" name="PrintScriptFile">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -2037,6 +2037,9 @@ and exp. time</string>
     </property>
    </widget>
    <widget class="QPushButton" name="SelectPrintScript">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1280</x>
@@ -2050,6 +2053,9 @@ and exp. time</string>
     </property>
    </widget>
    <widget class="QPushButton" name="ClearPrintScript">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>1360</x>

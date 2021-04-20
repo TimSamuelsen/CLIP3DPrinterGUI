@@ -80,6 +80,8 @@ static QTime PrintStartTime;
 static double GetPosition;
 static bool StagePrep1 = false;
 static bool StagePrep2 = false;
+static QStringList PrintScriptList;
+static int PrintScript = 0;
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -396,14 +398,53 @@ void MainWindow::on_LogFileBrowse_clicked()
 void MainWindow::on_ClearImageFiles_clicked()
 {
     ui->FileList->clear();
-    initConfirmationScreen();
+    //initConfirmationScreen();
 }
 
 void MainWindow::on_UsePrintScript_clicked()
 {
+    if (ui->UsePrintScript->checkState())
+    {
+        PrintScript = 1;
+        ui->SelectPrintScript->setEnabled(true);
+        ui->ClearPrintScript->setEnabled(true);
+        ui->PrintScriptFile->setEnabled(true);
+    }
+    else
+    {
+        PrintScript = 0;
+        ui->SelectPrintScript->setEnabled(false);
+        ui->ClearPrintScript->setEnabled(false);
+        ui->PrintScriptFile->setEnabled(false);
+    }
+}
+
+void MainWindow::on_SelectPrintScript_clicked()
+{
+    QString file_name = QFileDialog::getOpenFileName(this, "Open Print Script", "C://", "*.txt");
+    ui->PrintScriptFile->setText(file_name);
+    QFile file(file_name);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qDebug() << file.errorString();
+    }
+    QStringList wordList;
+    while (!file.atEnd())
+    {
+            QByteArray line = file.readLine();
+            PrintScriptList.append(line.split(',').at(1));
+    }
+    for (uint i= 0; i < PrintScriptList.size(); i++)
+    {
+        ui->ProgramPrints->append(PrintScriptList.at(i));
+    }
 
 }
 
+void MainWindow::on_ClearPrintScript_clicked()
+{
+    ui->PrintScriptFile->clear();
+}
 
 
 /*******************************************Peripheral Connections*********************************************/
@@ -516,7 +557,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             {
                 firstImage << firstItem->text();
             }
-            DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity);
+            DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity, PrintScript, PrintScriptList);
             nSlice = ui->FileList->count();
             ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
             QListWidgetItem * item;
@@ -530,7 +571,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
                         break;
                     }
             }
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, PrintScriptList);
             DLP.updateLUT();
             DLP.clearElements();
             remainingImages = MaxImageUpload - InitialExposure;
@@ -602,7 +643,7 @@ void MainWindow::PrintProcess(void)
                         break;
                     }
             }
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity);
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, PrintScriptList);
             DLP.updateLUT();
             DLP.clearElements();
             remainingImages = count - 1;
@@ -1191,4 +1232,3 @@ void MainWindow::CheckDLPStatus(void)
         return;
     }
 }
-

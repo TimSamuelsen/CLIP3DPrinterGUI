@@ -120,6 +120,10 @@ private slots:
 
     void on_UsePrintScript_clicked();
 
+    void on_SelectPrintScript_clicked();
+
+    void on_ClearPrintScript_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
