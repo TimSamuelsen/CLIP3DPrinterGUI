@@ -434,13 +434,13 @@ void MainWindow::on_SelectPrintScript_clicked()
             QByteArray line = file.readLine();
             PrintScriptList.append(line.split(',').at(1));
     }
-    /* //For testing
+     //For testing
     for (uint i= 0; i < PrintScriptList.size(); i++)
     {
         ui->ProgramPrints->append(PrintScriptList.at(i));
         //PrintScriptList.removeAt(0);
     }
-    */
+
 
 }
 
@@ -552,6 +552,10 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
                         break;
                     }
             }
+            if (PrintScript == 1)
+            {
+                ui->ProgramPrints->append("Using Print Script");
+            }
             DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, 0, PrintScriptList); //Set initial image to 0
             DLP.updateLUT();
             DLP.clearElements();
@@ -623,6 +627,10 @@ void MainWindow::PrintProcess(void)
                         break;
                     }
             }
+            if (PrintScript == 1)
+            {
+                ui->ProgramPrints->append("Using Print Script");
+            }
             DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, layerCount, PrintScriptList); //Should it be layerCount + 1??
             DLP.updateLUT();
             DLP.clearElements();
@@ -647,23 +655,27 @@ void MainWindow::PrintProcess(void)
             if (PrintScript == 1)
             {
                 QTimer::singleShot(PrintScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //value from printscript will be in ms
+                ui->ProgramPrints->append("Exposing: " + QString::number(PrintScriptList.at(layerCount).toDouble()) + " ms");
             }
             else
             {
                 QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //Value from exposuretime will be in us so /1000
+                ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
             }
             ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
             ExposureFlag = true;
             QString filename =ui->FileList->item(layerCount)->text();
-            QPixmap img(filename);
-            QPixmap img2 = img.scaled(890,490, Qt::KeepAspectRatio);
-            ui->PrintImage->setPixmap(img2);
-            ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
+            //QPixmap img(filename);
+            //QPixmap img2 = img.scaled(890,490, Qt::KeepAspectRatio);
+            //ui->PrintImage->setPixmap(img2);
+            //ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
             ui->ProgramPrints->append("Image File: " + filename);
             layerCount++;
             remainingImages--;
             updatePlot();
+            double OldPosition = GetPosition;
             emit(on_GetPosition_clicked());
+            ui->ProgramPrints->append("Stage moved: " + QString::number(OldPosition - GetPosition));
         }
         return;
     }
@@ -675,9 +687,11 @@ void MainWindow::PrintProcess(void)
         saveSettings();
 
         SMC.StopMotion();
-
+/*
         Sleep(50);
         SMC.SetVelocity(2);
+        Sleep(50);
+        emit(on_GetPosition_clicked());
         Sleep(50);
         if (MinEndOfRun > 0)
         {
@@ -687,7 +701,7 @@ void MainWindow::PrintProcess(void)
         {
            SMC.AbsoluteMove(0);
         }
-
+*/
         return;
     }
 }
@@ -825,7 +839,7 @@ void MainWindow::initStageSlot(void)
 {
     emit(on_GetPosition_clicked());
 
-    if (GetPosition < (StartingPosition-3.01))
+    if (GetPosition < (StartingPosition-3.05))
     {
         if (StagePrep1 == false)
         {
