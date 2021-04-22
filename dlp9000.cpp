@@ -63,16 +63,16 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
             {
                 pattern.bits = 1;
                 pattern.color = PatternElement::BLUE;
-                //if (PrintScript == 1)
-                //{
-                //    pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
-                //    printf("%d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000);
-                //    CurrentImage++; //Should this be done before?
-                //}
-                //else
-                //{
+                if (PrintScript == 1)
+                {
+                    pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
+                    printf("%d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000);
+                    CurrentImage++; //Should this be done before?
+                }
+                else
+                {
                     pattern.exposure = ExposureTime;
-                //}
+                }
                 pattern.darkPeriod = DarkTime;
                 pattern.trigIn = false;
                 pattern.trigOut2 = true;
