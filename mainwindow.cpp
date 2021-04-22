@@ -71,6 +71,8 @@ static bool DarkTimeFlag = false;
 static bool AutoModeFlag = false;
 static uint32_t nSlice = 0;
 static uint32_t layerCount = 0;
+static double TotalPrintTimeS = 0;
+static double RemainingPrintTimeS;
 
 static bool loadSettingsFlag = false;
 static QDateTime CurrentDateTime;
@@ -435,12 +437,12 @@ void MainWindow::on_SelectPrintScript_clicked()
             PrintScriptList.append(line.split(',').at(1));
     }
      //For testing
-    for (uint i= 0; i < PrintScriptList.size(); i++)
-    {
-        ui->ProgramPrints->append(PrintScriptList.at(i));
-        //PrintScriptList.removeAt(0);
-    }
-
+    //for (uint i= 0; i < PrintScriptList.size(); i++)
+    //{
+    //    ui->ProgramPrints->append(PrintScriptList.at(i));
+    //    //PrintScriptList.removeAt(0);
+    //}
+    ui->ProgramPrints->append("Print List has: " + QString::number(PrintScriptList.size()) + " entries");
 
 }
 
@@ -687,7 +689,7 @@ void MainWindow::PrintProcess(void)
         saveSettings();
 
         SMC.StopMotion();
-/*
+
         Sleep(50);
         SMC.SetVelocity(2);
         Sleep(50);
@@ -701,7 +703,7 @@ void MainWindow::PrintProcess(void)
         {
            SMC.AbsoluteMove(0);
         }
-*/
+
         return;
     }
 }
@@ -839,7 +841,7 @@ void MainWindow::initStageSlot(void)
 {
     emit(on_GetPosition_clicked());
 
-    if (GetPosition < (StartingPosition-3.05))
+    if (GetPosition < (StartingPosition-3.1))
     {
         if (StagePrep1 == false)
         {
@@ -948,7 +950,14 @@ bool MainWindow::initConfirmationScreen()
     {
         DetailedText += "Auto Mode Not Active\n";
     }
-    DetailedText += "Exposure Time: " + QString::number(ExposureTime/1000) + " ms\n";
+    if (PrintScript == 1)
+    {
+        DetailedText += "Exposure Time Controlled by Print Script\n";
+    }
+    else
+    {
+        DetailedText += "Exposure Time: " + QString::number(ExposureTime/1000) + " ms\n";
+    }
     DetailedText += "UV Intensity: " + QString::number(UVIntensity) + "\n";
     DetailedText += "Dark Time " + QString::number(DarkTime/1000) + " ms\n";
 
@@ -1065,9 +1074,26 @@ void MainWindow::initPlot()
     ui->LivePlot->graph(0)->setName("Print Progress");
     ui->LivePlot->xAxis->setLabel("Time (s)");
     ui->LivePlot->yAxis->setLabel("Position (mm)");
-    ui->LivePlot->xAxis->setRange(0, InitialExposure+5+0.1*nSlice+(1.5*(nSlice*(ExposureTime+DarkTime))/(1000*1000)));
+    if (PrintScript ==1)
+    {
+        TotalPrintTimeS = 0;
+        for (uint i= 0; i < PrintScriptList.size(); i++)
+            {
+                ui->ProgramPrints->append("Exp. Time: " + QString::number(PrintScriptList.at(i).toDouble()/1000));
+                TotalPrintTimeS += PrintScriptList.at(i).toDouble()/1000;
+                ui->ProgramPrints->append("Current Total :" + QString::number(TotalPrintTimeS));
+            }
+        TotalPrintTimeS += nSlice * (DarkTime/(1000*1000));
+        TotalPrintTimeS += InitialExposure + 5;
+        TotalPrintTimeS += nSlice * 0.1;
+        RemainingPrintTimeS = TotalPrintTimeS;
+        ui->LivePlot->xAxis->setRange(0, TotalPrintTimeS*1.1);
+    }
+    else
+    {
+        ui->LivePlot->xAxis->setRange(0, InitialExposure+5+0.1*nSlice+(1.5*(nSlice*(ExposureTime+DarkTime))/(1000*1000)));
+    }
     ui->LivePlot->yAxis->setRange(0.9*(StartingPosition - nSlice*SliceThickness),1.1*StartingPosition);
-
     ui->LivePlot->replot();
 }
 
@@ -1084,7 +1110,7 @@ void MainWindow::updatePlot()
     ui->LivePlot->graph(0)->setData(qv_x,qv_y);
     ui->LivePlot->clearItems();
 
-    //Update Time Remaining Label
+    //Update Layer label
     QString Layer = " Layer: " + QString::number(layerCount) + "/" + QString::number(nSlice);
     QCPItemText *textLabel1 = new QCPItemText(ui->LivePlot);
     textLabel1->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
@@ -1094,9 +1120,21 @@ void MainWindow::updatePlot()
     textLabel1->setFont(QFont(font().family(), 12)); // make font a bit larger
     textLabel1->setPen(QPen(Qt::black)); // show black border around text
 
-    //Update Layer Label
-    //Add Layer Label
-    QString RemainingTime = " Remaining Time: " + QString::number(((ExposureTime+DarkTime)/(1000*1000))*(nSlice-layerCount)+InitialExposure) + "s";
+
+    //Update Remaining Time Label
+    QString RemainingTime;
+    if (PrintScript == 1)
+    {
+        if (layerCount > 0)
+        {
+            RemainingPrintTimeS -= PrintScriptList.at(layerCount - 1).toDouble()/1000;
+        }
+        RemainingTime = "Est. Remaining Time: " + QString::number(RemainingPrintTimeS) + "s";
+    }
+    else
+    {
+        RemainingTime = "Est. Remaining Time: " + QString::number(((ExposureTime+DarkTime)/(1000*1000))*(nSlice-layerCount)+InitialExposure) + "s";
+    }
     QCPItemText *textLabel2 = new QCPItemText(ui->LivePlot);
     textLabel2->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
     textLabel2->position->setType(QCPItemPosition::ptAxisRectRatio);
