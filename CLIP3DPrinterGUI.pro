@@ -1,4 +1,4 @@
-QT       += core gui printsupport
+QT       += core gui printsupport svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -97,3 +97,18 @@ else:unix: LIBS += -L$$PWD/hidapi-master/lib4QT/ -lhidapi
 
 INCLUDEPATH += $$PWD/hidapi-master/lib4QT
 DEPENDPATH += $$PWD/hidapi-master/lib4QT
+
+#default in case something goes wrong...
+#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world452
+#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world452d
+#else:unix: LIBS += -L$$PWD/../OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world452
+
+#INCLUDEPATH += $$PWD/../OpenCV/opencv/build/include
+#DEPENDPATH += $$PWD/../OpenCV/opencv/build/include
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/OpenCV/vc15/lib/ -lopencv_world452
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/OpenCV/vc15/lib/ -lopencv_world452d
+else:unix: LIBS += -L$$PWD/OpenCV/vc15/lib/ -lopencv_world452
+
+INCLUDEPATH += $$PWD/OpenCV/include
+DEPENDPATH += $$PWD/OpenCV/include

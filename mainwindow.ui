@@ -176,7 +176,7 @@ QPushButton#StartPrint:disabled {
     <property name="geometry">
      <rect>
       <x>660</x>
-      <y>700</y>
+      <y>630</y>
       <width>141</width>
       <height>61</height>
      </rect>
@@ -190,7 +190,7 @@ Light Engine Control</string>
     <property name="geometry">
      <rect>
       <x>660</x>
-      <y>630</y>
+      <y>700</y>
       <width>141</width>
       <height>61</height>
      </rect>
@@ -326,7 +326,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -357,8 +357,8 @@ QPushButton#AbortPrint:hover:!pressed {
        <rect>
         <x>20</x>
         <y>10</y>
-        <width>891</width>
-        <height>491</height>
+        <width>491</width>
+        <height>261</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -366,6 +366,16 @@ QPushButton#AbortPrint:hover:!pressed {
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QGraphicsView" name="svgView">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>290</y>
+        <width>471</width>
+        <height>221</height>
+       </rect>
       </property>
      </widget>
     </widget>
@@ -2054,7 +2064,7 @@ and exp. time</string>
    </widget>
    <widget class="QPushButton" name="ClearPrintScript">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="geometry">
      <rect>
@@ -2153,7 +2163,7 @@ and exp. time</string>
      <x>0</x>
      <y>0</y>
      <width>1774</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

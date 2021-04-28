@@ -124,6 +124,8 @@ private slots:
 
     void on_ClearPrintScript_clicked();
 
+    void testFPS();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
