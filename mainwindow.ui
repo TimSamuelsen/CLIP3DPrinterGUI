@@ -172,7 +172,7 @@ QPushButton#StartPrint:disabled {
      <string>Start Print</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="ManualLightEngine">
+   <widget class="QPushButton" name="ImageProcess">
     <property name="geometry">
      <rect>
       <x>660</x>
@@ -182,8 +182,8 @@ QPushButton#StartPrint:disabled {
      </rect>
     </property>
     <property name="text">
-     <string>Manual 
-Light Engine Control</string>
+     <string>Image 
+ Processing</string>
     </property>
    </widget>
    <widget class="QPushButton" name="ManualStage">
@@ -357,8 +357,8 @@ QPushButton#AbortPrint:hover:!pressed {
        <rect>
         <x>20</x>
         <y>10</y>
-        <width>491</width>
-        <height>261</height>
+        <width>901</width>
+        <height>501</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -366,16 +366,6 @@ QPushButton#AbortPrint:hover:!pressed {
       </property>
       <property name="text">
        <string/>
-      </property>
-     </widget>
-     <widget class="QGraphicsView" name="svgView">
-      <property name="geometry">
-       <rect>
-        <x>460</x>
-        <y>290</y>
-        <width>471</width>
-        <height>221</height>
-       </rect>
       </property>
      </widget>
     </widget>
@@ -2102,7 +2092,7 @@ and exp. time</string>
    <zorder>InitializeAndSynchronize</zorder>
    <zorder>ProgramOutputLabel</zorder>
    <zorder>StartPrint</zorder>
-   <zorder>ManualLightEngine</zorder>
+   <zorder>ImageProcess</zorder>
    <zorder>ManualStage</zorder>
    <zorder>CurrentStagePos</zorder>
    <zorder>CurrentStagePosition</zorder>

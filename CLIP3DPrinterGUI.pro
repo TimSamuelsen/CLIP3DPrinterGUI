@@ -15,9 +15,9 @@ INCLUDEPATH += \
 SOURCES += \
     SMC100C.cpp \
     dlp9000.cpp \
+    imageprocessing.cpp \
     main.cpp \
     mainwindow.cpp \
-    manualprojcontrol.cpp \
     manualpumpcontrol.cpp \
     manualstagecontrol.cpp \
     qcustomplot.cpp \
@@ -27,8 +27,8 @@ HEADERS += \
     PtnImage.h \
     SMC100C.h \
     dlp9000.h \
+    imageprocessing.h \
     mainwindow.h \
-    manualprojcontrol.h \
     manualpumpcontrol.h \
     manualstagecontrol.h \
     patternelement.h \
@@ -37,8 +37,8 @@ HEADERS += \
 
 
 FORMS += \
+    imageprocessing.ui \
     mainwindow.ui \
-    manualprojcontrol.ui \
     manualpumpcontrol.ui \
     manualstagecontrol.ui
 
@@ -98,17 +98,22 @@ else:unix: LIBS += -L$$PWD/hidapi-master/lib4QT/ -lhidapi
 INCLUDEPATH += $$PWD/hidapi-master/lib4QT
 DEPENDPATH += $$PWD/hidapi-master/lib4QT
 
-#default in case something goes wrong...
-#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world452
-#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world452d
-#else:unix: LIBS += -L$$PWD/../OpenCV/opencv/build/x64/vc15/lib/ -lopencv_world452
+#OpenCV libs
+INCLUDEPATH += $$PWD/OpenCV/install/include
+DEPENDPATH += $$PWD/OpenCV/install/include
 
-#INCLUDEPATH += $$PWD/../OpenCV/opencv/build/include
-#DEPENDPATH += $$PWD/../OpenCV/opencv/build/include
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_core401.dll
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_core401.dll
+else:unix: LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_core401.dll
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/OpenCV/vc15/lib/ -lopencv_world452
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/OpenCV/vc15/lib/ -lopencv_world452d
-else:unix: LIBS += -L$$PWD/OpenCV/vc15/lib/ -lopencv_world452
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_imgcodecs401.dll
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_imgcodecs401.dll
+else:unix: LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_imgcodecs401.dll
 
-INCLUDEPATH += $$PWD/OpenCV/include
-DEPENDPATH += $$PWD/OpenCV/include
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_imgproc401.dll
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_imgproc401.dll
+else:unix: LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_imgproc401.dll
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_highgui401.dll
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_highgui401.dll
+else:unix: LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_highgui401.dll

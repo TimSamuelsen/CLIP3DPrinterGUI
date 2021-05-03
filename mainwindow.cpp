@@ -42,7 +42,6 @@
 #include "SMC100C.h"
 #include "dlp9000.h"
 #include "manualstagecontrol.h"
-#include "manualprojcontrol.h"
 #include "manualpumpcontrol.h"
 #include <opencv2/opencv.hpp>
 
@@ -158,6 +157,15 @@ void MainWindow::on_pushButton_clicked()
     ui->ProgramPrints->append("Manual Pump Control Entered");
     Pump.PSerial.closeDevice(); //Closes mainwindow pump connection
 }
+
+//Opens Image Processing Window
+void MainWindow::on_ImageProcess_clicked()
+{
+    ImageProcessUI = new imageprocessing();
+    ImageProcessUI->show();
+    ui->ProgramPrints->append("Opening Image Processing");
+}
+
 /*********************************************Print Parameters*********************************************/
 //Saves resin selected to log for reference
 void MainWindow::on_ResinSelect_activated(const QString &arg1)
@@ -443,6 +451,8 @@ void MainWindow::on_UsePrintScript_clicked()
 void MainWindow::on_SelectPrintScript_clicked()
 {
     QString file_name = QFileDialog::getOpenFileName(this, "Open Print Script", "C://", "*.txt *.csv");
+
+
     ui->PrintScriptFile->setText(file_name);
     QFile file(file_name);
     if (!file.open(QIODevice::ReadOnly))

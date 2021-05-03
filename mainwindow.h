@@ -3,8 +3,8 @@
 
 #include <QMainWindow>
 #include "manualstagecontrol.h"
-#include "manualprojcontrol.h"
 #include "manualpumpcontrol.h"
+#include "imageprocessing.h"
 #include "patternelement.h"
 #include "SMC100C.h"
 #include "dlp9000.h"
@@ -126,11 +126,13 @@ private slots:
 
     void testFPS();
 
+    void on_ImageProcess_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
-    manualLEcontrol *ManualProjUI;
     manualpumpcontrol *ManualPumpUI;
+    imageprocessing *ImageProcessUI;
     bool ValidateSettings(void);
     void loadSettings();
     void saveSettings();
