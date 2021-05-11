@@ -61,6 +61,11 @@ void imageprocessing::on_SelectImageFiles_clicked()
     }
 }
 
+void imageprocessing::on_ClearImageFiles_clicked()
+{
+    ui->InputList->clear();
+}
+
 void imageprocessing::on_BrowseTargetDir_clicked()
 {
     TargetDestination = QFileDialog::getExistingDirectory(this, "Open Log File Destination");
@@ -115,61 +120,50 @@ void imageprocessing::bitEncode24()
     QPixmap newImage = QPixmap::fromImage(QImage((unsigned char*) ImageOut.data, ImageOut.cols, ImageOut.rows, QImage::Format_BGR888));
     ui->ImageDisplay->setPixmap(newImage.scaled(853,533));
 
-    QString ImageName = TargetDestination + "/" + QString::number(encode24Count) + ".png";
+    QString ImageName = TargetDestination + "/" + QString::number(encode24Count) + ".tiff";
     imwrite(ImageName.toUtf8().constData(), ImageOut);
     ui->OutputImageList->addItem(ImageName);
     encode24Count++;
     //imshow("Test", ImageOut);
+
 }
 
 //8 bit encoding, called multiple times atm, possible improvements to be made but had weird memory issues
 void imageprocessing::bitEncode8(Mat source, Mat& Channel)
 {
     cv::Mat workingChannel (source.rows, source.cols, CV_8UC1); //Initialize Channel for return, might not be optimal, but at least it works
-    uchar* bit8array = source.isContinuous()? source.data: source.clone().data; //This might not be optimal, but at least it works
     for (uint i = 0; i < 8; i++) //Repeats loop 8 times for 8 bit-layers
     {
         if (remainingImages > 0) //Make sure that there are still images remaining
         {
-             //uchar* bit8array = source.isContinuous()? source.data: source.clone().data;
              QListWidgetItem* filename = ui->InputList->item(encodeCount); //Select image
              QString file_name = filename->text(); //convert to string to read by openCV
              Mat bit8read, bit8gray, bit8binary; //Prep working Mats
              bit8read = imread( samples::findFile (file_name.toUtf8().constData()), IMREAD_COLOR); //read image into workingImage mat
              cvtColor(bit8read, bit8gray, COLOR_BGR2GRAY); //convert image to grayscale
              threshold(bit8gray, bit8binary, 0, 255, 0); //threshold image to binary
-             uchar * array = bit8binary.isContinuous()? bit8binary.data: bit8binary.clone().data; //Copy binary mat to an array for operations
-             uint length = bit8binary.total()*bit8binary.channels(); //Get length of array for operations
              int encodeVal = hexSelect(i); //get correct hexval for current bit layer
              ui->TerminalOut->append("encodeVal: " + QString::number(encodeVal));
-             for (uint k = 0; k < length; k++) //iterates through every element in array
+
+             for (int row = 0; row < bit8binary.rows; row++)
              {
-                 if (array[k] > 0)
-                 {
-                     array[k] = encodeVal;
-                 }
-             }
-             if (i < 0)
-             {
-                for (uint z = 0; z < length; z++)
+                for (int col = 0; col < bit8binary.cols; col++)
                 {
-                    bit8array[z] = array[z];
+                    if (bit8binary.at<uchar>(row,col) > 0)
+                    {
+                        bit8binary.at<uchar>(row,col) = encodeVal;
+                    }
                 }
-                 //memcpy(bit8array, array, sizeof(bit8array)); //If firstlayer, simply copy array value into bit8array
              }
-             else
+
+             for (int row = 0; row < workingChannel.rows; row++)
              {
-                 for (uint w = 0; w < length; w++) //Iterates through every element in arrays, ARRAYS MUST BE EQUAL DIMENSIONS
-                 {
-                     bit8array[w] = array[w] | bit8array[w]; //| array[i]; //Bitwise OR operator
-                     //bit8array[w] << array[w] | bit8array[w];
-                 }
+                for (int col = 0; col < workingChannel.cols; col++)
+                {
+                        workingChannel.at<uchar>(row,col) = workingChannel.at<uchar>(row,col) | bit8binary.at<uchar>(row,col);
+                }
              }
-             //memcpy(finalbit8array, bit8array, sizeof(bit8array));
-             if (i == 7 || remainingImages < 1)
-             {
-                 workingChannel.data = bit8array;
-             }
+
              encodeCount++;
              remainingImages--;
         }
@@ -179,6 +173,23 @@ void imageprocessing::bitEncode8(Mat source, Mat& Channel)
         }
     }
     Channel = (source.rows, source.cols, CV_8UC1, workingChannel).clone();
+
+    uchar testbit = 0x02;
+    for (int row = 0; row < workingChannel.rows; row++)
+    {
+       for (int col = 0; col < workingChannel.cols; col++)
+       {
+           if ((workingChannel.at<uchar>(row,col) & testbit) > 0)
+           {
+               workingChannel.at<uchar>(row,col) = 0xff;
+           }
+           else
+           {
+               workingChannel.at<uchar>(row,col) = 0;
+           }
+       }
+    }
+    imshow("test", workingChannel);
     workingChannel.release();
 }
 
@@ -218,6 +229,7 @@ int imageprocessing::hexSelect(int imageNum)
     return returnVal;
 }
 
+#if 0
 void imageprocessing::on_DisplayImage_clicked()
 {
     QListWidgetItem* filename = ui->InputList->item(0);
@@ -287,7 +299,6 @@ void imageprocessing::on_BinarySplit_clicked()
     ui->ImageDisplay->setPixmap(EncodeTest.scaled(1300,800, Qt::KeepAspectRatio));
 }
 
-#if 0
 void imageprocessing::bitEncode24()
 {
     bool firstLayer = true;

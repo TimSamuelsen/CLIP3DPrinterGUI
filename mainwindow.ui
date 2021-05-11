@@ -326,7 +326,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -1649,9 +1649,9 @@ QPushButton#AbortPrint:hover:!pressed {
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>270</y>
+      <y>260</y>
       <width>481</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -1676,7 +1676,7 @@ QPushButton#AbortPrint:hover:!pressed {
       <number>0</number>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;General Print Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;General Print Settings&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>
@@ -1699,7 +1699,7 @@ QPushButton#AbortPrint:hover:!pressed {
       <x>0</x>
       <y>140</y>
       <width>481</width>
-      <height>131</height>
+      <height>121</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -1808,38 +1808,25 @@ and exp. time</string>
     <property name="lineWidth">
      <number>1</number>
     </property>
-    <widget class="QLabel" name="label_7">
+    <widget class="QLabel" name="SelectResinLabel">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>10</y>
-       <width>461</width>
+       <width>111</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Set Printing Parameters&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="SelectResinLabel">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>40</y>
-       <width>131</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Select Resin&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Select Resin&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QComboBox" name="ResinSelect">
      <property name="geometry">
       <rect>
-       <x>50</x>
-       <y>60</y>
-       <width>131</width>
+       <x>10</x>
+       <y>40</y>
+       <width>101</width>
        <height>31</height>
       </rect>
      </property>
@@ -1862,9 +1849,9 @@ and exp. time</string>
     <widget class="QRadioButton" name="DICLIPSelect">
      <property name="geometry">
       <rect>
-       <x>310</x>
+       <x>360</x>
        <y>60</y>
-       <width>141</width>
+       <width>91</width>
        <height>31</height>
       </rect>
      </property>
@@ -1887,9 +1874,9 @@ and exp. time</string>
     <widget class="QRadioButton" name="CLIPSelect">
      <property name="geometry">
       <rect>
-       <x>310</x>
+       <x>360</x>
        <y>30</y>
-       <width>141</width>
+       <width>91</width>
        <height>31</height>
       </rect>
      </property>
@@ -1910,6 +1897,73 @@ and exp. time</string>
      </property>
      <property name="checked">
       <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="SelectResinLabel_2">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>10</y>
+       <width>221</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Select Projection Mode&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="POTFcheckbox">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>40</y>
+       <width>161</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
+     </property>
+     <property name="text">
+      <string>    POTF Mode    </string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="VP_HDMIcheckbox">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>70</y>
+       <width>161</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Video Pattern HDMI</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="SelectResinLabel_3">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>10</y>
+       <width>121</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Select Printer&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>

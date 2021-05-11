@@ -12,7 +12,7 @@
 #include <QTimer>
 #include <QProgressDialog>
 
-//static MainWindow Main;
+//MainWindow Main;
 
 bool DLP9000::InitProjector(void)
 {
@@ -26,6 +26,7 @@ bool DLP9000::InitProjector(void)
         return false;
     }
 }
+
 
 
 
@@ -363,7 +364,7 @@ void DLP9000::updateLUT()
  */
 void DLP9000::startPatSequence(void)
 {
-    MainWindow Main;
+    MainWindow Main; //Redefining this all the time might be bad practice
 
     if (LCR_PatternDisplay(2) < 0)
         Main.showError("Unable to start pattern display");
@@ -374,6 +375,31 @@ void DLP9000::clearElements(void)
     m_elements.clear();
 }
 
+void DLP9000::setIT6535Mode(int Mode)
+{
+    MainWindow Main;
+    unsigned int dataPort, pixelClock, dataEnable, syncSelect;
+    dataPort = 0; //Select data port 1
+    pixelClock = 0; //Select pixelClock 1
+    dataEnable = 0; //Select dataEnable 1
+    syncSelect = 0;  //Select port 1 sync
+
+    if(LCR_SetPortConfig(dataPort,pixelClock,dataEnable,syncSelect)<0)
+        Main.showError("Unable to set port configuration!");
+    API_VideoConnector_t ProjectMode;
+    switch (Mode){
+        case 0:
+            ProjectMode = VIDEO_CON_DISABLE;
+            break;
+        case 1:
+            ProjectMode = VIDEO_CON_HDMI;
+        case 2:
+            ProjectMode = VIDEO_CON_DP;
+        default:
+            break;
+    }
+    LCR_SetIT6535PowerMode(ProjectMode);
+}
 
 /**
  * @brief MainWindow::calculateSplashImageDetails

@@ -48,11 +48,11 @@
 #define NormalTime
 #define QuickTime
 
-static DLP9000 DLP;
+static DLP9000 DLP; //DLP object for calling functions from dlp9000.cpp
 //Module level variables
-static bool PrintFlag = 0;
-static bool InitialExposureFlag = true;
+static bool InitialExposureFlag = true; //Flag to indicate print process to do intial expore first, set false after intial exposure never set true again
 //Settings are static so they can be accessed from outside anywhere in this module
+//Module level variables for print parameters
 static double SliceThickness;
 static double StageVelocity;
 static double StageAcceleration;
@@ -67,27 +67,26 @@ static double PrintSpeed;
 static double PrintHeight;
 static int MaxImageUpload = 20;
 
-static int remainingImages;
+static int remainingImages; //Keeps count of remaining images to be printed
 
-static bool ExposureFlag = false;
-static bool DarkTimeFlag = false;
-static bool AutoModeFlag = false;
-static uint32_t nSlice = 0;
-static uint32_t layerCount = 0;
-static double TotalPrintTimeS = 0;
-static double RemainingPrintTimeS;
+static bool AutoModeFlag = false; //true when automode is on, false otherwise
+static uint32_t nSlice = 0; //number of slices to be printed
+static uint32_t layerCount = 0; //current layer
+static double TotalPrintTimeS = 0; //For calculating print times
+static double RemainingPrintTimeS; //For calculating remaining print times
 
-static bool loadSettingsFlag = false;
-static QDateTime CurrentDateTime;
-static QString LogFileDestination;
-static QString ImageFileDirectory;
-static QTime PrintStartTime;
-static double GetPosition;
-static bool StagePrep1 = false;
-static bool StagePrep2 = false;
-static QStringList PrintScriptList;
-static int PrintScript = 0;
-
+static bool loadSettingsFlag = false; //For ensuring the settings are only loaded once, (May not be needed)
+static QDateTime CurrentDateTime; //Current time
+static QString LogFileDestination; //for storing log file destination in settings
+static QString ImageFileDirectory; //For storing image file directory in settings
+static QTime PrintStartTime; //Get start time for log
+static double GetPosition; //Holds
+static bool StagePrep1 = false; //For lowering stage
+static bool StagePrep2 = false; //For lowering stage
+static QStringList PrintScriptList; //Printscript is taken from a .csv file and stored in this variable
+static int PrintScript = 0; //For selecting type of printscript, currently: 0 = no printscript, 1 = exposure time print script
+static int ProjectionMode = 0; //For selecting projection mode, 0 = POTF mode, 1 = Video Pattern HDMI
+static bool VideoLocked;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -166,6 +165,63 @@ void MainWindow::on_ImageProcess_clicked()
     ui->ProgramPrints->append("Opening Image Processing");
 }
 
+/*********************************************Mode Selection*********************************************/
+void MainWindow::on_POTFcheckbox_clicked()
+{
+    if (ui->POTFcheckbox->isChecked())
+    {
+        ui->VP_HDMIcheckbox->setChecked(false);
+        ProjectionMode = 0;
+        DLP.setIT6535Mode(0); //not sure if needed
+    }
+}
+
+
+void MainWindow::on_VP_HDMIcheckbox_clicked()
+{
+    if (ui->VP_HDMIcheckbox->isChecked())
+    {
+        ui->POTFcheckbox->setChecked(false);
+        ProjectionMode = 1;
+        DLP.setIT6535Mode(1);
+        Check4VideoLock();
+    }
+}
+
+void MainWindow::Check4VideoLock()
+{
+    QMessageBox VlockPopup;
+    static uint8_t repeatCount = 0;
+    static bool repeat;
+    unsigned char HWStatus, SysStatus, MainStatus;
+    if (repeatCount == 0)
+        ui->ProgramPrints->append("Attempting to Lock to Video Source");
+    if (LCR_GetStatus(&HWStatus, &SysStatus, &MainStatus) == 0)
+    {
+        if(MainStatus & BIT3){
+            ui->ProgramPrints->append("External Video Source Locked");
+            VideoLocked = true;
+            repeat = false;
+            VlockPopup.close();
+            return;
+        }
+        else{
+            ui->ProgramPrints->append("External Video Source Not Locked, Please Wait");
+            repeat = true;
+            VideoLocked = false;
+        }
+    }
+    if(repeatCount < 15) //Repeats 15 times (15 seconds) before telling user that an error has occurred
+    {
+        QTimer::singleShot(1000, this, SLOT(Check4VideoLock()));
+        repeatCount++;
+    }
+    else
+    {
+        ui->ProgramPrints->append("External Video Source Lock Failed");
+        showError("External Video Source Lock Failed");
+    }
+}
 /*********************************************Print Parameters*********************************************/
 //Saves resin selected to log for reference
 void MainWindow::on_ResinSelect_activated(const QString &arg1)
@@ -690,8 +746,6 @@ void MainWindow::on_StartPrint_clicked()
         Sleep(20);
         emit(on_GetPosition_clicked());
         //usbPollTimer->stop();
-        //Set PrintFlag to true
-        PrintFlag = true; //Set PrintFlag True
         nSlice = ui->FileList->count();
         ui->ProgramPrints->append("Entering Printing Procedure");
         //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
@@ -764,7 +818,6 @@ void MainWindow::PrintProcess(void)
                 ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
             }
             ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
-            ExposureFlag = true;
             QString filename =ui->FileList->item(layerCount)->text();
             QPixmap img(filename);
             QPixmap img2 = img.scaled(890,490, Qt::KeepAspectRatio);
@@ -1248,13 +1301,6 @@ void MainWindow::updatePlot()
  * ********************OUTSIDE CODE***************************
  * ***********************************************************/
 
-/*
-void CallError(QString Error)
-{
-    MainWindow Main;
-    Main.showError(Error);
-}
-*/
 
 void MainWindow::on_ManualLightEngine_clicked()
 {
@@ -1344,29 +1390,3 @@ void MainWindow::on_ManualLightEngine_clicked()
 
 }
 
-void MainWindow::CheckDLPStatus(void)
-{
-    //If GUI is in exposure state
-    if (ExposureFlag == true && DarkTimeFlag == false)
-    {
-        //Query DLP status
-        if (true) //If DLP has changed to dark time
-        {
-
-        }
-        else //If DLP has not changed states
-        {
-            //Wait 20 ms and repeat this call
-            QTimer::singleShot(20, this, SLOT(CheckDLPStatus()));
-        }
-    }
-    else if (ExposureFlag == false && DarkTimeFlag == true)
-    {
-        //Query DLP status
-    }
-    else
-    {
-        showError("Flag error");
-        return;
-    }
-}

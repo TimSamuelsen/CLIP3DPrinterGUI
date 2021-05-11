@@ -82,8 +82,6 @@ private slots:
 
     void PrintProcess();
 
-    void CheckDLPStatus();
-
     void on_ManualLightEngine_clicked();
 
     void saveText();
@@ -127,6 +125,12 @@ private slots:
     void testFPS();
 
     void on_ImageProcess_clicked();
+
+    void on_POTFcheckbox_clicked();
+
+    void on_VP_HDMIcheckbox_clicked();
+
+    void Check4VideoLock();
 
 private:
     Ui::MainWindow *ui;

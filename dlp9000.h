@@ -17,6 +17,7 @@ public:
     void updateLUT();
     void startPatSequence(void);
     void clearElements(void);
+    void setIT6535Mode(int Mode);
 
 private:
     bool m_dualAsic = true;

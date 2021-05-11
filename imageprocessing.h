@@ -21,15 +21,7 @@ public:
 private slots:
     void on_SelectImageFiles_clicked();
 
-    void on_DisplayImage_clicked();
-
-    void on_pushButton_clicked();
-
     void on_ClearImageFiles_clicked();
-
-    void on_Split_clicked();
-
-    void on_BinarySplit_clicked();
 
     void on_EncodeTest_clicked();
 
