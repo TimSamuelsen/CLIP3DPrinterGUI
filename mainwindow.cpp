@@ -173,6 +173,7 @@ void MainWindow::on_POTFcheckbox_clicked()
         ui->VP_HDMIcheckbox->setChecked(false);
         ProjectionMode = 0;
         DLP.setIT6535Mode(0); //not sure if needed
+        LCR_SetMode(PTN_MODE_OTF);
     }
 }
 
@@ -185,6 +186,7 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
         ProjectionMode = 1;
         DLP.setIT6535Mode(1);
         Check4VideoLock();
+        LCR_SetMode(PTN_MODE_VIDEO);
     }
 }
 
@@ -207,19 +209,21 @@ void MainWindow::Check4VideoLock()
         }
         else{
             ui->ProgramPrints->append("External Video Source Not Locked, Please Wait");
-            repeat = true;
             VideoLocked = false;
+            if(repeatCount < 15) //Repeats 15 times (15 seconds) before telling user that an error has occurred
+            {
+                QTimer::singleShot(1000, this, SLOT(Check4VideoLock()));
+                repeatCount++;
+            }
+            else
+            {
+                ui->ProgramPrints->append("External Video Source Lock Failed");
+                showError("External Video Source Lock Failed");
+                ui->VP_HDMIcheckbox->setChecked(false);
+                ui->POTFcheckbox->setChecked(true);
+                emit(on_POTFcheckbox_clicked());
+            }
         }
-    }
-    if(repeatCount < 15) //Repeats 15 times (15 seconds) before telling user that an error has occurred
-    {
-        QTimer::singleShot(1000, this, SLOT(Check4VideoLock()));
-        repeatCount++;
-    }
-    else
-    {
-        ui->ProgramPrints->append("External Video Source Lock Failed");
-        showError("External Video Source Lock Failed");
     }
 }
 /*********************************************Print Parameters*********************************************/
