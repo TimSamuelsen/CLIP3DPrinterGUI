@@ -15,6 +15,7 @@ INCLUDEPATH += \
 SOURCES += \
     SMC100C.cpp \
     dlp9000.cpp \
+    imagepopout.cpp \
     imageprocessing.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -27,6 +28,7 @@ HEADERS += \
     PtnImage.h \
     SMC100C.h \
     dlp9000.h \
+    imagepopout.h \
     imageprocessing.h \
     mainwindow.h \
     manualpumpcontrol.h \
@@ -37,6 +39,7 @@ HEADERS += \
 
 
 FORMS += \
+    imagepopout.ui \
     imageprocessing.ui \
     mainwindow.ui \
     manualpumpcontrol.ui \

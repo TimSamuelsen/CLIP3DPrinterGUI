@@ -5,6 +5,7 @@
 #include "manualstagecontrol.h"
 #include "manualpumpcontrol.h"
 #include "imageprocessing.h"
+#include "imagepopout.h"
 #include "patternelement.h"
 #include "SMC100C.h"
 #include "dlp9000.h"
@@ -24,6 +25,7 @@ public:
     void PrintToTerminal(QString StringToPrint);
     SMC100C SMC;
     //DLP9000 DLP;
+    imagepopout popout;
     manualpumpcontrol Pump;
 
 public slots:
@@ -132,11 +134,14 @@ private slots:
 
     void Check4VideoLock();
 
+    void on_DICLIPSelect_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
     manualpumpcontrol *ManualPumpUI;
     imageprocessing *ImageProcessUI;
+    imagepopout *ImagePopoutUI;
     bool ValidateSettings(void);
     void loadSettings();
     void saveSettings();
@@ -149,5 +154,6 @@ private:
     void validateStartingPosition();
     bool initConfirmationScreen();
     void AutoMode();
+    void initImagePopout();
 };
 #endif // MAINWINDOW_H

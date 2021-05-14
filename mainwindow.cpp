@@ -43,12 +43,13 @@
 #include "dlp9000.h"
 #include "manualstagecontrol.h"
 #include "manualpumpcontrol.h"
+#include "imagepopout.h"
 #include <opencv2/opencv.hpp>
 
 #define NormalTime
 #define QuickTime
 
-static DLP9000 DLP; //DLP object for calling functions from dlp9000.cpp
+static DLP9000 DLP; //DLP object for calling functions from dlp9000.cpp, test if this still works without being a static
 //Module level variables
 static bool InitialExposureFlag = true; //Flag to indicate print process to do intial expore first, set false after intial exposure never set true again
 //Settings are static so they can be accessed from outside anywhere in this module
@@ -225,6 +226,24 @@ void MainWindow::Check4VideoLock()
             }
         }
     }
+}
+
+void MainWindow::initImagePopout()
+{
+    ImagePopoutUI = new imagepopout;
+    ImagePopoutUI->show();
+    QStringList imageList;
+    QListWidgetItem * item;
+    for(int i = 0; (i < (ui->FileList->count())); i++)
+    {
+            item = ui->FileList->item(i);
+            imageList << item->text();
+    }
+}
+
+void MainWindow::on_DICLIPSelect_clicked()
+{
+    initImagePopout();
 }
 /*********************************************Print Parameters*********************************************/
 //Saves resin selected to log for reference
@@ -808,6 +827,7 @@ void MainWindow::PrintProcess(void)
             QTimer::singleShot((InitialExposure*1000), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
             InitialExposureFlag = false;
             ui->ProgramPrints->append("Exposing Initial Layer " + QString::number(InitialExposure) + "s");
+            //popout.showImage(ui->FileList->item(layerCount)->text());
         }
         else
         {
@@ -823,9 +843,9 @@ void MainWindow::PrintProcess(void)
             }
             ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
             QString filename =ui->FileList->item(layerCount)->text();
-            QPixmap img(filename);
-            QPixmap img2 = img.scaled(890,490, Qt::KeepAspectRatio);
-            ui->PrintImage->setPixmap(img2);
+            //QPixmap img(filename);
+            //QPixmap img2 = img.scaled(890,490, Qt::KeepAspectRatio);
+            //ui->PrintImage->setPixmap(img2);
             ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
             ui->ProgramPrints->append("Image File: " + filename);
             layerCount++;
@@ -834,6 +854,9 @@ void MainWindow::PrintProcess(void)
             double OldPosition = GetPosition;
             emit(on_GetPosition_clicked());
             ui->ProgramPrints->append("Stage moved: " + QString::number(OldPosition - GetPosition));
+            QPixmap img(filename);
+            ImagePopoutUI->showImage(img);
+            //emit(popout.showImage(ui->FileList->item(layerCount-1)->text()));
         }
         return;
     }
@@ -1393,4 +1416,3 @@ void MainWindow::on_ManualLightEngine_clicked()
     }
 
 }
-
