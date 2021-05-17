@@ -84,8 +84,6 @@ private slots:
 
     void PrintProcess();
 
-    void on_ManualLightEngine_clicked();
-
     void saveText();
 
     void on_LogFileBrowse_clicked();

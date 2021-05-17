@@ -74,7 +74,7 @@ static bool AutoModeFlag = false; //true when automode is on, false otherwise
 static uint32_t nSlice = 0; //number of slices to be printed
 static uint32_t layerCount = 0; //current layer
 static double TotalPrintTimeS = 0; //For calculating print times
-static double RemainingPrintTimeS; //For calculating remaining print times
+static double RemainingPrintTimeS; //For calculating remaining pr int times
 
 static bool loadSettingsFlag = false; //For ensuring the settings are only loaded once, (May not be needed)
 static QDateTime CurrentDateTime; //Current time
@@ -84,10 +84,12 @@ static QTime PrintStartTime; //Get start time for log
 static double GetPosition; //Holds
 static bool StagePrep1 = false; //For lowering stage
 static bool StagePrep2 = false; //For lowering stage
-static QStringList PrintScriptList; //Printscript is taken from a .csv file and stored in this variable
+static QStringList ExposureScriptList; //Printscript is taken from a .csv file and stored in this variable
+static QStringList LEDScriptList;
 static int PrintScript = 0; //For selecting type of printscript, currently: 0 = no printscript, 1 = exposure time print script
 static int ProjectionMode = 0; //For selecting projection mode, 0 = POTF mode, 1 = Video Pattern HDMI
 static bool VideoLocked;
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -232,6 +234,8 @@ void MainWindow::initImagePopout()
 {
     ImagePopoutUI = new imagepopout;
     ImagePopoutUI->show();
+    ImagePopoutUI->windowHandle()->setScreen(qApp->screens()[1]);
+    ImagePopoutUI->showFullScreen();
     QStringList imageList;
     QListWidgetItem * item;
     for(int i = 0; (i < (ui->FileList->count())); i++)
@@ -244,6 +248,7 @@ void MainWindow::initImagePopout()
 void MainWindow::on_DICLIPSelect_clicked()
 {
     initImagePopout();
+    ProjectionMode = 1;
 }
 /*********************************************Print Parameters*********************************************/
 //Saves resin selected to log for reference
@@ -542,15 +547,18 @@ void MainWindow::on_SelectPrintScript_clicked()
     while (!file.atEnd())
     {
             QByteArray line = file.readLine();
-            PrintScriptList.append(line.split(',').at(1));
+            ExposureScriptList.append(line.split(',').at(0));
+            LEDScriptList.append(line.split(',').at(1));
     }
      //For testing
-    //for (uint i= 0; i < PrintScriptList.size(); i++)
-    //{
-    //    ui->ProgramPrints->append(PrintScriptList.at(i));
-    //    //PrintScriptList.removeAt(0);
-    //}
-    ui->ProgramPrints->append("Print List has: " + QString::number(PrintScriptList.size()) + " entries");
+    for (uint i= 0; i < ExposureScriptList.size(); i++)
+    {
+        ui->ProgramPrints->append(ExposureScriptList.at(i));
+        //ExposureScriptList.removeAt(0);
+       ui->ProgramPrints->append(LEDScriptList.at(i));
+        //LEDScriptList.removeAt(0);
+    }
+    ui->ProgramPrints->append("Print List has: " + QString::number(ExposureScriptList.size()) + " entries");
 
 }
 
@@ -718,7 +726,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             {
                 firstImage << firstItem->text();
             }
-            DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity, 0, 0, PrintScriptList); //Printscript is set to 0 for initial exposure time, 0 for initial image
+            DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity, 0, 0, ExposureScriptList); //Printscript is set to 0 for initial exposure time, 0 for initial image
             nSlice = ui->FileList->count();
             ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
             QListWidgetItem * item;
@@ -736,7 +744,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             {
                 ui->ProgramPrints->append("Using Print Script");
             }
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, 0, PrintScriptList); //Set initial image to 0
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, 0, ExposureScriptList); //Set initial image to 0
             DLP.updateLUT();
             DLP.clearElements();
             remainingImages = MaxImageUpload - InitialExposure;
@@ -772,7 +780,14 @@ void MainWindow::on_StartPrint_clicked()
         nSlice = ui->FileList->count();
         ui->ProgramPrints->append("Entering Printing Procedure");
         //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
-        LCR_SetLedCurrents(0, 0, UVIntensity);
+        if (PrintScript == 1)
+        {
+            LCR_SetLedCurrents(0,0,(LEDScriptList.at(0).toInt()));
+        }
+        else
+        {
+            LCR_SetLedCurrents(0, 0, UVIntensity);
+        }
         //LCR_PatternDisplay(0);
         PrintStartTime = QTime::currentTime();
         DLP.startPatSequence();
@@ -809,7 +824,7 @@ void MainWindow::PrintProcess(void)
             {
                 ui->ProgramPrints->append("Using Print Script");
             }
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, layerCount, PrintScriptList); //Should it be layerCount + 1??
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, layerCount, ExposureScriptList); //Should it be layerCount + 1??
             DLP.updateLUT();
             DLP.clearElements();
             remainingImages = count - 1;
@@ -833,8 +848,8 @@ void MainWindow::PrintProcess(void)
         {
             if (PrintScript == 1)
             {
-                QTimer::singleShot(PrintScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //value from printscript will be in ms
-                ui->ProgramPrints->append("Exposing: " + QString::number(PrintScriptList.at(layerCount).toDouble()) + " ms");
+                QTimer::singleShot(ExposureScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //value from printscript will be in ms
+                ui->ProgramPrints->append("Exposing: " + QString::number(ExposureScriptList.at(layerCount).toDouble()) + " ms");
             }
             else
             {
@@ -855,8 +870,10 @@ void MainWindow::PrintProcess(void)
             emit(on_GetPosition_clicked());
             ui->ProgramPrints->append("Stage moved: " + QString::number(OldPosition - GetPosition));
             QPixmap img(filename);
-            ImagePopoutUI->showImage(img);
-            //emit(popout.showImage(ui->FileList->item(layerCount-1)->text()));
+            if (ProjectionMode == 1)
+            {
+                ImagePopoutUI->showImage(img);
+            }
         }
         return;
     }
@@ -891,6 +908,10 @@ void MainWindow::ExposureTimeSlot(void)
 {
     QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
     SMC.RelativeMove(-SliceThickness);
+    if (layerCount < sizeof(LEDScriptList)){
+        LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
+        ui->ProgramPrints->append("LED Intensity: " + LEDScriptList.at(layerCount));
+    }
     ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTime/1000) + " ms");
     ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness*1000) + " um");
 }
@@ -1256,11 +1277,11 @@ void MainWindow::initPlot()
     if (PrintScript ==1)
     {
         TotalPrintTimeS = 0;
-        for (uint i= 0; i < PrintScriptList.size(); i++)
+        for (int i= 0; i < ExposureScriptList.size(); i++)
             {
-                ui->ProgramPrints->append("Exp. Time: " + QString::number(PrintScriptList.at(i).toDouble()/1000));
-                TotalPrintTimeS += PrintScriptList.at(i).toDouble()/1000;
-                ui->ProgramPrints->append("Current Total :" + QString::number(TotalPrintTimeS));
+                ui->ProgramPrints->append("Exp. Time: " + QString::number(ExposureScriptList.at(i).toDouble()/1000));
+                TotalPrintTimeS += ExposureScriptList.at(i).toDouble()/1000;
+                //ui->ProgramPrints->append("Current Total :" + QString::number(TotalPrintTimeS));
             }
         TotalPrintTimeS += nSlice * (DarkTime/(1000*1000));
         TotalPrintTimeS += InitialExposure + 5;
@@ -1306,7 +1327,7 @@ void MainWindow::updatePlot()
     {
         if (layerCount > 0)
         {
-            RemainingPrintTimeS -= PrintScriptList.at(layerCount - 1).toDouble()/1000;
+            RemainingPrintTimeS -= ExposureScriptList.at(layerCount - 1).toDouble()/1000;
         }
         RemainingTime = "Est. Remaining Time: " + QString::number(RemainingPrintTimeS) + "s";
     }
@@ -1328,7 +1349,7 @@ void MainWindow::updatePlot()
  * ********************OUTSIDE CODE***************************
  * ***********************************************************/
 
-
+#if 0
 void MainWindow::on_ManualLightEngine_clicked()
 {
     //ManualProjUI = new manualLEcontrol();
@@ -1416,3 +1437,4 @@ void MainWindow::on_ManualLightEngine_clicked()
     }
 
 }
+#endif
