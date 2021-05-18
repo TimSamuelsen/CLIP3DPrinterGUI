@@ -551,14 +551,14 @@ void MainWindow::on_SelectPrintScript_clicked()
             LEDScriptList.append(line.split(',').at(1));
     }
      //For testing
-    for (uint i= 0; i < ExposureScriptList.size(); i++)
+    for (int i= 0; i < ExposureScriptList.size(); i++)
     {
-        ui->ProgramPrints->append(ExposureScriptList.at(i));
+        ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i));
         //ExposureScriptList.removeAt(0);
-       ui->ProgramPrints->append(LEDScriptList.at(i));
         //LEDScriptList.removeAt(0);
     }
-    ui->ProgramPrints->append("Print List has: " + QString::number(ExposureScriptList.size()) + " entries");
+    ui->ProgramPrints->append("Print List has: " + QString::number(ExposureScriptList.size()) + " exposure entries");
+    ui->ProgramPrints->append("Print List has: " + QString::number(LEDScriptList.size()) + " LED intensity entries");
 
 }
 
@@ -908,9 +908,24 @@ void MainWindow::ExposureTimeSlot(void)
 {
     QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
     SMC.RelativeMove(-SliceThickness);
-    if (layerCount < sizeof(LEDScriptList)){
-        LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
+    if (layerCount < LEDScriptList.size()){
+        if (layerCount > 0)
+        {
+            if ((LEDScriptList.at(layerCount).toInt()) == LEDScriptList.at(layerCount-1).toInt()){
+                //do nothing, this avoids spamming the light engine when LED intensity is constant
+            }
+            else{
+                 LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
+            }
+        }
+        else
+        {
+            LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
+        }
         ui->ProgramPrints->append("LED Intensity: " + LEDScriptList.at(layerCount));
+    }
+    else{
+        ui->ProgramPrints->append(QString::number(layerCount) + QString::number(sizeof(LEDScriptList)));
     }
     ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTime/1000) + " ms");
     ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness*1000) + " um");
@@ -1279,7 +1294,7 @@ void MainWindow::initPlot()
         TotalPrintTimeS = 0;
         for (int i= 0; i < ExposureScriptList.size(); i++)
             {
-                ui->ProgramPrints->append("Exp. Time: " + QString::number(ExposureScriptList.at(i).toDouble()/1000));
+                //ui->ProgramPrints->append("Exp. Time: " + QString::number(ExposureScriptList.at(i).toDouble()/1000));
                 TotalPrintTimeS += ExposureScriptList.at(i).toDouble()/1000;
                 //ui->ProgramPrints->append("Current Total :" + QString::number(TotalPrintTimeS));
             }
