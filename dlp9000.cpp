@@ -121,7 +121,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
 
             if(m_elements.size()==0)
             {
-                pattern.bits = 1;
+                pattern.bits = BitMode;
                 pattern.color = PatternElement::BLUE;
                 if (PrintScript == 1)
                 {
@@ -141,7 +141,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
             }
             else
             {
-                pattern.bits = 1;
+                pattern.bits = BitMode;
                 pattern.color = PatternElement::BLUE;
                 if (PrintScript == 1)
                 {
@@ -444,8 +444,10 @@ void DLP9000::setIT6535Mode(int Mode)
             break;
         case 1:
             ProjectMode = VIDEO_CON_HDMI;
+            break;
         case 2:
             ProjectMode = VIDEO_CON_DP;
+            break;
         default:
             break;
     }

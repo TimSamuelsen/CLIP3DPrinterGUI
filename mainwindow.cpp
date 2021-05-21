@@ -188,9 +188,19 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
     {
         ui->POTFcheckbox->setChecked(false);
         ProjectionMode = 1;
+        if (LCR_SetMode(PTN_MODE_DISABLE) < 0)
+        {
+            showError("Unable to switch to video mode");
+            ui->VP_HDMIcheckbox->setChecked(false);
+            ui->POTFcheckbox->setChecked(true);
+            emit(on_POTFcheckbox_clicked());
+            return;
+        }
         DLP.setIT6535Mode(1);
+        //API_VideoConnector_t hdmi = VIDEO_CON_HDMI;
+        //LCR_SetIT6535PowerMode(hdmi);
         Check4VideoLock();
-        LCR_SetMode(PTN_MODE_VIDEO);
+
     }
 }
 
@@ -209,10 +219,24 @@ void MainWindow::Check4VideoLock()
             VideoLocked = true;
             repeat = false;
             VlockPopup.close();
+            if (LCR_SetMode(PTN_MODE_VIDEO) < 0)
+            {
+                showError("Unable to switch to video pattern mode");
+                ui->VP_HDMIcheckbox->setChecked(false);
+                ui->POTFcheckbox->setChecked(true);
+                emit(on_POTFcheckbox_clicked());
+            }
+            ui->ProgramPrints->append("Video Pattern Mode Enabled");
             return;
         }
         else{
             ui->ProgramPrints->append("External Video Source Not Locked, Please Wait");
+            //API_VideoConnector_t testVC;
+            //LCR_GetIT6535PowerMode(&testVC);
+            API_DisplayMode_t testDM;
+            LCR_GetMode(&testDM);
+            ui->ProgramPrints->append(QString::number(testDM));
+
             VideoLocked = false;
             if(repeatCount < 15) //Repeats 15 times (15 seconds) before telling user that an error has occurred
             {
@@ -1069,7 +1093,7 @@ void MainWindow::initStageSlot(void)
 {
     emit(on_GetPosition_clicked());
 
-    if (GetPosition < (StartingPosition-3.1))
+    if (GetPosition < (StartingPosition-3.2))
     {
         if (StagePrep1 == false)
         {
