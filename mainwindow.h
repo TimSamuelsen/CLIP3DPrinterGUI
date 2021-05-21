@@ -134,6 +134,10 @@ private slots:
 
     void on_DICLIPSelect_clicked();
 
+    void PrintProcessVP();
+
+    void on_SetBitDepth_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;

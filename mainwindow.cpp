@@ -87,8 +87,10 @@ static bool StagePrep2 = false; //For lowering stage
 static QStringList ExposureScriptList; //Printscript is taken from a .csv file and stored in this variable
 static QStringList LEDScriptList;
 static int PrintScript = 0; //For selecting type of printscript, currently: 0 = no printscript, 1 = exposure time print script
+
 static int ProjectionMode = 0; //For selecting projection mode, 0 = POTF mode, 1 = Video Pattern HDMI
 static bool VideoLocked;
+static int BitMode = 1;
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -106,7 +108,6 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::timerTimeout(void)
 {
     //emit(on_GetPosition_clicked());
-
 }
 
 MainWindow::~MainWindow()
@@ -157,7 +158,7 @@ void MainWindow::on_pushButton_clicked()
     ManualPumpUI = new manualpumpcontrol();
     ManualPumpUI->show();
     ui->ProgramPrints->append("Manual Pump Control Entered");
-    Pump.PSerial.closeDevice(); //Closes mainwindow pump connection
+    Pump.PSerial.closeDevice(); //Closes mai nwindow pump connection
 }
 
 //Opens Image Processing Window
@@ -250,6 +251,13 @@ void MainWindow::on_DICLIPSelect_clicked()
     initImagePopout();
     ProjectionMode = 1;
 }
+
+void MainWindow::on_SetBitDepth_clicked()
+{
+    BitMode = ui->BitDepthParam->value();
+    ui->ProgramPrints->append("Bit-Depth set to: " + QString::number(BitMode));
+}
+
 /*********************************************Print Parameters*********************************************/
 //Saves resin selected to log for reference
 void MainWindow::on_ResinSelect_activated(const QString &arg1)
@@ -726,7 +734,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             {
                 firstImage << firstItem->text();
             }
-            DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity, 0, 0, ExposureScriptList); //Printscript is set to 0 for initial exposure time, 0 for initial image
+            DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity, 0, 0, ExposureScriptList, ProjectionMode, BitMode); //Printscript is set to 0 for initial exposure time, 0 for initial image
             nSlice = ui->FileList->count();
             ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
             QListWidgetItem * item;
@@ -744,7 +752,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             {
                 ui->ProgramPrints->append("Using Print Script");
             }
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, 0, ExposureScriptList); //Set initial image to 0
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, 0, ExposureScriptList, ProjectionMode, BitMode); //Set initial image to 0
             DLP.updateLUT();
             DLP.clearElements();
             remainingImages = MaxImageUpload - InitialExposure;
@@ -824,7 +832,7 @@ void MainWindow::PrintProcess(void)
             {
                 ui->ProgramPrints->append("Using Print Script");
             }
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, layerCount, ExposureScriptList); //Should it be layerCount + 1??
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, layerCount, ExposureScriptList, ProjectionMode, BitMode); //Should it be layerCount + 1??
             DLP.updateLUT();
             DLP.clearElements();
             remainingImages = count - 1;
@@ -902,6 +910,11 @@ void MainWindow::PrintProcess(void)
 
         return;
     }
+}
+
+void MainWindow::PrintProcessVP()
+{
+
 }
 
 void MainWindow::ExposureTimeSlot(void)
@@ -1453,3 +1466,4 @@ void MainWindow::on_ManualLightEngine_clicked()
 
 }
 #endif
+

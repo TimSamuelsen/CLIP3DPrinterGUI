@@ -34,13 +34,72 @@ bool DLP9000::InitProjector(void)
  * @brief MainWindow::on_addPatternsButton_clicked
  */
 //Make sure that input comes from
-void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int UVIntensity, int PrintScript, int CurrentImage, QStringList ExposureTimeList)
+void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int UVIntensity, int PrintScript, int CurrentImage, QStringList ExposureTimeList, int ProjectionMode, int BitMode)
 {
+    if(BitMode == 0){
+        BitMode = 1; //Default bitmode to 1 if it somehow gets passed in undefined
+    }
     int i;
     int numPatAdded = 0;
     MainWindow Main;
+    if (ProjectionMode == 1)//Video Pattern Mode
+    {
+        for(i = 0; i < fileNames.size(); i++)
+        {
+            PatternElement pattern;
 
+            if(m_elements.size()==0)
+            {
+                pattern.bits = 1;
+                pattern.color = PatternElement::BLUE;
+                if (PrintScript == 1)
+                {
+                    pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
+                    printf("%d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000);
+                    CurrentImage++; //Should this be done before?
+                }
+                else
+                {
+                    pattern.exposure = ExposureTime;
+                }
+                pattern.darkPeriod = DarkTime;
+                pattern.trigIn = true;
+                pattern.trigOut2 = true;
+                pattern.splashImageBitPos = 0;
+                pattern.splashImageIndex = 0;
+                pattern.clear = true;
 
+            }
+            else
+            {
+                pattern.bits = 1;
+                pattern.color = PatternElement::BLUE;
+                if (PrintScript == 1)
+                {
+                    pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
+                    printf("%d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000);
+                    CurrentImage++; //Should this be done before?
+                }
+                else
+                {
+                    pattern.exposure = ExposureTime;
+                }
+                pattern.darkPeriod = DarkTime;
+                pattern.trigIn = true;
+                pattern.trigOut2 = true;
+                pattern.clear = true;
+                pattern.splashImageIndex = 0;
+                pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos + m_elements[m_elements.size()-1].bits;
+
+            }
+            pattern.selected = true;
+            m_elements.append(pattern);
+            numPatAdded++;
+            //m_patternImageChange = true;
+        }
+    }
+    else //POTF mode
+    {
         if(fileNames.isEmpty())
         {
             Main.showError("No image file found");
@@ -82,15 +141,6 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
             }
             else
             {
-                /*
-                pattern.bits = m_elements[m_elements.size()-1].bits;
-                pattern.color = m_elements[m_elements.size()-1].color;
-                pattern.exposure = m_elements[m_elements.size()-1].exposure;
-                pattern.darkPeriod = m_elements[m_elements.size()-1].darkPeriod;
-                pattern.trigIn = m_elements[m_elements.size()-1].trigIn;
-                pattern.trigOut2 = m_elements[m_elements.size()-1].trigOut2;
-                pattern.clear = m_elements[m_elements.size()-1].clear;
-                */
                 pattern.bits = 1;
                 pattern.color = PatternElement::BLUE;
                 if (PrintScript == 1)
@@ -121,6 +171,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
             numPatAdded++;
             //m_patternImageChange = true;
         }
+    }
 #if 0
     if (m_elements.size() > 0)
     {
