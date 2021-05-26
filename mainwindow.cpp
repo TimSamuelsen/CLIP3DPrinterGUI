@@ -91,7 +91,9 @@ static int PrintScript = 0; //For selecting type of printscript, currently: 0 = 
 static int ProjectionMode = 0; //For selecting projection mode, 0 = POTF mode, 1 = Video Pattern HDMI
 static bool VideoLocked;
 static int BitMode = 1;
-
+static int MotionMode = 0; //Set stepped motion as default
+static bool continuousRestart;
+static double PrintEnd;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -282,6 +284,24 @@ void MainWindow::on_SetBitDepth_clicked()
     ui->ProgramPrints->append("Bit-Depth set to: " + QString::number(BitMode));
 }
 
+
+void MainWindow::on_SteppedMotion_clicked()
+{
+    if(ui->SteppedMotion->isChecked() == true)
+    {
+        MotionMode = 0;
+        ui->ContinuousMotion->setChecked(false);
+    }
+}
+
+void MainWindow::on_ContinuousMotion_clicked()
+{
+    if(ui->ContinuousMotion->isChecked() == true)
+    {
+        MotionMode = 1;
+        ui->SteppedMotion->setChecked(false);
+    }
+}
 /*********************************************Print Parameters*********************************************/
 //Saves resin selected to log for reference
 void MainWindow::on_ResinSelect_activated(const QString &arg1)
@@ -607,7 +627,7 @@ void MainWindow::on_ClearPrintScript_clicked()
     {
         FPSStartTime = QTime::currentTime();
         //SVG = true;
-        testFPS();
+        //testFPS();
         /*for (int i = 0; i < ui->FileList->count() ; i++)
         {
             QString filename =ui->FileList->item(i)->text();
@@ -617,55 +637,6 @@ void MainWindow::on_ClearPrintScript_clicked()
             ui->ProgramPrints->append(QString::number(i));
             Sleep(20);
         }*/
-    }
-}
-
-void MainWindow::testFPS()
-{
-    if(SVG)
-    {
-        if (FPStestImage < ui->FileList->count())
-        {
-            QString filename =ui->FileList->item(FPStestImage)->text();
-            QSvgRenderer *renderer = new QSvgRenderer(filename);
-            QGraphicsSvgItem *testImage = new QGraphicsSvgItem(filename);
-            QImage image(900, 500, QImage::Format_Mono);
-            QPainter painter(&image);
-            renderer->render(&painter);
-            QPixmap pix = QPixmap::fromImage(image);
-            ui->PrintImage->setPixmap(pix);
-            //ui->ProgramPrints->append(QString::number(FPStestImage));
-            FPStestImage++;
-            //ui->svgImage->
-            //ui->svgImage->render(image);
-            QTimer::singleShot(1, Qt::PreciseTimer, this, SLOT(testFPS()));
-        }
-        else
-        {
-            QTime FPSupdateTime = QTime::currentTime();
-            double TimeElapsed = FPSStartTime.msecsTo(FPSupdateTime);
-            ui->ProgramPrints->append("Elapsed Time: " + QString::number(TimeElapsed));
-        }
-    }
-    else
-    {
-        if (FPStestImage < ui->FileList->count())
-        {
-            QString filename =ui->FileList->item(FPStestImage)->text();
-            QPixmap img(filename);
-            //QPixmap img2 = img.scaled(900,500, Qt::KeepAspectRatio);
-            ui->PrintImage->setPixmap(img);
-            ui->ProgramPrints->append(QString::number(FPStestImage));
-            FPStestImage++;
-            //testFPS();
-            QTimer::singleShot(1, Qt::PreciseTimer, this, SLOT(testFPS()));
-        }
-        else
-        {
-            QTime FPSupdateTime = QTime::currentTime();
-            double TimeElapsed = FPSStartTime.msecsTo(FPSupdateTime);
-            ui->ProgramPrints->append("Elapsed Time: " + QString::number(TimeElapsed));
-        }
     }
 }
 
@@ -787,6 +758,10 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             initPlot();
             updatePlot();
             ui->StartPrint->setEnabled(true);
+            if(MotionMode == 1){
+                PrintEnd = StartingPosition - (ui->FileList->count()*SliceThickness);
+                ui->ProgramPrints->append("Print End for continous motion print set to: " + QString::number(PrintEnd));
+            }
         }
     }
 }
@@ -833,6 +808,9 @@ void MainWindow::PrintProcess(void)
     {
         if (remainingImages <= 0)
         {
+            if (MotionMode == 1){
+                SMC.StopMotion();
+            }
             LCR_PatternDisplay(0);
             QListWidgetItem * item;
             QStringList imageList;
@@ -864,7 +842,12 @@ void MainWindow::PrintProcess(void)
             Sleep(500);
             DLP.startPatSequence();
             QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-            updatePlot();
+            if(MotionMode == 1){
+                SMC.AbsoluteMove(PrintEnd);
+            }
+            else{
+                updatePlot();
+            }
             ui->ProgramPrints->append("Reupload succesful, current layer: " + QString::number(layerCount));
             ui->ProgramPrints->append(QString::number(remainingImages + 1) + " images uploaded");
         }
@@ -874,6 +857,7 @@ void MainWindow::PrintProcess(void)
             QTimer::singleShot((InitialExposure*1000), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
             InitialExposureFlag = false;
             ui->ProgramPrints->append("Exposing Initial Layer " + QString::number(InitialExposure) + "s");
+
             //popout.showImage(ui->FileList->item(layerCount)->text());
         }
         else
@@ -897,7 +881,9 @@ void MainWindow::PrintProcess(void)
             ui->ProgramPrints->append("Image File: " + filename);
             layerCount++;
             remainingImages--;
-            updatePlot();
+            if(MotionMode == 0){
+                updatePlot();
+            }
             double OldPosition = GetPosition;
             emit(on_GetPosition_clicked());
             ui->ProgramPrints->append("Stage moved: " + QString::number(OldPosition - GetPosition));
@@ -938,34 +924,67 @@ void MainWindow::PrintProcess(void)
 
 void MainWindow::PrintProcessVP()
 {
+    if (layerCount +1 <= nSlice)
+    {
 
+    }
+    else
+    {
+        //USB_Close();
+        ui->ProgramPrints->append("Print Complete");
+        saveText();
+        saveSettings();
+
+        SMC.StopMotion();
+
+        Sleep(50);
+        SMC.SetVelocity(2);
+        Sleep(50);
+        emit(on_GetPosition_clicked());
+        Sleep(50);
+        if (MinEndOfRun > 0)
+        {
+            SMC.AbsoluteMove(MinEndOfRun);
+        }
+        else
+        {
+           SMC.AbsoluteMove(0);
+        }
+
+        return;
+    }
 }
 
 void MainWindow::ExposureTimeSlot(void)
 {
-    QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
-    SMC.RelativeMove(-SliceThickness);
-    if (layerCount < LEDScriptList.size()){
-        if (layerCount > 0)
-        {
-            if ((LEDScriptList.at(layerCount).toInt()) == LEDScriptList.at(layerCount-1).toInt()){
-                //do nothing, this avoids spamming the light engine when LED intensity is constant
+    if(MotionMode == 0){
+        QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        SMC.RelativeMove(-SliceThickness);
+        if (layerCount < LEDScriptList.size()){
+            if (layerCount > 0)
+            {
+                if ((LEDScriptList.at(layerCount).toInt()) == LEDScriptList.at(layerCount-1).toInt()){
+                    //do nothing, this avoids spamming the light engine when LED intensity is constant
+                }
+                else{
+                     LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
+                }
             }
-            else{
-                 LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
+            else
+            {
+                LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
             }
+            ui->ProgramPrints->append("LED Intensity: " + LEDScriptList.at(layerCount));
         }
-        else
-        {
-            LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
+        else{
+            ui->ProgramPrints->append(QString::number(layerCount) + QString::number(sizeof(LEDScriptList)));
         }
-        ui->ProgramPrints->append("LED Intensity: " + LEDScriptList.at(layerCount));
+        ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTime/1000) + " ms");
+        ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness*1000) + " um");
     }
-    else{
-        ui->ProgramPrints->append(QString::number(layerCount) + QString::number(sizeof(LEDScriptList)));
+    else if(MotionMode == 1){
+        PrintProcess();
     }
-    ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTime/1000) + " ms");
-    ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness*1000) + " um");
 }
 
 void MainWindow::DarkTimeSlot(void)
@@ -977,57 +996,49 @@ void MainWindow::DarkTimeSlot(void)
 bool MainWindow::ValidateSettings(void)
 {
     //Validate Slicethickness
-    if (SliceThickness <= 0)
-    {
+    if (SliceThickness <= 0){
         showError("Invalid Slice Thickness");
         ui->ProgramPrints->append("Invalid Slice Thickness");
         return false;
     }
     //Validate StageVelocity
-    else if (StageVelocity <= 0 || StageVelocity > 10)
-    {
+    else if (StageVelocity <= 0 || StageVelocity > 10){
         showError("Invalid Stage Velocity");
         ui->ProgramPrints->append("Invalid Stage Velocity");
         return false;
     }
     //Validate StageAcceleration
-    else if (StageAcceleration <= 0 || StageAcceleration > 10)
-    {
+    else if (StageAcceleration <= 0 || StageAcceleration > 10){
         showError("Invalid Stage Acceleration");
         ui->ProgramPrints->append("Invalid Stage Acceleration");
         return false;
     }
     //Validate MaxEndOfRun
-    else if (MaxEndOfRun < -5 || MaxEndOfRun > 65 || MinEndOfRun >= MaxEndOfRun)
-    {
+    else if (MaxEndOfRun < -5 || MaxEndOfRun > 65 || MinEndOfRun >= MaxEndOfRun){
         showError("Invalid Max End Of Run");
         ui->ProgramPrints->append("Invalid Max End Of Run");
         return false;
     }
     //Validate StageMinEndOfRun
-    else if (MinEndOfRun < -5 || MinEndOfRun > 65 || MinEndOfRun >= MaxEndOfRun)
-    {
+    else if (MinEndOfRun < -5 || MinEndOfRun > 65 || MinEndOfRun >= MaxEndOfRun){
         showError("Invalid Min End Of Run");
         ui->ProgramPrints->append("Invalid Min End Of Run");
         return false;
     }
     //Validate DarkTime
-    else if (DarkTime <= 0)
-    {
+    else if (DarkTime <= 0){
         showError("Invalid Dark Time");
         ui->ProgramPrints->append("Invalid Dark Time");
         return false;
     }
     //Validate ExposureTime
-    else if (ExposureTime <= 0)
-    {
+    else if (ExposureTime <= 0){
         showError("Invalid Exposure Time");
         ui->ProgramPrints->append("Invalid Exposure Time");
         return false;
     }
     //Validate UVIntensity
-    else if (UVIntensity < 1 || UVIntensity > 255)
-    {
+    else if (UVIntensity < 1 || UVIntensity > 255){
         showError("Invalid UV Intensity");
         ui->ProgramPrints->append("Invalid UVIntensity");
         return false;
@@ -1106,7 +1117,6 @@ void MainWindow::initStageSlot(void)
             StagePrep1 = true;
             ui->ProgramPrints->append("Performing Rough Stage Movement");
         }
-
         QTimer::singleShot(1000, this, SLOT(initStageSlot()));
     }
     else
@@ -1398,10 +1408,60 @@ void MainWindow::updatePlot()
     ui->LivePlot->replot(QCustomPlot::rpQueuedReplot);
 }
 /*************************************************************
- * ********************OUTSIDE CODE***************************
+ * ********************Graveyard***************************
  * ***********************************************************/
 
 #if 0
+void MainWindow::testFPS()
+{
+    if(SVG)
+    {
+        if (FPStestImage < ui->FileList->count())
+        {
+            QString filename =ui->FileList->item(FPStestImage)->text();
+            QSvgRenderer *renderer = new QSvgRenderer(filename);
+            QGraphicsSvgItem *testImage = new QGraphicsSvgItem(filename);
+            QImage image(900, 500, QImage::Format_Mono);
+            QPainter painter(&image);
+            renderer->render(&painter);
+            QPixmap pix = QPixmap::fromImage(image);
+            ui->PrintImage->setPixmap(pix);
+            //ui->ProgramPrints->append(QString::number(FPStestImage));
+            FPStestImage++;
+            //ui->svgImage->
+            //ui->svgImage->render(image);
+            QTimer::singleShot(1, Qt::PreciseTimer, this, SLOT(testFPS()));
+        }
+        else
+        {
+            QTime FPSupdateTime = QTime::currentTime();
+            double TimeElapsed = FPSStartTime.msecsTo(FPSupdateTime);
+            ui->ProgramPrints->append("Elapsed Time: " + QString::number(TimeElapsed));
+        }
+    }
+    else
+    {
+        if (FPStestImage < ui->FileList->count())
+        {
+            QString filename =ui->FileList->item(FPStestImage)->text();
+            QPixmap img(filename);
+            //QPixmap img2 = img.scaled(900,500, Qt::KeepAspectRatio);
+            ui->PrintImage->setPixmap(img);
+            ui->ProgramPrints->append(QString::number(FPStestImage));
+            FPStestImage++;
+            //testFPS();
+            QTimer::singleShot(1, Qt::PreciseTimer, this, SLOT(testFPS()));
+        }
+        else
+        {
+            QTime FPSupdateTime = QTime::currentTime();
+            double TimeElapsed = FPSStartTime.msecsTo(FPSupdateTime);
+            ui->ProgramPrints->append("Elapsed Time: " + QString::number(TimeElapsed));
+        }
+    }
+}
+
+
 void MainWindow::on_ManualLightEngine_clicked()
 {
     //ManualProjUI = new manualLEcontrol();
@@ -1490,4 +1550,5 @@ void MainWindow::on_ManualLightEngine_clicked()
 
 }
 #endif
+
 

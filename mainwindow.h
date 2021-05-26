@@ -122,8 +122,6 @@ private slots:
 
     void on_ClearPrintScript_clicked();
 
-    void testFPS();
-
     void on_ImageProcess_clicked();
 
     void on_POTFcheckbox_clicked();
@@ -137,6 +135,10 @@ private slots:
     void PrintProcessVP();
 
     void on_SetBitDepth_clicked();
+
+    void on_SteppedMotion_clicked();
+
+    void on_ContinuousMotion_clicked();
 
 private:
     Ui::MainWindow *ui;

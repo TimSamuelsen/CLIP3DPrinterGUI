@@ -333,7 +333,7 @@ void SMC100C::RelativeMove(float DistanceToMove)
 { 
     char CommandParam[25];
     sprintf(CommandParam,"Relative Move : %f \r\n",DistanceToMove);
-    printf(CommandParam);
+    //printf(CommandParam);
     SetCommand(CommandType::MoveRel, DistanceToMove, CommandGetSetType::Set);
     SendCurrentCommand();
 };
@@ -446,7 +446,7 @@ char* SMC100C::GetPosition()
     SetCommand(CommandType::PositionReal, 0.0, CommandGetSetType::Get);
     SendCurrentCommand();
     char* Read = SerialRead();
-    printf("at SMC: %s\r\n", Read);
+    //printf("at SMC: %s\r\n", Read);
     char* POut;
 
     //for (uint8_t index = 3; index < strlen(PositionOutput);index++)
