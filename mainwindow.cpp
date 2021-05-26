@@ -92,7 +92,7 @@ static int ProjectionMode = 0; //For selecting projection mode, 0 = POTF mode, 1
 static bool VideoLocked;
 static int BitMode = 1;
 static int MotionMode = 0; //Set stepped motion as default
-static bool continuousRestart;
+static bool inMotion;
 static double PrintEnd;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -143,7 +143,7 @@ void MainWindow::on_GetPosition_clicked()
     char* ReadPosition = SMC.GetPosition(); //Get position and store it in char*, could store directly in QString but if result is null it can cause issues
     if (strlen(ReadPosition) > 1) //In essence means that if there has not been an error -> update variable
     {
-        printf("at mainwindow %s\r\n",ReadPosition);
+        //printf("at mainwindow %s\r\n",ReadPosition);
         QString CurrentPosition = QString::fromUtf8(ReadPosition); //convert char* to QString
         CurrentPosition.remove(0,3); //Removes address and command code
         CurrentPosition.chop(2); //To be removed...
@@ -291,6 +291,7 @@ void MainWindow::on_SteppedMotion_clicked()
     {
         MotionMode = 0;
         ui->ContinuousMotion->setChecked(false);
+        ui->ProgramPrints->append("Stepped Motion Selected");
     }
 }
 
@@ -300,6 +301,7 @@ void MainWindow::on_ContinuousMotion_clicked()
     {
         MotionMode = 1;
         ui->SteppedMotion->setChecked(false);
+        ui->ProgramPrints->append("Continuous Motion Selected");
     }
 }
 /*********************************************Print Parameters*********************************************/
@@ -787,13 +789,16 @@ void MainWindow::on_StartPrint_clicked()
         nSlice = ui->FileList->count();
         ui->ProgramPrints->append("Entering Printing Procedure");
         //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
-        if (PrintScript == 1)
-        {
+        if (PrintScript == 1){
             LCR_SetLedCurrents(0,0,(LEDScriptList.at(0).toInt()));
         }
-        else
-        {
+        else{
             LCR_SetLedCurrents(0, 0, UVIntensity);
+        }
+        if (MotionMode == 1){
+            double ContStageVelocity = (SliceThickness)/(ExposureTime/(1e6)); //Multiply Exposure time by 1e6 to convert from us to s to get to proper units
+            ui->ProgramPrints->append("Continuous Stage Velocity set to " + QString::number(SliceThickness) + "/" + QString::number(ExposureTime) + " = " + QString::number(ContStageVelocity) + " mm/s");
+            SMC.SetVelocity(ContStageVelocity);
         }
         //LCR_PatternDisplay(0);
         PrintStartTime = QTime::currentTime();
@@ -857,7 +862,7 @@ void MainWindow::PrintProcess(void)
             QTimer::singleShot((InitialExposure*1000), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
             InitialExposureFlag = false;
             ui->ProgramPrints->append("Exposing Initial Layer " + QString::number(InitialExposure) + "s");
-
+            inMotion = false;
             //popout.showImage(ui->FileList->item(layerCount)->text());
         }
         else
@@ -983,6 +988,9 @@ void MainWindow::ExposureTimeSlot(void)
         ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness*1000) + " um");
     }
     else if(MotionMode == 1){
+        if (inMotion == false){
+            SMC.AbsoluteMove(PrintEnd);
+        }
         PrintProcess();
     }
 }

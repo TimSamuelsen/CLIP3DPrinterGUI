@@ -310,8 +310,8 @@ Author:
 void SMC100C::SetAcceleration(float AccelerationToSet)
 {
     char CommandParam[25];
-    sprintf(CommandParam,"Set Velocity : %f \r\n",AccelerationToSet);
-    printf(CommandParam);
+    //sprintf(CommandParam,"Set Velocity : %f \r\n",AccelerationToSet);
+    //printf(CommandParam);
     SetCommand(CommandType::Acceleration, AccelerationToSet, CommandGetSetType::Set);
     SendCurrentCommand();
 };
@@ -332,7 +332,7 @@ Author:
 void SMC100C::RelativeMove(float DistanceToMove)
 { 
     char CommandParam[25];
-    sprintf(CommandParam,"Relative Move : %f \r\n",DistanceToMove);
+    //sprintf(CommandParam,"Relative Move : %f \r\n",DistanceToMove);
     //printf(CommandParam);
     SetCommand(CommandType::MoveRel, DistanceToMove, CommandGetSetType::Set);
     SendCurrentCommand();
