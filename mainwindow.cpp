@@ -965,24 +965,27 @@ void MainWindow::ExposureTimeSlot(void)
     if(MotionMode == 0){
         QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
         SMC.RelativeMove(-SliceThickness);
-        if (layerCount < LEDScriptList.size()){
-            if (layerCount > 0)
-            {
-                if ((LEDScriptList.at(layerCount).toInt()) == LEDScriptList.at(layerCount-1).toInt()){
-                    //do nothing, this avoids spamming the light engine when LED intensity is constant
+        if(PrintScript == 1)
+        {
+            if (layerCount < LEDScriptList.size()){
+                if (layerCount > 0)
+                {
+                    if ((LEDScriptList.at(layerCount).toInt()) == LEDScriptList.at(layerCount-1).toInt()){
+                        //do nothing, this avoids spamming the light engine when LED intensity is constant
+                    }
+                    else{
+                         LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
+                    }
                 }
-                else{
-                     LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
+                else
+                {
+                    LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
                 }
+                ui->ProgramPrints->append("LED Intensity: " + LEDScriptList.at(layerCount));
             }
-            else
-            {
-                LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
+            else{
+                ui->ProgramPrints->append(QString::number(layerCount) + QString::number(sizeof(LEDScriptList)));
             }
-            ui->ProgramPrints->append("LED Intensity: " + LEDScriptList.at(layerCount));
-        }
-        else{
-            ui->ProgramPrints->append(QString::number(layerCount) + QString::number(sizeof(LEDScriptList)));
         }
         ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTime/1000) + " ms");
         ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness*1000) + " um");
