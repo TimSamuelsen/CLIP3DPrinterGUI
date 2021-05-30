@@ -17,7 +17,7 @@ custom software solution that integrates all the features required to perform th
    :maxdepth: 2
    :caption: General
    
-   30umCLIP3Dprinter
+   30umclip3dprinter
    installation
    contributors
    history
@@ -26,13 +26,13 @@ custom software solution that integrates all the features required to perform th
    :maxdepth:
    :caption: Features
    
-   Interface
-   PrintCustomization
-   GeneralPrintSettings
-   PrintControls
-   PeripheralConnections
-   InputFiles
-   PrintMonitoring
+   interface
+   printcustomization
+   generalprintsettings
+   printcontrols
+   peripheralconnections
+   inputfiles
+   printmonitoring
    
 Indices and tables
 ==================
