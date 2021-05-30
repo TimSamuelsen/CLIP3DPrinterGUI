@@ -15,11 +15,29 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
-   :glob:
+   :caption: General
+   
+   intro
+   30 um CLIP 3D printer
+   installation
+   contributors
+   history
 
-   *
-
-
+.. toctree::
+   :maxdepth:
+   :caption: Features
+   
+   Print Customization
+   General Print Settings
+   Print Controls
+   Peripheral Connections
+   Input Files
+   Print Monitoring
+   
+  
+   
+   
+   
 
 Indices and tables
 ==================
