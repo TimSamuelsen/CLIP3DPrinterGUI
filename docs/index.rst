@@ -17,7 +17,7 @@ custom software solution that integrates all the features required to perform th
    :maxdepth: 2
    :caption: General
    
-   30umCLIP3D printer
+   30umCLIP3Dprinter
    installation
    contributors
    history
