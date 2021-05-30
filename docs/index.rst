@@ -23,7 +23,7 @@ custom software solution that integrates all the features required to perform th
    history
 
 .. toctree::
-   :maxdepth:
+   :maxdepth: 2
    :caption: Features
    
    interface
