@@ -17,7 +17,6 @@ Contents:
    :maxdepth: 2
    :caption: General
    
-   intro
    30 um CLIP 3D printer
    installation
    contributors
@@ -27,6 +26,7 @@ Contents:
    :maxdepth:
    :caption: Features
    
+   Interface
    Print Customization
    General Print Settings
    Print Controls
