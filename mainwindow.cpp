@@ -322,8 +322,8 @@ void MainWindow::on_pumpingCheckBox_clicked()
 void MainWindow::on_setPumping_clicked()
 {
     if(PumpingMode == 1){
-        PumpingParameter = ui->pumpingParameter->value();
-        ui->ProgramPrints->append("Pumping depth set to: " + QString::number(PumpingParameter) + " μm");
+        PumpingParameter = ui->pumpingParameter->value()/1000;
+        ui->ProgramPrints->append("Pumping depth set to: " + QString::number(PumpingParameter*1000) + " μm");
     }
     else{
         ui->ProgramPrints->append("Please enable pumping before setting pumping parameter");
@@ -885,11 +885,18 @@ void MainWindow::PrintProcess(void)
         else if (InitialExposureFlag == true)
         {
             updatePlot();
-            QTimer::singleShot((InitialExposure*1000), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+            //QTimer::singleShot((InitialExposure*1000), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+            if (PumpingMode == 1){
+                QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(pumpingSlot())); //Value from exposuretime will be in us so /1000
+            }
+            else{
+                QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //Value from exposuretime will be in us so /1000
+            }
             InitialExposureFlag = false;
             ui->ProgramPrints->append("Exposing Initial Layer " + QString::number(InitialExposure) + "s");
             inMotion = false;
             //popout.showImage(ui->FileList->item(layerCount)->text());
+
         }
         else
         {
@@ -999,8 +1006,8 @@ void MainWindow::PrintProcessVP()
 void MainWindow::pumpingSlot(void)
 {
     QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-    SMC.RelativeMove(-PumpingParameter/1000); //Move the stage back the desired pumping distance
-
+    SMC.RelativeMove(-PumpingParameter); //Move the stage back the desired pumping distance
+    ui->ProgramPrints->append("Pumping " + QString::number(PumpingParameter*1000) +" um");
 }
 
 void MainWindow::ExposureTimeSlot(void)
@@ -1008,7 +1015,8 @@ void MainWindow::ExposureTimeSlot(void)
     if(MotionMode == 0){
         QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
         if(PumpingMode == 1){
-            SMC.RelativeMove((PumpingParameter/1000 - SliceThickness)); //pumping param is in um, slicethickness is in um
+            emit(on_GetPosition_clicked());
+            SMC.RelativeMove((PumpingParameter - SliceThickness)); //pumping param is in um, slicethickness is in mm
         }
         else{
             SMC.RelativeMove(-SliceThickness);
@@ -1048,13 +1056,7 @@ void MainWindow::ExposureTimeSlot(void)
 
 void MainWindow::DarkTimeSlot(void)
 {
-    if (PumpingMode == 1)
-    {
-
-    }
-    else{
       PrintProcess();
-    }
 }
 
 //Validate all settings

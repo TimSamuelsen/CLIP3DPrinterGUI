@@ -1925,6 +1925,9 @@ parameters</string>
        <height>31</height>
       </rect>
      </property>
+     <property name="maximum">
+      <double>5000.000000000000000</double>
+     </property>
     </widget>
     <widget class="QPushButton" name="setPumping">
      <property name="geometry">
@@ -2376,7 +2379,7 @@ parameters</string>
      <x>0</x>
      <y>0</y>
      <width>1774</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
