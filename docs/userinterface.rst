@@ -60,11 +60,13 @@ Determines print settings automatically based on desired print speed and height.
 at the moment.
 
 **Light Engine Control:**
+
 * Exposure time determines how long the light engine will expose for each layer. If a print script is active it will take over exposure time control.
 * UV Intensity determines the intensity of the UV LEDs in the light engine (ranges from 1-255).
 * Dark time determines the time in between exposures, dark time is used for stage movement and timing overhead.
 
 **Stage Control:**
+
 * Stage velocity determines the velocity of the stage. Does not have an active effect on the print unless set below 1 mm/s.
 * Stage acceleration determines the acceleration of the stage. Does not have an active effect on the print unless set below 3 mm/s^2.
 * Max end of run determines the upper limit of stage movement, this value should be set to be the same height as the build window.
@@ -79,11 +81,21 @@ Peripheral Controls
     :align: right
     :figwidth: 300px
 
+**Light Engine:**
+
+**Stage:**
+
+**Pump:**
+
 Input Files
 ---------------------------
 .. figure:: https://i.imgur.com/CBlX0mU.png
     :align: right
     :figwidth: 300px
+
+**Image Files:**
+
+**Print Script:**
 
 Print Controls
 ---------------------------
@@ -91,11 +103,34 @@ Print Controls
     :align: right
     :figwidth: 300px
 
+**Start Print:**
+
+**Initialize and Synchronize:**
+
+**Abort:**
+
+**Image Processing:**
+
+**Manual Pump Control:**
+
+**Manual Stage Control:**
+
 Print Log
 -------------------
 .. figure:: https://i.imgur.com/qYGeweg.png
     :align: right
     :figwidth: 300px
 
+**Terminal Output:**
+
+**Log File Destination:**
+
+
 Print Monitoring
 ---------------------------
+
+**Graphics Window:**
+
+**Current Stage Position:**
+
+**Monitor Live Values:**

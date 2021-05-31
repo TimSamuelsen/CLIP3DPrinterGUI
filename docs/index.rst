@@ -12,6 +12,7 @@ custom software solution that integrates all the features required to perform th
 
 * **Free software:** MIT license
 * **Github repository:** https://github.com/TimSamuelsen/CLIP3DPrinterGUI
+* **Qt Version:** 5.15.2
 
 .. toctree::
    :maxdepth: 2
