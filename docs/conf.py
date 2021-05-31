@@ -131,7 +131,7 @@ html_static_path = ['_static']
 
 def setup(app):
     #overrides RTD theme
-    app.add_stylesheet("theme_overrides.css") #path relative to static
+    app.add_css_file("theme_overrides.css") #path relative to static
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied

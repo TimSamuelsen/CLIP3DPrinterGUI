@@ -79,8 +79,6 @@ Peripheral Controls
     :align: right
     :figwidth: 300px
 
-    
-
 Input Files
 ---------------------------
 .. figure:: https://i.imgur.com/CBlX0mU.png
