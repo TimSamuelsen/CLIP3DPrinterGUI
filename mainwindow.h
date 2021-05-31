@@ -140,6 +140,10 @@ private slots:
 
     void on_ContinuousMotion_clicked();
 
+    void on_pumpingCheckBox_clicked();
+
+    void on_setPumping_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;

@@ -1644,6 +1644,26 @@ QPushButton#AbortPrint:hover:!pressed {
       <string>Set</string>
      </property>
     </widget>
+    <widget class="QCheckBox" name="AutoCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>80</y>
+       <width>101</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Auto mode 
+parameters</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QFrame" name="frame_9">
     <property name="geometry">
@@ -1711,30 +1731,10 @@ QPushButton#AbortPrint:hover:!pressed {
     <property name="lineWidth">
      <number>1</number>
     </property>
-    <widget class="QCheckBox" name="AutoCheckBox">
-     <property name="geometry">
-      <rect>
-       <x>270</x>
-       <y>70</y>
-       <width>201</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::RightToLeft</enum>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
-     </property>
-     <property name="text">
-      <string>Automate slice thickness 
-and exp. time</string>
-     </property>
-    </widget>
     <widget class="QSpinBox" name="MaxImageUpload">
      <property name="geometry">
       <rect>
-       <x>330</x>
+       <x>340</x>
        <y>30</y>
        <width>71</width>
        <height>31</height>
@@ -1747,7 +1747,7 @@ and exp. time</string>
     <widget class="QLabel" name="MaxImageLabel">
      <property name="geometry">
       <rect>
-       <x>310</x>
+       <x>320</x>
        <y>0</y>
        <width>171</width>
        <height>31</height>
@@ -1760,7 +1760,7 @@ and exp. time</string>
     <widget class="QPushButton" name="SetMaxImageUpload">
      <property name="geometry">
       <rect>
-       <x>410</x>
+       <x>420</x>
        <y>30</y>
        <width>51</width>
        <height>28</height>
@@ -1773,8 +1773,8 @@ and exp. time</string>
     <widget class="QSpinBox" name="BitDepthParam">
      <property name="geometry">
       <rect>
-       <x>170</x>
-       <y>30</y>
+       <x>340</x>
+       <y>80</y>
        <width>71</width>
        <height>31</height>
       </rect>
@@ -1789,8 +1789,8 @@ and exp. time</string>
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
-       <x>170</x>
-       <y>10</y>
+       <x>340</x>
+       <y>60</y>
        <width>121</width>
        <height>20</height>
       </rect>
@@ -1802,8 +1802,8 @@ and exp. time</string>
     <widget class="QPushButton" name="SetBitDepth">
      <property name="geometry">
       <rect>
-       <x>250</x>
-       <y>30</y>
+       <x>420</x>
+       <y>80</y>
        <width>51</width>
        <height>31</height>
       </rect>
@@ -1881,25 +1881,64 @@ and exp. time</string>
       <bool>false</bool>
      </property>
     </widget>
-   </widget>
-   <widget class="QFrame" name="frame_10">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>100</y>
-      <width>481</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Box</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <property name="lineWidth">
-     <number>1</number>
-    </property>
+    <widget class="QCheckBox" name="pumpingCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>10</y>
+       <width>121</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Pumping Active</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_15">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>40</y>
+       <width>131</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Pump Depth (μm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="pumpingParameter">
+     <property name="geometry">
+      <rect>
+       <x>170</x>
+       <y>70</y>
+       <width>71</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="setPumping">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>70</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Set</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QFrame" name="frame_12">
     <property name="geometry">
@@ -2249,6 +2288,25 @@ and exp. time</string>
      <string>Use Print Script</string>
     </property>
    </widget>
+   <widget class="QFrame" name="frame_10">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>100</y>
+      <width>481</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::Box</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <property name="lineWidth">
+     <number>1</number>
+    </property>
+   </widget>
    <zorder>frame_5</zorder>
    <zorder>FileList</zorder>
    <zorder>SelectFile</zorder>
@@ -2299,7 +2357,6 @@ and exp. time</string>
    <zorder>frame_9</zorder>
    <zorder>label_12</zorder>
    <zorder>frame_11</zorder>
-   <zorder>frame_10</zorder>
    <zorder>frame_12</zorder>
    <zorder>label</zorder>
    <zorder>label_14</zorder>
@@ -2311,6 +2368,7 @@ and exp. time</string>
    <zorder>SelectPrintScript</zorder>
    <zorder>ClearPrintScript</zorder>
    <zorder>UsePrintScript</zorder>
+   <zorder>frame_10</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

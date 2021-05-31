@@ -78,14 +78,14 @@ static double RemainingPrintTimeS; //For calculating remaining pr int times
 
 static bool loadSettingsFlag = false; //For ensuring the settings are only loaded once, (May not be needed)
 static QDateTime CurrentDateTime; //Current time
-static QString LogFileDestination; //for storing log file destination in settings
-static QString ImageFileDirectory; //For storing image file directory in settings
-static QTime PrintStartTime; //Get start time for log
+QString LogFileDestination; //for storing log file destination in settings
+QString ImageFileDirectory; //For storing image file directory in settings
+QTime PrintStartTime; //Get start time for log
 static double GetPosition; //Holds
 static bool StagePrep1 = false; //For lowering stage
 static bool StagePrep2 = false; //For lowering stage
-static QStringList ExposureScriptList; //Printscript is taken from a .csv file and stored in this variable
-static QStringList LEDScriptList;
+QStringList ExposureScriptList; //Printscript is taken from a .csv file and stored in this variable
+QStringList LEDScriptList;
 static int PrintScript = 0; //For selecting type of printscript, currently: 0 = no printscript, 1 = exposure time print script
 
 static int ProjectionMode = 0; //For selecting projection mode, 0 = POTF mode, 1 = Video Pattern HDMI
@@ -94,6 +94,8 @@ static int BitMode = 1;
 static int MotionMode = 0; //Set stepped motion as default
 static bool inMotion;
 static double PrintEnd;
+bool PumpingMode = 0;
+double PumpingParameter;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -304,6 +306,30 @@ void MainWindow::on_ContinuousMotion_clicked()
         ui->ProgramPrints->append("Continuous Motion Selected");
     }
 }
+
+void MainWindow::on_pumpingCheckBox_clicked()
+{
+    if(ui->pumpingCheckBox->isChecked() == true){
+        PumpingMode = 1;
+        ui->ProgramPrints->append("Pumping Enabled");
+    }
+    else{
+        PumpingMode = 0;
+        ui->ProgramPrints->append("Pumping Disabled");
+    }
+}
+
+void MainWindow::on_setPumping_clicked()
+{
+    if(PumpingMode == 1){
+        PumpingParameter = ui->pumpingParameter->value();
+        ui->ProgramPrints->append("Pumping depth set to: " + QString::number(PumpingParameter) + " μm");
+    }
+    else{
+        ui->ProgramPrints->append("Please enable pumping before setting pumping parameter");
+    }
+}
+
 /*********************************************Print Parameters*********************************************/
 //Saves resin selected to log for reference
 void MainWindow::on_ResinSelect_activated(const QString &arg1)
@@ -1561,5 +1587,3 @@ void MainWindow::on_ManualLightEngine_clicked()
 
 }
 #endif
-
-
