@@ -895,12 +895,22 @@ void MainWindow::PrintProcess(void)
         {
             if (PrintScript == 1)
             {
-                QTimer::singleShot(ExposureScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //value from printscript will be in ms
+                if (PumpingMode == 1){
+                    QTimer::singleShot(ExposureScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(pumpingSlot())); //value from printscript will be in ms, goes to pumping mode
+                }
+                else{
+                    QTimer::singleShot(ExposureScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //value from printscript will be in ms
+                }
                 ui->ProgramPrints->append("Exposing: " + QString::number(ExposureScriptList.at(layerCount).toDouble()) + " ms");
             }
             else
             {
-                QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //Value from exposuretime will be in us so /1000
+                if (PumpingMode == 1){
+                    QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(pumpingSlot())); //Value from exposuretime will be in us so /1000
+                }
+                else{
+                    QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //Value from exposuretime will be in us so /1000
+                }
                 ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
             }
             ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
@@ -986,11 +996,23 @@ void MainWindow::PrintProcessVP()
     }
 }
 
+void MainWindow::pumpingSlot(void)
+{
+    QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+    SMC.RelativeMove(-PumpingParameter/1000); //Move the stage back the desired pumping distance
+
+}
+
 void MainWindow::ExposureTimeSlot(void)
 {
     if(MotionMode == 0){
         QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
-        SMC.RelativeMove(-SliceThickness);
+        if(PumpingMode == 1){
+            SMC.RelativeMove((PumpingParameter/1000 - SliceThickness)); //pumping param is in um, slicethickness is in um
+        }
+        else{
+            SMC.RelativeMove(-SliceThickness);
+        }
         if(PrintScript == 1)
         {
             if (layerCount < LEDScriptList.size()){
@@ -1021,12 +1043,18 @@ void MainWindow::ExposureTimeSlot(void)
             SMC.AbsoluteMove(PrintEnd);
         }
         PrintProcess();
-    }
+        }
 }
 
 void MainWindow::DarkTimeSlot(void)
 {
-    PrintProcess();
+    if (PumpingMode == 1)
+    {
+
+    }
+    else{
+      PrintProcess();
+    }
 }
 
 //Validate all settings

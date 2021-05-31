@@ -1884,9 +1884,9 @@ parameters</string>
     <widget class="QCheckBox" name="pumpingCheckBox">
      <property name="geometry">
       <rect>
-       <x>170</x>
+       <x>160</x>
        <y>10</y>
-       <width>121</width>
+       <width>131</width>
        <height>20</height>
       </rect>
      </property>
@@ -1903,9 +1903,9 @@ parameters</string>
     <widget class="QLabel" name="label_15">
      <property name="geometry">
       <rect>
-       <x>170</x>
+       <x>160</x>
        <y>40</y>
-       <width>131</width>
+       <width>141</width>
        <height>20</height>
       </rect>
      </property>
@@ -1913,7 +1913,7 @@ parameters</string>
       <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Pump Depth (μm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Pumping Depth (μm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="pumpingParameter">

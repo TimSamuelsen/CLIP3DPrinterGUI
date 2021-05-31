@@ -59,21 +59,18 @@ in a 10um thick layer.
 Determines print settings automatically based on desired print speed and height. Not in much use
 at the moment.
 
-Light Engine Control
-""""""""""""""""""""""
+**Light Engine Control:**
 * Exposure time determines how long the light engine will expose for each layer. If a print script is active it will take over exposure time control.
 * UV Intensity determines the intensity of the UV LEDs in the light engine (ranges from 1-255).
 * Dark time determines the time in between exposures, dark time is used for stage movement and timing overhead.
 
-Stage Control
-"""""""""""""""""""""
+**Stage Control:**
 * Stage velocity determines the velocity of the stage. Does not have an active effect on the print unless set below 1 mm/s.
 * Stage acceleration determines the acceleration of the stage. Does not have an active effect on the print unless set below 3 mm/s^2.
 * Max end of run determines the upper limit of stage movement, this value should be set to be the same height as the build window.
 * Min end of run determines the lower limit of stage movement. Default is set to 0, changing this variable is not reccommended unless you printing object with heights greater than max end of run.
 
-Pump Control
-"""""""""""""""""""
+**Pump Control:**
 Pump control is currently not in use.
 
 Peripheral Controls
@@ -82,6 +79,7 @@ Peripheral Controls
     :align: right
     :figwidth: 300px
 
+    
 
 Input Files
 ---------------------------

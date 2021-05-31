@@ -144,6 +144,7 @@ private slots:
 
     void on_setPumping_clicked();
 
+    void pumpingSlot();
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;

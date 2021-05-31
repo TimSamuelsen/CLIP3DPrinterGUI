@@ -43,8 +43,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Read the Docs Template'
-copyright = u'2014, Read the Docs'
+project = u'CLIP3DGUI'
+copyright = u'2021, Stanford University'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -103,10 +103,8 @@ html_theme = 'default'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = {
-    'style_nav_header_background': '#8C1515'
-}
-
+#html_theme_options =
+ 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
 
@@ -130,6 +128,10 @@ html_short_title = 'CLIP3DGUI'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+def setup(app):
+    #overrides RTD theme
+    app.add_stylesheet("theme_overrides.css") #path relative to static
 
 # Add any extra paths that contain custom files (such as robots.txt or
 # .htaccess) here, relative to this directory. These files are copied
