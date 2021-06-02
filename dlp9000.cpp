@@ -273,7 +273,7 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
 }
 
 /**
- * @brief MainWindow::UpdateLUTOnTheFly
+ * @brief DLP9000::uploadPatternToEVM
  * Updates the Pattern images into the Splash block on the Firmware image in the EVM on the fly
  * @param master - I - boolean to indicate if it is madetr or slave
  * @param splashImageCount - I - the Index of the Splash Image to be updated
