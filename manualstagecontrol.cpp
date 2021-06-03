@@ -5,6 +5,11 @@
 
 static bool ConnectionFlag = false;
 
+/**
+ * @brief ManualStageControl::ManualStageControl
+ * @param parent
+ * Starts
+ */
 ManualStageControl::ManualStageControl(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ManualStageControl)

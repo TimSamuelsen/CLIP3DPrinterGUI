@@ -12,8 +12,10 @@
 #include <QTimer>
 #include <QProgressDialog>
 
-//MainWindow Main;
-
+/**
+ * @brief DLP9000::InitProjector
+ * @return whether the connection was succesful
+ */
 bool DLP9000::InitProjector(void)
 {
     if (USB_Open() == 0)
@@ -273,7 +275,7 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
 }
 
 /**
- * @brief DLP9000::uploadPatternToEVM
+ * @brief MainWindow::UpdateLUTOnTheFly
  * Updates the Pattern images into the Splash block on the Firmware image in the EVM on the fly
  * @param master - I - boolean to indicate if it is madetr or slave
  * @param splashImageCount - I - the Index of the Splash Image to be updated
