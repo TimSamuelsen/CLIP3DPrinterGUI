@@ -1052,7 +1052,13 @@ void MainWindow::PrintProcess(void)
             layerCount++;
             Sleep(500);
             DLP.startPatSequence();
-            QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+            if (PumpingMode == 1){
+                QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
+            }
+            else{
+                QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+            }
+
             if(MotionMode == 1){
                 SMC.AbsoluteMove(PrintEnd);
             }
