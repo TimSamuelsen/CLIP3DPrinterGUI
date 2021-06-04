@@ -97,23 +97,36 @@ static double PrintEnd;
 bool PumpingMode = 0;
 double PumpingParameter;
 
+
+/**
+ * @brief MainWindow::MainWindow
+ * @param parent
+ * Creates the mainwindow, gets current time for print log,
+ * loads and initializes saved settings and initializes plot
+ */
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
-
 {
     ui = (new Ui::MainWindow);
     ui->setupUi(this);
-    CurrentDateTime = QDateTime::currentDateTime(); //Saves current date into module variable
-    loadSettings(); //Called to load settings into module variables
-    initSettings(); //Initialize UI with settings from settings files
-    initPlot(); //Ini
+    CurrentDateTime = QDateTime::currentDateTime();
+    loadSettings();
+    initSettings();
+    initPlot();
 }
 
+/**
+ * @brief MainWindow::timerTimeout
+ * Currently not in use
+ */
 void MainWindow::timerTimeout(void)
 {
     //emit(on_GetPosition_clicked());
 }
 
+/**
+ * @brief MainWindow::~MainWindow
+ */
 MainWindow::~MainWindow()
 {
     saveSettings();
@@ -122,8 +135,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
-//Opens manual stage control window
+/**
+ * @brief MainWindow::on_ManualStage_clicked
+ * Open the manual stage control window, sends home
+ * command to stage and closes mainwindow connection
+ */
 void MainWindow::on_ManualStage_clicked()
 {
     ManualStageUI = new ManualStageControl();
@@ -135,7 +151,12 @@ void MainWindow::on_ManualStage_clicked()
     ui->StageConnectionIndicator->setText("Manual Control");
 }
 
-//Gets position, saves it in module level variable GetPosition, updates slider and print to terminal window
+
+/**
+ * @brief MainWindow::on_GetPosition_clicked
+ * Gets position, saves it in module level variable GetPosition,
+ * updates slider and prints to terminal window
+ */
 void MainWindow::on_GetPosition_clicked()
 {
     for (int i = 0; i<5; i++) //To be removed...
@@ -156,7 +177,11 @@ void MainWindow::on_GetPosition_clicked()
     }
 }
 
-//Opens Manual Pump Control Window, closes mainwindow pump connection
+/**
+ * @brief MainWindow::on_pushButton_clicked
+ * Opens the Manual Pump Control window and closes the mainwindow
+ * pump connection
+ */
 void MainWindow::on_pushButton_clicked()
 {
     ManualPumpUI = new manualpumpcontrol();
@@ -165,7 +190,10 @@ void MainWindow::on_pushButton_clicked()
     Pump.PSerial.closeDevice(); //Closes mai nwindow pump connection
 }
 
-//Opens Image Processing Window
+/**
+ * @brief MainWindow::on_ImageProcess_clicked
+ * Opens the image processing window
+ */
 void MainWindow::on_ImageProcess_clicked()
 {
     ImageProcessUI = new imageprocessing();
@@ -174,6 +202,10 @@ void MainWindow::on_ImageProcess_clicked()
 }
 
 /*********************************************Mode Selection*********************************************/
+/**
+ * @brief MainWindow::on_POTFcheckbox_clicked
+ * Sets projection mode to POTF
+ */
 void MainWindow::on_POTFcheckbox_clicked()
 {
     if (ui->POTFcheckbox->isChecked())
@@ -185,7 +217,10 @@ void MainWindow::on_POTFcheckbox_clicked()
     }
 }
 
-
+/**
+ * @brief MainWindow::on_VP_HDMIcheckbox_clicked
+ * Sets projection mode to Video Pattern
+ */
 void MainWindow::on_VP_HDMIcheckbox_clicked()
 {
     if (ui->VP_HDMIcheckbox->isChecked())
@@ -208,6 +243,10 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
     }
 }
 
+/**
+ * @brief MainWindow::Check4VideoLock
+ * Validates that the video source is locked, this is needed for Video Pattern Mode
+ */
 void MainWindow::Check4VideoLock()
 {
     QMessageBox VlockPopup;
@@ -259,6 +298,10 @@ void MainWindow::Check4VideoLock()
     }
 }
 
+/**
+ * @brief MainWindow::initImagePopout
+ * Initializes the image popout window that is used for video pattern mode
+ */
 void MainWindow::initImagePopout()
 {
     ImagePopoutUI = new imagepopout;
@@ -274,19 +317,31 @@ void MainWindow::initImagePopout()
     }
 }
 
+/**
+ * @brief MainWindow::on_DICLIPSelect_clicked
+ * Currently just a dummy fuction used for testing
+ */
 void MainWindow::on_DICLIPSelect_clicked()
 {
     initImagePopout();
     ProjectionMode = 1;
 }
 
+/**
+ * @brief MainWindow::on_SetBitDepth_clicked
+ * Sets the module variable BitMode which is used to determine the bit depth
+ * the user wishes to print with
+ */
 void MainWindow::on_SetBitDepth_clicked()
 {
     BitMode = ui->BitDepthParam->value();
     ui->ProgramPrints->append("Bit-Depth set to: " + QString::number(BitMode));
 }
 
-
+/**
+ * @brief MainWindow::on_SteppedMotion_clicked
+ * Sets motion mode to stepped, this is the default
+ */
 void MainWindow::on_SteppedMotion_clicked()
 {
     if(ui->SteppedMotion->isChecked() == true)
@@ -297,6 +352,10 @@ void MainWindow::on_SteppedMotion_clicked()
     }
 }
 
+/**
+ * @brief MainWindow::on_ContinuousMotion_clicked
+ * Sets motion mode to continuous
+ */
 void MainWindow::on_ContinuousMotion_clicked()
 {
     if(ui->ContinuousMotion->isChecked() == true)
@@ -307,6 +366,11 @@ void MainWindow::on_ContinuousMotion_clicked()
     }
 }
 
+/**
+ * @brief MainWindow::on_pumpingCheckBox_clicked
+ * Enables pumping mode in which the stage movement is exaggerated
+ * to avoid the part sticking to the window
+ */
 void MainWindow::on_pumpingCheckBox_clicked()
 {
     if(ui->pumpingCheckBox->isChecked() == true){
@@ -319,6 +383,10 @@ void MainWindow::on_pumpingCheckBox_clicked()
     }
 }
 
+/**
+ * @brief MainWindow::on_setPumping_clicked
+ * Sets the pumping depth parameter
+ */
 void MainWindow::on_setPumping_clicked()
 {
     if(PumpingMode == 1){
@@ -331,13 +399,21 @@ void MainWindow::on_setPumping_clicked()
 }
 
 /*********************************************Print Parameters*********************************************/
-//Saves resin selected to log for reference
+/**
+ * @brief MainWindow::on_ResinSelect_activated
+ * @param arg1: The resin selected
+ * Prints the resin selected to the terminal
+ */
 void MainWindow::on_ResinSelect_activated(const QString &arg1)
 {
     ui->ProgramPrints->append(arg1 + " Selected");
 }
 
-//Sets whether auto mode is set
+/**
+ * @brief MainWindow::on_AutoCheckBox_stateChanged
+ * @param arg1: The state of the AutoCheckBox
+ * If AutoCheckBox is set, go into auto mode
+ */
 void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
 {
     if (arg1 == 2) //If automode is checked
@@ -386,7 +462,10 @@ void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
     }
 }
 
-//Needed to avoid the auto mode checkbox becoming checked
+/**
+ * @brief MainWindow::on_AutoCheckBox_clicked
+ * Guard on edge case that sets the checkbox while it's actual state is unchecked
+ */
 void MainWindow::on_AutoCheckBox_clicked()
 {
     int SliceCount = ui->FileList->count();
@@ -396,7 +475,11 @@ void MainWindow::on_AutoCheckBox_clicked()
     }
 }
 
-//Sets max image upload, used to avoid large error buildup or large stop times from large image upload times
+/**
+ * @brief MainWindow::on_SetMaxImageUpload_clicked
+ * Sets the max image upload, used to avoid large error buildup
+ * or large wait times due to large uploads
+ */
 void MainWindow::on_SetMaxImageUpload_clicked()
 {
     int MaxImageVal = ui->MaxImageUpload->value(); //Grab value from UI
@@ -417,7 +500,11 @@ void MainWindow::on_SetMaxImageUpload_clicked()
     ui->ProgramPrints->append(MaxImageUploadString);
 }
 
-//Sets PrintSpeed variable from value inputted by user, also triggers automode
+
+/**
+ * @brief MainWindow::on_setPrintSpeed_clicked
+ * Sets PrintSpeed variable from value inputted by user, also triggers automode
+ */
 void MainWindow::on_setPrintSpeed_clicked()
 {
     PrintSpeed = (ui->PrintSpeedParam->value());
@@ -426,7 +513,10 @@ void MainWindow::on_setPrintSpeed_clicked()
     AutoMode();
 }
 
-//Sets PrintHeight variable from value inputted by user, also triggers automode
+/**
+ * @brief MainWindow::on_SetPrintHeight_clicked
+ * Sets PrintHeight variable from value inputted by user, also triggers automode
+ */
 void MainWindow::on_SetPrintHeight_clicked()
 {
     PrintHeight = (ui->PrintHeightParam->value());
@@ -435,7 +525,10 @@ void MainWindow::on_SetPrintHeight_clicked()
     AutoMode();
 }
 
-//Sets InitialExposure variable from the value inputted by the user
+/**
+ * @brief MainWindow::on_SetIntialAdhesionTimeButton_clicked
+ * Sets InitialExposure variable from the value inputted by the user
+ */
 void MainWindow::on_SetIntialAdhesionTimeButton_clicked()
 {
     InitialExposure = (ui->InitialAdhesionParameter->value());
@@ -443,7 +536,11 @@ void MainWindow::on_SetIntialAdhesionTimeButton_clicked()
     ui->ProgramPrints->append(InitialExposureString);
 }
 
-//Sets Starting Position variable from the value inputted by the user (also doubles as debug tool for GetPosition(), will be removed)
+/**
+ * @brief MainWindow::on_SetStartingPosButton_clicked
+ * Sets Starting Position variable from the value inputted by the user
+ * (also doubles as debug tool for GetPosition(), will be removed)
+ */
 void MainWindow::on_SetStartingPosButton_clicked()
 {
     StartingPosition = (ui->StartingPositionParam->value());
@@ -455,7 +552,10 @@ void MainWindow::on_SetStartingPosButton_clicked()
     ui->CurrentPositionIndicator->setText(CurrentPosition);
 }
 
-//Sets Slicethickness variable from the value inputted by the user
+/**
+ * @brief MainWindow::on_SetSliceThickness_clicked
+ * Sets Slicethickness variable from the value inputted by the user
+ */
 void MainWindow::on_SetSliceThickness_clicked()
 {
     SliceThickness = (ui->SliceThicknessParam->value()/1000);
@@ -463,7 +563,11 @@ void MainWindow::on_SetSliceThickness_clicked()
     ui->ProgramPrints->append(ThicknessString);
 }
 
-//Sets StageVelocity variable from the value inputted by the user, also directly sends command to stage to set velocity
+/**
+ * @brief MainWindow::on_SetStageVelocity_clicked
+ * Sets StageVelocity variable from the value inputted by the user,
+ * also directly sends command to stage to set velocity
+ */
 void MainWindow::on_SetStageVelocity_clicked()
 {
     StageVelocity = (ui->StageVelocityParam->value());
@@ -472,7 +576,11 @@ void MainWindow::on_SetStageVelocity_clicked()
     ui->ProgramPrints->append(VelocityString);
 }
 
-//Sets StageAcceleration variable from the value inputted by the user, also directly sends command to stage to set acceleration
+/**
+ * @brief MainWindow::on_SetStageAcceleration_clicked
+ * Sets StageAcceleration variable from the value inputted by the user,
+ * also directly sends command to stage to set acceleration
+ */
 void MainWindow::on_SetStageAcceleration_clicked()
 {
     StageAcceleration = (ui->StageAccelParam->value());
@@ -481,7 +589,11 @@ void MainWindow::on_SetStageAcceleration_clicked()
     ui->ProgramPrints->append(AccelerationString);
 }
 
-//Sets MaxEndOfRun variable from the value inputted by the user, also directly sends command to stage to set max end of run
+/**
+ * @brief MainWindow::on_SetMaxEndOfRun_clicked
+ * Sets MaxEndOfRun variable from the value inputted by the user,
+ * also directly sends command to stage to set max end of run
+ */
 void MainWindow::on_SetMaxEndOfRun_clicked()
 {
     MaxEndOfRun = (ui->MaxEndOfRun->value());
@@ -490,7 +602,11 @@ void MainWindow::on_SetMaxEndOfRun_clicked()
     ui->ProgramPrints->append(MaxEndOfRunString);
 }
 
-//Sets MinEndOfRun variable from the value inputted by the user, also directly sends command to stage to set min end of run
+/**
+ * @brief MainWindow::on_SetMinEndOfRun_clicked
+ * Sets MinEndOfRun variable from the value inputted by the user,
+ * also directly sends command to stage to set min end of run
+ */
 void MainWindow::on_SetMinEndOfRun_clicked()
 {
     MinEndOfRun = (ui->MinEndOfRunParam->value());
@@ -499,7 +615,10 @@ void MainWindow::on_SetMinEndOfRun_clicked()
     ui->ProgramPrints->append(MinEndOfRunString);
 }
 
-//Sets DarkTime variable from the value inputted by the user
+/**
+ * @brief MainWindow::on_SetDarkTime_clicked
+ * Sets DarkTime variable from the value inputted by the user
+ */
 void MainWindow::on_SetDarkTime_clicked()
 {
     DarkTime = (ui->DarkTimeParam->value()*1000);
@@ -507,7 +626,10 @@ void MainWindow::on_SetDarkTime_clicked()
     ui->ProgramPrints->append(DarkTimeString);
 }
 
-//Sets ExposureTime variable from the value inputted by the user
+/**
+ * @brief MainWindow::on_SetExposureTime_clicked
+ * Sets ExposureTime variable from the value inputted by the user
+ */
 void MainWindow::on_SetExposureTime_clicked()
 {
     ExposureTime = (ui->ExposureTimeParam->value()*1000);
@@ -515,7 +637,10 @@ void MainWindow::on_SetExposureTime_clicked()
     ui->ProgramPrints->append(ExposureTimeString);
 }
 
-//Sets UVIntensity from the value inputted by the user
+/**
+ * @brief MainWindow::on_SetUVIntensity_clicked
+ * Sets UVIntensity from the value inputted by the user
+ */
 void MainWindow::on_SetUVIntensity_clicked()
 {
     UVIntensity = (ui->UVIntensityParam->value());
@@ -523,44 +648,71 @@ void MainWindow::on_SetUVIntensity_clicked()
     ui->ProgramPrints->append(UVIntensityString);
 }
 
-//Currently Not In Use
+/**
+ * @brief MainWindow::on_LiveValueList1_activated
+ * @param arg1
+ * Currently Not In Use
+ */
 void MainWindow::on_LiveValueList1_activated(const QString &arg1)
 {
     ui->ProgramPrints->append("LV1: " + arg1);
 }
 
-//Currently Not In Use
+/**
+ * @brief MainWindow::on_LiveValueList2_activated
+ * @param arg1
+ * Currently Not In Use
+ */
 void MainWindow::on_LiveValueList2_activated(const QString &arg1)
 {
     ui->ProgramPrints->append("LV2: " + arg1);
 }
 
-//Currently Not In Use
+/**
+ * @brief MainWindow::on_LiveValueList3_activated
+ * @param arg1
+ * Currently Not In Use
+ */
 void MainWindow::on_LiveValueList3_activated(const QString &arg1)
 {
     ui->ProgramPrints->append("LV3: " + arg1);
 }
 
-//Currently Not In Use
+/**
+ * @brief MainWindow::on_LiveValueList4_activated
+ * @param arg1
+ * Currently Not In Use
+ */
 void MainWindow::on_LiveValueList4_activated(const QString &arg1)
 {
     ui->ProgramPrints->append("LV4: " + arg1);
 }
 
-//Currently Not In Use
+/**
+ * @brief MainWindow::on_LiveValueList5_activated
+ * @param arg1
+ * Currently Not In Use
+ */
 void MainWindow::on_LiveValueList5_activated(const QString &arg1)
 {
     ui->ProgramPrints->append("LV5: " + arg1);
 }
 
-//Currently Not In Use
+/**
+ * @brief MainWindow::on_LiveValueList6_activated
+ * @param arg1
+ * Currently Not In Use
+ */
 void MainWindow::on_LiveValueList6_activated(const QString &arg1)
 {
     ui->ProgramPrints->append("LV6: " + arg1);
 }
 
 /*********************************************File Handling*********************************************/
-//Select all object image files to project
+/**
+ * @brief MainWindow::on_SelectFile_clicked
+ * Select all object image files to project
+ */
 void MainWindow::on_SelectFile_clicked()
 {
     //Open files from last directory chosen (stored in settings), limited to bitmapped image file formats
@@ -578,21 +730,30 @@ void MainWindow::on_SelectFile_clicked()
     ui->ProgramPrints->append(QString::number(SliceCount) + " Images Currently Selected");
 }
 
-//Select directory to store log files
+/**
+ * @brief MainWindow::on_LogFileBrowse_clicked
+ * Select directory to store log files
+ */
 void MainWindow::on_LogFileBrowse_clicked()
 {
     LogFileDestination = QFileDialog::getExistingDirectory(this, "Open Log File Destination");
     ui->LogFileLocation->setText(LogFileDestination);
 }
 
-//Clear image files selected
+/**
+ * @brief MainWindow::on_ClearImageFiles_clicked
+ * Clear image files selected
+ */
 void MainWindow::on_ClearImageFiles_clicked()
 {
     ui->FileList->clear();
     //initConfirmationScreen();
 }
 
-//Used to select whether to use set print variables or print script
+/**
+ * @brief MainWindow::on_UsePrintScript_clicked
+ * Used to select whether to use set print variables or print script
+ */
 void MainWindow::on_UsePrintScript_clicked()
 {
     if (ui->UsePrintScript->checkState()) //If printscript is checked
@@ -611,7 +772,12 @@ void MainWindow::on_UsePrintScript_clicked()
     }
 }
 
-//
+/**
+ * @brief MainWindow::on_SelectPrintScript_clicked
+ * User selects print script from file, the print script is parsed
+ * and the exposure time and LED intensity is stored in
+ * module level QStringLists: ExposureScriptList and LEDScriptList
+ */
 void MainWindow::on_SelectPrintScript_clicked()
 {
     QString file_name = QFileDialog::getOpenFileName(this, "Open Print Script", "C://", "*.txt *.csv");
@@ -642,34 +808,24 @@ void MainWindow::on_SelectPrintScript_clicked()
 
 }
 
-
-static int FPStestImage = 0;
-static bool SVG = false;
-static QTime FPSStartTime;
-
-
+/**
+ * @brief MainWindow::on_ClearPrintScript_clicked
+ * Clears selected print list
+ */
 void MainWindow::on_ClearPrintScript_clicked()
 {
     ui->PrintScriptFile->clear();
     if (PrintScript == 0)
     {
-        FPSStartTime = QTime::currentTime();
-        //SVG = true;
-        //testFPS();
-        /*for (int i = 0; i < ui->FileList->count() ; i++)
-        {
-            QString filename =ui->FileList->item(i)->text();
-            QPixmap img(filename);
-            QPixmap img2 = img.scaled(890,490, Qt::KeepAspectRatio);
-            ui->PrintImage->setPixmap(img);
-            ui->ProgramPrints->append(QString::number(i));
-            Sleep(20);
-        }*/
+
     }
 }
-
-
 /*******************************************Peripheral Connections*********************************************/
+/**
+ * @brief MainWindow::on_LightEngineConnectButton_clicked
+ * Connect to light engine, gets last error code to validate that
+ * no errors have occured and connection is working
+ */
 void MainWindow::on_LightEngineConnectButton_clicked()
 {
     if (DLP.InitProjector())
@@ -696,6 +852,11 @@ void MainWindow::on_LightEngineConnectButton_clicked()
     }
 }
 
+/**
+ * @brief MainWindow::on_StageConnectButton_clicked
+ * Connects to stage, if succesful gets position, sends
+ * home commands and gets position
+ */
 void MainWindow::on_StageConnectButton_clicked()
 {
     SMC.SMC100CClose();
@@ -718,6 +879,10 @@ void MainWindow::on_StageConnectButton_clicked()
     }
 }
 
+/**
+ * @brief MainWindow::on_PumpConnectButton_clicked
+ * Connects to pump
+ */
 void MainWindow::on_PumpConnectButton_clicked()
 {
     Pump.PSerial.closeDevice();
@@ -737,9 +902,12 @@ void MainWindow::on_PumpConnectButton_clicked()
         ui->PumpConnectionIndicator->setText("Disconnected");
     }
 }
-
-
 /***************************************Print Functionality*********************************************/
+/**
+ * @brief MainWindow::on_InitializeAndSynchronize_clicked
+ * Prepares the system for printing, moves stage to starting position
+ * inits plot, uploads images to the light engine
+ */
 void MainWindow::on_InitializeAndSynchronize_clicked()
 {
     if (initConfirmationScreen())
@@ -794,14 +962,23 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
     }
 }
 
+/**
+ * @brief MainWindow::on_AbortPrint_clicked
+ * Aborts print and acts as e-stop. Stops light engine projection,
+ * stage movement and print process
+ */
 void MainWindow::on_AbortPrint_clicked()
 {
-    LCR_PatternDisplay(0);
-    SMC.StopMotion();
-    layerCount = 0xFFFF; //Set layer count high to stop print process
+    LCR_PatternDisplay(0); //Turn off light engine projection
+    SMC.StopMotion(); //Stop stage movement
+    layerCount = 0xFFFFFF; //Set layer count high to stop print process
     ui->ProgramPrints->append("PRINT ABORTED");
 }
 
+/**
+ * @brief MainWindow::on_StartPrint_clicked
+ * Starts print process, set LED current calculates speed for continuous motion mode
+ */
 void MainWindow::on_StartPrint_clicked()
 {
     if (ValidateSettings() == true) //If settings are validated successfully and Initialization has been completed
@@ -811,7 +988,6 @@ void MainWindow::on_StartPrint_clicked()
         emit(on_GetPosition_clicked());
         Sleep(20);
         emit(on_GetPosition_clicked());
-        //usbPollTimer->stop();
         nSlice = ui->FileList->count();
         ui->ProgramPrints->append("Entering Printing Procedure");
         //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
@@ -833,6 +1009,10 @@ void MainWindow::on_StartPrint_clicked()
     }
 }
 
+/**
+ * @brief MainWindow::PrintProcess
+ * Print process, for detailed description see documentation
+ */
 void MainWindow::PrintProcess(void)
 {
     if (layerCount +1 <= nSlice)
@@ -887,10 +1067,10 @@ void MainWindow::PrintProcess(void)
             updatePlot();
             //QTimer::singleShot((InitialExposure*1000), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
             if (PumpingMode == 1){
-                QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(pumpingSlot())); //Value from exposuretime will be in us so /1000
+                QTimer::singleShot(InitialExposure*1000, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
             }
             else{
-                QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //Value from exposuretime will be in us so /1000
+                QTimer::singleShot(InitialExposure*1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
             }
             InitialExposureFlag = false;
             ui->ProgramPrints->append("Exposing Initial Layer " + QString::number(InitialExposure) + "s");
@@ -970,6 +1150,10 @@ void MainWindow::PrintProcess(void)
     }
 }
 
+/**
+ * @brief MainWindow::PrintProcessVP
+ * Separate print process for Video Pattern mode
+ */
 void MainWindow::PrintProcessVP()
 {
     if (layerCount +1 <= nSlice)
@@ -1003,6 +1187,11 @@ void MainWindow::PrintProcessVP()
     }
 }
 
+/**
+ * @brief MainWindow::pumpingSlot
+ * Pumping slot for when pumping is activated,
+ * intermediary step between exposure time and dark time
+ */
 void MainWindow::pumpingSlot(void)
 {
     QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
@@ -1010,6 +1199,10 @@ void MainWindow::pumpingSlot(void)
     ui->ProgramPrints->append("Pumping " + QString::number(PumpingParameter*1000) +" um");
 }
 
+/**
+ * @brief MainWindow::ExposureTimeSlot
+ * Handles all dark time actions required
+ */
 void MainWindow::ExposureTimeSlot(void)
 {
     if(MotionMode == 0){
@@ -1054,12 +1247,20 @@ void MainWindow::ExposureTimeSlot(void)
         }
 }
 
+/**
+ * @brief MainWindow::DarkTimeSlot
+ * Dummy slot, maye be removed
+ */
 void MainWindow::DarkTimeSlot(void)
 {
       PrintProcess();
 }
 
-//Validate all settings
+/**
+ * @brief MainWindow::ValidateSettings
+ * @return bool: true if settings are valid, false otherwise
+ *
+ */
 bool MainWindow::ValidateSettings(void)
 {
     //Validate Slicethickness
@@ -1134,6 +1335,11 @@ void MainWindow::showError(QString errMsg)
     errMsgBox.exec();
 }
 
+/**
+ * @brief MainWindow::saveText
+ * Saves Terminal Window printout to .txt log upon print
+ * completion or abort
+ */
 void MainWindow::saveText()
 {
      QString Log = ui->ProgramPrints->toPlainText();
@@ -1152,6 +1358,11 @@ void MainWindow::saveText()
      }
 }
 
+/**
+ * @brief MainWindow::validateStartingPosition
+ * Validates whether stage has reached it's starting position,
+ * repeats at 1 Hz until starting position is reached. Deprecated??
+ */
 void MainWindow::validateStartingPosition()
 {
     QString CurrentPosition = SMC.GetPosition();
@@ -1167,6 +1378,10 @@ void MainWindow::validateStartingPosition()
     }
 }
 
+/**
+ * @brief MainWindow::initStageSlot
+ * Initializes stage and moves it to starting position
+ */
 void MainWindow::initStageSlot(void)
 {
     emit(on_GetPosition_clicked());
@@ -1192,6 +1407,11 @@ void MainWindow::initStageSlot(void)
     }
 }
 
+/**
+ * @brief MainWindow::fineMovement
+ * Once the stage is within 3 mm of the window move to slow movement to
+ * avoid creating bubbles in the resin
+ */
 void MainWindow::fineMovement()
 {
     emit(on_GetPosition_clicked());
@@ -1215,6 +1435,10 @@ void MainWindow::fineMovement()
     }
 }
 
+/**
+ * @brief MainWindow::verifyStageParams
+ * Resends the correct stage parameter to the stage
+ */
 void MainWindow::verifyStageParams()
 {
     ui->ProgramPrints->append("Verifying Stage Parameters");
@@ -1228,6 +1452,11 @@ void MainWindow::verifyStageParams()
     SMC.SetVelocity(StageVelocity);
 }
 
+/**
+ * @brief MainWindow::AutoMode
+ * Calculates exposure time and slice thickness based on input
+ * print height and print speed
+ */
 void MainWindow::AutoMode()
 {
     if (AutoModeFlag)
@@ -1256,6 +1485,12 @@ void MainWindow::AutoMode()
     }
 }
 
+/**
+ * @brief MainWindow::initConfirmationScreen
+ * @return bool: true if user has confirmed, false otherwise
+ * Initializes the confirmation screen so that the user can
+ * confirm whether the input parameters are correct
+ */
 bool MainWindow::initConfirmationScreen()
 {
     bool retVal = false;
@@ -1317,7 +1552,10 @@ bool MainWindow::initConfirmationScreen()
     return retVal;
 }
 /*******************************************Settings Functions*********************************************/
-
+/**
+ * @brief MainWindow::saveSettings
+ * Saves settings so that they are initialized upon startup
+ */
 void MainWindow::saveSettings()
 {
     QSettings settings;
@@ -1343,6 +1581,10 @@ void MainWindow::saveSettings()
     settings.setValue("ImageFileDirectory", ImageFileDirectory);
 }
 
+/**
+ * @brief MainWindow::loadSettings
+ * Loads the settings from file to module variables
+ */
 void MainWindow::loadSettings()
 {
     if (loadSettingsFlag == false) //ensures that this only runs once
@@ -1373,6 +1615,10 @@ void MainWindow::loadSettings()
     }
 }
 
+/**
+ * @brief MainWindow::initSettings
+ * Updates the UI to reflect the settings
+ */
 void MainWindow::initSettings()
 {
     ui->ExposureTimeParam->setValue(ExposureTime/1000);
@@ -1396,7 +1642,10 @@ void MainWindow::initSettings()
 }
 
 /*******************************************Plot Functions*********************************************/
-
+/**
+ * @brief MainWindow::initPlot
+ * Initializes live plotting of stage position
+ */
 void MainWindow::initPlot()
 {
     ui->LivePlot->addGraph();
@@ -1426,6 +1675,10 @@ void MainWindow::initPlot()
     ui->LivePlot->replot();
 }
 
+/**
+ * @brief MainWindow::updatePlot
+ * Updates current plot with new stage position
+ */
 void MainWindow::updatePlot()
 {
     QTime updateTime = QTime::currentTime();
@@ -1477,7 +1730,7 @@ void MainWindow::updatePlot()
 /*************************************************************
  * ********************Graveyard***************************
  * ***********************************************************/
-
+//Snippets that may be useful in the future but the overall functionality has been deprecated
 #if 0
 void MainWindow::testFPS()
 {

@@ -24,11 +24,7 @@ QString TargetDestination = "C://";
 static int rowDim;
 static int colDim;
 
-/**
- * @brief imageprocessing::imageprocessing
- * @param parent
- * opens image processing window
- */
+
 imageprocessing::imageprocessing(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::imageprocessing)
@@ -36,19 +32,12 @@ imageprocessing::imageprocessing(QWidget *parent) :
     ui->setupUi(this);
 }
 
-/**
- * @brief imageprocessing::~imageprocessing
- * Closes image processing window
- */
 imageprocessing::~imageprocessing()
 {
     delete ui;
 }
 
-/**
- * @brief imageprocessing::on_SelectImageFiles_clicked
- * Open images files to be encoded
- */
+
 void imageprocessing::on_SelectImageFiles_clicked()
 {
     QStringList file_name = QFileDialog::getOpenFileNames(this,"Open Object Image Files","C://Users/le54t/Documents/Stanford/Research/testImages","*.bmp *.png *.tiff *.tif *.svg");
@@ -72,30 +61,18 @@ void imageprocessing::on_SelectImageFiles_clicked()
     }
 }
 
-/**
- * @brief imageprocessing::on_ClearImageFiles_clicked
- * Clear image files
- */
 void imageprocessing::on_ClearImageFiles_clicked()
 {
     ui->InputList->clear();
 }
 
-/**
- * @brief imageprocessing::on_BrowseTargetDir_clicked
- * Select target directory for encoded images
- */
 void imageprocessing::on_BrowseTargetDir_clicked()
 {
     TargetDestination = QFileDialog::getExistingDirectory(this, "Open Log File Destination");
     ui->TargetDirLabel->setText(TargetDestination);
 }
 
-/**
- * @brief imageprocessing::on_EncodeTest_clicked
- * Starts image endcoding process,
- * call bitEncode24 for every set of 24 images
- */
+
 void imageprocessing::on_EncodeTest_clicked()
 {
     while (remainingImages > 0)
@@ -107,11 +84,6 @@ void imageprocessing::on_EncodeTest_clicked()
     encodeCount = 0; //reset encodeCount
 }
 
-/**
- * @brief imageprocessing::bitEncode24
- * 24bit encoding, takes set of 24 images and call 8bitEncode 3 times to encode
- * upon all three of the channels
- */
 void imageprocessing::bitEncode24()
 {
     Mat channel[3];
@@ -156,12 +128,7 @@ void imageprocessing::bitEncode24()
 
 }
 
-/**
- * @brief imageprocessing::bitEncode8
- * @param source: Source image matrix used to get correct dimension
- * @param Channel: input image matrix to be altered (8bit)
- * Encodes 8 1-bit images into 1 8-bit image
- */
+//8 bit encoding, called multiple times atm, possible improvements to be made but had weird memory issues
 void imageprocessing::bitEncode8(Mat source, Mat& Channel)
 {
     cv::Mat workingChannel (source.rows, source.cols, CV_8UC1); //Initialize Channel for return, might not be optimal, but at least it works
@@ -226,12 +193,7 @@ void imageprocessing::bitEncode8(Mat source, Mat& Channel)
     workingChannel.release();
 }
 
-/**
- * @brief imageprocessing::hexSelect
- * @param imageNum: the image number ranging from 0-7
- * @return A hex value from 0x01 to 0x80
- * Used for selecting the correct hex value to encode
- */
+//For selecting correct hex value to encode
 int imageprocessing::hexSelect(int imageNum)
 {
     int returnVal = 0;
