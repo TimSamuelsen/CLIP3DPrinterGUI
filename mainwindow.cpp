@@ -975,11 +975,12 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             {
                 ui->ProgramPrints->append("Using Print Script");
             }
+            if (ProjectionMode == POTF){
             DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, 0, ExposureScriptList, ProjectionMode, BitMode, 0); //Set initial image to 0
             DLP.updateLUT();
             DLP.clearElements();
             remainingImages = MaxImageUpload - InitialExposure;
-
+            }
             QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
             ui->ProgramPrints->append(dir.absolutePath());
             emit(on_GetPosition_clicked());
@@ -1052,6 +1053,7 @@ void MainWindow::on_StartPrint_clicked()
             ui->ProgramPrints->append("Entering POTF print process");
         }
         else{ //else in Video Pattern Mode
+            DLP.clearElements();
             PrintProcessVP();
             ui->ProgramPrints->append("Entering Video Pattern print process");
         }
@@ -1179,25 +1181,32 @@ void MainWindow::PrintProcessVP()
         if (ReSyncFlag == 1) //if resync
         {
             ReSyncFlag = 0;
-            LCR_PatternDisplay(0); //Stop pattern display
+            if (LCR_PatternDisplay(0) < 0)
+                showError("Unable to stop pattern display");
+            Sleep(5000);
             QListWidgetItem * item;
             QStringList imageList;
+            uint count = 0;
             for(int i = FrameCount; i < FrameCount + (5*BitMode); i++)
             {
-                if (i < ui->FileList->count()){
-                    item = ui->FileList->item(i);
-                    imageList << item->text();
-                }
-                else{
-                    ui->ProgramPrints->append("VP Image segmentation fault");
+                for (int j = 0; j < (24/BitMode); j++)
+                {
+                    if (i < ui->FileList->count()){
+                        item = ui->FileList->item(i);
+                        imageList << item->text();
+                        count++;
+                    }
+                    else{
+                        ui->ProgramPrints->append("VP Image segmentation fault");
+                    }
                 }
             }
             //Add pattern data to buffer to prepare for pattern upload
             DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, ProjectionMode, BitMode, 0);
-            //DLP.updateLUT(); //update LUT on light engine to upload pattern data
+            DLP.updateLUT(); //update LUT on light engine to upload pattern data
             DLP.clearElements(); //clear pattern data buffer
             Sleep(50); //small delay to ensure that the new patterns are uploaded
-            ui->ProgramPrints->append("Resync succesful, frame: " + QString::number(FrameCount) + " layer: " + QString::number(layerCount));
+            ui->ProgramPrints->append("Resync succesful, frame: " + QString::number(FrameCount) + " layer: " + QString::number(layerCount) + "New Patterns: " + QString::number(count));
             DLP.startPatSequence();
             SetExposureTimer(0, PrintScript, PumpingMode);
 

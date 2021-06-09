@@ -44,6 +44,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
     MainWindow Main;
     if (ProjectionMode == 1)//Video Pattern Mode
     {
+        printf("VP pattern upload");
         for(i = 0; i < fileNames.size(); i++)
         {
             PatternElement pattern;
@@ -63,7 +64,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                     pattern.exposure = ExposureTime;
                 }
                 pattern.darkPeriod = DarkTime;
-                pattern.trigIn = true;
+                pattern.trigIn = false;
                 pattern.trigOut2 = true;
                 pattern.splashImageBitPos = 0;
                 pattern.splashImageIndex = 0;
@@ -85,7 +86,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                     pattern.exposure = ExposureTime;
                 }
                 pattern.darkPeriod = DarkTime;
-                pattern.trigIn = true;
+                pattern.trigIn = false;
                 pattern.trigOut2 = true;
                 pattern.clear = true;
                 pattern.splashImageIndex = 0;
@@ -94,6 +95,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                 }
                 else{
                     pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos + m_elements[m_elements.size()-1].bits;
+                    printf("BitPos: %d", m_elements[m_elements.size()-1].splashImageBitPos + m_elements[m_elements.size()-1].bits);
                 }
             }
             pattern.selected = true;
@@ -104,6 +106,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
     }
     else //POTF mode
     {
+        printf("POTF pattern upload");
         if(fileNames.isEmpty())
         {
             Main.showError("No image file found");
@@ -393,7 +396,7 @@ void DLP9000::updateLUT()
     }
 
     ret = LCR_SetPatternConfig(m_elements.size(), m_elements.size());
-
+    printf("elements size: %d",m_elements.size());
     if (ret < 0)
     {
         Main.showError("Sending pattern LUT size failed!");
