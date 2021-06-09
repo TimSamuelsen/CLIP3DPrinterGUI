@@ -1,14 +1,13 @@
-Template
-========
+.. image:: https://i.imgur.com/7DLm4m2.png
 
-$project will solve your problem of where to start with documentation,
-by providing a basic explanation of how to do it easily.
+Welcome to the CLIP3DGUI Documentation!
+==================================================
+CLIP3DGUI is print control software developed for the DeSimone Research Group in-house 
+CLIP 3D printers at Stanford University. It is designed to provide lab members with a fully
+custom software solution that integrates all the features required to perform their experiments.
 
-Look how easy it is to use:
-
-    import project
-    # Get your stuff done
-    project.do_stuff()
+* **Github repository:** https://github.com/TimSamuelsen/CLIP3DPrinterGUI
+* **Qt Version:** 5.15.2
 
 Features
 --------
@@ -19,23 +18,11 @@ Features
 Installation
 ------------
 
-Install $project by running:
-
-    install project
-
-Contribute
-----------
-
-- Issue Tracker: github.com/$project/$project/issues
-- Source Code: github.com/$project/$project
-
 Support
 -------
 
-If you are having issues, please let us know.
-We have a mailing list located at: project@google-groups.com
+If you are having issues please contact: tim.samuelsen@gmail.com
 
 License
 -------
 
-The project is licensed under the BSD license.
