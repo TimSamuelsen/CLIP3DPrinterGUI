@@ -48,11 +48,19 @@
 
 #define NormalTime
 #define QuickTime
+#define ON   1
+#define OFF  0
+#define CONTINUOUS  1
+#define STEPPED     0
+#define VIDEOPATTERN 1
+#define POTF 0
+
 
 static DLP9000 DLP; //DLP object for calling functions from dlp9000.cpp, test if this still works without being a static
 //Module level variables
 static bool InitialExposureFlag = true; //Flag to indicate print process to do intial expore first, set false after intial exposure never set true again
 //Settings are static so they can be accessed from outside anywhere in this module
+
 //Module level variables for print parameters
 static double SliceThickness;
 static double StageVelocity;
@@ -64,38 +72,57 @@ static double ExposureTime;
 static double DarkTime;
 static uint InitialExposure;
 static int UVIntensity;
-static double PrintSpeed;
-static double PrintHeight;
 static int MaxImageUpload = 20;
 
+//Auto parameter selection mode
+static double PrintSpeed;
+static double PrintHeight;
+static bool AutoModeFlag = false; //true when automode is on, false otherwise
+
+//Print Process Variables
+static uint nSlice = 0; //number of slices to be printed
+static uint layerCount = 0; //current layer
 static int remainingImages; //Keeps count of remaining images to be printed
 
-static bool AutoModeFlag = false; //true when automode is on, false otherwise
-static uint32_t nSlice = 0; //number of slices to be printed
-static uint32_t layerCount = 0; //current layer
+//Plot Variables
 static double TotalPrintTimeS = 0; //For calculating print times
 static double RemainingPrintTimeS; //For calculating remaining pr int times
 
+//Settings and log variables
 static bool loadSettingsFlag = false; //For ensuring the settings are only loaded once, (May not be needed)
-static QDateTime CurrentDateTime; //Current time
+QDateTime CurrentDateTime; //Current time
 QString LogFileDestination; //for storing log file destination in settings
 QString ImageFileDirectory; //For storing image file directory in settings
 QTime PrintStartTime; //Get start time for log
 static double GetPosition; //Holds
 static bool StagePrep1 = false; //For lowering stage
 static bool StagePrep2 = false; //For lowering stage
+
+//Print script parameters
 QStringList ExposureScriptList; //Printscript is taken from a .csv file and stored in this variable
 QStringList LEDScriptList;
 static int PrintScript = 0; //For selecting type of printscript, currently: 0 = no printscript, 1 = exposure time print script
 
-static int ProjectionMode = 0; //For selecting projection mode, 0 = POTF mode, 1 = Video Pattern HDMI
+//Projection mode parameters
+static int ProjectionMode = POTF; //For selecting projection mode, 0 = POTF mode, 1 = Video Pattern HDMI
 static bool VideoLocked;
+int BitLayer = 1;
+int FrameCount = 0;
+int ReSyncFlag = 0;
+int ReSyncCount = 0;
+
+//Bit depth selection parameters
 static int BitMode = 1;
+
+//Stepped motion parameters
 static int MotionMode = 0; //Set stepped motion as default
 static bool inMotion;
 static double PrintEnd;
+
+//Pumping parameter
 bool PumpingMode = 0;
 double PumpingParameter;
+uint StageMode = 0; //Selects which stage to use
 
 
 /**
@@ -482,7 +509,7 @@ void MainWindow::on_AutoCheckBox_clicked()
  */
 void MainWindow::on_SetMaxImageUpload_clicked()
 {
-    int MaxImageVal = ui->MaxImageUpload->value(); //Grab value from UI
+    uint MaxImageVal = ui->MaxImageUpload->value(); //Grab value from UI
     if (MaxImageVal < (InitialExposure + 1)) //Verifies that the max image upload is greater than initial exposure time
     {
         MaxImageVal = InitialExposure + 1;
@@ -912,25 +939,30 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
 {
     if (initConfirmationScreen())
     {
-        LCR_PatternDisplay(0);
-
-        initStageSlot();
+        LCR_PatternDisplay(0); //Turn off any projection
+        initStageSlot(); //Initializes stage with correct parameters and moves controlled to starting position
 
         if (ui->FileList->count() > 0)
         {
             //Upload images for initial exposure
-            QListWidgetItem * firstItem = ui->FileList->item(0);
+            QListWidgetItem * firstItem = ui->FileList->item(0); //Get first image
             QStringList firstImage;
+            //Create an imagelist that contain n copies of first image, where n = InitialExposure in integer seconds
             for (uint i = 0; i < InitialExposure; i++)
             {
                 firstImage << firstItem->text();
             }
-            DLP.AddPatterns(firstImage, 1000*1000, 0, UVIntensity, 0, 0, ExposureScriptList, ProjectionMode, BitMode); //Printscript is set to 0 for initial exposure time, 0 for initial image
-            nSlice = ui->FileList->count();
+            DLP.AddPatterns(firstImage, 1000*1000, 0, 0, 0, ExposureScriptList, ProjectionMode, BitMode, InitialExposureFlag); //Printscript is set to 0 for initial exposure time, 0 for initial image
+            if(ProjectionMode == POTF){
+                nSlice = ui->FileList->count();
+            }
+            else if (ProjectionMode == VIDEOPATTERN){
+                nSlice = (24/BitMode)*ui->FileList->count();
+            }
             ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
             QListWidgetItem * item;
             QStringList imageList;
-            for(int i = 1; (i < (ui->FileList->count())); i++)
+            for(uint i = 1; (i < (ui->FileList->count())); i++)
             {
                     item = ui->FileList->item(i);
                     imageList << item->text();
@@ -943,7 +975,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             {
                 ui->ProgramPrints->append("Using Print Script");
             }
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, 0, ExposureScriptList, ProjectionMode, BitMode); //Set initial image to 0
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, 0, ExposureScriptList, ProjectionMode, BitMode, 0); //Set initial image to 0
             DLP.updateLUT();
             DLP.clearElements();
             remainingImages = MaxImageUpload - InitialExposure;
@@ -957,6 +989,11 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             if(MotionMode == 1){
                 PrintEnd = StartingPosition - (ui->FileList->count()*SliceThickness);
                 ui->ProgramPrints->append("Print End for continous motion print set to: " + QString::number(PrintEnd));
+            }
+            if(ProjectionMode == VIDEOPATTERN){
+                QString filename =ui->FileList->item(layerCount)->text();
+                QPixmap img(filename);
+                ImagePopoutUI->showImage(img);
             }
         }
     }
@@ -983,29 +1020,41 @@ void MainWindow::on_StartPrint_clicked()
 {
     if (ValidateSettings() == true) //If settings are validated successfully and Initialization has been completed
     {
-        SMC.SetVelocity(StageVelocity);
+        SMC.SetVelocity(StageVelocity); //Update stage velocity
+        Sleep(20); //Sleep to avoid spamming motor controller
+        emit(on_GetPosition_clicked()); //Get stage position to validate that stage connection is working
         Sleep(20);
         emit(on_GetPosition_clicked());
-        Sleep(20);
-        emit(on_GetPosition_clicked());
-        nSlice = ui->FileList->count();
+        if(ProjectionMode == POTF){
+            nSlice = ui->FileList->count();  //# of images selected = # of slices
+        }
+        else if (ProjectionMode == VIDEOPATTERN){
+            nSlice = (24/BitMode)*ui->FileList->count();
+        }
+
         ui->ProgramPrints->append("Entering Printing Procedure");
         //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
-        if (PrintScript == 1){
-            LCR_SetLedCurrents(0,0,(LEDScriptList.at(0).toInt()));
+        if (PrintScript == ON){ //If printscript is on
+            LCR_SetLedCurrents(0,0,(LEDScriptList.at(0).toInt())); //Set LED intensity to first value in printscript
         }
-        else{
-            LCR_SetLedCurrents(0, 0, UVIntensity);
+        else{ //if printscript is off
+            LCR_SetLedCurrents(0, 0, UVIntensity); //set static LED intensity
         }
-        if (MotionMode == 1){
+        if (MotionMode == CONTINUOUS){ //continuous motion mode
             double ContStageVelocity = (SliceThickness)/(ExposureTime/(1e6)); //Multiply Exposure time by 1e6 to convert from us to s to get to proper units
             ui->ProgramPrints->append("Continuous Stage Velocity set to " + QString::number(SliceThickness) + "/" + QString::number(ExposureTime) + " = " + QString::number(ContStageVelocity) + " mm/s");
-            SMC.SetVelocity(ContStageVelocity);
+            SMC.SetVelocity(ContStageVelocity); //Set stage velocity to the calculated velocity
         }
-        //LCR_PatternDisplay(0);
-        PrintStartTime = QTime::currentTime();
-        DLP.startPatSequence();
-        PrintProcess();
+        PrintStartTime = QTime::currentTime(); //Get print start time from current time
+        DLP.startPatSequence(); //Start projection
+        if (ProjectionMode == POTF){ //if in POTF mode
+            PrintProcess(); //Start print process
+            ui->ProgramPrints->append("Entering POTF print process");
+        }
+        else{ //else in Video Pattern Mode
+            PrintProcessVP();
+            ui->ProgramPrints->append("Entering Video Pattern print process");
+        }
     }
 }
 
@@ -1031,7 +1080,7 @@ void MainWindow::PrintProcess(void)
             {
                 MaxImageReupload -= 5;
             }
-            for(int i = (layerCount); (i < ui->FileList->count()); i++)
+            for(uint i = (layerCount); (i < ui->FileList->count()); i++)
             {
                     item = ui->FileList->item(i);
                     imageList << item->text();
@@ -1045,14 +1094,14 @@ void MainWindow::PrintProcess(void)
             {
                 ui->ProgramPrints->append("Using Print Script");
             }
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime,UVIntensity, PrintScript, layerCount, ExposureScriptList, ProjectionMode, BitMode); //Should it be layerCount + 1??
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, ProjectionMode, BitMode, 0);
             DLP.updateLUT();
             DLP.clearElements();
             remainingImages = count - 1;
             layerCount++;
             Sleep(500);
             DLP.startPatSequence();
-            QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+            SetExposureTimer(0, InitialExposureFlag, PrintScript);
             if(MotionMode == 1){
                 SMC.AbsoluteMove(PrintEnd);
             }
@@ -1064,60 +1113,30 @@ void MainWindow::PrintProcess(void)
         }
         else if (InitialExposureFlag == true)
         {
+            SetExposureTimer(InitialExposureFlag, PrintScript, PumpingMode);
             updatePlot();
-            //QTimer::singleShot((InitialExposure*1000), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-            if (PumpingMode == 1){
-                QTimer::singleShot(InitialExposure*1000, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
-            }
-            else{
-                QTimer::singleShot(InitialExposure*1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-            }
             InitialExposureFlag = false;
-            ui->ProgramPrints->append("Exposing Initial Layer " + QString::number(InitialExposure) + "s");
+            ui->ProgramPrints->append("POTF Exposing Initial Layer " + QString::number(InitialExposure) + "s");
             inMotion = false;
-            //popout.showImage(ui->FileList->item(layerCount)->text());
-
         }
         else
         {
-            if (PrintScript == 1)
-            {
-                if (PumpingMode == 1){
-                    QTimer::singleShot(ExposureScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(pumpingSlot())); //value from printscript will be in ms, goes to pumping mode
-                }
-                else{
-                    QTimer::singleShot(ExposureScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //value from printscript will be in ms
-                }
-                ui->ProgramPrints->append("Exposing: " + QString::number(ExposureScriptList.at(layerCount).toDouble()) + " ms");
-            }
-            else
-            {
-                if (PumpingMode == 1){
-                    QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(pumpingSlot())); //Value from exposuretime will be in us so /1000
-                }
-                else{
-                    QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot())); //Value from exposuretime will be in us so /1000
-                }
-                ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
-            }
+            SetExposureTimer(0, PrintScript, PumpingMode);
             ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
             QString filename =ui->FileList->item(layerCount)->text();
-            //QPixmap img(filename);
-            //QPixmap img2 = img.scaled(890,490, Qt::KeepAspectRatio);
-            //ui->PrintImage->setPixmap(img2);
-            ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
+            ui->ProgramPrints->append("POTF Exposing: " + QString::number(ExposureTime/1000) + " ms");
             ui->ProgramPrints->append("Image File: " + filename);
             layerCount++;
             remainingImages--;
-            if(MotionMode == 0){
+            if(MotionMode == STEPPED){
                 updatePlot();
             }
             double OldPosition = GetPosition;
             emit(on_GetPosition_clicked());
             ui->ProgramPrints->append("Stage moved: " + QString::number(OldPosition - GetPosition));
-            QPixmap img(filename);
             if (ProjectionMode == 1)
             {
+                QPixmap img(filename);
                 ImagePopoutUI->showImage(img);
             }
         }
@@ -1125,13 +1144,12 @@ void MainWindow::PrintProcess(void)
     }
     else
     {
-        //USB_Close();
         ui->ProgramPrints->append("Print Complete");
         saveText();
         saveSettings();
 
         SMC.StopMotion();
-
+        LCR_PatternDisplay(0);
         Sleep(50);
         SMC.SetVelocity(2);
         Sleep(50);
@@ -1158,31 +1176,76 @@ void MainWindow::PrintProcessVP()
 {
     if (layerCount +1 <= nSlice)
     {
+        if (ReSyncFlag == 1) //if resync
+        {
+            ReSyncFlag = 0;
+            LCR_PatternDisplay(0); //Stop pattern display
+            QListWidgetItem * item;
+            QStringList imageList;
+            for(int i = FrameCount; i < FrameCount + (5*BitMode); i++)
+            {
+                if (i < ui->FileList->count()){
+                    item = ui->FileList->item(i);
+                    imageList << item->text();
+                }
+                else{
+                    ui->ProgramPrints->append("VP Image segmentation fault");
+                }
+            }
+            //Add pattern data to buffer to prepare for pattern upload
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, ProjectionMode, BitMode, 0);
+            //DLP.updateLUT(); //update LUT on light engine to upload pattern data
+            DLP.clearElements(); //clear pattern data buffer
+            Sleep(50); //small delay to ensure that the new patterns are uploaded
+            ui->ProgramPrints->append("Resync succesful, frame: " + QString::number(FrameCount) + " layer: " + QString::number(layerCount));
+            DLP.startPatSequence();
+            SetExposureTimer(0, PrintScript, PumpingMode);
 
+        }
+        else if (InitialExposureFlag == true) //Initial Exposure
+        {
+            SetExposureTimer(InitialExposureFlag, PrintScript, PumpingMode);
+            BitLayer = 1; //set to first bitlayer
+            ReSyncFlag = 1; //resync after intial exposure
+            ui->ProgramPrints->append("VP Exposing Initial Layer " + QString::number(InitialExposure) + "s");
+            InitialExposureFlag = 0;
+            layerCount++;
+        }
+        else //Normal print process
+        {
+            //Start exposuretime timers
+            SetExposureTimer(0, PrintScript, PumpingMode);
+            //Print information to log
+            ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
+            QString filename =ui->FileList->item(FrameCount)->text();
+            ui->ProgramPrints->append("VP Exposing: " + QString::number(ExposureTime/1000) + " ms");
+            ui->ProgramPrints->append("Image File: " + filename);
+
+            layerCount++; //increment layer counter
+            remainingImages--; //decrement remaining images
+
+            updatePlot();
+            BitLayer += BitMode;
+        }
     }
-    else
+    else //print complete
     {
         //USB_Close();
         ui->ProgramPrints->append("Print Complete");
         saveText();
         saveSettings();
-
         SMC.StopMotion();
-
         Sleep(50);
         SMC.SetVelocity(2);
         Sleep(50);
         emit(on_GetPosition_clicked());
         Sleep(50);
-        if (MinEndOfRun > 0)
-        {
+        if (MinEndOfRun > 0){
             SMC.AbsoluteMove(MinEndOfRun);
         }
-        else
-        {
+        else{
            SMC.AbsoluteMove(0);
         }
-
         return;
     }
 }
@@ -1205,15 +1268,42 @@ void MainWindow::pumpingSlot(void)
  */
 void MainWindow::ExposureTimeSlot(void)
 {
+    if (ProjectionMode == VIDEOPATTERN) //If in video pattern mode
+    {
+        //Add if statement here if last exposure time
+        if (PrintScript == ON && layerCount > 0)
+        {
+            if((ExposureScriptList.at(layerCount).toInt()) != ExposureScriptList.at(layerCount - 1).toInt())
+            {
+
+            }
+        }
+        if (BitLayer > 24) //If end of frame has been reached
+        {
+            FrameCount++; //increment frame counter
+            ui->ProgramPrints->append("New Frame: " + QString::number(FrameCount));
+            QPixmap img(ui->FileList->item(FrameCount)->text()); //select next image
+            ImagePopoutUI->showImage(img); //display next image
+            BitLayer = 1;
+            ReSyncCount++;
+            if (ReSyncCount > 120/(24/BitMode)){
+                ReSyncFlag = 1;
+                ReSyncCount = 0;
+            }
+        }
+    }
+
     if(MotionMode == 0){
         QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
         if(PumpingMode == 1){
             emit(on_GetPosition_clicked());
+            updatePlot();
             SMC.RelativeMove((PumpingParameter - SliceThickness)); //pumping param is in um, slicethickness is in mm
         }
         else{
             SMC.RelativeMove(-SliceThickness);
         }
+
         if(PrintScript == 1)
         {
             if (layerCount < LEDScriptList.size()){
@@ -1249,13 +1339,54 @@ void MainWindow::ExposureTimeSlot(void)
 
 /**
  * @brief MainWindow::DarkTimeSlot
- * Dummy slot, maye be removed
+ * Dummy slot, may be removed
  */
 void MainWindow::DarkTimeSlot(void)
 {
-      PrintProcess();
+    if(ProjectionMode == POTF){
+        PrintProcess();
+    }
+    else if(ProjectionMode == VIDEOPATTERN){
+        PrintProcessVP();
+    }
+    else{
+        showError("Incorrect Projection Mode");
+    }
 }
 
+void MainWindow::SetExposureTimer(int InitialExposureFlag, int PrintScript, int PumpingMode)
+{
+    if (InitialExposureFlag == 1)
+    {
+        if (PumpingMode == 1){
+            QTimer::singleShot(InitialExposure*1000, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
+        }
+        else{
+            QTimer::singleShot(InitialExposure*1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+        }
+    }
+    else
+    {
+        if (PrintScript == 1){
+            if (PumpingMode == 1){
+                QTimer::singleShot(ExposureScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(pumpingSlot()));
+            }
+            else{
+                QTimer::singleShot(ExposureScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+            }
+            ui->ProgramPrints->append("Exposing: " + QString::number(ExposureScriptList.at(layerCount).toDouble()) + " ms");
+        }
+        else{
+            if (PumpingMode == 1){
+                QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
+            }
+            else{
+                QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+            }
+            ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
+        }
+    }
+}
 /**
  * @brief MainWindow::ValidateSettings
  * @return bool: true if settings are valid, false otherwise
@@ -1726,6 +1857,129 @@ void MainWindow::updatePlot()
     textLabel2->setPen(QPen(Qt::black)); // show black border around text
 
     ui->LivePlot->replot(QCustomPlot::rpQueuedReplot);
+}
+
+/*************************Expanded Stage Lib***********************/
+int MainWindow::StageInit(const char* COMPort, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.SMC100CInit(COMPort);
+        return 1;
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int MainWindow::StageClose(Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.SMC100CClose();
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int MainWindow::StageHome(Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        returnVal = SMC.Home();
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int MainWindow::StageStop(Stage_t StageType)
+{
+    int returnVal = 0; //default 0 is an error
+    if(StageType == STAGE_SMC){
+        SMC.StopMotion();
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int MainWindow::SetStageVelocity(float VelocityToSet, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.SetVelocity(VelocityToSet);
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int MainWindow::SetStageAccleration(float AccelerationToSet, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.SetAcceleration(AccelerationToSet);
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int MainWindow::SetStagePositiveLimit(float PositiveLimit, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.SetPositiveLimit(PositiveLimit);
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int MainWindow::SetStageNegativeLimit(float NegativeLimit, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.SetNegativeLimit(NegativeLimit);
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int MainWindow::StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.AbsoluteMove(AbsoluteMovePosition);
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int MainWindow::StageRelativeMove(float RelativeMoveDistance, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.RelativeMove(RelativeMoveDistance);
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+
+char* MainWindow::StageGetPosition(Stage_t StageType)
+{
+    if(StageType == STAGE_SMC){
+        return SMC.GetPosition();
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
 }
 /*************************************************************
  * ********************Graveyard***************************

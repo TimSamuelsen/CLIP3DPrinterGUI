@@ -10,6 +10,11 @@
 #include "SMC100C.h"
 #include "dlp9000.h"
 
+typedef enum StageType{
+    STAGE_SMC,
+    STAGE_GCODE,
+}Stage_t;
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -27,6 +32,7 @@ public:
     //DLP9000 DLP;
     imagepopout popout;
     manualpumpcontrol Pump;
+
 
 public slots:
     void showError(QString errMsg);
@@ -164,5 +170,19 @@ private:
     bool initConfirmationScreen();
     void AutoMode();
     void initImagePopout();
+    void SetExposureTimer(int InitialExposureFlag, int PrintScript, int PumpingMode);
+
+    int StageInit(const char* COMPort,Stage_t StageType);
+    int StageClose(Stage_t StageType);
+    int StageHome(Stage_t StageType);
+    int StageStop(Stage_t StageType);
+    int SetStageVelocity(float VelocityToSet, Stage_t StageType);
+    int SetStageAccleration(float AccelerationToSet, Stage_t StageType);
+    int SetStagePositiveLimit(float PositiveLimit, Stage_t StageType);
+    int SetStageNegativeLimit(float NegativeLimit, Stage_t StageType);
+    int StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageType);
+    int StageRelativeMove(float RelativeMoveDistance, Stage_t StageType);
+    char* StageGetPosition(Stage_t);
+
 };
 #endif // MAINWINDOW_H

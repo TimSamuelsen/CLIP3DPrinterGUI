@@ -34,7 +34,7 @@ bool DLP9000::InitProjector(void)
  * @brief MainWindow::on_addPatternsButton_clicked
  */
 //Make sure that input comes from
-void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int UVIntensity, int PrintScript, int CurrentImage, QStringList ExposureTimeList, int ProjectionMode, int BitMode)
+void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int PrintScript, int CurrentImage, QStringList ExposureTimeList, int ProjectionMode, int BitMode, bool InitialExposure)
 {
     if(BitMode == 0){
         BitMode = 1; //Default bitmode to 1 if it somehow gets passed in undefined
@@ -89,8 +89,12 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                 pattern.trigOut2 = true;
                 pattern.clear = true;
                 pattern.splashImageIndex = 0;
-                pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos + m_elements[m_elements.size()-1].bits;
-
+                if (InitialExposure){
+                    pattern.splashImageBitPos = 0;
+                }
+                else{
+                    pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos + m_elements[m_elements.size()-1].bits;
+                }
             }
             pattern.selected = true;
             m_elements.append(pattern);

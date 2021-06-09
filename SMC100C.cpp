@@ -446,16 +446,6 @@ char* SMC100C::GetPosition()
     SetCommand(CommandType::PositionReal, 0.0, CommandGetSetType::Get);
     SendCurrentCommand();
     char* Read = SerialRead();
-    //printf("at SMC: %s\r\n", Read);
-    char* POut;
-
-    //for (uint8_t index = 3; index < strlen(PositionOutput);index++)
-    //{
-        //strcat(POut,&PositionOutput[index]);
-   // }
-   //CurrentPosition = POut;
-   //printf(CurrentPosition);
-   //return CurrentPosition;
    return Read;
 };
 
