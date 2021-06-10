@@ -97,7 +97,7 @@ void imageprocessing::bitEncode24()
         QString file1 = filename1->text();
         src1 = imread( samples::findFile (file1.toUtf8().constData()), IMREAD_COLOR);
         src1 = Scalar::all(0);
-        bitEncode8(src1, channel[0]);
+        bitEncode8(src1, channel[1]);
     }
     if (remainingImages > 0)
     {
@@ -105,7 +105,7 @@ void imageprocessing::bitEncode24()
         QString file2 = filename2->text();
         src2 = imread( samples::findFile (file2.toUtf8().constData()), IMREAD_COLOR);
         src2 = Scalar::all(0);
-        bitEncode8(src2, channel[1]);
+        bitEncode8(src2, channel[2]);
     }
     if (remainingImages > 0)
     {
@@ -113,7 +113,7 @@ void imageprocessing::bitEncode24()
         QString file3 = filename3->text();
         src3 = imread( samples::findFile (file3.toUtf8().constData()), IMREAD_COLOR);
         src3 = Scalar::all(0);
-        bitEncode8(src3, channel[2]);
+        bitEncode8(src3, channel[0]);
     }
 
     merge(channel,3,ImageOut);

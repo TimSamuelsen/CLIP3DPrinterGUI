@@ -2015,7 +2015,7 @@ parameters</string>
       <string notr="true">font: 10pt &quot;MS Shell Dlg 2&quot;;</string>
      </property>
      <property name="text">
-      <string>DI-CLIP </string>
+      <string>iCLIP </string>
      </property>
      <property name="iconSize">
       <size>
@@ -2379,7 +2379,7 @@ parameters</string>
      <x>0</x>
      <y>0</y>
      <width>1774</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

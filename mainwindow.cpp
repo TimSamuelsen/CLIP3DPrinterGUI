@@ -958,6 +958,8 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             }
             else if (ProjectionMode == VIDEOPATTERN){
                 nSlice = (24/BitMode)*ui->FileList->count();
+                DLP.updateLUT();
+                DLP.clearElements();
             }
             ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
             QListWidgetItem * item;
@@ -1183,7 +1185,7 @@ void MainWindow::PrintProcessVP()
             ReSyncFlag = 0;
             if (LCR_PatternDisplay(0) < 0)
                 showError("Unable to stop pattern display");
-            Sleep(5000);
+            Sleep(10);
             QListWidgetItem * item;
             QStringList imageList;
             uint count = 0;

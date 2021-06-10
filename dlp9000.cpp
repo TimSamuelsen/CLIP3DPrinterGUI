@@ -40,6 +40,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
         BitMode = 1; //Default bitmode to 1 if it somehow gets passed in undefined
     }
     int i;
+    int BitPos = 0;
     int numPatAdded = 0;
     MainWindow Main;
     if (ProjectionMode == 1)//Video Pattern Mode
@@ -69,7 +70,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                 pattern.splashImageBitPos = 0;
                 pattern.splashImageIndex = 0;
                 pattern.clear = true;
-
+                BitPos++;
             }
             else
             {
@@ -94,8 +95,12 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                     pattern.splashImageBitPos = 0;
                 }
                 else{
-                    pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos + m_elements[m_elements.size()-1].bits;
-                    printf("BitPos: %d", m_elements[m_elements.size()-1].splashImageBitPos + m_elements[m_elements.size()-1].bits);
+                    //pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos + m_elements[m_elements.size()-1].bits;
+                    if (BitPos > 23)
+                        BitPos = 0;
+                    pattern.splashImageBitPos = BitPos;
+                    printf("BitPos: %d", BitPos);
+                    BitPos++;
                 }
             }
             pattern.selected = true;
