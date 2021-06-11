@@ -14,9 +14,6 @@
 #include <QDesktopServices>
 #include <QDateTime>
 #include <QSettings>
-#include <QGraphicsSvgItem>
-#include <QSvgRenderer>
-#include <QSvgWidget>
 #include <time.h>
 
 #include "BMPParser.h"
