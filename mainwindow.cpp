@@ -1218,7 +1218,7 @@ void MainWindow::PrintProcessVP()
             ReSyncFlag = 1; //resync after intial exposure
             ui->ProgramPrints->append("VP Exposing Initial Layer " + QString::number(InitialExposure) + "s");
             InitialExposureFlag = 0;
-            layerCount++;
+            //layerCount++;
         }
         else //Normal print process
         {
