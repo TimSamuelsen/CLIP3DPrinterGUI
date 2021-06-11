@@ -189,7 +189,7 @@ void imageprocessing::bitEncode8(Mat source, Mat& Channel)
            }
        }
     }
-    imshow("test", workingChannel);
+    //imshow("test", workingChannel);
     workingChannel.release();
 }
 

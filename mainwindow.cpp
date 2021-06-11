@@ -1303,6 +1303,7 @@ void MainWindow::ExposureTimeSlot(void)
                 ReSyncCount = 0;
             }
         }
+        emit(on_GetPosition_clicked());
     }
 
     if(MotionMode == 0){
