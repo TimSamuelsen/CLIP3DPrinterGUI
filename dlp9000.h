@@ -12,9 +12,9 @@ class DLP9000
 public:
     bool InitProjector(void);
     void AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int PrintScript, int CurrentImage, QStringList ExposureTimeList, int ProjectionMode, int BitMode, bool InitialExposure);
-    int UpdatePatternMemory(int totalSplashImages, bool firmware );
+    int UpdatePatternMemory(int totalSplashImages, bool firmware);
     int uploadPatternToEVM(bool master, int splashImageCount, int splash_size, uint8_t* splash_block);
-    void updateLUT();
+    void updateLUT(int ProjectionMode);
     void startPatSequence(void);
     void clearElements(void);
     void setIT6535Mode(int Mode);
@@ -25,7 +25,7 @@ private:
     uint32_t m_ptnHeight = PTN_HEIGHT_WQXGA;
     QString m_ptnImagePath;
     QList<PatternElement> m_elements;
-    int calculateSplashImageDetails(int *totalSplashImages, bool firmware);
+    int calculateSplashImageDetails(int *totalSplashImages, bool firmware, int ProjectionMode);
 };
 
 

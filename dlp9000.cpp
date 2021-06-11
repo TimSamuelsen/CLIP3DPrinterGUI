@@ -95,12 +95,14 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                     pattern.splashImageBitPos = 0;
                 }
                 else{
-                    //pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos + m_elements[m_elements.size()-1].bits;
-                    if (BitPos > 23)
+                    pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos + m_elements[m_elements.size()-1].bits;
+                    if (BitPos > 23){
                         BitPos = 0;
+                    }
+                    printf("BP: %d,", BitPos);
                     pattern.splashImageBitPos = BitPos;
-                    printf("BitPos: %d", BitPos);
                     BitPos++;
+                    printf("BitPos: %d \r\n", pattern.splashImageBitPos);
                 }
             }
             pattern.selected = true;
@@ -217,7 +219,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
  * @param firmware - I - boolean to determine if it is to update firmware or On the Fly mode
  * @return
  */
-int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
+int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware)
 {
     MainWindow Main;
     for(int image = 0; image < totalSplashImages; image++)
@@ -238,6 +240,7 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware )
             if(ei != splashImageCount)
                 continue;
             int bitpos = m_elements[i].splashImageBitPos;
+            printf("UPbp: %d", m_elements[i].splashImageBitPos);
             int bitdepth = m_elements[i].bits;
             PtnImage image(m_elements[i].name);
             merge_image.merge(image,bitpos,bitdepth);
@@ -358,7 +361,7 @@ int DLP9000::uploadPatternToEVM(bool master, int splashImageCount, int splash_si
 /**
  * @brief MainWindow::on_updateLUT_Button_clicked
  */
-void DLP9000::updateLUT()
+void DLP9000::updateLUT(int ProjectionMode)
 {
     int totalSplashImages = 0;
     int ret;
@@ -374,13 +377,14 @@ void DLP9000::updateLUT()
         return;
     }
 
-    if (calculateSplashImageDetails(&totalSplashImages,FALSE))
+    if (calculateSplashImageDetails(&totalSplashImages,FALSE, ProjectionMode))
         return;
 
     LCR_ClearPatLut();
 
     for(int i = 0; i < m_elements.size(); i++)
     {
+        printf("Update BitPos: %d", m_elements[i].splashImageBitPos);
         if(LCR_AddToPatLut(i, m_elements[i].exposure, m_elements[i].clear, m_elements[i].bits, m_elements[i].color, m_elements[i].trigIn, m_elements[i].darkPeriod, m_elements[i].trigOut2, m_elements[i].splashImageIndex, m_elements[i].splashImageBitPos)<0)
         {
             sprintf(errStr,"Unable to add pattern number %d to the LUT",i);
@@ -477,15 +481,19 @@ void DLP9000::setIT6535Mode(int Mode)
  * @return - 0 - success
  *          -1 - failure
  */
-int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware)
+int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware, int ProjectionMode)
 {
     MainWindow Main;
     int maxbits = 400;
     int imgCount = 0;
     int bits = 0;
     int totalBits = 0;
+    int myBits;
     for(int elemCount = 0; elemCount < m_elements.size(); elemCount++)
     {
+        if (ProjectionMode == 1){
+            myBits = m_elements[elemCount].splashImageBitPos;
+        }
         if (m_elements[elemCount].bits > 16)
         {
             char dispStr[255];
@@ -525,7 +533,13 @@ int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware)
         if(i < elemCount)
         {
             m_elements[elemCount].splashImageIndex = m_elements[i].splashImageIndex;
-            m_elements[elemCount].splashImageBitPos = m_elements[i].splashImageBitPos;
+            if (ProjectionMode == 1){
+                m_elements[elemCount].splashImageBitPos = myBits;
+                printf("myBits: %d\r\n", m_elements[elemCount].splashImageBitPos);
+            }
+            else{
+                m_elements[elemCount].splashImageBitPos = m_elements[i].splashImageBitPos;
+            }
             continue;
         }
 
@@ -540,6 +554,13 @@ int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware)
 
         m_elements[elemCount].splashImageIndex = imgCount;
         m_elements[elemCount].splashImageBitPos = bits;
+        if (ProjectionMode == 1){
+            m_elements[elemCount].splashImageBitPos = myBits;
+            printf("myBits: %d\r\n", m_elements[elemCount].splashImageBitPos);
+        }
+        else{
+            m_elements[elemCount].splashImageBitPos = bits;
+        }
         bits += m_elements[elemCount].bits;
     }
 

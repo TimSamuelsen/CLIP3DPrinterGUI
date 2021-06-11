@@ -958,7 +958,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             }
             else if (ProjectionMode == VIDEOPATTERN){
                 nSlice = (24/BitMode)*ui->FileList->count();
-                DLP.updateLUT();
+                DLP.updateLUT(ProjectionMode);
                 DLP.clearElements();
             }
             ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
@@ -978,10 +978,10 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
                 ui->ProgramPrints->append("Using Print Script");
             }
             if (ProjectionMode == POTF){
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, 0, ExposureScriptList, ProjectionMode, BitMode, 0); //Set initial image to 0
-            DLP.updateLUT();
-            DLP.clearElements();
-            remainingImages = MaxImageUpload - InitialExposure;
+                DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, 0, ExposureScriptList, ProjectionMode, BitMode, 0); //Set initial image to 0
+                DLP.updateLUT(ProjectionMode);
+                DLP.clearElements();
+                remainingImages = MaxImageUpload - InitialExposure;
             }
             QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
             ui->ProgramPrints->append(dir.absolutePath());
@@ -1099,18 +1099,18 @@ void MainWindow::PrintProcess(void)
                 ui->ProgramPrints->append("Using Print Script");
             }
             DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, ProjectionMode, BitMode, 0);
-            DLP.updateLUT();
+            DLP.updateLUT(ProjectionMode);
             DLP.clearElements();
             remainingImages = count - 1;
             layerCount++;
             Sleep(500);
             DLP.startPatSequence();
-            SetExposureTimer(0, InitialExposureFlag, PrintScript);
+            SetExposureTimer(0, PrintScript, PumpingMode);
             if(MotionMode == 1){
                 SMC.AbsoluteMove(PrintEnd);
             }
             else{
-                updatePlot();
+                //updatePlot();
             }
             ui->ProgramPrints->append("Reupload succesful, current layer: " + QString::number(layerCount));
             ui->ProgramPrints->append(QString::number(remainingImages + 1) + " images uploaded");
@@ -1205,7 +1205,7 @@ void MainWindow::PrintProcessVP()
             }
             //Add pattern data to buffer to prepare for pattern upload
             DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, ProjectionMode, BitMode, 0);
-            DLP.updateLUT(); //update LUT on light engine to upload pattern data
+            DLP.updateLUT(ProjectionMode); //update LUT on light engine to upload pattern data
             DLP.clearElements(); //clear pattern data buffer
             Sleep(50); //small delay to ensure that the new patterns are uploaded
             ui->ProgramPrints->append("Resync succesful, frame: " + QString::number(FrameCount) + " layer: " + QString::number(layerCount) + "New Patterns: " + QString::number(count));
@@ -1345,7 +1345,7 @@ void MainWindow::ExposureTimeSlot(void)
             SMC.AbsoluteMove(PrintEnd);
         }
         PrintProcess();
-        }
+    }
 }
 
 /**
