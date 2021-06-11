@@ -253,6 +253,7 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
     if (ui->VP_HDMIcheckbox->isChecked())
     {
         ui->POTFcheckbox->setChecked(false);
+        initImagePopout();
         ProjectionMode = 1;
         if (LCR_SetMode(PTN_MODE_DISABLE) < 0)
         {
