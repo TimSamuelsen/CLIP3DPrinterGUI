@@ -1297,7 +1297,7 @@ void MainWindow::ExposureTimeSlot(void)
             ImagePopoutUI->showImage(img); //display next image
             BitLayer = 1;
             ReSyncCount++;
-            if (ReSyncCount > 120/(24/BitMode)){
+            if (ReSyncCount > (120-24)/(24/BitMode)){
                 ReSyncFlag = 1;
                 ReSyncCount = 0;
             }
