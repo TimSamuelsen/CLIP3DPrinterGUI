@@ -1277,6 +1277,9 @@ void MainWindow::pumpingSlot(void)
  */
 void MainWindow::ExposureTimeSlot(void)
 {
+    if (MotionMode == 0){
+        QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+    }
     if (ProjectionMode == VIDEOPATTERN) //If in video pattern mode
     {
         //Add if statement here if last exposure time
@@ -1306,7 +1309,6 @@ void MainWindow::ExposureTimeSlot(void)
     }
 
     if(MotionMode == 0){
-        QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
         if(PumpingMode == 1){
             emit(on_GetPosition_clicked());
             updatePlot();

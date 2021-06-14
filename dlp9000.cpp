@@ -52,7 +52,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
 
             if(m_elements.size()==0)
             {
-                pattern.bits = 1;
+                pattern.bits = BitMode;
                 pattern.color = PatternElement::BLUE;
                 if (PrintScript == 1)
                 {
@@ -70,11 +70,10 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                 pattern.splashImageBitPos = 0;
                 pattern.splashImageIndex = 0;
                 pattern.clear = true;
-                BitPos++;
             }
             else
             {
-                pattern.bits = 1;
+                pattern.bits = BitMode;
                 pattern.color = PatternElement::BLUE;
                 if (PrintScript == 1)
                 {
@@ -101,7 +100,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                     }
                     printf("BP: %d,", BitPos);
                     pattern.splashImageBitPos = BitPos;
-                    BitPos++;
+                    BitPos += BitMode;
                     printf("BitPos: %d \r\n", pattern.splashImageBitPos);
                 }
             }
@@ -482,6 +481,9 @@ int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware, 
 {
     MainWindow Main;
     int maxbits = 400;
+    if(ProjectionMode == 1){
+        maxbits = 5000;
+    }
     int imgCount = 0;
     int bits = 0;
     int totalBits = 0;

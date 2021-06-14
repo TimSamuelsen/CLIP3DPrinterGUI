@@ -9,7 +9,7 @@
 #include <iostream>
 #include <time.h>
 #include <windows.h>
-
+#include <math.h>
 
 using namespace cv;
 using std::cout;
@@ -144,7 +144,9 @@ void imageprocessing::bitEncode24()
 {
     Mat channel[3];
     split(src,channel); //Channels are split from actual image to retain properties of images being  handled
-    channel[0], channel[1], channel[2] = Scalar::all(0); //Clear out image channels to remove any potential artifacts
+    channel[0] = Scalar::all(0);
+    channel[1] = Scalar::all(0);
+    channel[2] = Scalar::all(0); //Clear out image channels to remove any potential artifacts
     Mat ImageOut;
 
     if (remainingImages > 0)
@@ -153,6 +155,7 @@ void imageprocessing::bitEncode24()
         QString file1 = filename1->text();
         src1 = imread( samples::findFile (file1.toUtf8().constData()), IMREAD_COLOR);
         src1 = Scalar::all(0);
+        ui->TerminalOut->append("Green");
         bitEncode8(src1, channel[1]);
     }
     if (remainingImages > 0)
@@ -161,6 +164,7 @@ void imageprocessing::bitEncode24()
         QString file2 = filename2->text();
         src2 = imread( samples::findFile (file2.toUtf8().constData()), IMREAD_COLOR);
         src2 = Scalar::all(0);
+        ui->TerminalOut->append("Red");
         bitEncode8(src2, channel[2]);
     }
     if (remainingImages > 0)
@@ -169,6 +173,7 @@ void imageprocessing::bitEncode24()
         QString file3 = filename3->text();
         src3 = imread( samples::findFile (file3.toUtf8().constData()), IMREAD_COLOR);
         src3 = Scalar::all(0);
+        ui->TerminalOut->append("Blue");
         bitEncode8(src3, channel[0]);
     }
 
@@ -188,6 +193,8 @@ void imageprocessing::bitEncode24()
 void imageprocessing::bitEncode8(Mat source, Mat& Channel)
 {
     cv::Mat workingChannel (source.rows, source.cols, CV_8UC1); //Initialize Channel for return, might not be optimal, but at least it works
+    workingChannel = Scalar::all(0);
+    bool MaskFlag = true;
     for (uint i = 0; i < 8; i++) //Repeats loop 8 times for 8 bit-layers
     {
         if (remainingImages > 0) //Make sure that there are still images remaining
@@ -225,12 +232,29 @@ void imageprocessing::bitEncode8(Mat source, Mat& Channel)
         }
         else
         {
-            ui->TerminalOut->append("No more images remaining");
+            uint Mask;
+            if(MaskFlag)
+            {
+                MaskFlag = false;
+                Mask = pow(2, (i)) - 1;
+                ui->TerminalOut->append("No more images remaining, Mask: " + QString::number(Mask));
+            }
+            else
+            {
+                ui->TerminalOut->append("No more images remaining");
+            }
+            for (int row = 0; row < workingChannel.rows; row++)
+            {
+               for (int col = 0; col < workingChannel.cols; col++)
+               {
+                       workingChannel.at<uchar>(row,col) = workingChannel.at<uchar>(row,col) & Mask;
+               }
+            }
         }
     }
     Channel = (source.rows, source.cols, CV_8UC1, workingChannel).clone();
-
-    uchar testbit = 0x02;
+#if 0
+    uchar testbit = 0xff;
     for (int row = 0; row < workingChannel.rows; row++)
     {
        for (int col = 0; col < workingChannel.cols; col++)
@@ -245,7 +269,8 @@ void imageprocessing::bitEncode8(Mat source, Mat& Channel)
            }
        }
     }
-    //imshow("test", workingChannel);
+    imshow("test", workingChannel);
+#endif
     workingChannel.release();
 }
 
