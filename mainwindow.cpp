@@ -1291,8 +1291,10 @@ void MainWindow::ExposureTimeSlot(void)
         {
             FrameCount++; //increment frame counter
             ui->ProgramPrints->append("New Frame: " + QString::number(FrameCount));
-            QPixmap img(ui->FileList->item(FrameCount)->text()); //select next image
-            ImagePopoutUI->showImage(img); //display next image
+            if (FrameCount < ui->FileList->count()){
+                QPixmap img(ui->FileList->item(FrameCount)->text()); //select next image
+                ImagePopoutUI->showImage(img); //display next image
+            }
             BitLayer = 1;
             ReSyncCount++;
             if (ReSyncCount > (120-24)/(24/BitMode)){

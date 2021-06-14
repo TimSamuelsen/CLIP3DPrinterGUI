@@ -19,6 +19,7 @@ cv::Mat workingImage, workingGray, workingBinary, bit8Image, encodedImage;
 static int remainingImages;
 static int encode24Count = 1;
 static int encodeCount = 0;
+int grayEncodeCount = 1;
 
 QString TargetDestination = "C://";
 static int rowDim;
@@ -82,6 +83,61 @@ void imageprocessing::on_EncodeTest_clicked()
         imageprocessing::update();
     }
     encodeCount = 0; //reset encodeCount
+}
+
+void imageprocessing::on_GreyscaleEncode_clicked()
+{
+    while (remainingImages > 0)
+    {
+        Mat channel[3];
+        split(src,channel); //Channels are split from actual image to retain properties of images being  handled
+        channel[0], channel[1], channel[2] = Scalar::all(0); //Clear out image channels to remove any potential artifacts
+        Mat ImageOut;
+
+        if(remainingImages > 0){
+            QListWidgetItem* filename = ui->InputList->item(encodeCount); //Select image
+            QString file_name = filename->text(); //convert to string to read by openCV
+            Mat bit8read, bit8gray; //Prep working Mats
+            bit8read = imread( samples::findFile (file_name.toUtf8().constData()), IMREAD_COLOR); //read image into workingImage mat
+            cvtColor(bit8read, bit8gray, COLOR_BGR2GRAY); //convert image to grayscale
+            channel[1] = bit8gray.clone();
+            encodeCount++;
+            remainingImages--;
+        }
+
+        if(remainingImages > 0){
+            QListWidgetItem* filename = ui->InputList->item(encodeCount); //Select image
+            QString file_name = filename->text(); //convert to string to read by openCV
+            Mat bit8read, bit8gray; //Prep working Mats
+            bit8read = imread( samples::findFile (file_name.toUtf8().constData()), IMREAD_COLOR); //read image into workingImage mat
+            cvtColor(bit8read, bit8gray, COLOR_BGR2GRAY); //convert image to grayscale
+            channel[2] = bit8gray.clone();
+            encodeCount++;
+            remainingImages--;
+        }
+
+        if(remainingImages > 0){
+            QListWidgetItem* filename = ui->InputList->item(encodeCount); //Select image
+            QString file_name = filename->text(); //convert to string to read by openCV
+            Mat bit8read, bit8gray; //Prep working Mats
+            bit8read = imread( samples::findFile (file_name.toUtf8().constData()), IMREAD_COLOR); //read image into workingImage mat
+            cvtColor(bit8read, bit8gray, COLOR_BGR2GRAY); //convert image to grayscale
+            channel[0] = bit8gray.clone();
+            encodeCount++;
+            remainingImages--;
+        }
+
+        merge(channel,3,ImageOut);
+        QPixmap newImage = QPixmap::fromImage(QImage((unsigned char*) ImageOut.data, ImageOut.cols, ImageOut.rows, QImage::Format_BGR888));
+        ui->ImageDisplay->setPixmap(newImage.scaled(853,533));
+
+        QString ImageName = TargetDestination + "/" + QString::number(grayEncodeCount) + ".tiff";
+        imwrite(ImageName.toUtf8().constData(), ImageOut);
+        ui->OutputImageList->addItem(ImageName);
+        //imshow("Test", ImageOut);
+        grayEncodeCount++;
+        imageprocessing::update();
+    }
 }
 
 void imageprocessing::bitEncode24()

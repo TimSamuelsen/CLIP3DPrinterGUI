@@ -205,9 +205,6 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
     //updatePtnCheckbox();
     return;
 }
-
-
-
 /***************Helper Functions**************************/
 
 /**

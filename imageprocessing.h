@@ -29,6 +29,8 @@ private slots:
 
     void bitEncode8(cv::Mat source, cv::Mat& Channel);
 
+    void on_GreyscaleEncode_clicked();
+
 private:
     Ui::imageprocessing *ui;
     cv::Mat mframe;
