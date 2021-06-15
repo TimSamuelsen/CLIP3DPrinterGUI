@@ -53,7 +53,7 @@
 #define POTF 0
 
 
-static DLP9000 DLP; //DLP object for calling functions from dlp9000.cpp, test if this still works without being a static
+DLP9000 DLP; //DLP object for calling functions from dlp9000.cpp, test if this still works without being a static
 //Module level variables
 static bool InitialExposureFlag = true; //Flag to indicate print process to do intial expore first, set false after intial exposure never set true again
 //Settings are static so they can be accessed from outside anywhere in this module
@@ -131,17 +131,20 @@ uint StageMode = 0; //Selects which stage to use
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
+    //Create new window
     ui = (new Ui::MainWindow);
     ui->setupUi(this);
-    CurrentDateTime = QDateTime::currentDateTime();
-    loadSettings();
-    initSettings();
-    initPlot();
+
+    //Initialize features
+    CurrentDateTime = QDateTime::currentDateTime(); //get current time for startup time
+    loadSettings(); //load settings from settings file
+    initSettings(); //initialize settings by updating ui
+    initPlot(); //initiallize the plot window
 }
 
 /**
  * @brief MainWindow::timerTimeout
- * Currently not in use
+ * Currently not in use, to be used for ui refresh rate
  */
 void MainWindow::timerTimeout(void)
 {
@@ -150,12 +153,12 @@ void MainWindow::timerTimeout(void)
 
 /**
  * @brief MainWindow::~MainWindow
+ * Called when the main window is closed
  */
 MainWindow::~MainWindow()
 {
-    saveSettings();
+    saveSettings(); //Save settings upon closing application main window
     //SMC.SMC100CClose();
-
     delete ui;
 }
 
@@ -166,39 +169,18 @@ MainWindow::~MainWindow()
  */
 void MainWindow::on_ManualStage_clicked()
 {
+    //Create new manual stage control window
     ManualStageUI = new ManualStageControl();
     ManualStageUI->show();
+
+    //Initialize stage for manual stage control
     SMC.Home(); //Home command is issued to make sure the stage is referenced upon startup
     SMC.SMC100CClose(); //Close main window connection to allow manual stage control to take over, ideally this would not be needed and it would stay on the same connection.
-    ui->ProgramPrints->append("Manual Stage Control Entered");
-    ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 255); border: 1px solid black;");
-    ui->StageConnectionIndicator->setText("Manual Control");
-}
 
-
-/**
- * @brief MainWindow::on_GetPosition_clicked
- * Gets position, saves it in module level variable GetPosition,
- * updates slider and prints to terminal window
- */
-void MainWindow::on_GetPosition_clicked()
-{
-    for (int i = 0; i<5; i++) //To be removed...
-    {
-        QString delay = "This delay is needed for the serial read";
-    }
-    char* ReadPosition = SMC.GetPosition(); //Get position and store it in char*, could store directly in QString but if result is null it can cause issues
-    if (strlen(ReadPosition) > 1) //In essence means that if there has not been an error -> update variable
-    {
-        //printf("at mainwindow %s\r\n",ReadPosition);
-        QString CurrentPosition = QString::fromUtf8(ReadPosition); //convert char* to QString
-        CurrentPosition.remove(0,3); //Removes address and command code
-        CurrentPosition.chop(2); //To be removed...
-        ui->CurrentPositionIndicator->setText(CurrentPosition);
-        ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + " mm");
-        ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
-        GetPosition = CurrentPosition.toDouble();
-    }
+    //Update Terminal and Stage Connection Indicator
+    ui->ProgramPrints->append("Manual Stage Control Entered"); //Print to terminal
+    ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 255); border: 1px solid black;"); //Set color of indicator to teal to indicate in manual stage control
+    ui->StageConnectionIndicator->setText("Manual Control"); //Set text on indicator to indicate in manual stage control
 }
 
 /**
@@ -208,10 +190,12 @@ void MainWindow::on_GetPosition_clicked()
  */
 void MainWindow::on_pushButton_clicked()
 {
+    //Create new manual pump control window
     ManualPumpUI = new manualpumpcontrol();
     ManualPumpUI->show();
-    ui->ProgramPrints->append("Manual Pump Control Entered");
-    Pump.PSerial.closeDevice(); //Closes mai nwindow pump connection
+
+    ui->ProgramPrints->append("Manual Pump Control Entered"); //Print to terminal
+    Pump.PSerial.closeDevice(); //Closes main window pump connection to allow manual pump control to take over
 }
 
 /**
@@ -220,9 +204,33 @@ void MainWindow::on_pushButton_clicked()
  */
 void MainWindow::on_ImageProcess_clicked()
 {
+    //Create new image processing window
     ImageProcessUI = new imageprocessing();
     ImageProcessUI->show();
     ui->ProgramPrints->append("Opening Image Processing");
+}
+
+/**
+ * @brief MainWindow::on_GetPosition_clicked
+ * Gets position, saves it in module level variable GetPosition,
+ * updates slider and prints to terminal window
+ */
+void MainWindow::on_GetPosition_clicked()
+{
+    //Get position and store it in char*, could store directly in QString but if result is null it can cause issues
+    char* ReadPosition = SMC.GetPosition();
+
+    //If the string length returned from SMC.GetPosition is > 1, then no errors have occurred
+    if (strlen(ReadPosition) > 1)
+    {
+        QString CurrentPosition = QString::fromUtf8(ReadPosition); //convert char* to QString
+        CurrentPosition.remove(0,3); //Removes address and command code
+        CurrentPosition.chop(2); //To be removed...
+        ui->CurrentPositionIndicator->setText(CurrentPosition); //Update current position indicator
+        ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + " mm"); //Print to terminal
+        ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble()); //Update slider position
+        GetPosition = CurrentPosition.toDouble(); //Update module variable GetPosition (to be accessed from other functions)
+    }
 }
 
 /*********************************************Mode Selection*********************************************/
@@ -232,12 +240,13 @@ void MainWindow::on_ImageProcess_clicked()
  */
 void MainWindow::on_POTFcheckbox_clicked()
 {
+    //Make sure that the checkbox is checked before proceeding
     if (ui->POTFcheckbox->isChecked())
     {
-        ui->VP_HDMIcheckbox->setChecked(false);
-        ProjectionMode = 0;
-        DLP.setIT6535Mode(0); //not sure if needed
-        LCR_SetMode(PTN_MODE_OTF);
+        ui->VP_HDMIcheckbox->setChecked(false); //Uncheck the Video Pattern checkbox
+        ProjectionMode = POTF; //Set projection mode to POTF
+        DLP.setIT6535Mode(0); //Turn off HDMI connection
+        LCR_SetMode(PTN_MODE_OTF); //Set light engine to POTF mode
     }
 }
 

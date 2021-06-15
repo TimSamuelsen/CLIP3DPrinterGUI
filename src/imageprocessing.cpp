@@ -44,7 +44,7 @@ void imageprocessing::on_SelectImageFiles_clicked()
     QStringList file_name = QFileDialog::getOpenFileNames(this,"Open Object Image Files","C://Users/le54t/Documents/Stanford/Research/testImages","*.bmp *.png *.tiff *.tif *.svg");
     if (file_name.count() > 0) //If images were selected
     {
-        QDir ImageDirectory = QFileInfo(file_name.at(0)).absoluteDir();
+        //QDir ImageDirectory = QFileInfo(file_name.at(0)).absoluteDir();
         //ImageFileDirectory = ImageDirectory.filePath(file_name.at(0));
         for (uint16_t i = 0; i < file_name.count(); i++)
         {

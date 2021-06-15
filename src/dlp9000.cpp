@@ -461,6 +461,7 @@ void DLP9000::setIT6535Mode(int Mode)
             ProjectMode = VIDEO_CON_DP;
             break;
         default:
+            ProjectMode = VIDEO_CON_DISABLE; //do nothing
             break;
     }
     LCR_SetIT6535PowerMode(ProjectMode);
