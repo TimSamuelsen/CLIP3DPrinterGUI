@@ -9,41 +9,41 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-INCLUDEPATH += \
+INCLUDEPATH += "src"
 
 
 SOURCES += \
-    SMC100C.cpp \
-    dlp9000.cpp \
-    imagepopout.cpp \
-    imageprocessing.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    manualpumpcontrol.cpp \
-    manualstagecontrol.cpp \
-    qcustomplot.cpp \
-    serialib.cpp
+    src/SMC100C.cpp \
+    src/dlp9000.cpp \
+    src/imagepopout.cpp \
+    src/imageprocessing.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/manualpumpcontrol.cpp \
+    src/manualstagecontrol.cpp \
+    src/qcustomplot.cpp \
+    src/serialib.cpp
 
 HEADERS += \
-    PtnImage.h \
-    SMC100C.h \
-    dlp9000.h \
-    imagepopout.h \
-    imageprocessing.h \
-    mainwindow.h \
-    manualpumpcontrol.h \
-    manualstagecontrol.h \
-    patternelement.h \
-    qcustomplot.h \
-    serialib.h
+    src/PtnImage.h \
+    src/SMC100C.h \
+    src/dlp9000.h \
+    src/imagepopout.h \
+    src/imageprocessing.h \
+    src/mainwindow.h \
+    src/manualpumpcontrol.h \
+    src/manualstagecontrol.h \
+    src/patternelement.h \
+    src/qcustomplot.h \
+    src/serialib.h
 
 
 FORMS += \
-    imagepopout.ui \
-    imageprocessing.ui \
-    mainwindow.ui \
-    manualpumpcontrol.ui \
-    manualstagecontrol.ui
+    src/imagepopout.ui \
+    src/imageprocessing.ui \
+    src/mainwindow.ui \
+    src/manualpumpcontrol.ui \
+    src/manualstagecontrol.ui
 
 #For Lightcrafter API
 INCLUDEPATH += "HiresLib"
