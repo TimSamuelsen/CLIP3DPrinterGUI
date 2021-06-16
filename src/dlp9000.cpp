@@ -70,6 +70,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                 pattern.splashImageBitPos = 0;
                 pattern.splashImageIndex = 0;
                 pattern.clear = true;
+                BitPos += BitMode;
             }
             else
             {
@@ -109,6 +110,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
             numPatAdded++;
             //m_patternImageChange = true;
         }
+        printf("%d Patterns Added",numPatAdded);
     }
     else //POTF mode
     {

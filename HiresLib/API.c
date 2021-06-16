@@ -2717,7 +2717,7 @@ int LCR_AddToPatLut(int PatNum, int ExpUs, BOOL ClearPat, int BitDepth, int LEDS
     lutShort = SplashIndex & 0x7FF;
     lutShort |= (BitIndex & 0x1F) << 11;
     printf("BitIndex: %d", BitIndex);
-    printf("lutShort: %d", lutShort);
+    printf("lutShort: %x", lutShort);
 
     PatLut[10][PatLutIndex] = lutShort & 0xFF;
     PatLut[11][PatLutIndex] = (lutShort >> 8) & 0xFF;
