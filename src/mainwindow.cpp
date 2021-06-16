@@ -1207,8 +1207,10 @@ void MainWindow::PrintProcessVP()
                     }
                     else{
                         ui->ProgramPrints->append("VP Image segmentation fault");
+                        break;
                     }
                 }
+                ui->ProgramPrints->append(QString::number(count) + " patterns uploaded");
             }
             //Add pattern data to buffer to prepare for pattern upload
             DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, ProjectionMode, BitMode, 0);
@@ -1234,9 +1236,9 @@ void MainWindow::PrintProcessVP()
             //Start exposuretime timers
             SetExposureTimer(0, PrintScript, PumpingMode);
             //Print information to log
-            ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
+            ui->ProgramPrints->append("VP Layer: " + QString::number(layerCount));
             QString filename =ui->FileList->item(FrameCount)->text();
-            ui->ProgramPrints->append("VP Exposing: " + QString::number(ExposureTime/1000) + " ms");
+            //ui->ProgramPrints->append("VP Exposing: " + QString::number(ExposureTime/1000) + " ms");
             ui->ProgramPrints->append("Image File: " + filename);
 
             layerCount++; //increment layer counter
