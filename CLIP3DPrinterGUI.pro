@@ -45,10 +45,10 @@ FORMS += \
     src/manualpumpcontrol.ui \
     src/manualstagecontrol.ui
 
-#For Lightcrafter API
-INCLUDEPATH += $$PWD/src/HiresLib
-INCLUDEPATH += $$PWD/hidapi-master/hidapi
-INCLUDEPATH += $$PWD/src/hidapi-master/windows/Release
+#For Lightcrafter API"
+INCLUDEPATH += "src\\HiresLib"
+INCLUDEPATH += "src\\hidapi-master\\hidapi"
+INCLUDEPATH += "src\\hidapi-master\\windows\\Release"
 INCLUDEPATH += $$PWD/src/HiresLib
 DEPENDPATH += $$PWD/src/HiresLib
 
