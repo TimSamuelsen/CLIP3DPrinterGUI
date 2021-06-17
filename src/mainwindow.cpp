@@ -1110,7 +1110,7 @@ void MainWindow::PrintProcess(void)
             DLP.clearElements();
             remainingImages = count - 1;
             layerCount++;
-            Sleep(500);
+            Sleep(50);
             DLP.startPatSequence();
             SetExposureTimer(0, PrintScript, PumpingMode);
             if(MotionMode == 1){
@@ -1196,6 +1196,12 @@ void MainWindow::PrintProcessVP()
             QListWidgetItem * item;
             QStringList imageList;
             uint count = 0;
+            //if (BitMode == 8){
+              //  uploadCount = 16;
+            //}
+            //else{
+             //   uploadCount = 5;
+            //}
             for(int i = FrameCount; i < FrameCount + (5*BitMode); i++)
             {
                 for (int j = 0; j < (24/BitMode); j++)
@@ -1205,10 +1211,10 @@ void MainWindow::PrintProcessVP()
                         imageList << item->text();
                         count++;
                     }
-                    else{
-                        ui->ProgramPrints->append("VP Image segmentation fault");
-                        break;
-                    }
+                        else{
+                            ui->ProgramPrints->append("VP Image segmentation fault");
+                            break;
+                        }
                 }
                 ui->ProgramPrints->append(QString::number(count) + " patterns uploaded");
             }
@@ -1219,8 +1225,11 @@ void MainWindow::PrintProcessVP()
             Sleep(50); //small delay to ensure that the new patterns are uploaded
             ui->ProgramPrints->append("Resync succesful, frame: " + QString::number(FrameCount) + " layer: " + QString::number(layerCount) + "New Patterns: " + QString::number(count));
             DLP.startPatSequence();
+            Sleep(5);
             SetExposureTimer(0, PrintScript, PumpingMode);
-
+            layerCount++; //increment layer counter
+            remainingImages--; //decrement remaining images
+            BitLayer += BitMode;
         }
         else if (InitialExposureFlag == true) //Initial Exposure
         {
@@ -1244,7 +1253,7 @@ void MainWindow::PrintProcessVP()
             layerCount++; //increment layer counter
             remainingImages--; //decrement remaining images
 
-            updatePlot();
+            //updatePlot();
             BitLayer += BitMode;
         }
     }
@@ -1290,7 +1299,9 @@ void MainWindow::ExposureTimeSlot(void)
 {
     if (MotionMode == 0){
         QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        ui->ProgramPrints->append(QTime::currentTime().toString("hh.mm.ss.zzz"));
     }
+    updatePlot();
     if (ProjectionMode == VIDEOPATTERN) //If in video pattern mode
     {
         //Add if statement here if last exposure time
@@ -1311,6 +1322,13 @@ void MainWindow::ExposureTimeSlot(void)
             }
             BitLayer = 1;
             ReSyncCount++;
+            int ReSyncNum;
+            if (BitMode > 1){
+                ReSyncNum = 48;
+            }
+            else{
+                ReSyncNum = 120;
+            }
             if (ReSyncCount > (120-24)/(24/BitMode)){
                 ReSyncFlag = 1;
                 ReSyncCount = 0;
