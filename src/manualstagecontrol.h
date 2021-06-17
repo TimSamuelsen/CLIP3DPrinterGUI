@@ -4,6 +4,11 @@
 #include <QWidget>
 #include "SMC100C.h"
 
+typedef enum StageType{
+    STAGE_SMC,
+    STAGE_GCODE,
+}Stage_t;
+
 namespace Ui {
 class ManualStageControl;
 }
@@ -16,6 +21,7 @@ public:
     explicit ManualStageControl(QWidget *parent = nullptr);
     ~ManualStageControl();
     SMC100C SMC;
+    serialib StageSerial;
 private slots:
     void on_MoveRelative_clicked();
 
@@ -46,6 +52,18 @@ private slots:
 private:
     Ui::ManualStageControl *ui;
     void GetValues();
+
+    int StageInit(const char* COMPort,Stage_t StageType);
+    int StageClose(Stage_t StageType);
+    int StageHome(Stage_t StageType);
+    int StageStop(Stage_t StageType);
+    int SetStageVelocity(float VelocityToSet, Stage_t StageType);
+    int SetStageAccleration(float AccelerationToSet, Stage_t StageType);
+    int SetStagePositiveLimit(float PositiveLimit, Stage_t StageType);
+    int SetStageNegativeLimit(float NegativeLimit, Stage_t StageType);
+    int StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageType);
+    int StageRelativeMove(float RelativeMoveDistance, Stage_t StageType);
+    char* StageGetPosition(Stage_t);
 };
 
 #endif // MANUALSTAGECONTROL_H

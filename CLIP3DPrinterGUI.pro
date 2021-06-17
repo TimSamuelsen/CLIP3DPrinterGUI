@@ -62,7 +62,7 @@ HEADERS += \
     src/HiresLib/flashloader.h \
     src/HiresLib/pattern.h \
     src/HiresLib/splash.h \
-    src/HiresLib/usb.h \
+    src/HiresLib/usb.h
 
 SOURCES += \
     src/HiresLib/API.c \
@@ -75,7 +75,7 @@ SOURCES += \
     src/HiresLib/flashloader.c \
     src/HiresLib/pattern.c \
     src/HiresLib/splash.c \
-    src/HiresLib/usb.c \
+    src/HiresLib/usb.c
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -84,7 +84,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     Pictures.qrc
-    HiRes.qrc
+   # HiRes.qrc \
 
 INCLUDEPATH += $$PWD/HiresLib
 DEPENDPATH += $$PWD/HiresLib

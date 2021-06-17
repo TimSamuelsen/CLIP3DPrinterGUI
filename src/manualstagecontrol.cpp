@@ -153,3 +153,163 @@ void ManualStageControl::on_StopMotion_clicked()
     SMC.StopMotion();
     ui->TerminalOut->append("Stopping Motion");
 }
+
+
+/*************************Expanded Stage Lib***********************/
+int ManualStageControl::StageInit(const char* COMPort, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.SMC100CInit(COMPort);
+        returnVal = 1;
+    }
+    else if (StageType == STAGE_GCODE){
+        if(StageSerial.openDevice(COMPort,9600) == 1){ //If serial connection was succesful
+            returnVal = 1; //return 1 for succesful connection
+            Sleep(10); //Delay to avoid serial congestion
+
+            //Set stage programming to mm
+            QString UnitCommand = "G21\r";
+            int UnitReturn = StageSerial.writeString(UnitCommand.toLatin1().data());
+            if (UnitReturn < 0) //if command failed
+                returnVal = -1; //return -1 for failed command
+            Sleep(10); //Delay to avoid serial congestion
+
+            //Set stage to use incremental movements
+            QString IncrementCommand = "G91\r";
+            int IncrementReturn = StageSerial.writeString(IncrementCommand.toLatin1().data());
+            if (IncrementReturn < 0) //if command failed
+                returnVal = -1; //return -1 for failed command
+            Sleep(10); //Delay to avoid serial congestion
+
+            //Enable steppers
+            QString StepperCommand = "M17\r";
+            int StepperReturn = StageSerial.writeString(StepperCommand.toLatin1().data());
+            if (StepperReturn < 0) //if command failed
+                returnVal = -1; //return -1 for failed command
+        }
+        else{ //Serial connection failed
+            returnVal = -1;
+            printf("GCode stage connection failed");
+        }
+    }
+    return returnVal;
+}
+int ManualStageControl::StageClose(Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.SMC100CClose();
+    }
+    else if (StageType == STAGE_GCODE){
+        StageSerial.closeDevice();
+    }
+    return returnVal;
+}
+int ManualStageControl::StageHome(Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        returnVal = SMC.Home();
+    }
+    else if (StageType == STAGE_GCODE){
+        //Is there a use for a stage home command?
+    }
+    return returnVal;
+}
+int ManualStageControl::StageStop(Stage_t StageType)
+{
+    int returnVal = 0; //default 0 is an error
+    if(StageType == STAGE_SMC){
+        SMC.StopMotion();
+    }
+    else if (StageType == STAGE_GCODE){
+        QString STOP = "M0\r";
+        int STOPreturn = StageSerial.writeString(STOP.toLatin1().data());
+        if (STOPreturn)
+            returnVal = -1;
+    }
+    return returnVal;
+}
+int ManualStageControl::SetStageVelocity(float VelocityToSet, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.SetVelocity(VelocityToSet);
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int ManualStageControl::SetStageAccleration(float AccelerationToSet, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.SetAcceleration(AccelerationToSet);
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int ManualStageControl::SetStagePositiveLimit(float PositiveLimit, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.SetPositiveLimit(PositiveLimit);
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int ManualStageControl::SetStageNegativeLimit(float NegativeLimit, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.SetNegativeLimit(NegativeLimit);
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+int ManualStageControl::StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.AbsoluteMove(AbsoluteMovePosition);
+    }
+    else if (StageType == STAGE_GCODE){
+        //Set stage to do absolute move
+        QString AbsMoveCommand = "G92 Z" + QString::number(AbsoluteMovePosition) + "\r";
+        int AbsMoveReturn = StageSerial.writeString(AbsMoveCommand.toLatin1().data());
+        if (AbsMoveReturn < 0) //if command failed
+            returnVal = -1; //return -1 for failed command
+        Sleep(10); //Delay to avoid serial congestion
+    }
+    return returnVal;
+}
+int ManualStageControl::StageRelativeMove(float RelativeMoveDistance, Stage_t StageType)
+{
+    int returnVal = 0;
+    if(StageType == STAGE_SMC){
+        SMC.RelativeMove(RelativeMoveDistance);
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return returnVal;
+}
+
+char* ManualStageControl::StageGetPosition(Stage_t StageType)
+{
+    if(StageType == STAGE_SMC){
+        return SMC.GetPosition();
+    }
+    else if (StageType == STAGE_GCODE){
+
+    }
+    return 0;
+}
