@@ -46,9 +46,11 @@ FORMS += \
     src/manualstagecontrol.ui
 
 #For Lightcrafter API
-INCLUDEPATH += "src\\HiresLib"
-INCLUDEPATH += "src\\hidapi-master\\hidapi"
-INCLUDEPATH += "src\\hidapi-master\\windows\\Release"
+INCLUDEPATH += $$PWD/src/HiresLib
+INCLUDEPATH += $$PWD/hidapi-master/hidapi
+INCLUDEPATH += $$PWD/src/hidapi-master/windows/Release
+INCLUDEPATH += $$PWD/src/HiresLib
+DEPENDPATH += $$PWD/src/HiresLib
 
 HEADERS += \
     src/HiresLib/API.h \
@@ -77,6 +79,10 @@ SOURCES += \
     src/HiresLib/splash.c \
     src/HiresLib/usb.c
 
+INCLUDEPATH += $$PWD/hidapi-master/lib4QT
+DEPENDPATH += $$PWD/hidapi-master/lib4QT
+win32: LIBS += -L$$PWD/src/hidapi-master/lib4QT/ -lhidapi
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
@@ -84,38 +90,13 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     Pictures.qrc
-   # HiRes.qrc \
-
-INCLUDEPATH += $$PWD/HiresLib
-DEPENDPATH += $$PWD/HiresLib
 
 win32: LIBS += -lSetupAPI
-
-win32: INCLUDEPATH += C:/DEV/boost_1_75_0
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/src/hidapi-master/lib4QT/ -lhidapi
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/src/hidapi-master/lib4QT/ -lhidapi
-else:unix: LIBS += -L$$PWD/src/hidapi-master/lib4QT/ -lhidapi
-
-INCLUDEPATH += $$PWD/hidapi-master/lib4QT
-DEPENDPATH += $$PWD/hidapi-master/lib4QT
-
 #OpenCV libs
 INCLUDEPATH += $$PWD/src/OpenCV/install/include
 DEPENDPATH += $$PWD/src/OpenCV/install/include
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_core401.dll
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_core401.dll
-else:unix: LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_core401.dll
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_imgcodecs401.dll
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_imgcodecs401.dll
-else:unix: LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_imgcodecs401.dll
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_imgproc401.dll
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_imgproc401.dll
-else:unix: LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_imgproc401.dll
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_highgui401.dll
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_highgui401.dll
-else:unix: LIBS += -L$$PWD/OpenCV/install/x64/mingw/lib/ -llibopencv_highgui401.dll
+win32: LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_core401.dll
+win32: LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_imgcodecs401.dll
+win32: LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_imgproc401.dll
+win32: LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_highgui401.dll
