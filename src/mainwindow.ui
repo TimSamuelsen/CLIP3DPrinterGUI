@@ -2178,11 +2178,14 @@ parameters</string>
       <height>45</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">image: url(:/new/pics/desimone_lab_wordmark-nobg.png);</string>
+    </property>
     <property name="text">
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap resource="../Pictures.qrc">:/new/prefix1/desimone_lab_wordmark-nobg.png</pixmap>
+     <pixmap>:/new/prefix1/desimone_lab_wordmark-nobg.png</pixmap>
     </property>
     <property name="scaledContents">
      <bool>true</bool>
@@ -2454,8 +2457,6 @@ parameters</string>
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../Pictures.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

@@ -9,6 +9,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 INCLUDEPATH += "src"
 INCLUDEPATH += "src/serialib"
+INCLUDEPATH += "src/qcustomplot"
 
 SOURCES += \
     src/SMC100C.cpp \
@@ -19,7 +20,7 @@ SOURCES += \
     src/mainwindow.cpp \
     src/manualpumpcontrol.cpp \
     src/manualstagecontrol.cpp \
-    src/qcustomplot.cpp \
+    src/qcustomplot/qcustomplot.cpp \
     src/serialib/serialib.cpp
 
 HEADERS += \
@@ -32,7 +33,7 @@ HEADERS += \
     src/manualpumpcontrol.h \
     src/manualstagecontrol.h \
     src/patternelement.h \
-    src/qcustomplot.h \
+    src/qcustomplot/qcustomplot.h \
     src/serialib/serialib.h
 
 FORMS += \
@@ -86,9 +87,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    Pictures.qrc \
     images/CLIP3Dresources.qrc
-     #$$PWD/images/Pictures.qrc
 
 win32: LIBS += -lSetupAPI
 #OpenCV libs
