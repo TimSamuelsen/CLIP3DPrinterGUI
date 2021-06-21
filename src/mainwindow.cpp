@@ -256,11 +256,14 @@ void MainWindow::on_POTFcheckbox_clicked()
  */
 void MainWindow::on_VP_HDMIcheckbox_clicked()
 {
+    //Make sure that the checkbox is checked before proceeding
     if (ui->VP_HDMIcheckbox->isChecked())
     {
-        ui->POTFcheckbox->setChecked(false);
-        initImagePopout();
-        ProjectionMode = 1;
+        ui->POTFcheckbox->setChecked(false); //Uncheck the Video Pattern checkbox
+        initImagePopout(); //Open projection window
+        ProjectionMode = VIDEOPATTERN; //Set projection mode to video pattern
+
+        //Set video display off
         if (LCR_SetMode(PTN_MODE_DISABLE) < 0)
         {
             showError("Unable to switch to video mode");
@@ -269,7 +272,7 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
             emit(on_POTFcheckbox_clicked());
             return;
         }
-        DLP.setIT6535Mode(1);
+        DLP.setIT6535Mode(1); //Set IT6535 reciever to HDMI input
         //API_VideoConnector_t hdmi = VIDEO_CON_HDMI;
         //LCR_SetIT6535PowerMode(hdmi);
         Check4VideoLock();
@@ -429,511 +432,6 @@ void MainWindow::on_setPumping_clicked()
     }
     else{
         ui->ProgramPrints->append("Please enable pumping before setting pumping parameter");
-    }
-}
-
-/*********************************************Print Parameters*********************************************/
-/**
- * @brief MainWindow::on_ResinSelect_activated
- * @param arg1: The resin selected
- * Prints the resin selected to the terminal
- */
-void MainWindow::on_ResinSelect_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append(arg1 + " Selected");
-}
-
-/**
- * @brief MainWindow::on_AutoCheckBox_stateChanged
- * @param arg1: The state of the AutoCheckBox
- * If AutoCheckBox is set, go into auto mode
- */
-void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
-{
-    if (arg1 == 2) //If automode is checked
-    {
-        int SliceCount = ui->FileList->count(); //# of images = # of slices
-        if (SliceCount > 0)  //If there are images selected
-        {
-            ui->SetExposureTime->setEnabled(false);
-            ui->ExposureTimeParam->setEnabled(false);
-
-            ui->SetSliceThickness->setEnabled(false);
-            ui->SliceThicknessParam->setEnabled(false);
-
-            ui->PrintSpeedParam->setEnabled(true);
-            ui->setPrintSpeed->setEnabled(true);
-
-            ui->PrintHeightParam->setEnabled(true);
-            ui->SetPrintHeight->setEnabled(true);
-
-            AutoModeFlag = true;
-            AutoMode();
-        }
-        else //With no images selected auto mode does not worked and the program reverts to normal operation
-        {
-            ui->AutoCheckBox->setChecked(false);
-            ui->ProgramPrints->append("No Object Image Files Detected, Please Select Image Files First");
-        }
-    }
-    else //Automode is not checked, revert to normal operation
-    {
-        ui->SetExposureTime->setEnabled(true);
-        ui->ExposureTimeParam->setEnabled(true);
-
-        ui->SetSliceThickness->setEnabled(true);
-        ui->SliceThicknessParam->setEnabled(true);
-
-        ui->PrintSpeedParam->setEnabled(false);
-        ui->setPrintSpeed->setEnabled(false);
-
-        ui->PrintHeightParam->setEnabled(false);
-        ui->SetPrintHeight->setEnabled(false);
-
-        ui->AutoCheckBox->setChecked(false);
-
-        AutoModeFlag = false;
-    }
-}
-
-/**
- * @brief MainWindow::on_AutoCheckBox_clicked
- * Guard on edge case that sets the checkbox while it's actual state is unchecked
- */
-void MainWindow::on_AutoCheckBox_clicked()
-{
-    int SliceCount = ui->FileList->count();
-    if (SliceCount < 1)
-    {
-        ui->AutoCheckBox->setChecked(false);
-    }
-}
-
-/**
- * @brief MainWindow::on_SetMaxImageUpload_clicked
- * Sets the max image upload, used to avoid large error buildup
- * or large wait times due to large uploads
- */
-void MainWindow::on_SetMaxImageUpload_clicked()
-{
-    uint MaxImageVal = ui->MaxImageUpload->value(); //Grab value from UI
-    if (MaxImageVal < (InitialExposure + 1)) //Verifies that the max image upload is greater than initial exposure time
-    {
-        MaxImageVal = InitialExposure + 1;
-    }
-    else if (MaxImageVal > 398) //Verifies that max image upload is not greater than the storage limit on light engine
-    {
-        MaxImageVal = 398;
-    }
-    else //If MaxImageVal is is an acceptable range
-    {
-        MaxImageUpload = MaxImageVal; //This line might not be needed
-    }
-    MaxImageUpload = MaxImageVal;
-    QString MaxImageUploadString = "Set Max Image Upload to: " + QString::number(MaxImageUpload);
-    ui->ProgramPrints->append(MaxImageUploadString);
-}
-
-
-/**
- * @brief MainWindow::on_setPrintSpeed_clicked
- * Sets PrintSpeed variable from value inputted by user, also triggers automode
- */
-void MainWindow::on_setPrintSpeed_clicked()
-{
-    PrintSpeed = (ui->PrintSpeedParam->value());
-    QString PrintSpeedString = "Set Print Speed to: " + QString::number(PrintSpeed) + " um/s";
-    ui->ProgramPrints->append(PrintSpeedString);
-    AutoMode();
-}
-
-/**
- * @brief MainWindow::on_SetPrintHeight_clicked
- * Sets PrintHeight variable from value inputted by user, also triggers automode
- */
-void MainWindow::on_SetPrintHeight_clicked()
-{
-    PrintHeight = (ui->PrintHeightParam->value());
-    QString PrintHeightString = "Set Print Speed to: " + QString::number(PrintHeight) + "" ;
-    ui->ProgramPrints->append(PrintHeightString);
-    AutoMode();
-}
-
-/**
- * @brief MainWindow::on_SetIntialAdhesionTimeButton_clicked
- * Sets InitialExposure variable from the value inputted by the user
- */
-void MainWindow::on_SetIntialAdhesionTimeButton_clicked()
-{
-    InitialExposure = (ui->InitialAdhesionParameter->value());
-    QString InitialExposureString = "Set Initial Exposure to: " + QString::number(InitialExposure) + " s";
-    ui->ProgramPrints->append(InitialExposureString);
-}
-
-/**
- * @brief MainWindow::on_SetStartingPosButton_clicked
- * Sets Starting Position variable from the value inputted by the user
- * (also doubles as debug tool for GetPosition(), will be removed)
- */
-void MainWindow::on_SetStartingPosButton_clicked()
-{
-    StartingPosition = (ui->StartingPositionParam->value());
-    QString StartingPositionString = "Set Starting Position to: " + QString::number(StartingPosition) + " mm";
-    ui->ProgramPrints->append(StartingPositionString);
-    QString CurrentPosition = SMC.GetPosition();
-    CurrentPosition = CurrentPosition.remove(0,3);
-    ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
-    ui->CurrentPositionIndicator->setText(CurrentPosition);
-}
-
-/**
- * @brief MainWindow::on_SetSliceThickness_clicked
- * Sets Slicethickness variable from the value inputted by the user
- */
-void MainWindow::on_SetSliceThickness_clicked()
-{
-    SliceThickness = (ui->SliceThicknessParam->value()/1000);
-    QString ThicknessString = "Set Slice Thickness to: " + QString::number(SliceThickness*1000) + " μm";
-    ui->ProgramPrints->append(ThicknessString);
-}
-
-/**
- * @brief MainWindow::on_SetStageVelocity_clicked
- * Sets StageVelocity variable from the value inputted by the user,
- * also directly sends command to stage to set velocity
- */
-void MainWindow::on_SetStageVelocity_clicked()
-{
-    StageVelocity = (ui->StageVelocityParam->value());
-    SMC.SetVelocity(StageVelocity); //Sends command to stage
-    QString VelocityString = "Set Stage Velocity to: " + QString::number(StageVelocity) +" mm/s";
-    ui->ProgramPrints->append(VelocityString);
-}
-
-/**
- * @brief MainWindow::on_SetStageAcceleration_clicked
- * Sets StageAcceleration variable from the value inputted by the user,
- * also directly sends command to stage to set acceleration
- */
-void MainWindow::on_SetStageAcceleration_clicked()
-{
-    StageAcceleration = (ui->StageAccelParam->value());
-    SMC.SetAcceleration(StageAcceleration); //Sends command to stage
-    QString AccelerationString = "Set Stage Acceleration to: " + QString::number(StageAcceleration) + " mm/s";
-    ui->ProgramPrints->append(AccelerationString);
-}
-
-/**
- * @brief MainWindow::on_SetMaxEndOfRun_clicked
- * Sets MaxEndOfRun variable from the value inputted by the user,
- * also directly sends command to stage to set max end of run
- */
-void MainWindow::on_SetMaxEndOfRun_clicked()
-{
-    MaxEndOfRun = (ui->MaxEndOfRun->value());
-    SMC.SetPositiveLimit(MaxEndOfRun); //Sends command to stage
-    QString MaxEndOfRunString = "Set Max End Of Run to: " + QString::number(MaxEndOfRun) + " mm";
-    ui->ProgramPrints->append(MaxEndOfRunString);
-}
-
-/**
- * @brief MainWindow::on_SetMinEndOfRun_clicked
- * Sets MinEndOfRun variable from the value inputted by the user,
- * also directly sends command to stage to set min end of run
- */
-void MainWindow::on_SetMinEndOfRun_clicked()
-{
-    MinEndOfRun = (ui->MinEndOfRunParam->value());
-    SMC.SetNegativeLimit(MinEndOfRun); //Sends command to stage
-    QString MinEndOfRunString = "Set Min End Of Run to: " + QString::number(MinEndOfRun) + " mm";
-    ui->ProgramPrints->append(MinEndOfRunString);
-}
-
-/**
- * @brief MainWindow::on_SetDarkTime_clicked
- * Sets DarkTime variable from the value inputted by the user
- */
-void MainWindow::on_SetDarkTime_clicked()
-{
-    DarkTime = (ui->DarkTimeParam->value()*1000);
-    QString DarkTimeString = "Set Dark Time to: " + QString::number(DarkTime/1000) + " ms";
-    ui->ProgramPrints->append(DarkTimeString);
-}
-
-/**
- * @brief MainWindow::on_SetExposureTime_clicked
- * Sets ExposureTime variable from the value inputted by the user
- */
-void MainWindow::on_SetExposureTime_clicked()
-{
-    ExposureTime = (ui->ExposureTimeParam->value()*1000);
-    QString ExposureTimeString = "Set Exposure Time to: " + QString::number(ExposureTime/1000) + " ms";
-    ui->ProgramPrints->append(ExposureTimeString);
-}
-
-/**
- * @brief MainWindow::on_SetUVIntensity_clicked
- * Sets UVIntensity from the value inputted by the user
- */
-void MainWindow::on_SetUVIntensity_clicked()
-{
-    UVIntensity = (ui->UVIntensityParam->value());
-    QString UVIntensityString = "Set UV Intensity to: " + QString::number(UVIntensity);
-    ui->ProgramPrints->append(UVIntensityString);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList1_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList1_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append("LV1: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList2_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList2_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append("LV2: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList3_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList3_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append("LV3: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList4_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList4_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append("LV4: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList5_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList5_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append("LV5: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList6_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList6_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append("LV6: " + arg1);
-}
-
-/*********************************************File Handling*********************************************/
-/**
- * @brief MainWindow::on_SelectFile_clicked
- * Select all object image files to project
- */
-void MainWindow::on_SelectFile_clicked()
-{
-    //Open files from last directory chosen (stored in settings), limited to bitmapped image file formats
-    QStringList file_name = QFileDialog::getOpenFileNames(this,"Open Object Image Files",ImageFileDirectory,"*.bmp *.png *.tiff *.tif *.svg");
-    if (file_name.count() > 0) //If images were selected
-    {
-        QDir ImageDirectory = QFileInfo(file_name.at(0)).absoluteDir();
-        ImageFileDirectory = ImageDirectory.filePath(file_name.at(0));
-        for (uint16_t i = 0; i < file_name.count(); i++)
-        {
-            ui->FileList->addItem(file_name.at(i)); //Add each file name to FileList, will be displayed for user
-        }
-    }
-    int SliceCount = ui->FileList->count();
-    ui->ProgramPrints->append(QString::number(SliceCount) + " Images Currently Selected");
-}
-
-/**
- * @brief MainWindow::on_LogFileBrowse_clicked
- * Select directory to store log files
- */
-void MainWindow::on_LogFileBrowse_clicked()
-{
-    LogFileDestination = QFileDialog::getExistingDirectory(this, "Open Log File Destination");
-    ui->LogFileLocation->setText(LogFileDestination);
-}
-
-/**
- * @brief MainWindow::on_ClearImageFiles_clicked
- * Clear image files selected
- */
-void MainWindow::on_ClearImageFiles_clicked()
-{
-    ui->FileList->clear();
-    //initConfirmationScreen();
-}
-
-/**
- * @brief MainWindow::on_UsePrintScript_clicked
- * Used to select whether to use set print variables or print script
- */
-void MainWindow::on_UsePrintScript_clicked()
-{
-    if (ui->UsePrintScript->checkState()) //If printscript is checked
-    {
-        PrintScript = 1;
-        ui->SelectPrintScript->setEnabled(true);
-        ui->ClearPrintScript->setEnabled(true);
-        ui->PrintScriptFile->setEnabled(true);
-    }
-    else //printscript is not checked
-    {
-        PrintScript = 0;
-        ui->SelectPrintScript->setEnabled(false);
-        ui->ClearPrintScript->setEnabled(false);
-        ui->PrintScriptFile->setEnabled(false);
-    }
-}
-
-/**
- * @brief MainWindow::on_SelectPrintScript_clicked
- * User selects print script from file, the print script is parsed
- * and the exposure time and LED intensity is stored in
- * module level QStringLists: ExposureScriptList and LEDScriptList
- */
-void MainWindow::on_SelectPrintScript_clicked()
-{
-    QString file_name = QFileDialog::getOpenFileName(this, "Open Print Script", "C://", "*.txt *.csv");
-
-
-    ui->PrintScriptFile->setText(file_name);
-    QFile file(file_name);
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        qDebug() << file.errorString();
-    }
-    QStringList wordList;
-    while (!file.atEnd())
-    {
-            QByteArray line = file.readLine();
-            ExposureScriptList.append(line.split(',').at(0));
-            LEDScriptList.append(line.split(',').at(1));
-    }
-     //For testing
-    for (int i= 0; i < ExposureScriptList.size(); i++)
-    {
-        ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i));
-        //ExposureScriptList.removeAt(0);
-        //LEDScriptList.removeAt(0);
-    }
-    ui->ProgramPrints->append("Print List has: " + QString::number(ExposureScriptList.size()) + " exposure entries");
-    ui->ProgramPrints->append("Print List has: " + QString::number(LEDScriptList.size()) + " LED intensity entries");
-
-}
-
-/**
- * @brief MainWindow::on_ClearPrintScript_clicked
- * Clears selected print list
- */
-void MainWindow::on_ClearPrintScript_clicked()
-{
-    ui->PrintScriptFile->clear();
-    if (PrintScript == 0)
-    {
-
-    }
-}
-/*******************************************Peripheral Connections*********************************************/
-/**
- * @brief MainWindow::on_LightEngineConnectButton_clicked
- * Connect to light engine, gets last error code to validate that
- * no errors have occured and connection is working
- */
-void MainWindow::on_LightEngineConnectButton_clicked()
-{
-    if (DLP.InitProjector())
-    {
-        ui->ProgramPrints->append("Light Engine Connected");
-        ui->LightEngineIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
-        ui->LightEngineIndicator->setText("Connected");
-        uint Code;
-        //Their GUI does not call reader Errorcode
-        if (LCR_ReadErrorCode(&Code) >= 0)
-        {
-            ui->ProgramPrints->append("Last Error Code: " + QString::number(Code));
-        }
-        else
-        {
-            ui->ProgramPrints->append("Failed to get last error code");
-        }
-    }
-    else
-    {
-        ui->ProgramPrints->append("Light Engine Connection Failed");
-        ui->LightEngineIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
-        ui->LightEngineIndicator->setText("Disconnected");
-    }
-}
-
-/**
- * @brief MainWindow::on_StageConnectButton_clicked
- * Connects to stage, if succesful gets position, sends
- * home commands and gets position
- */
-void MainWindow::on_StageConnectButton_clicked()
-{
-    SMC.SMC100CClose();
-    QString COMSelect = ui->COMPortSelect->currentText();
-    QByteArray array = COMSelect.toLocal8Bit();
-    char* COM = array.data();
-    if (SMC.SMC100CInit(COM) == true && SMC.Home() == true)
-    {
-        ui->ProgramPrints->append("Stage Connected");
-        ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
-        ui->StageConnectionIndicator->setText("Connected");
-        Sleep(10);
-        emit(on_GetPosition_clicked());
-    }
-    else
-    {
-        ui->ProgramPrints->append("Stage Connection Failed");
-        ui->StageConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
-        ui->StageConnectionIndicator->setText("Disconnected");
-    }
-}
-
-/**
- * @brief MainWindow::on_PumpConnectButton_clicked
- * Connects to pump
- */
-void MainWindow::on_PumpConnectButton_clicked()
-{
-    Pump.PSerial.closeDevice();
-    QString COMSelect = ui->COMPortSelectPump->currentText();
-    QByteArray array = COMSelect.toLocal8Bit();
-    char* COM = array.data();
-    if (Pump.PSerial.openDevice(COM,9600) == 1)
-    {
-        ui->ProgramPrints->append("Pump Connected");
-        ui->PumpConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
-        ui->PumpConnectionIndicator->setText("Connected");
-    }
-    else
-    {
-        ui->ProgramPrints->append("Pump Connection Failed");
-        ui->PumpConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
-        ui->PumpConnectionIndicator->setText("Disconnected");
     }
 }
 /***************************************Print Functionality*********************************************/
@@ -1430,66 +928,514 @@ void MainWindow::SetExposureTimer(int InitialExposureFlag, int PrintScript, int 
         }
     }
 }
+/*********************************************File Handling*********************************************/
 /**
- * @brief MainWindow::ValidateSettings
- * @return bool: true if settings are valid, false otherwise
- *
+ * @brief MainWindow::on_SelectFile_clicked
+ * Select all object image files to project
  */
-bool MainWindow::ValidateSettings(void)
+void MainWindow::on_SelectFile_clicked()
 {
-    //Validate Slicethickness
-    if (SliceThickness <= 0){
-        showError("Invalid Slice Thickness");
-        ui->ProgramPrints->append("Invalid Slice Thickness");
-        return false;
+    //Open files from last directory chosen (stored in settings), limited to bitmapped image file formats
+    QStringList file_name = QFileDialog::getOpenFileNames(this,"Open Object Image Files",ImageFileDirectory,"*.bmp *.png *.tiff *.tif *.svg");
+    if (file_name.count() > 0) //If images were selected
+    {
+        QDir ImageDirectory = QFileInfo(file_name.at(0)).absoluteDir();
+        ImageFileDirectory = ImageDirectory.filePath(file_name.at(0));
+        for (uint16_t i = 0; i < file_name.count(); i++)
+        {
+            ui->FileList->addItem(file_name.at(i)); //Add each file name to FileList, will be displayed for user
+        }
     }
-    //Validate StageVelocity
-    else if (StageVelocity <= 0 || StageVelocity > 10){
-        showError("Invalid Stage Velocity");
-        ui->ProgramPrints->append("Invalid Stage Velocity");
-        return false;
+    else
+    {
+        ui->ProgramPrints->append("Please select more images");
     }
-    //Validate StageAcceleration
-    else if (StageAcceleration <= 0 || StageAcceleration > 10){
-        showError("Invalid Stage Acceleration");
-        ui->ProgramPrints->append("Invalid Stage Acceleration");
-        return false;
+    int SliceCount = ui->FileList->count();
+    ui->ProgramPrints->append(QString::number(SliceCount) + " Images Currently Selected");
+}
+
+/**
+ * @brief MainWindow::on_LogFileBrowse_clicked
+ * Select directory to store log files
+ */
+void MainWindow::on_LogFileBrowse_clicked()
+{
+    LogFileDestination = QFileDialog::getExistingDirectory(this, "Open Log File Destination");
+    ui->LogFileLocation->setText(LogFileDestination);
+}
+
+/**
+ * @brief MainWindow::on_ClearImageFiles_clicked
+ * Clear image files selected
+ */
+void MainWindow::on_ClearImageFiles_clicked()
+{
+    ui->FileList->clear();
+    //initConfirmationScreen();
+}
+
+/**
+ * @brief MainWindow::on_UsePrintScript_clicked
+ * Used to select whether to use set print variables or print script
+ */
+void MainWindow::on_UsePrintScript_clicked()
+{
+    if (ui->UsePrintScript->checkState()) //If printscript is checked
+    {
+        PrintScript = 1;
+        ui->SelectPrintScript->setEnabled(true);
+        ui->ClearPrintScript->setEnabled(true);
+        ui->PrintScriptFile->setEnabled(true);
     }
-    //Validate MaxEndOfRun
-    else if (MaxEndOfRun < -5 || MaxEndOfRun > 65 || MinEndOfRun >= MaxEndOfRun){
-        showError("Invalid Max End Of Run");
-        ui->ProgramPrints->append("Invalid Max End Of Run");
-        return false;
+    else //printscript is not checked
+    {
+        PrintScript = 0;
+        ui->SelectPrintScript->setEnabled(false);
+        ui->ClearPrintScript->setEnabled(false);
+        ui->PrintScriptFile->setEnabled(false);
     }
-    //Validate StageMinEndOfRun
-    else if (MinEndOfRun < -5 || MinEndOfRun > 65 || MinEndOfRun >= MaxEndOfRun){
-        showError("Invalid Min End Of Run");
-        ui->ProgramPrints->append("Invalid Min End Of Run");
-        return false;
+}
+
+/**
+ * @brief MainWindow::on_SelectPrintScript_clicked
+ * User selects print script from file, the print script is parsed
+ * and the exposure time and LED intensity is stored in
+ * module level QStringLists: ExposureScriptList and LEDScriptList
+ */
+void MainWindow::on_SelectPrintScript_clicked()
+{
+    QString file_name = QFileDialog::getOpenFileName(this, "Open Print Script", "C://", "*.txt *.csv");
+
+
+    ui->PrintScriptFile->setText(file_name);
+    QFile file(file_name);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qDebug() << file.errorString();
     }
-    //Validate DarkTime
-    else if (DarkTime <= 0){
-        showError("Invalid Dark Time");
-        ui->ProgramPrints->append("Invalid Dark Time");
-        return false;
+    QStringList wordList;
+    while (!file.atEnd())
+    {
+            QByteArray line = file.readLine();
+            ExposureScriptList.append(line.split(',').at(0));
+            LEDScriptList.append(line.split(',').at(1));
     }
-    //Validate ExposureTime
-    else if (ExposureTime <= 0){
-        showError("Invalid Exposure Time");
-        ui->ProgramPrints->append("Invalid Exposure Time");
-        return false;
+     //For testing
+    for (int i= 0; i < ExposureScriptList.size(); i++)
+    {
+        ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i));
+        //ExposureScriptList.removeAt(0);
+        //LEDScriptList.removeAt(0);
     }
-    //Validate UVIntensity
-    else if (UVIntensity < 1 || UVIntensity > 255){
-        showError("Invalid UV Intensity");
-        ui->ProgramPrints->append("Invalid UVIntensity");
-        return false;
+    ui->ProgramPrints->append("Print List has: " + QString::number(ExposureScriptList.size()) + " exposure entries");
+    ui->ProgramPrints->append("Print List has: " + QString::number(LEDScriptList.size()) + " LED intensity entries");
+
+}
+
+/**
+ * @brief MainWindow::on_ClearPrintScript_clicked
+ * Clears selected print list
+ */
+void MainWindow::on_ClearPrintScript_clicked()
+{
+    ui->PrintScriptFile->clear();
+    if (PrintScript == 0)
+    {
+
     }
-    ui->ProgramPrints->append("All Settings Valid");
-    return true;
+}
+/*******************************************Peripheral Connections*********************************************/
+/**
+ * @brief MainWindow::on_LightEngineConnectButton_clicked
+ * Connect to light engine, gets last error code to validate that
+ * no errors have occured and connection is working
+ */
+void MainWindow::on_LightEngineConnectButton_clicked()
+{
+    if (DLP.InitProjector())
+    {
+        ui->ProgramPrints->append("Light Engine Connected");
+        ui->LightEngineIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
+        ui->LightEngineIndicator->setText("Connected");
+        uint Code;
+        //Their GUI does not call reader Errorcode
+        if (LCR_ReadErrorCode(&Code) >= 0)
+        {
+            ui->ProgramPrints->append("Last Error Code: " + QString::number(Code));
+        }
+        else
+        {
+            ui->ProgramPrints->append("Failed to get last error code");
+        }
+    }
+    else
+    {
+        ui->ProgramPrints->append("Light Engine Connection Failed");
+        ui->LightEngineIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
+        ui->LightEngineIndicator->setText("Disconnected");
+    }
+}
+
+/**
+ * @brief MainWindow::on_StageConnectButton_clicked
+ * Connects to stage, if succesful gets position, sends
+ * home commands and gets position
+ */
+void MainWindow::on_StageConnectButton_clicked()
+{
+    SMC.SMC100CClose();
+    QString COMSelect = ui->COMPortSelect->currentText();
+    QByteArray array = COMSelect.toLocal8Bit();
+    char* COM = array.data();
+    if (SMC.SMC100CInit(COM) == true && SMC.Home() == true)
+    {
+        ui->ProgramPrints->append("Stage Connected");
+        ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
+        ui->StageConnectionIndicator->setText("Connected");
+        Sleep(10);
+        emit(on_GetPosition_clicked());
+    }
+    else
+    {
+        ui->ProgramPrints->append("Stage Connection Failed");
+        ui->StageConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
+        ui->StageConnectionIndicator->setText("Disconnected");
+    }
+}
+
+/**
+ * @brief MainWindow::on_PumpConnectButton_clicked
+ * Connects to pump
+ */
+void MainWindow::on_PumpConnectButton_clicked()
+{
+    Pump.PSerial.closeDevice();
+    QString COMSelect = ui->COMPortSelectPump->currentText();
+    QByteArray array = COMSelect.toLocal8Bit();
+    char* COM = array.data();
+    if (Pump.PSerial.openDevice(COM,9600) == 1)
+    {
+        ui->ProgramPrints->append("Pump Connected");
+        ui->PumpConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
+        ui->PumpConnectionIndicator->setText("Connected");
+    }
+    else
+    {
+        ui->ProgramPrints->append("Pump Connection Failed");
+        ui->PumpConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
+        ui->PumpConnectionIndicator->setText("Disconnected");
+    }
+}
+
+/*********************************************Print Parameters*********************************************/
+/**
+ * @brief MainWindow::on_ResinSelect_activated
+ * @param arg1: The resin selected
+ * Prints the resin selected to the terminal
+ */
+void MainWindow::on_ResinSelect_activated(const QString &arg1)
+{
+    ui->ProgramPrints->append(arg1 + " Selected");
+}
+
+/**
+ * @brief MainWindow::on_AutoCheckBox_stateChanged
+ * @param arg1: The state of the AutoCheckBox
+ * If AutoCheckBox is set, go into auto mode
+ */
+void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
+{
+    if (arg1 == 2) //If automode is checked
+    {
+        int SliceCount = ui->FileList->count(); //# of images = # of slices
+        if (SliceCount > 0)  //If there are images selected
+        {
+            ui->SetExposureTime->setEnabled(false);
+            ui->ExposureTimeParam->setEnabled(false);
+
+            ui->SetSliceThickness->setEnabled(false);
+            ui->SliceThicknessParam->setEnabled(false);
+
+            ui->PrintSpeedParam->setEnabled(true);
+            ui->setPrintSpeed->setEnabled(true);
+
+            ui->PrintHeightParam->setEnabled(true);
+            ui->SetPrintHeight->setEnabled(true);
+
+            AutoModeFlag = true;
+            AutoMode();
+        }
+        else //With no images selected auto mode does not worked and the program reverts to normal operation
+        {
+            ui->AutoCheckBox->setChecked(false);
+            ui->ProgramPrints->append("No Object Image Files Detected, Please Select Image Files First");
+        }
+    }
+    else //Automode is not checked, revert to normal operation
+    {
+        ui->SetExposureTime->setEnabled(true);
+        ui->ExposureTimeParam->setEnabled(true);
+
+        ui->SetSliceThickness->setEnabled(true);
+        ui->SliceThicknessParam->setEnabled(true);
+
+        ui->PrintSpeedParam->setEnabled(false);
+        ui->setPrintSpeed->setEnabled(false);
+
+        ui->PrintHeightParam->setEnabled(false);
+        ui->SetPrintHeight->setEnabled(false);
+
+        ui->AutoCheckBox->setChecked(false);
+
+        AutoModeFlag = false;
+    }
+}
+
+/**
+ * @brief MainWindow::on_AutoCheckBox_clicked
+ * Guard on edge case that sets the checkbox while it's actual state is unchecked
+ */
+void MainWindow::on_AutoCheckBox_clicked()
+{
+    int SliceCount = ui->FileList->count();
+    if (SliceCount < 1)
+    {
+        ui->AutoCheckBox->setChecked(false);
+    }
+}
+
+/**
+ * @brief MainWindow::on_SetMaxImageUpload_clicked
+ * Sets the max image upload, used to avoid large error buildup
+ * or large wait times due to large uploads
+ */
+void MainWindow::on_SetMaxImageUpload_clicked()
+{
+    uint MaxImageVal = ui->MaxImageUpload->value(); //Grab value from UI
+    if (MaxImageVal < (InitialExposure + 1)) //Verifies that the max image upload is greater than initial exposure time
+    {
+        MaxImageVal = InitialExposure + 1;
+    }
+    else if (MaxImageVal > 398) //Verifies that max image upload is not greater than the storage limit on light engine
+    {
+        MaxImageVal = 398;
+    }
+    else //If MaxImageVal is is an acceptable range
+    {
+        MaxImageUpload = MaxImageVal; //This line might not be needed
+    }
+    MaxImageUpload = MaxImageVal;
+    QString MaxImageUploadString = "Set Max Image Upload to: " + QString::number(MaxImageUpload);
+    ui->ProgramPrints->append(MaxImageUploadString);
 }
 
 
+/**
+ * @brief MainWindow::on_setPrintSpeed_clicked
+ * Sets PrintSpeed variable from value inputted by user, also triggers automode
+ */
+void MainWindow::on_setPrintSpeed_clicked()
+{
+    PrintSpeed = (ui->PrintSpeedParam->value());
+    QString PrintSpeedString = "Set Print Speed to: " + QString::number(PrintSpeed) + " um/s";
+    ui->ProgramPrints->append(PrintSpeedString);
+    AutoMode();
+}
+
+/**
+ * @brief MainWindow::on_SetPrintHeight_clicked
+ * Sets PrintHeight variable from value inputted by user, also triggers automode
+ */
+void MainWindow::on_SetPrintHeight_clicked()
+{
+    PrintHeight = (ui->PrintHeightParam->value());
+    QString PrintHeightString = "Set Print Speed to: " + QString::number(PrintHeight) + "" ;
+    ui->ProgramPrints->append(PrintHeightString);
+    AutoMode();
+}
+
+/**
+ * @brief MainWindow::on_SetIntialAdhesionTimeButton_clicked
+ * Sets InitialExposure variable from the value inputted by the user
+ */
+void MainWindow::on_SetIntialAdhesionTimeButton_clicked()
+{
+    InitialExposure = (ui->InitialAdhesionParameter->value());
+    QString InitialExposureString = "Set Initial Exposure to: " + QString::number(InitialExposure) + " s";
+    ui->ProgramPrints->append(InitialExposureString);
+}
+
+/**
+ * @brief MainWindow::on_SetStartingPosButton_clicked
+ * Sets Starting Position variable from the value inputted by the user
+ * (also doubles as debug tool for GetPosition(), will be removed)
+ */
+void MainWindow::on_SetStartingPosButton_clicked()
+{
+    StartingPosition = (ui->StartingPositionParam->value());
+    QString StartingPositionString = "Set Starting Position to: " + QString::number(StartingPosition) + " mm";
+    ui->ProgramPrints->append(StartingPositionString);
+    QString CurrentPosition = SMC.GetPosition();
+    CurrentPosition = CurrentPosition.remove(0,3);
+    ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
+    ui->CurrentPositionIndicator->setText(CurrentPosition);
+}
+
+/**
+ * @brief MainWindow::on_SetSliceThickness_clicked
+ * Sets Slicethickness variable from the value inputted by the user
+ */
+void MainWindow::on_SetSliceThickness_clicked()
+{
+    SliceThickness = (ui->SliceThicknessParam->value()/1000);
+    QString ThicknessString = "Set Slice Thickness to: " + QString::number(SliceThickness*1000) + " μm";
+    ui->ProgramPrints->append(ThicknessString);
+}
+
+/**
+ * @brief MainWindow::on_SetStageVelocity_clicked
+ * Sets StageVelocity variable from the value inputted by the user,
+ * also directly sends command to stage to set velocity
+ */
+void MainWindow::on_SetStageVelocity_clicked()
+{
+    StageVelocity = (ui->StageVelocityParam->value());
+    SMC.SetVelocity(StageVelocity); //Sends command to stage
+    QString VelocityString = "Set Stage Velocity to: " + QString::number(StageVelocity) +" mm/s";
+    ui->ProgramPrints->append(VelocityString);
+}
+
+/**
+ * @brief MainWindow::on_SetStageAcceleration_clicked
+ * Sets StageAcceleration variable from the value inputted by the user,
+ * also directly sends command to stage to set acceleration
+ */
+void MainWindow::on_SetStageAcceleration_clicked()
+{
+    StageAcceleration = (ui->StageAccelParam->value());
+    SMC.SetAcceleration(StageAcceleration); //Sends command to stage
+    QString AccelerationString = "Set Stage Acceleration to: " + QString::number(StageAcceleration) + " mm/s";
+    ui->ProgramPrints->append(AccelerationString);
+}
+
+/**
+ * @brief MainWindow::on_SetMaxEndOfRun_clicked
+ * Sets MaxEndOfRun variable from the value inputted by the user,
+ * also directly sends command to stage to set max end of run
+ */
+void MainWindow::on_SetMaxEndOfRun_clicked()
+{
+    MaxEndOfRun = (ui->MaxEndOfRun->value());
+    SMC.SetPositiveLimit(MaxEndOfRun); //Sends command to stage
+    QString MaxEndOfRunString = "Set Max End Of Run to: " + QString::number(MaxEndOfRun) + " mm";
+    ui->ProgramPrints->append(MaxEndOfRunString);
+}
+
+/**
+ * @brief MainWindow::on_SetMinEndOfRun_clicked
+ * Sets MinEndOfRun variable from the value inputted by the user,
+ * also directly sends command to stage to set min end of run
+ */
+void MainWindow::on_SetMinEndOfRun_clicked()
+{
+    MinEndOfRun = (ui->MinEndOfRunParam->value());
+    SMC.SetNegativeLimit(MinEndOfRun); //Sends command to stage
+    QString MinEndOfRunString = "Set Min End Of Run to: " + QString::number(MinEndOfRun) + " mm";
+    ui->ProgramPrints->append(MinEndOfRunString);
+}
+
+/**
+ * @brief MainWindow::on_SetDarkTime_clicked
+ * Sets DarkTime variable from the value inputted by the user
+ */
+void MainWindow::on_SetDarkTime_clicked()
+{
+    DarkTime = (ui->DarkTimeParam->value()*1000);
+    QString DarkTimeString = "Set Dark Time to: " + QString::number(DarkTime/1000) + " ms";
+    ui->ProgramPrints->append(DarkTimeString);
+}
+
+/**
+ * @brief MainWindow::on_SetExposureTime_clicked
+ * Sets ExposureTime variable from the value inputted by the user
+ */
+void MainWindow::on_SetExposureTime_clicked()
+{
+    ExposureTime = (ui->ExposureTimeParam->value()*1000);
+    QString ExposureTimeString = "Set Exposure Time to: " + QString::number(ExposureTime/1000) + " ms";
+    ui->ProgramPrints->append(ExposureTimeString);
+}
+
+/**
+ * @brief MainWindow::on_SetUVIntensity_clicked
+ * Sets UVIntensity from the value inputted by the user
+ */
+void MainWindow::on_SetUVIntensity_clicked()
+{
+    UVIntensity = (ui->UVIntensityParam->value());
+    QString UVIntensityString = "Set UV Intensity to: " + QString::number(UVIntensity);
+    ui->ProgramPrints->append(UVIntensityString);
+}
+
+/**
+ * @brief MainWindow::on_LiveValueList1_activated
+ * @param arg1
+ * Currently Not In Use
+ */
+void MainWindow::on_LiveValueList1_activated(const QString &arg1)
+{
+    ui->ProgramPrints->append("LV1: " + arg1);
+}
+
+/**
+ * @brief MainWindow::on_LiveValueList2_activated
+ * @param arg1
+ * Currently Not In Use
+ */
+void MainWindow::on_LiveValueList2_activated(const QString &arg1)
+{
+    ui->ProgramPrints->append("LV2: " + arg1);
+}
+
+/**
+ * @brief MainWindow::on_LiveValueList3_activated
+ * @param arg1
+ * Currently Not In Use
+ */
+void MainWindow::on_LiveValueList3_activated(const QString &arg1)
+{
+    ui->ProgramPrints->append("LV3: " + arg1);
+}
+
+/**
+ * @brief MainWindow::on_LiveValueList4_activated
+ * @param arg1
+ * Currently Not In Use
+ */
+void MainWindow::on_LiveValueList4_activated(const QString &arg1)
+{
+    ui->ProgramPrints->append("LV4: " + arg1);
+}
+
+/**
+ * @brief MainWindow::on_LiveValueList5_activated
+ * @param arg1
+ * Currently Not In Use
+ */
+void MainWindow::on_LiveValueList5_activated(const QString &arg1)
+{
+    ui->ProgramPrints->append("LV5: " + arg1);
+}
+
+/**
+ * @brief MainWindow::on_LiveValueList6_activated
+ * @param arg1
+ * Currently Not In Use
+ */
+void MainWindow::on_LiveValueList6_activated(const QString &arg1)
+{
+    ui->ProgramPrints->append("LV6: " + arg1);
+}
 /*******************************************Helper Functions********************************************/
 /**
  * @brief MainWindow::showError
@@ -1725,6 +1671,66 @@ bool MainWindow::initConfirmationScreen()
     }
     return retVal;
 }
+
+/**
+ * @brief MainWindow::ValidateSettings
+ * @return bool: true if settings are valid, false otherwise
+ *
+ */
+bool MainWindow::ValidateSettings(void)
+{
+    //Validate Slicethickness
+    if (SliceThickness <= 0){
+        showError("Invalid Slice Thickness");
+        ui->ProgramPrints->append("Invalid Slice Thickness");
+        return false;
+    }
+    //Validate StageVelocity
+    else if (StageVelocity <= 0 || StageVelocity > 10){
+        showError("Invalid Stage Velocity");
+        ui->ProgramPrints->append("Invalid Stage Velocity");
+        return false;
+    }
+    //Validate StageAcceleration
+    else if (StageAcceleration <= 0 || StageAcceleration > 10){
+        showError("Invalid Stage Acceleration");
+        ui->ProgramPrints->append("Invalid Stage Acceleration");
+        return false;
+    }
+    //Validate MaxEndOfRun
+    else if (MaxEndOfRun < -5 || MaxEndOfRun > 65 || MinEndOfRun >= MaxEndOfRun){
+        showError("Invalid Max End Of Run");
+        ui->ProgramPrints->append("Invalid Max End Of Run");
+        return false;
+    }
+    //Validate StageMinEndOfRun
+    else if (MinEndOfRun < -5 || MinEndOfRun > 65 || MinEndOfRun >= MaxEndOfRun){
+        showError("Invalid Min End Of Run");
+        ui->ProgramPrints->append("Invalid Min End Of Run");
+        return false;
+    }
+    //Validate DarkTime
+    else if (DarkTime <= 0){
+        showError("Invalid Dark Time");
+        ui->ProgramPrints->append("Invalid Dark Time");
+        return false;
+    }
+    //Validate ExposureTime
+    else if (ExposureTime <= 0){
+        showError("Invalid Exposure Time");
+        ui->ProgramPrints->append("Invalid Exposure Time");
+        return false;
+    }
+    //Validate UVIntensity
+    else if (UVIntensity < 1 || UVIntensity > 255){
+        showError("Invalid UV Intensity");
+        ui->ProgramPrints->append("Invalid UVIntensity");
+        return false;
+    }
+    ui->ProgramPrints->append("All Settings Valid");
+    return true;
+}
+
 /*******************************************Settings Functions*********************************************/
 /**
  * @brief MainWindow::saveSettings

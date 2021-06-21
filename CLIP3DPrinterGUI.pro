@@ -7,10 +7,8 @@ CONFIG += c++11
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
-
 INCLUDEPATH += "src"
-
+INCLUDEPATH += "src/serialib"
 
 SOURCES += \
     src/SMC100C.cpp \
@@ -22,7 +20,7 @@ SOURCES += \
     src/manualpumpcontrol.cpp \
     src/manualstagecontrol.cpp \
     src/qcustomplot.cpp \
-    src/serialib.cpp
+    src/serialib/serialib.cpp
 
 HEADERS += \
     src/PtnImage.h \
@@ -35,8 +33,7 @@ HEADERS += \
     src/manualstagecontrol.h \
     src/patternelement.h \
     src/qcustomplot.h \
-    src/serialib.h
-
+    src/serialib/serialib.h
 
 FORMS += \
     src/imagepopout.ui \
@@ -89,7 +86,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    Pictures.qrc
+    Pictures.qrc \
+    images/CLIP3Dresources.qrc
+     #$$PWD/images/Pictures.qrc
 
 win32: LIBS += -lSetupAPI
 #OpenCV libs

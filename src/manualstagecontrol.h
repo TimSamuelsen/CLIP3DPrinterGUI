@@ -49,6 +49,10 @@ private slots:
 
     void on_StopMotion_clicked();
 
+    void on_SMCSelect_clicked();
+
+    void on_GcodeSelect_clicked();
+
 private:
     Ui::ManualStageControl *ui;
     void GetValues();
@@ -58,7 +62,7 @@ private:
     int StageHome(Stage_t StageType);
     int StageStop(Stage_t StageType);
     int SetStageVelocity(float VelocityToSet, Stage_t StageType);
-    int SetStageAccleration(float AccelerationToSet, Stage_t StageType);
+    int SetStageAcceleration(float AccelerationToSet, Stage_t StageType);
     int SetStagePositiveLimit(float PositiveLimit, Stage_t StageType);
     int SetStageNegativeLimit(float NegativeLimit, Stage_t StageType);
     int StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageType);

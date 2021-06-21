@@ -120,7 +120,7 @@ p, li { white-space: pre-wrap; }
  Sychronize</string>
     </property>
    </widget>
-   <widget class="QLabel" name="ProgramOutputLabel">
+   <widget class="QLabel" name="TerminalOutputTitle">
     <property name="geometry">
      <rect>
       <x>1460</x>
@@ -375,7 +375,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </attribute>
     </widget>
    </widget>
-   <widget class="QLabel" name="label_5">
+   <widget class="QLabel" name="MonitorLiveValuesTitle">
     <property name="geometry">
      <rect>
       <x>1450</x>
@@ -636,7 +636,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
     </item>
    </widget>
-   <widget class="QLabel" name="label_9">
+   <widget class="QLabel" name="LightEngineConnectionTitle">
     <property name="geometry">
      <rect>
       <x>810</x>
@@ -649,7 +649,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Light Engine:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_13">
+   <widget class="QLabel" name="StageConnectTitle">
     <property name="geometry">
      <rect>
       <x>800</x>
@@ -662,7 +662,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Stage:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_8">
+   <widget class="QLabel" name="SystemConnectionsTitle">
     <property name="geometry">
      <rect>
       <x>810</x>
@@ -763,7 +763,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <string>Connect</string>
     </property>
    </widget>
-   <widget class="QLabel" name="ProgramOutputLabel_2">
+   <widget class="QLabel" name="LogFileTitle">
     <property name="geometry">
      <rect>
       <x>1450</x>
@@ -952,7 +952,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QFrame" name="frame_3">
+   <widget class="QFrame" name="LightEngineControls">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -1122,7 +1122,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
     </widget>
    </widget>
-   <widget class="QFrame" name="frame">
+   <widget class="QFrame" name="StageControls">
     <property name="geometry">
      <rect>
       <x>160</x>
@@ -1294,7 +1294,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
     </widget>
    </widget>
-   <widget class="QFrame" name="frame_2">
+   <widget class="QFrame" name="StageControlTitleFrame">
     <property name="geometry">
      <rect>
       <x>160</x>
@@ -1312,7 +1312,7 @@ QPushButton#AbortPrint:hover:!pressed {
     <property name="lineWidth">
      <number>1</number>
     </property>
-    <widget class="QLabel" name="label_4">
+    <widget class="QLabel" name="StageControlTitle">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -1326,7 +1326,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
     </widget>
    </widget>
-   <widget class="QFrame" name="frame_5">
+   <widget class="QFrame" name="LightEngineTitleFrame">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -1358,7 +1358,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
     </widget>
    </widget>
-   <widget class="QFrame" name="frame_6">
+   <widget class="QFrame" name="PumpControlTitleFrame">
     <property name="geometry">
      <rect>
       <x>320</x>
@@ -1376,7 +1376,7 @@ QPushButton#AbortPrint:hover:!pressed {
     <property name="lineWidth">
      <number>1</number>
     </property>
-    <widget class="QLabel" name="label_10">
+    <widget class="QLabel" name="PumpControlTitle">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -1390,7 +1390,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
     </widget>
    </widget>
-   <widget class="QFrame" name="frame_8">
+   <widget class="QFrame" name="PumpControls">
     <property name="geometry">
      <rect>
       <x>320</x>
@@ -1408,8 +1408,80 @@ QPushButton#AbortPrint:hover:!pressed {
     <property name="lineWidth">
      <number>1</number>
     </property>
+    <widget class="QLabel" name="VolPerLayerTitle">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>141</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Vol/layer (μl)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="VolPerLayerParam">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>81</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="SetVolPerLayer">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>30</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Set</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="InfuseRateParam">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>81</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="SetInfuseRate">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>90</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Set</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="InfuseRateTitle">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>141</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Infusion Rate (μl/s)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
    </widget>
-   <widget class="QFrame" name="frame_7">
+   <widget class="QFrame" name="GeneralPrintSettings">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -1655,7 +1727,7 @@ parameters</string>
      </property>
     </widget>
    </widget>
-   <widget class="QFrame" name="frame_9">
+   <widget class="QFrame" name="GeneralPrintSettingsTitleFrame">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -1673,7 +1745,7 @@ parameters</string>
     <property name="lineWidth">
      <number>1</number>
     </property>
-    <widget class="QLabel" name="label_11">
+    <widget class="QLabel" name="GeneralPrintSettingsTitle">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -1690,20 +1762,7 @@ parameters</string>
      </property>
     </widget>
    </widget>
-   <widget class="QLabel" name="label_12">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>100</y>
-      <width>481</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Customize Your Print&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QFrame" name="frame_11">
+   <widget class="QFrame" name="PrintCustomizationControls">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -1933,7 +1992,7 @@ parameters</string>
      </property>
     </widget>
    </widget>
-   <widget class="QFrame" name="frame_12">
+   <widget class="QFrame" name="PrintSelect">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -2110,7 +2169,7 @@ parameters</string>
      </property>
     </widget>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="DeSimoneLabLogo">
     <property name="geometry">
      <rect>
       <x>1440</x>
@@ -2129,7 +2188,7 @@ parameters</string>
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QLabel" name="label_14">
+   <widget class="QLabel" name="PumpControlTitle_2">
     <property name="geometry">
      <rect>
       <x>810</x>
@@ -2281,7 +2340,7 @@ parameters</string>
      <string>Use Print Script</string>
     </property>
    </widget>
-   <widget class="QFrame" name="frame_10">
+   <widget class="QFrame" name="CustomizePrintTitle">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -2299,14 +2358,27 @@ parameters</string>
     <property name="lineWidth">
      <number>1</number>
     </property>
+    <widget class="QLabel" name="PrintCustomizationTitle">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>481</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Customize Your Print&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
    </widget>
-   <zorder>frame_5</zorder>
+   <zorder>LightEngineTitleFrame</zorder>
    <zorder>FileList</zorder>
    <zorder>SelectFile</zorder>
    <zorder>ObjectImageFiles</zorder>
    <zorder>ProgramOutput</zorder>
    <zorder>InitializeAndSynchronize</zorder>
-   <zorder>ProgramOutputLabel</zorder>
+   <zorder>TerminalOutputTitle</zorder>
    <zorder>StartPrint</zorder>
    <zorder>ImageProcess</zorder>
    <zorder>ManualStage</zorder>
@@ -2317,7 +2389,7 @@ parameters</string>
    <zorder>AbortPrint</zorder>
    <zorder>pushButton</zorder>
    <zorder>tabWidget</zorder>
-   <zorder>label_5</zorder>
+   <zorder>MonitorLiveValuesTitle</zorder>
    <zorder>LiveValue1</zorder>
    <zorder>LiveValue2</zorder>
    <zorder>LiveValue3</zorder>
@@ -2326,33 +2398,32 @@ parameters</string>
    <zorder>LiveValueList2</zorder>
    <zorder>LiveValueList3</zorder>
    <zorder>LiveValueList4</zorder>
-   <zorder>label_9</zorder>
-   <zorder>label_13</zorder>
-   <zorder>label_8</zorder>
+   <zorder>LightEngineConnectionTitle</zorder>
+   <zorder>StageConnectTitle</zorder>
+   <zorder>SystemConnectionsTitle</zorder>
    <zorder>COMPortSelect</zorder>
    <zorder>LightEngineIndicator</zorder>
    <zorder>StageConnectionIndicator</zorder>
    <zorder>LightEngineConnectButton</zorder>
    <zorder>StageConnectButton</zorder>
-   <zorder>ProgramOutputLabel_2</zorder>
+   <zorder>LogFileTitle</zorder>
    <zorder>LogFileBrowse</zorder>
    <zorder>scrollArea</zorder>
    <zorder>LiveValueList5</zorder>
    <zorder>LiveValueList6</zorder>
    <zorder>LiveValue5</zorder>
    <zorder>LiveValue6</zorder>
-   <zorder>frame_3</zorder>
-   <zorder>frame</zorder>
-   <zorder>frame_2</zorder>
-   <zorder>frame_6</zorder>
-   <zorder>frame_8</zorder>
-   <zorder>frame_7</zorder>
-   <zorder>frame_9</zorder>
-   <zorder>label_12</zorder>
-   <zorder>frame_11</zorder>
-   <zorder>frame_12</zorder>
-   <zorder>label</zorder>
-   <zorder>label_14</zorder>
+   <zorder>LightEngineControls</zorder>
+   <zorder>StageControls</zorder>
+   <zorder>StageControlTitleFrame</zorder>
+   <zorder>PumpControlTitleFrame</zorder>
+   <zorder>PumpControls</zorder>
+   <zorder>GeneralPrintSettings</zorder>
+   <zorder>GeneralPrintSettingsTitleFrame</zorder>
+   <zorder>PrintCustomizationControls</zorder>
+   <zorder>PrintSelect</zorder>
+   <zorder>DeSimoneLabLogo</zorder>
+   <zorder>PumpControlTitle_2</zorder>
    <zorder>COMPortSelectPump</zorder>
    <zorder>PumpConnectionIndicator</zorder>
    <zorder>PumpConnectButton</zorder>
@@ -2361,7 +2432,7 @@ parameters</string>
    <zorder>SelectPrintScript</zorder>
    <zorder>ClearPrintScript</zorder>
    <zorder>UsePrintScript</zorder>
-   <zorder>frame_10</zorder>
+   <zorder>CustomizePrintTitle</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -2369,7 +2440,7 @@ parameters</string>
      <x>0</x>
      <y>0</y>
      <width>1774</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

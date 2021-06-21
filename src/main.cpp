@@ -14,16 +14,16 @@ int main(int argc, char *argv[])
     a.setApplicationName("CLIP3DGUI");
 
     QString CurrentPath = QDir::currentPath();
-    a.setWindowIcon(QIcon(":/new/prefix1//testicon.ico"));
+    a.setWindowIcon(QIcon(":/new/pics/testicon.ico"));
 
-    QFile styleSheetFile(":/new/prefix1/Ubuntu.qss");
+    QFile styleSheetFile(":/new/pics/Ubuntu.qss");
     styleSheetFile.open(QFile::ReadOnly);
     QString styleSheet { QLatin1String(styleSheetFile.readAll()) };
     a.setStyleSheet(styleSheet);
 
     MainWindow w;
     w.setWindowTitle("CLIP3DGUI");
-    w.setWindowIcon(QIcon(":/new/prefix1/testicon.ico"));
+    w.setWindowIcon(QIcon(":/new/pics/testicon.ico"));
     w.show();
     return a.exec();
 }
