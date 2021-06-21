@@ -194,26 +194,26 @@ int ManualStageControl::StageInit(const char* COMPort, Stage_t StageType)
         returnVal = 1;
     }
     else if (StageType == STAGE_GCODE){
-        if(StageSerial.openDevice(COMPort,9600) == 1){ //If serial connection was succesful
+        if(StageSerial.openDevice(COMPort,115200) == 1){ //If serial connection was succesful
             returnVal = 1; //return 1 for succesful connection
             Sleep(10); //Delay to avoid serial congestion
 
             //Set stage programming to mm
-            QString UnitCommand = "G21\r";
+            QString UnitCommand = "\rG21\r\n";
             int UnitReturn = StageSerial.writeString(UnitCommand.toLatin1().data());
             if (UnitReturn < 0) //if command failed
                 returnVal = -1; //return -1 for failed command
             Sleep(10); //Delay to avoid serial congestion
 
             //Set stage to use incremental movements
-            QString IncrementCommand = "G91\r";
+            QString IncrementCommand = "G91\r\n";
             int IncrementReturn = StageSerial.writeString(IncrementCommand.toLatin1().data());
             if (IncrementReturn < 0) //if command failed
                 returnVal = -1; //return -1 for failed command
             Sleep(10); //Delay to avoid serial congestion
 
             //Enable steppers
-            QString StepperCommand = "M17\r";
+            QString StepperCommand = "M17\r\n";
             int StepperReturn = StageSerial.writeString(StepperCommand.toLatin1().data());
             if (StepperReturn < 0) //if command failed
                 returnVal = -1; //return -1 for failed command
@@ -327,7 +327,7 @@ int ManualStageControl::StageRelativeMove(float RelativeMoveDistance, Stage_t St
         SMC.RelativeMove(RelativeMoveDistance);
     }
     else if (StageType == STAGE_GCODE){
-        QString RelMoveCommand = "G1 Z" + QString::number(RelativeMoveDistance) + " F" + QString::number(FeedRate);
+        QString RelMoveCommand = "G1 Z" + QString::number(RelativeMoveDistance) + " F" + QString::number(FeedRate) + "\r\n";
         int RelMoveReturn = StageSerial.writeString(RelMoveCommand.toLatin1().data());
         if (RelMoveReturn < 0)
             returnVal = 1;
