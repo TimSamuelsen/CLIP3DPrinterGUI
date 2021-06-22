@@ -6,7 +6,7 @@
 static bool ConnectionFlag = false;
 static Stage_t StageType = STAGE_SMC; //Initialize stage type as SMC
 
-static float FeedRate;
+static float FeedRate = 60;
 
 ManualStageControl::ManualStageControl(QWidget *parent) :
     QWidget(parent),
@@ -57,6 +57,7 @@ void ManualStageControl::on_ConnectButton_clicked()
             ui->ConnectionIndicator->setText("Connected");
             ui->ConnectButton->setText("Disconnect");
             ConnectionFlag = true;
+
         }
         else
         {
@@ -313,7 +314,7 @@ int ManualStageControl::StageAbsoluteMove(float AbsoluteMovePosition, Stage_t St
     }
     else if (StageType == STAGE_GCODE){
         //Set stage to do absolute move
-        QString AbsMoveCommand = "G92 Z" + QString::number(AbsoluteMovePosition) + "\r";
+        QString AbsMoveCommand = "G92\r\nG1 Z" + QString::number(AbsoluteMovePosition) + " F" + QString::number(FeedRate) + "\r\n";
         int AbsMoveReturn = StageSerial.writeString(AbsMoveCommand.toLatin1().data());
         if (AbsMoveReturn < 0) //if command failed
             returnVal = -1; //return -1 for failed command
@@ -327,7 +328,7 @@ int ManualStageControl::StageRelativeMove(float RelativeMoveDistance, Stage_t St
         SMC.RelativeMove(RelativeMoveDistance);
     }
     else if (StageType == STAGE_GCODE){
-        QString RelMoveCommand = "G1 Z" + QString::number(RelativeMoveDistance) + " F" + QString::number(FeedRate) + "\r\n";
+        QString RelMoveCommand = "G91\r\nG1 Z" + QString::number(RelativeMoveDistance) + " F" + QString::number(FeedRate) + "\r\n";
         int RelMoveReturn = StageSerial.writeString(RelMoveCommand.toLatin1().data());
         if (RelMoveReturn < 0)
             returnVal = 1;
