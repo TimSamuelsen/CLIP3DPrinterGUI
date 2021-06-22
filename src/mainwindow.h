@@ -145,6 +145,8 @@ private slots:
     void on_setPumping_clicked();
 
     void pumpingSlot();
+    void on_CLIPSelect_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;

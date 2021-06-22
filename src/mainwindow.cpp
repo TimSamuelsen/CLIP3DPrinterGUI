@@ -122,7 +122,7 @@ double PumpingParameter;
 uint StageMode = 0; //Selects which stage to use
 
 //Stage select parameter
-static Stage_t StageType;
+static Stage_t StageType = STAGE_SMC;
 
 /**
  * @brief MainWindow::MainWindow
@@ -367,7 +367,15 @@ void MainWindow::on_DICLIPSelect_clicked()
 {
     initImagePopout();
     ProjectionMode = 1;
+    StageType = STAGE_GCODE;
 }
+
+void MainWindow::on_CLIPSelect_clicked()
+{
+    ProjectionMode = 1;
+    StageType = STAGE_SMC;
+}
+
 
 /**
  * @brief MainWindow::on_SetBitDepth_clicked
