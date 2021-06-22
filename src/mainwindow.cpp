@@ -121,6 +121,8 @@ bool PumpingMode = 0;
 double PumpingParameter;
 uint StageMode = 0; //Selects which stage to use
 
+//Stage select parameter
+static Stage_t StageType;
 
 /**
  * @brief MainWindow::MainWindow
@@ -174,8 +176,10 @@ void MainWindow::on_ManualStage_clicked()
     ManualStageUI->show();
 
     //Initialize stage for manual stage control
-    SMC.Home(); //Home command is issued to make sure the stage is referenced upon startup
-    SMC.SMC100CClose(); //Close main window connection to allow manual stage control to take over, ideally this would not be needed and it would stay on the same connection.
+    //SMC.Home(); //Home command is issued to make sure the stage is referenced upon startup
+    Stage.StageHome(StageType);
+    //SMC.SMC100CClose(); //Close main window connection to allow manual stage control to take over, ideally this would not be needed and it would stay on the same connection.
+    Stage.StageClose(StageType);
 
     //Update Terminal and Stage Connection Indicator
     ui->ProgramPrints->append("Manual Stage Control Entered"); //Print to terminal
@@ -218,7 +222,8 @@ void MainWindow::on_ImageProcess_clicked()
 void MainWindow::on_GetPosition_clicked()
 {
     //Get position and store it in char*, could store directly in QString but if result is null it can cause issues
-    char* ReadPosition = SMC.GetPosition();
+    //char* ReadPosition = SMC.GetPosition();
+    char* ReadPosition = Stage.StageGetPosition(StageType);
 
     //If the string length returned from SMC.GetPosition is > 1, then no errors have occurred
     if (strlen(ReadPosition) > 1)
@@ -515,7 +520,8 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
 void MainWindow::on_AbortPrint_clicked()
 {
     LCR_PatternDisplay(0); //Turn off light engine projection
-    SMC.StopMotion(); //Stop stage movement
+    //SMC.StopMotion(); //Stop stage movement
+    Stage.StageStop(StageType);
     layerCount = 0xFFFFFF; //Set layer count high to stop print process
     ui->ProgramPrints->append("PRINT ABORTED");
 }
@@ -528,7 +534,8 @@ void MainWindow::on_StartPrint_clicked()
 {
     if (ValidateSettings() == true) //If settings are validated successfully and Initialization has been completed
     {
-        SMC.SetVelocity(StageVelocity); //Update stage velocity
+        //SMC.SetVelocity(StageVelocity); //Update stage velocity
+        Stage.SetStageVelocity(StageVelocity, StageType);
         Sleep(20); //Sleep to avoid spamming motor controller
         emit(on_GetPosition_clicked()); //Get stage position to validate that stage connection is working
         Sleep(20);
@@ -551,7 +558,8 @@ void MainWindow::on_StartPrint_clicked()
         if (MotionMode == CONTINUOUS){ //continuous motion mode
             double ContStageVelocity = (SliceThickness)/(ExposureTime/(1e6)); //Multiply Exposure time by 1e6 to convert from us to s to get to proper units
             ui->ProgramPrints->append("Continuous Stage Velocity set to " + QString::number(SliceThickness) + "/" + QString::number(ExposureTime) + " = " + QString::number(ContStageVelocity) + " mm/s");
-            SMC.SetVelocity(ContStageVelocity); //Set stage velocity to the calculated velocity
+            //SMC.SetVelocity(ContStageVelocity); //Set stage velocity to the calculated velocity
+            Stage.SetStageVelocity(ContStageVelocity, StageType);
         }
         PrintStartTime = QTime::currentTime(); //Get print start time from current time
         DLP.startPatSequence(); //Start projection
@@ -578,7 +586,8 @@ void MainWindow::PrintProcess(void)
         if (remainingImages <= 0)
         {
             if (MotionMode == 1){
-                SMC.StopMotion();
+                //SMC.StopMotion();
+                Stage.StageStop(StageType);
             }
             LCR_PatternDisplay(0);
             QListWidgetItem * item;
@@ -612,7 +621,8 @@ void MainWindow::PrintProcess(void)
             DLP.startPatSequence();
             SetExposureTimer(0, PrintScript, PumpingMode);
             if(MotionMode == 1){
-                SMC.AbsoluteMove(PrintEnd);
+                //SMC.AbsoluteMove(PrintEnd);
+                Stage.StageAbsoluteMove(PrintEnd, StageType);
             }
             else{
                 //updatePlot();
@@ -657,20 +667,24 @@ void MainWindow::PrintProcess(void)
         saveText();
         saveSettings();
 
-        SMC.StopMotion();
+        //SMC.StopMotion();
+        Stage.StageStop(StageType);
         LCR_PatternDisplay(0);
         Sleep(50);
-        SMC.SetVelocity(2);
+        //SMC.SetVelocity(2);
+        Stage.SetStageVelocity(2, StageType);
         Sleep(50);
         emit(on_GetPosition_clicked());
         Sleep(50);
         if (MinEndOfRun > 0)
         {
-            SMC.AbsoluteMove(MinEndOfRun);
+            Stage.StageAbsoluteMove(MinEndOfRun, StageType);
+            //SMC.AbsoluteMove(MinEndOfRun);
         }
         else
         {
-           SMC.AbsoluteMove(0);
+           Stage.StageAbsoluteMove(0, StageType);
+           //SMC.AbsoluteMove(0);
         }
 
         return;
@@ -761,17 +775,21 @@ void MainWindow::PrintProcessVP()
         ui->ProgramPrints->append("Print Complete");
         saveText();
         saveSettings();
-        SMC.StopMotion();
+        Stage.StageStop(StageType);
+        //SMC.StopMotion();
         Sleep(50);
-        SMC.SetVelocity(2);
+        Stage.SetStageVelocity(2, StageType);
+        //SMC.SetVelocity(2);
         Sleep(50);
         emit(on_GetPosition_clicked());
         Sleep(50);
         if (MinEndOfRun > 0){
-            SMC.AbsoluteMove(MinEndOfRun);
+            //SMC.AbsoluteMove(MinEndOfRun);
+            Stage.StageAbsoluteMove(MinEndOfRun, StageType);
         }
         else{
-           SMC.AbsoluteMove(0);
+           //SMC.AbsoluteMove(0);
+            Stage.StageAbsoluteMove(0, StageType);
         }
         return;
     }
@@ -785,7 +803,8 @@ void MainWindow::PrintProcessVP()
 void MainWindow::pumpingSlot(void)
 {
     QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-    SMC.RelativeMove(-PumpingParameter); //Move the stage back the desired pumping distance
+    //SMC.RelativeMove(-PumpingParameter); //Move the stage back the desired pumping distance
+    Stage.StageRelativeMove(-PumpingParameter, StageType);
     ui->ProgramPrints->append("Pumping " + QString::number(PumpingParameter*1000) +" um");
 }
 
@@ -839,10 +858,12 @@ void MainWindow::ExposureTimeSlot(void)
         if(PumpingMode == 1){
             emit(on_GetPosition_clicked());
             updatePlot();
-            SMC.RelativeMove((PumpingParameter - SliceThickness)); //pumping param is in um, slicethickness is in mm
+            Stage.StageRelativeMove(PumpingParameter - SliceThickness, StageType);
+            //SMC.RelativeMove((PumpingParameter - SliceThickness)); //pumping param is in um, slicethickness is in mm
         }
         else{
-            SMC.RelativeMove(-SliceThickness);
+            //SMC.RelativeMove(-SliceThickness);
+            Stage.StageRelativeMove(-SliceThickness, StageType);
         }
 
         if(PrintScript == 1)
@@ -872,7 +893,8 @@ void MainWindow::ExposureTimeSlot(void)
     }
     else if(MotionMode == 1){
         if (inMotion == false){
-            SMC.AbsoluteMove(PrintEnd);
+            //SMC.AbsoluteMove(PrintEnd);
+            Stage.StageAbsoluteMove(PrintEnd, StageType);
         }
         PrintProcess();
     }
@@ -1083,11 +1105,13 @@ void MainWindow::on_LightEngineConnectButton_clicked()
  */
 void MainWindow::on_StageConnectButton_clicked()
 {
-    SMC.SMC100CClose();
+    //SMC.SMC100CClose();
+    Stage.StageClose(StageType);
     QString COMSelect = ui->COMPortSelect->currentText();
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
-    if (SMC.SMC100CInit(COM) == true && SMC.Home() == true)
+    //if (SMC.SMC100CInit(COM) == true && SMC.Home() == true)
+    if (Stage.StageInit(COM, StageType) == true && Stage.StageHome(StageType) == true)
     {
         ui->ProgramPrints->append("Stage Connected");
         ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
@@ -1275,7 +1299,8 @@ void MainWindow::on_SetStartingPosButton_clicked()
     StartingPosition = (ui->StartingPositionParam->value());
     QString StartingPositionString = "Set Starting Position to: " + QString::number(StartingPosition) + " mm";
     ui->ProgramPrints->append(StartingPositionString);
-    QString CurrentPosition = SMC.GetPosition();
+    //QString CurrentPosition = SMC.GetPosition();
+    QString CurrentPosition = Stage.StageGetPosition(StageType);
     CurrentPosition = CurrentPosition.remove(0,3);
     ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
     ui->CurrentPositionIndicator->setText(CurrentPosition);
@@ -1300,7 +1325,8 @@ void MainWindow::on_SetSliceThickness_clicked()
 void MainWindow::on_SetStageVelocity_clicked()
 {
     StageVelocity = (ui->StageVelocityParam->value());
-    SMC.SetVelocity(StageVelocity); //Sends command to stage
+    //SMC.SetVelocity(StageVelocity); //Sends command to stage
+    Stage.SetStageVelocity(StageVelocity, StageType);
     QString VelocityString = "Set Stage Velocity to: " + QString::number(StageVelocity) +" mm/s";
     ui->ProgramPrints->append(VelocityString);
 }
@@ -1313,7 +1339,8 @@ void MainWindow::on_SetStageVelocity_clicked()
 void MainWindow::on_SetStageAcceleration_clicked()
 {
     StageAcceleration = (ui->StageAccelParam->value());
-    SMC.SetAcceleration(StageAcceleration); //Sends command to stage
+    //SMC.SetAcceleration(StageAcceleration); //Sends command to stage
+    Stage.SetStageAcceleration(StageAcceleration, StageType);
     QString AccelerationString = "Set Stage Acceleration to: " + QString::number(StageAcceleration) + " mm/s";
     ui->ProgramPrints->append(AccelerationString);
 }
@@ -1326,7 +1353,8 @@ void MainWindow::on_SetStageAcceleration_clicked()
 void MainWindow::on_SetMaxEndOfRun_clicked()
 {
     MaxEndOfRun = (ui->MaxEndOfRun->value());
-    SMC.SetPositiveLimit(MaxEndOfRun); //Sends command to stage
+    //SMC.SetPositiveLimit(MaxEndOfRun); //Sends command to stage
+    Stage.SetStagePositiveLimit(MaxEndOfRun, StageType);
     QString MaxEndOfRunString = "Set Max End Of Run to: " + QString::number(MaxEndOfRun) + " mm";
     ui->ProgramPrints->append(MaxEndOfRunString);
 }
@@ -1339,7 +1367,8 @@ void MainWindow::on_SetMaxEndOfRun_clicked()
 void MainWindow::on_SetMinEndOfRun_clicked()
 {
     MinEndOfRun = (ui->MinEndOfRunParam->value());
-    SMC.SetNegativeLimit(MinEndOfRun); //Sends command to stage
+    //SMC.SetNegativeLimit(MinEndOfRun); //Sends command to stage
+    Stage.SetStageNegativeLimit(MinEndOfRun, StageType);
     QString MinEndOfRunString = "Set Min End Of Run to: " + QString::number(MinEndOfRun) + " mm";
     ui->ProgramPrints->append(MinEndOfRunString);
 }
@@ -1485,7 +1514,8 @@ void MainWindow::saveText()
  */
 void MainWindow::validateStartingPosition()
 {
-    QString CurrentPosition = SMC.GetPosition();
+    //QString CurrentPosition = SMC.GetPosition();
+    QString CurrentPosition = Stage.StageGetPosition(StageType);
     CurrentPosition = CurrentPosition.remove(0,3);
     if (CurrentPosition.toInt() > (StartingPosition - 0.1) && CurrentPosition.toInt() < (StartingPosition +0.1))
     {
@@ -1510,12 +1540,14 @@ void MainWindow::initStageSlot(void)
     {
         if (StagePrep1 == false)
         {
-            SMC.SetVelocity(3);
+            //SMC.SetVelocity(3);
+            Stage.SetStageVelocity(3, StageType);
             Sleep(20);
-            SMC.AbsoluteMove((StartingPosition-3));
+            //SMC.AbsoluteMove((StartingPosition-3));
+            Stage.StageAbsoluteMove(StartingPosition-3, StageType);
             Sleep(20);
-            QString MoveTime = SMC.GetMotionTime();
-            MoveTime.remove(0,3);
+            //QString MoveTime = SMC.GetMotionTime();
+            //MoveTime.remove(0,3);
             StagePrep1 = true;
             ui->ProgramPrints->append("Performing Rough Stage Movement");
         }
@@ -1545,9 +1577,11 @@ void MainWindow::fineMovement()
         if (StagePrep2 == false)
         {
             Sleep(20);
-            SMC.SetVelocity(0.3);
+            //SMC.SetVelocity(0.3);
+            Stage.SetStageVelocity(0.3, StageType);
             Sleep(20);
-            SMC.AbsoluteMove(StartingPosition);
+            //SMC.AbsoluteMove(StartingPosition);
+            Stage.StageAbsoluteMove(StartingPosition, StageType);
             ui->ProgramPrints->append("Fine Stage Movement");
             StagePrep2 = true;
         }
@@ -1563,13 +1597,17 @@ void MainWindow::verifyStageParams()
 {
     ui->ProgramPrints->append("Verifying Stage Parameters");
     Sleep(50);
-    SMC.SetAcceleration(StageAcceleration);
+    //SMC.SetAcceleration(StageAcceleration);
+    Stage.SetStageAcceleration(StageAcceleration, StageType);
     Sleep(50);
-    SMC.SetNegativeLimit(MinEndOfRun);
+    //SMC.SetNegativeLimit(MinEndOfRun);
+    Stage.SetStageNegativeLimit(MinEndOfRun, StageType);
     Sleep(50);
-    SMC.SetPositiveLimit(MaxEndOfRun);
+    //SMC.SetPositiveLimit(MaxEndOfRun);
+    Stage.SetStagePositiveLimit(MaxEndOfRun, StageType);
     Sleep(50);
-    SMC.SetVelocity(StageVelocity);
+    //SMC.SetVelocity(StageVelocity);
+    Stage.SetStageVelocity(StageVelocity, StageType);
 }
 
 /**

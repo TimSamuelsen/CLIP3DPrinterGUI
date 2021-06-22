@@ -22,12 +22,10 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    bool nanosleep(double ns);
     void PrintToTerminal(QString StringToPrint);
-    SMC100C SMC;
-    //DLP9000 DLP;
     imagepopout popout;
     manualpumpcontrol Pump;
+    ManualStageControl Stage;
 
 
 public slots:
