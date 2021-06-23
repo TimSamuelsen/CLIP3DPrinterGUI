@@ -339,7 +339,7 @@ int ManualStageControl::StageRelativeMove(float RelativeMoveDistance, Stage_t St
         SMC.RelativeMove(RelativeMoveDistance);
     }
     else if (StageType == STAGE_GCODE){
-        QString RelMoveCommand = "G91\r\nG1 Z" + QString::number(RelativeMoveDistance) + " F" + QString::number(FeedRate) + "\r\n";
+        QString RelMoveCommand = "G91\r\nG1 Z" + QString::number(-RelativeMoveDistance) + " F" + QString::number(FeedRate) + "\r\n";
         int RelMoveReturn = StageSerial.writeString(RelMoveCommand.toLatin1().data());
         if (RelMoveReturn < 0)
             returnVal = 1;
