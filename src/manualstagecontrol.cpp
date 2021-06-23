@@ -342,7 +342,14 @@ char* ManualStageControl::StageGetPosition(Stage_t StageType)
         return SMC.GetPosition();
     }
     else if (StageType == STAGE_GCODE){
-
+        QString GetPositionCommand = "M114 R\r\n";
+        int GetPositionReturn = StageSerial.writeString(GetPositionCommand.toLatin1().data());
+        static char receivedString[] = "ThisIsMyTest";
+        char finalChar = '\n';
+        uint maxNbBytes = 30;//make sure to validate this
+        int ReadStatus = StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
+        printf(receivedString);
+        return receivedString;
     }
     return 0;
 }

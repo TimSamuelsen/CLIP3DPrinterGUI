@@ -715,6 +715,11 @@ char* SMC100C::SerialRead()
         char* errString = "Max N bytes reached";
         return  receivedString;
     }
+    else
+    {
+        char* errString = "Unknown Error";
+        return errString;
+    }
 }
 /*----------------------------------------------------- Work in Progress Code -------------------------------------------------------*/
 /**************************************************************************************************************************************
