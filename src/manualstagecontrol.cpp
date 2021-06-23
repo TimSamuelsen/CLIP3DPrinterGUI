@@ -354,3 +354,11 @@ char* ManualStageControl::StageGetPosition(Stage_t StageType)
     return 0;
 }
 
+
+void ManualStageControl::on_SetPositionValue_clicked()
+{
+    double PositionVal = ui->SetPositionParam->value();
+    QString SetPositionCommand = "G92 Z" + QString::number(PositionVal) + "\r\n";
+    StageSerial.writeString(SetPositionCommand.toLatin1().data());
+    ui->TerminalOut->append("Set current position to: " + QString::number(PositionVal));
+}

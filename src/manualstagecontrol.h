@@ -66,6 +66,8 @@ private slots:
 
     void on_GcodeSelect_clicked();
 
+    void on_SetPositionValue_clicked();
+
 private:
     Ui::ManualStageControl *ui;
     void GetValues();
