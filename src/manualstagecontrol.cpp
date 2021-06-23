@@ -172,8 +172,9 @@ void ManualStageControl::on_GetAcceleration_clicked()
 
 void ManualStageControl::on_GetPosition_clicked()
 {
-    QString CurrentPosition = SMC.GetPosition();
-    CurrentPosition = CurrentPosition.remove(0,3);
+    //QString CurrentPosition = SMC.GetPosition();
+    //CurrentPosition = CurrentPosition.remove(0,3);
+    QString CurrentPosition = StageGetPosition(StageType);
     ui->TerminalOut->append("Stage is at: " + CurrentPosition);
     ui->CurrentPositionIndicator->setText(CurrentPosition);
 }
@@ -218,6 +219,15 @@ int ManualStageControl::StageInit(const char* COMPort, Stage_t StageType)
             int StepperReturn = StageSerial.writeString(StepperCommand.toLatin1().data());
             if (StepperReturn < 0) //if command failed
                 returnVal = -1; //return -1 for failed command
+            /*Sleep(400);
+            for (uint8_t i = 0; i < 25; i++){
+                static char receivedString[] = "ThisIsMyTest";
+                char finalChar = '\n';
+                uint maxNbBytes = 100;//make sure to validate this
+                int ReadStatus = StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
+                ui->TerminalOut->append(receivedString);
+                Sleep(10);
+            }*/
         }
         else{ //Serial connection failed
             returnVal = -1;
@@ -245,6 +255,7 @@ int ManualStageControl::StageHome(Stage_t StageType)
     }
     else if (StageType == STAGE_GCODE){
         //Is there a use for a stage home command?
+        returnVal = 1;
     }
     return returnVal;
 }
@@ -342,15 +353,18 @@ char* ManualStageControl::StageGetPosition(Stage_t StageType)
         return SMC.GetPosition();
     }
     else if (StageType == STAGE_GCODE){
+        /*
         QString GetPositionCommand = "M114 R\r\n";
         int GetPositionReturn = StageSerial.writeString(GetPositionCommand.toLatin1().data());
         static char receivedString[] = "ThisIsMyTest";
         char finalChar = '\n';
-        uint maxNbBytes = 30;//make sure to validate this
+        uint maxNbBytes = 100;//make sure to validate this
+        Sleep(10);
         int ReadStatus = StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
         printf(receivedString);
         return receivedString;
+        */
     }
-    return 0;
+    return "NA";
 }
 

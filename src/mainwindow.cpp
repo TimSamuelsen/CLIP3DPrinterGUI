@@ -365,8 +365,8 @@ void MainWindow::initImagePopout()
  */
 void MainWindow::on_DICLIPSelect_clicked()
 {
-    initImagePopout();
-    ProjectionMode = 1;
+    //initImagePopout();
+    //ProjectionMode = 1;
     StageType = STAGE_GCODE;
 }
 
