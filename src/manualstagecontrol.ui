@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>508</width>
+    <width>515</width>
     <height>737</height>
    </rect>
   </property>
@@ -59,9 +59,9 @@
   <widget class="QLabel" name="label_9">
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>190</x>
      <y>300</y>
-     <width>81</width>
+     <width>61</width>
      <height>20</height>
     </rect>
    </property>
@@ -72,9 +72,9 @@
   <widget class="QLabel" name="CurrentMinEndOfRun">
    <property name="geometry">
     <rect>
-     <x>50</x>
+     <x>10</x>
      <y>320</y>
-     <width>71</width>
+     <width>61</width>
      <height>31</height>
     </rect>
    </property>
@@ -130,7 +130,7 @@
     <rect>
      <x>0</x>
      <y>280</y>
-     <width>251</width>
+     <width>161</width>
      <height>20</height>
     </rect>
    </property>
@@ -141,9 +141,9 @@
   <widget class="QLabel" name="label_11">
    <property name="geometry">
     <rect>
-     <x>130</x>
+     <x>90</x>
      <y>300</y>
-     <width>81</width>
+     <width>61</width>
      <height>20</height>
     </rect>
    </property>
@@ -241,9 +241,9 @@
   <widget class="QPushButton" name="SetMinEndOfRun">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>90</x>
      <y>360</y>
-     <width>71</width>
+     <width>61</width>
      <height>31</height>
     </rect>
    </property>
@@ -280,7 +280,7 @@
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
-     <x>50</x>
+     <x>0</x>
      <y>300</y>
      <width>81</width>
      <height>20</height>
@@ -293,9 +293,9 @@
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>254</x>
+     <x>194</x>
      <y>280</y>
-     <width>271</width>
+     <width>131</width>
      <height>20</height>
     </rect>
    </property>
@@ -306,14 +306,14 @@
   <widget class="QDoubleSpinBox" name="NewMaxEndOfRunParam">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>270</x>
      <y>320</y>
-     <width>71</width>
+     <width>61</width>
      <height>31</height>
     </rect>
    </property>
    <property name="decimals">
-    <number>5</number>
+    <number>3</number>
    </property>
    <property name="minimum">
     <double>-5.000000000000000</double>
@@ -325,9 +325,9 @@
   <widget class="QLabel" name="CurrentMaxEndOfRun">
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>190</x>
      <y>320</y>
-     <width>71</width>
+     <width>61</width>
      <height>31</height>
     </rect>
    </property>
@@ -342,9 +342,9 @@
   <widget class="QPushButton" name="SetMaxEndOfRun">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>270</x>
      <y>360</y>
-     <width>71</width>
+     <width>61</width>
      <height>31</height>
     </rect>
    </property>
@@ -372,9 +372,9 @@
   <widget class="QLabel" name="label_10">
    <property name="geometry">
     <rect>
-     <x>390</x>
+     <x>270</x>
      <y>300</y>
-     <width>81</width>
+     <width>61</width>
      <height>20</height>
     </rect>
    </property>
@@ -411,14 +411,14 @@
   <widget class="QDoubleSpinBox" name="NewMinEndOfRunParam">
    <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>90</x>
      <y>320</y>
-     <width>71</width>
+     <width>61</width>
      <height>31</height>
     </rect>
    </property>
    <property name="decimals">
-    <number>5</number>
+    <number>3</number>
    </property>
    <property name="minimum">
     <double>-5.000000000000000</double>
@@ -613,9 +613,9 @@
   <widget class="QPushButton" name="GetMinEndOfRun">
    <property name="geometry">
     <rect>
-     <x>50</x>
+     <x>10</x>
      <y>360</y>
-     <width>71</width>
+     <width>61</width>
      <height>31</height>
     </rect>
    </property>
@@ -626,9 +626,9 @@
   <widget class="QPushButton" name="GetMaxEndOfRun">
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>190</x>
      <y>360</y>
-     <width>71</width>
+     <width>61</width>
      <height>31</height>
     </rect>
    </property>
@@ -801,6 +801,107 @@ QPushButton#StopMotion:hover:!pressed {
    </property>
    <property name="text">
     <string>Gcode</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_20">
+   <property name="geometry">
+    <rect>
+     <x>364</x>
+     <y>280</y>
+     <width>131</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Set Position Value (mm)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_21">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>300</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;New&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="CurrentPositionValue">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>320</y>
+     <width>61</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background:rgb(255, 255, 255); border: 1px solid black;
+</string>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="GetMaxEndOfRun_2">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>360</y>
+     <width>61</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Get</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="SetPositionValue">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>360</y>
+     <width>61</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Set</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="SetPositionParam">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>320</y>
+     <width>61</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="decimals">
+    <number>3</number>
+   </property>
+   <property name="minimum">
+    <double>0.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>1000.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_22">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>300</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Current&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
  </widget>
