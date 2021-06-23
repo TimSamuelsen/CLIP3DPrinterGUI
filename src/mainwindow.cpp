@@ -482,7 +482,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
             QListWidgetItem * item;
             QStringList imageList;
-            for(uint i = 1; (i < (ui->FileList->count())); i++)
+            for(int i = 1; (i < (ui->FileList->count())); i++)
             {
                     item = ui->FileList->item(i);
                     imageList << item->text();
@@ -1543,27 +1543,33 @@ void MainWindow::validateStartingPosition()
 void MainWindow::initStageSlot(void)
 {
     emit(on_GetPosition_clicked());
-
-    if (GetPosition < (StartingPosition-3.2))
+    if (StageType == STAGE_SMC)
     {
-        if (StagePrep1 == false)
+        if (GetPosition < (StartingPosition-3.2))
         {
-            //SMC.SetVelocity(3);
-            Stage.SetStageVelocity(3, StageType);
-            Sleep(20);
-            //SMC.AbsoluteMove((StartingPosition-3));
-            Stage.StageAbsoluteMove(StartingPosition-3, StageType);
-            Sleep(20);
-            //QString MoveTime = SMC.GetMotionTime();
-            //MoveTime.remove(0,3);
-            StagePrep1 = true;
-            ui->ProgramPrints->append("Performing Rough Stage Movement");
+            if (StagePrep1 == false)
+            {
+                //SMC.SetVelocity(3);
+                Stage.SetStageVelocity(3, StageType);
+                Sleep(20);
+                //SMC.AbsoluteMove((StartingPosition-3));
+                Stage.StageAbsoluteMove(StartingPosition-3, StageType);
+                Sleep(20);
+                //QString MoveTime = SMC.GetMotionTime();
+                //MoveTime.remove(0,3);
+                StagePrep1 = true;
+                ui->ProgramPrints->append("Performing Rough Stage Movement");
+            }
+            QTimer::singleShot(1000, this, SLOT(initStageSlot()));
         }
-        QTimer::singleShot(1000, this, SLOT(initStageSlot()));
+        else
+        {
+            fineMovement();
+        }
     }
-    else
+    else //stage is in gcode mode
     {
-        fineMovement();
+        ui->ProgramPrints->append("Auto stage initialization disabled for iCLIP, please move stage to endstop with manual controls");
     }
 }
 
