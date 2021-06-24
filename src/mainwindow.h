@@ -11,6 +11,7 @@
 #include "dlp9000.h"
 #include "serialib.h"
 
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -147,6 +148,10 @@ private slots:
     void pumpingSlot();
     void on_CLIPSelect_clicked();
 
+    void on_SetInfuseRate_clicked();
+
+    void on_SetVolPerLayer_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
@@ -167,5 +172,6 @@ private:
     void AutoMode();
     void initImagePopout();
     void SetExposureTimer(int InitialExposureFlag, int PrintScript, int PumpingMode);
+    void PrintInfuse();
 };
 #endif // MAINWINDOW_H

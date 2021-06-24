@@ -47,10 +47,15 @@
 #define QuickTime
 #define ON   1
 #define OFF  0
+//For selecting motion mode
 #define CONTINUOUS  1
 #define STEPPED     0
+//For selecting projection mode
 #define VIDEOPATTERN 1
 #define POTF 0
+//For selecting printer
+#define CLIP30UM 0
+#define ICLIP 1
 
 
 DLP9000 DLP; //DLP object for calling functions from dlp9000.cpp, test if this still works without being a static
@@ -70,6 +75,8 @@ static double DarkTime;
 static uint InitialExposure;
 static int UVIntensity;
 static int MaxImageUpload = 20;
+static double InfusionRate;
+static double InfusionVolume;
 
 //Auto parameter selection mode
 static double PrintSpeed;
@@ -123,6 +130,7 @@ uint StageMode = 0; //Selects which stage to use
 
 //Stage select parameter
 static Stage_t StageType = STAGE_SMC;
+static int PrinterType = CLIP30UM;
 
 /**
  * @brief MainWindow::MainWindow
@@ -368,12 +376,14 @@ void MainWindow::on_DICLIPSelect_clicked()
     //initImagePopout();
     //ProjectionMode = 1;
     StageType = STAGE_GCODE;
+    PrinterType = ICLIP;
 }
 
 void MainWindow::on_CLIPSelect_clicked()
 {
     ProjectionMode = 1;
     StageType = STAGE_SMC;
+    PrinterType = CLIP30UM;
 }
 
 
@@ -826,7 +836,9 @@ void MainWindow::ExposureTimeSlot(void)
         QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
         ui->ProgramPrints->append(QTime::currentTime().toString("hh.mm.ss.zzz"));
     }
+
     updatePlot();
+
     if (ProjectionMode == VIDEOPATTERN) //If in video pattern mode
     {
         //Add if statement here if last exposure time
@@ -860,6 +872,11 @@ void MainWindow::ExposureTimeSlot(void)
             }
         }
         emit(on_GetPosition_clicked());
+    }
+    if (PrinterType == ICLIP)
+    {
+        PrintInfuse();
+        ui->ProgramPrints->append("Injecting " + QString::number(InfusionVolume) + "ul at " + QString::number(InfusionRate) + "ul/s");
     }
 
     if(MotionMode == 0){
@@ -957,6 +974,12 @@ void MainWindow::SetExposureTimer(int InitialExposureFlag, int PrintScript, int 
             ui->ProgramPrints->append("Exposing: " + QString::number(ExposureTime/1000) + " ms");
         }
     }
+}
+
+void MainWindow::PrintInfuse()
+{
+    Pump.ClearVolume();
+    Pump.StartInfusion();
 }
 /*********************************************File Handling*********************************************/
 /**
@@ -1324,7 +1347,7 @@ void MainWindow::on_SetSliceThickness_clicked()
     QString ThicknessString = "Set Slice Thickness to: " + QString::number(SliceThickness*1000) + " μm";
     ui->ProgramPrints->append(ThicknessString);
 }
-
+/*******************************************Stage Parameters********************************************/
 /**
  * @brief MainWindow::on_SetStageVelocity_clicked
  * Sets StageVelocity variable from the value inputted by the user,
@@ -1381,9 +1404,10 @@ void MainWindow::on_SetMinEndOfRun_clicked()
     ui->ProgramPrints->append(MinEndOfRunString);
 }
 
+/******************************************Light Engine Parameters********************************************/
 /**
  * @brief MainWindow::on_SetDarkTime_clicked
- * Sets DarkTime variable from the value inputted by the user
+ * Sets DarkTime variable from the value selected by the user
  */
 void MainWindow::on_SetDarkTime_clicked()
 {
@@ -1394,7 +1418,7 @@ void MainWindow::on_SetDarkTime_clicked()
 
 /**
  * @brief MainWindow::on_SetExposureTime_clicked
- * Sets ExposureTime variable from the value inputted by the user
+ * Sets ExposureTime variable from the value selected by the user
  */
 void MainWindow::on_SetExposureTime_clicked()
 {
@@ -1405,7 +1429,7 @@ void MainWindow::on_SetExposureTime_clicked()
 
 /**
  * @brief MainWindow::on_SetUVIntensity_clicked
- * Sets UVIntensity from the value inputted by the user
+ * Sets UVIntensity from the value selected by the user
  */
 void MainWindow::on_SetUVIntensity_clicked()
 {
@@ -1413,7 +1437,30 @@ void MainWindow::on_SetUVIntensity_clicked()
     QString UVIntensityString = "Set UV Intensity to: " + QString::number(UVIntensity);
     ui->ProgramPrints->append(UVIntensityString);
 }
+/*******************************************Pump Parameters********************************************/
+/**
+ * @brief MainWindow::on_SetInfuseRate_clicked
+ */
+void MainWindow::on_SetInfuseRate_clicked()
+{
+    InfusionRate = ui->InfuseRateParam->value();
+    Pump.SetInfuseRate(InfusionRate);
+    QString InfusionRateString = "Set Infusion Rate to: " + QString::number(InfusionRate) + " μl/s";
+    ui->ProgramPrints->append(InfusionRateString);
+}
 
+/**
+ * @brief MainWindow::on_SetVolPerLayer_clicked
+ */
+void MainWindow::on_SetVolPerLayer_clicked()
+{
+    InfusionVolume = ui->InfuseRateParam->value();
+    Pump.SetTargetVolume(InfusionVolume);
+    QString InfusionVolumeString = "Set Infusion Volume per layer to: " + QString::number(InfusionVolume) + " ul";
+    ui->ProgramPrints->append(InfusionVolumeString);
+}
+
+/*******************************************Live Value Monitoring********************************************/
 /**
  * @brief MainWindow::on_LiveValueList1_activated
  * @param arg1
@@ -1514,6 +1561,8 @@ void MainWindow::saveText()
          file.close();
      }
 }
+
+
 
 /**
  * @brief MainWindow::validateStartingPosition
