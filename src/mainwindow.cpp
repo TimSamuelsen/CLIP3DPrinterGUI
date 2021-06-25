@@ -377,6 +377,21 @@ void MainWindow::on_DICLIPSelect_clicked()
     //ProjectionMode = 1;
     StageType = STAGE_GCODE;
     PrinterType = ICLIP;
+
+    ui->VolPerLayerParam->setEnabled(true);
+    ui->SetVolPerLayer->setEnabled(true);
+    ui->InfuseRateParam->setEnabled(true);
+    ui->SetInfuseRate->setEnabled(true);
+
+    ui->StartingPositionParam->setEnabled(false);
+    ui->SetStartingPosButton->setEnabled(false);
+
+    ui->StageAccelParam->setEnabled(false);
+    ui->SetStageAcceleration->setEnabled(false);
+    ui->MaxEndOfRun->setEnabled(false);
+    ui->SetMaxEndOfRun->setEnabled(false);
+    ui->MinEndOfRunParam->setEnabled(false);
+    ui->SetMinEndOfRun->setEnabled(false);
 }
 
 void MainWindow::on_CLIPSelect_clicked()
@@ -384,6 +399,21 @@ void MainWindow::on_CLIPSelect_clicked()
     ProjectionMode = 1;
     StageType = STAGE_SMC;
     PrinterType = CLIP30UM;
+
+    ui->VolPerLayerParam->setEnabled(false);
+    ui->SetVolPerLayer->setEnabled(false);
+    ui->InfuseRateParam->setEnabled(false);
+    ui->SetInfuseRate->setEnabled(false);
+
+    ui->StartingPositionParam->setEnabled(true);
+    ui->SetStartingPosButton->setEnabled(true);
+
+    ui->StageAccelParam->setEnabled(true);
+    ui->SetStageAcceleration->setEnabled(true);
+    ui->MaxEndOfRun->setEnabled(true);
+    ui->SetMaxEndOfRun->setEnabled(true);
+    ui->MinEndOfRunParam->setEnabled(true);
+    ui->SetMinEndOfRun->setEnabled(true);
 }
 
 
@@ -409,6 +439,7 @@ void MainWindow::on_SteppedMotion_clicked()
         MotionMode = 0;
         ui->ContinuousMotion->setChecked(false);
         ui->ProgramPrints->append("Stepped Motion Selected");
+        ui->SetDarkTime->setEnabled(true);
     }
 }
 
@@ -423,6 +454,9 @@ void MainWindow::on_ContinuousMotion_clicked()
         MotionMode = 1;
         ui->SteppedMotion->setChecked(false);
         ui->ProgramPrints->append("Continuous Motion Selected");
+        DarkTime = 0;
+        ui->DarkTimeParam->setValue(0);
+        ui->SetDarkTime->setEnabled(false);
     }
 }
 
@@ -435,10 +469,14 @@ void MainWindow::on_pumpingCheckBox_clicked()
 {
     if(ui->pumpingCheckBox->isChecked() == true){
         PumpingMode = 1;
+        ui->pumpingParameter->setEnabled(true);
+        ui->setPumping->setEnabled(true);
         ui->ProgramPrints->append("Pumping Enabled");
     }
     else{
         PumpingMode = 0;
+        ui->pumpingParameter->setEnabled(false);
+        ui->setPumping->setEnabled(false);
         ui->ProgramPrints->append("Pumping Disabled");
     }
 }
@@ -1730,9 +1768,33 @@ bool MainWindow::initConfirmationScreen()
     confScreen.setText("Please Confirm Print Parameters");
 
     QString DetailedText;
+    if(PrinterType == CLIP30UM){
+        DetailedText += "Printer set to CLIP 30um\n";
+    }
+    else if(PrinterType == ICLIP){
+        DetailedText += "Printer set to iCLIP\n";
+    }
+
+    if(MotionMode == STEPPED){
+        DetailedText += "Motion mode set to stepped\n";
+    }
+    else if(MotionMode == CONTINUOUS){
+        DetailedText += "Motion mode set to continuous\n";
+    }
+
+    if(PumpingMode == 0){
+        DetailedText += "Pumping disabled\n";
+    }
+    else if(PumpingMode == 1){
+        DetailedText += "Pumping Enabled\n";
+    }
+
+    DetailedText += "Max Image Upload: " + QString::number(MaxImageUpload) + "images\n";
+    DetailedText += "Bit Depth set to: " + QString::number(BitMode) + "\n";
     DetailedText += "Initial Exposure Time: " + QString::number(InitialExposure) + "s\n";
     DetailedText += "Starting Position: " + QString::number(StartingPosition) + " mm\n";
     DetailedText += "Slice Thickness: " + QString::number(SliceThickness*1000) + " μm\n";
+
     if (AutoModeFlag)
     {
         DetailedText += "Auto Mode Active \n";
@@ -1745,19 +1807,22 @@ bool MainWindow::initConfirmationScreen()
     }
     if (PrintScript == 1)
     {
-        DetailedText += "Exposure Time Controlled by Print Script\n";
+        DetailedText += "Exposure Time controlled by print script\n";
+        DetailedText += "UV Intensity controlled by print script\n";
     }
     else
     {
         DetailedText += "Exposure Time: " + QString::number(ExposureTime/1000) + " ms\n";
+        DetailedText += "UV Intensity: " + QString::number(UVIntensity) + "\n";
     }
-    DetailedText += "UV Intensity: " + QString::number(UVIntensity) + "\n";
-    DetailedText += "Dark Time " + QString::number(DarkTime/1000) + " ms\n";
 
+    DetailedText += "Dark Time " + QString::number(DarkTime/1000) + " ms\n";
     DetailedText += "Stage Velocity: " + QString::number(StageVelocity) + " mm/s\n";
     DetailedText += "Stage Acceleration: " + QString::number(StageAcceleration) + " mm/s^2\n";
     DetailedText += "Max End Of Run: " + QString::number(MaxEndOfRun) + " mm\n";
-    DetailedText += "Min End Of Run: " + QString::number(MinEndOfRun) + " mm";
+    DetailedText += "Min End Of Run: " + QString::number(MinEndOfRun) + " mm\n";
+    DetailedText += "Infusion volume per layer: " + QString::number(InfusionVolume) + "ul\n";
+    DetailedText += "Infusion rate per layer: " + QString::number(InfusionRate) + "ul/s";
     confScreen.setDetailedText(DetailedText);
 
     confScreen.exec();
@@ -1852,7 +1917,6 @@ void MainWindow::saveSettings()
     settings.setValue("DarkTime", DarkTime);
     settings.setValue("UVIntensity", UVIntensity);
 
-    settings.setValue("SliceThickness", SliceThickness);
     settings.setValue("StageVelocity", StageVelocity);
     settings.setValue("StageAcceleration", StageAcceleration);
     settings.setValue("MaxEndOfRun", MaxEndOfRun);
@@ -1868,6 +1932,18 @@ void MainWindow::saveSettings()
 
     settings.setValue("LogFileDestination", LogFileDestination);
     settings.setValue("ImageFileDirectory", ImageFileDirectory);
+
+    settings.setValue("ProjectionMode", ProjectionMode);
+    settings.setValue("PrinterType", PrinterType);
+    settings.setValue("StageType", StageType);
+
+    settings.setValue("MotionMode", MotionMode);
+    settings.setValue("PumpingMode",PumpingMode);
+    settings.setValue("PumpingParameter", PumpingParameter);
+    settings.setValue("BitMode", BitMode);
+
+    settings.setValue("InfusionRate", InfusionRate);
+    settings.setValue("InfusionVolume", InfusionVolume);
 }
 
 /**
@@ -1900,6 +1976,16 @@ void MainWindow::loadSettings()
         LogFileDestination = settings.value("LogFileDestination", "C://").toString();
         ImageFileDirectory = settings.value("ImageFileDirectory", "C://").toString();
 
+        ProjectionMode = settings.value("ProjectionMode", POTF).toDouble();
+        PrinterType = settings.value("PrinterType", CLIP30UM).toDouble();
+
+        MotionMode = settings.value("MotionMode", STEPPED).toDouble();
+        PumpingMode = settings.value("PumpingMode", 0).toDouble();
+        PumpingParameter = settings.value("PumpingParameter", 0).toDouble();
+        BitMode = settings.value("BitMode", 1).toDouble();
+        InfusionRate = settings.value("InfusionRate", 5).toDouble();
+        InfusionVolume = settings.value("InfusionVolume", 5).toDouble();
+
         loadSettingsFlag = true;
     }
 }
@@ -1928,6 +2014,48 @@ void MainWindow::initSettings()
     ui->MaxImageUpload->setValue(MaxImageUpload);
 
     ui->LogFileLocation->setText(LogFileDestination);
+
+    if(ProjectionMode == POTF){
+        //emit(on_POTFcheckbox_clicked());
+    }
+    else if (ProjectionMode == VIDEOPATTERN){
+        //emit(on_VP_HDMIcheckbox_clicked());
+    }
+
+    if(PrinterType == CLIP30UM){
+        ui->CLIPSelect->setChecked(true);
+        ui->DICLIPSelect->setChecked(false);
+        emit(on_CLIPSelect_clicked());
+    }
+    else if(PrinterType == ICLIP){
+        ui->DICLIPSelect->setChecked(true);
+        ui->CLIPSelect->setChecked(false);
+        emit(on_DICLIPSelect_clicked());
+    }
+
+    if(MotionMode == STEPPED){
+        ui->SteppedMotion->setChecked(true);
+        ui->ContinuousMotion->setChecked(false);
+        emit(on_SteppedMotion_clicked());
+    }
+    else if(MotionMode == CONTINUOUS){
+        ui->ContinuousMotion->setChecked(true);
+        ui->SteppedMotion->setChecked(false);
+        emit(on_ContinuousMotion_clicked());
+    }
+
+    if(PumpingMode == ON){
+        ui->pumpingCheckBox->setChecked(true);
+        emit(on_pumpingCheckBox_clicked());
+    }
+    else if(PumpingMode == OFF){
+        ui->pumpingCheckBox->setChecked(false);
+    }
+
+    ui->pumpingParameter->setValue(PumpingParameter);
+    ui->BitDepthParam->setValue(BitMode);
+    ui->InfuseRateParam->setValue(InfusionRate);
+    ui->VolPerLayerParam->setValue(InfusionVolume);
 }
 
 /*******************************************Plot Functions*********************************************/
