@@ -518,7 +518,15 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             updatePlot();
             ui->StartPrint->setEnabled(true);
             if(MotionMode == 1){
-                PrintEnd = StartingPosition - (ui->FileList->count()*SliceThickness);
+                if(PrinterType == CLIP30UM){
+                    PrintEnd = StartingPosition - (ui->FileList->count()*SliceThickness);
+                }
+                else if (PrinterType == ICLIP){
+                    PrintEnd = ui->FileList->count()*SliceThickness;
+                }
+                else{
+                    showError("PrinterType Error, on_InitializeAndSynchronize_clicked");
+                }
                 ui->ProgramPrints->append("Print End for continous motion print set to: " + QString::number(PrintEnd));
             }
             if(ProjectionMode == VIDEOPATTERN){
@@ -616,7 +624,7 @@ void MainWindow::PrintProcess(void)
             {
                 MaxImageReupload -= 5;
             }
-            for(uint i = (layerCount); (i < ui->FileList->count()); i++)
+            for(int i = (layerCount); (i < ui->FileList->count()); i++)
             {
                     item = ui->FileList->item(i);
                     imageList << item->text();
