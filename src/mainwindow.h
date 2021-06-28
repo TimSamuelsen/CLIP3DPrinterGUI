@@ -173,5 +173,6 @@ private:
     void initImagePopout();
     void SetExposureTimer(int InitialExposureFlag, int PrintScript, int PumpingMode);
     void PrintInfuse();
+    void SetDarkTimer(int PrintScript);
 };
 #endif // MAINWINDOW_H

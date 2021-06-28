@@ -105,6 +105,9 @@ static bool StagePrep2 = false; //For lowering stage
 //Print script parameters
 QStringList ExposureScriptList; //Printscript is taken from a .csv file and stored in this variable
 QStringList LEDScriptList;
+QStringList DarkTimeScriptList;
+QStringList InjectionVolumeScriptList;
+QStringList InjectionRateScriptList;
 static int PrintScript = 0; //For selecting type of printscript, currently: 0 = no printscript, 1 = exposure time print script
 
 //Projection mode parameters
@@ -518,7 +521,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             {
                 firstImage << firstItem->text();
             }
-            DLP.AddPatterns(firstImage, 1000*1000, 0, 0, 0, ExposureScriptList, ProjectionMode, BitMode, InitialExposureFlag); //Printscript is set to 0 for initial exposure time, 0 for initial image
+            DLP.AddPatterns(firstImage, 1000*1000, 0, 0, 0, ExposureScriptList, DarkTimeScriptList,ProjectionMode, BitMode, InitialExposureFlag); //Printscript is set to 0 for initial exposure time, 0 for initial image
             if(ProjectionMode == POTF){
                 nSlice = ui->FileList->count();
             }
@@ -544,7 +547,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
                 ui->ProgramPrints->append("Using Print Script");
             }
             if (ProjectionMode == POTF){
-                DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, 0, ExposureScriptList, ProjectionMode, BitMode, 0); //Set initial image to 0
+                DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, 0, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0); //Set initial image to 0
                 DLP.updateLUT(ProjectionMode);
                 DLP.clearElements();
                 remainingImages = MaxImageUpload - InitialExposure;
@@ -560,7 +563,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
                     PrintEnd = StartingPosition - (ui->FileList->count()*SliceThickness);
                 }
                 else if (PrinterType == ICLIP){
-                    PrintEnd = ui->FileList->count()*SliceThickness;
+                    PrintEnd = ui->FileList->count()*SliceThickness; //Make sure stage is zeroed
                 }
                 else{
                     showError("PrinterType Error, on_InitializeAndSynchronize_clicked");
@@ -676,7 +679,7 @@ void MainWindow::PrintProcess(void)
             {
                 ui->ProgramPrints->append("Using Print Script");
             }
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, ProjectionMode, BitMode, 0);
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0);
             DLP.updateLUT(ProjectionMode);
             DLP.clearElements();
             remainingImages = count - 1;
@@ -795,7 +798,7 @@ void MainWindow::PrintProcessVP()
                 ui->ProgramPrints->append(QString::number(count) + " patterns uploaded");
             }
             //Add pattern data to buffer to prepare for pattern upload
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, ProjectionMode, BitMode, 0);
+            DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0);
             DLP.updateLUT(ProjectionMode); //update LUT on light engine to upload pattern data
             DLP.clearElements(); //clear pattern data buffer
             Sleep(50); //small delay to ensure that the new patterns are uploaded
@@ -879,7 +882,7 @@ void MainWindow::pumpingSlot(void)
 void MainWindow::ExposureTimeSlot(void)
 {
     if (MotionMode == 0){
-        QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        SetDarkTimer(PrintScript);
         ui->ProgramPrints->append(QTime::currentTime().toString("hh.mm.ss.zzz"));
     }
 
@@ -921,6 +924,33 @@ void MainWindow::ExposureTimeSlot(void)
     }
     if (PrinterType == ICLIP)
     {
+        if (PrintScript == ON)
+        {
+            if(layerCount < InjectionRateScriptList.size() && layerCount < InjectionVolumeScriptList.size())
+            {
+                if (layerCount > 0){
+                    if ((InjectionRateScriptList.at(layerCount).toInt()) == InjectionRateScriptList.at(layerCount-1).toInt()){
+                        //do nothing, this avoids spamming the light engine when LED intensity is constant
+                    }
+                    else{
+                         Pump.SetInfuseRate(InjectionRateScriptList.at(layerCount).toDouble());
+                         Sleep(10);
+                    }
+                    if ((InjectionVolumeScriptList.at(layerCount).toInt()) == InjectionVolumeScriptList.at(layerCount-1).toInt()){
+                        //do nothing, this avoids spamming the light engine when LED intensity is constant
+
+                    }
+                    else{
+                         Pump.SetTargetVolume(InjectionVolumeScriptList.at(layerCount).toDouble());
+                    }
+                }
+                else{
+                    Pump.SetInfuseRate(InjectionRateScriptList.at(layerCount).toDouble());
+                    Sleep(10);
+                    Pump.SetTargetVolume(InjectionVolumeScriptList.at(layerCount).toDouble());
+                }
+            }
+        }
         PrintInfuse();
         ui->ProgramPrints->append("Injecting " + QString::number(InfusionVolume) + "ul at " + QString::number(InfusionRate) + "ul/s");
     }
@@ -1022,6 +1052,19 @@ void MainWindow::SetExposureTimer(int InitialExposureFlag, int PrintScript, int 
     }
 }
 
+void MainWindow::SetDarkTimer(int PrintScript)
+{
+    if (PrintScript == ON){
+        QTimer::singleShot(DarkTimeScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+    }
+    else if(PrintScript == OFF){
+        QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+    }
+    else{
+        showError("Dark time settings error, SetDarkTime");
+    }
+}
+
 void MainWindow::PrintInfuse()
 {
     Pump.ClearVolume();
@@ -1118,17 +1161,24 @@ void MainWindow::on_SelectPrintScript_clicked()
             QByteArray line = file.readLine();
             ExposureScriptList.append(line.split(',').at(0));
             LEDScriptList.append(line.split(',').at(1));
+            DarkTimeScriptList.append(line.split(',').at(2));
+            if(PrinterType == ICLIP){
+                InjectionVolumeScriptList.append(line.split(',').at(3));
+                InjectionRateScriptList.append(line.split(',').at(4));
+            }
     }
      //For testing
     for (int i= 0; i < ExposureScriptList.size(); i++)
     {
-        ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i));
-        //ExposureScriptList.removeAt(0);
-        //LEDScriptList.removeAt(0);
+        ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i) + "," + DarkTimeScriptList.at(i) + "," + InjectionVolumeScriptList.at(i) + "," + InjectionRateScriptList.at(i));
     }
-    ui->ProgramPrints->append("Print List has: " + QString::number(ExposureScriptList.size()) + " exposure entries");
+    ui->ProgramPrints->append("Print List has: " + QString::number(ExposureScriptList.size()) + " exposure time entries");
     ui->ProgramPrints->append("Print List has: " + QString::number(LEDScriptList.size()) + " LED intensity entries");
-
+    ui->ProgramPrints->append("Print List has: " + QString::number(DarkTimeScriptList.size()) + " dark time entries");
+    if(PrinterType == ICLIP){
+        ui->ProgramPrints->append("Print List has: " + QString::number(InjectionVolumeScriptList.size()) + " injection volume entries");
+        ui->ProgramPrints->append("Print List has: " + QString::number(InjectionRateScriptList.size()) + " injection rate entries");
+    }
 }
 
 /**
@@ -2249,7 +2299,7 @@ void MainWindow::on_ManualLightEngine_clicked()
         if(HWStatus & BIT6)
                     ui->ProgramPrints->append("Sequencer has detected an error condition causing an Abort");
         else
-                    ui->ProgramPrints->append("No Sequencer Errors have Occured");
+                    ui->Pr ogramPrints->append("No Sequencer Errors have Occured");
 
         if(HWStatus & BIT7)
                     ui->ProgramPrints->append("Sequencer has detected an error");

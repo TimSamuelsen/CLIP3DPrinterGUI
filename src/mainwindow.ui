@@ -189,8 +189,8 @@ QPushButton#StartPrint:disabled {
    <widget class="QPushButton" name="ManualStage">
     <property name="geometry">
      <rect>
-      <x>820</x>
-      <y>510</y>
+      <x>660</x>
+      <y>700</y>
       <width>141</width>
       <height>61</height>
      </rect>
@@ -468,6 +468,31 @@ QPushButton#AbortPrint:hover:!pressed {
     <item>
      <property name="text">
       <string>None</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Exposure Time</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Dark Time</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LED Intensity</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Vol/layer</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Injection Rate</string>
      </property>
     </item>
     <item>
@@ -1521,7 +1546,7 @@ QPushButton#AbortPrint:hover:!pressed {
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Slice Thickness (μm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Layer Thickness (μm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QPushButton" name="SetSliceThickness">
