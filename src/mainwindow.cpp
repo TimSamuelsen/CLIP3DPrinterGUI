@@ -907,13 +907,6 @@ void MainWindow::ExposureTimeSlot(void)
             }
             BitLayer = 1;
             ReSyncCount++;
-            int ReSyncNum;
-            if (BitMode > 1){
-                ReSyncNum = 48;
-            }
-            else{
-                ReSyncNum = 120;
-            }
             if (ReSyncCount > (120-24)/(24/BitMode)){
                 ReSyncFlag = 1;
                 ReSyncCount = 0;
@@ -933,6 +926,7 @@ void MainWindow::ExposureTimeSlot(void)
                     }
                     else{
                          Pump.SetInfuseRate(InjectionRateScriptList.at(layerCount).toDouble());
+                         ui->LiveValue5->setText(QString::number(InjectionRateScriptList.at(layerCount).toDouble()));
                          Sleep(10);
                     }
                     if ((InjectionVolumeScriptList.at(layerCount).toInt()) == InjectionVolumeScriptList.at(layerCount-1).toInt()){
@@ -941,6 +935,7 @@ void MainWindow::ExposureTimeSlot(void)
                     }
                     else{
                          Pump.SetTargetVolume(InjectionVolumeScriptList.at(layerCount).toDouble());
+                         ui->LiveValue4->setText(QString::number(InjectionVolumeScriptList.at(layerCount).toDouble()));
                     }
                 }
                 else{
@@ -976,6 +971,7 @@ void MainWindow::ExposureTimeSlot(void)
                     }
                     else{
                          LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
+                         ui->LiveValue2->setText(QString::number(LEDScriptList.at(layerCount).toInt()));
                     }
                 }
                 else
@@ -991,6 +987,8 @@ void MainWindow::ExposureTimeSlot(void)
         if (PrintScript == ON){
             if(layerCount < DarkTimeScriptList.size()){
                 ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTimeScriptList.at(layerCount).toDouble()));
+                ui->LiveValue1->setText(QString::number(ExposureScriptList.at(layerCount).toInt()));
+                ui->LiveValue3->setText(QString::number(DarkTimeScriptList.at(layerCount).toInt()));
             }
         }
         else{
@@ -1198,15 +1196,19 @@ void MainWindow::on_SelectPrintScript_clicked()
         else{
             ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i) + "," + DarkTimeScriptList.at(i));
         }
-
-
     }
     ui->ProgramPrints->append("Print List has: " + QString::number(ExposureScriptList.size()) + " exposure time entries");
     ui->ProgramPrints->append("Print List has: " + QString::number(LEDScriptList.size()) + " LED intensity entries");
     ui->ProgramPrints->append("Print List has: " + QString::number(DarkTimeScriptList.size()) + " dark time entries");
+
+    ui->LiveValueList1->setCurrentIndex(1);
+    ui->LiveValueList2->setCurrentIndex(2);
+    ui->LiveValueList3->setCurrentIndex(3);
     if(PrinterType == ICLIP){
         ui->ProgramPrints->append("Print List has: " + QString::number(InjectionVolumeScriptList.size()) + " injection volume entries");
         ui->ProgramPrints->append("Print List has: " + QString::number(InjectionRateScriptList.size()) + " injection rate entries");
+        ui->LiveValueList4->setCurrentIndex(4);
+        ui->LiveValueList5->setCurrentIndex(5);
     }
 }
 
@@ -1971,7 +1973,7 @@ bool MainWindow::ValidateSettings(void)
         return false;
     }
     //Validate DarkTime
-    else if (DarkTime <= 0){
+    else if (DarkTime < 0){
         showError("Invalid Dark Time");
         ui->ProgramPrints->append("Invalid Dark Time");
         return false;

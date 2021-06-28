@@ -477,12 +477,12 @@ QPushButton#AbortPrint:hover:!pressed {
     </item>
     <item>
      <property name="text">
-      <string>Dark Time</string>
+      <string>LED Intensity</string>
      </property>
     </item>
     <item>
      <property name="text">
-      <string>LED Intensity</string>
+      <string>Dark Time</string>
      </property>
     </item>
     <item>
@@ -503,11 +503,6 @@ QPushButton#AbortPrint:hover:!pressed {
     <item>
      <property name="text">
       <string>Stage Position</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UV Intensity</string>
      </property>
     </item>
     <item>
@@ -542,17 +537,37 @@ QPushButton#AbortPrint:hover:!pressed {
     </item>
     <item>
      <property name="text">
+      <string>Exposure Time</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LED Intensity</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Dark Time</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Vol/layer</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Injection Rate</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>Stage Velocity</string>
      </property>
     </item>
     <item>
      <property name="text">
       <string>Stage Position</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UV Intensity</string>
      </property>
     </item>
     <item>
@@ -587,17 +602,37 @@ QPushButton#AbortPrint:hover:!pressed {
     </item>
     <item>
      <property name="text">
+      <string>Exposure Time</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LED Intensity</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Dark Time</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Vol/layer</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Injection Rate</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>Stage Velocity</string>
      </property>
     </item>
     <item>
      <property name="text">
       <string>Stage Position</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UV Intensity</string>
      </property>
     </item>
     <item>
@@ -632,17 +667,37 @@ QPushButton#AbortPrint:hover:!pressed {
     </item>
     <item>
      <property name="text">
+      <string>Exposure Time</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LED Intensity</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Dark Time</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Vol/layer</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Injection Rate</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>Stage Velocity</string>
      </property>
     </item>
     <item>
      <property name="text">
       <string>Stage Position</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UV Intensity</string>
      </property>
     </item>
     <item>
@@ -869,17 +924,37 @@ QPushButton#AbortPrint:hover:!pressed {
     </item>
     <item>
      <property name="text">
+      <string>Exposure Time</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LED Intensity</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Dark Time</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Vol/layer</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Injection Rate</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>Stage Velocity</string>
      </property>
     </item>
     <item>
      <property name="text">
       <string>Stage Position</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UV Intensity</string>
      </property>
     </item>
     <item>
@@ -914,17 +989,37 @@ QPushButton#AbortPrint:hover:!pressed {
     </item>
     <item>
      <property name="text">
+      <string>Exposure Time</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>LED Intensity</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Dark Time</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Vol/layer</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Injection Rate</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
       <string>Stage Velocity</string>
      </property>
     </item>
     <item>
      <property name="text">
       <string>Stage Position</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>UV Intensity</string>
      </property>
     </item>
     <item>
@@ -2486,7 +2581,7 @@ parameters</string>
      <x>0</x>
      <y>0</y>
      <width>1774</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
