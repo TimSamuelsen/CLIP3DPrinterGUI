@@ -399,7 +399,6 @@ void MainWindow::on_DICLIPSelect_clicked()
 
 void MainWindow::on_CLIPSelect_clicked()
 {
-    ProjectionMode = 1;
     StageType = STAGE_SMC;
     PrinterType = CLIP30UM;
 
@@ -989,7 +988,14 @@ void MainWindow::ExposureTimeSlot(void)
                 ui->ProgramPrints->append(QString::number(layerCount) + QString::number(sizeof(LEDScriptList)));
             }
         }
-        ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTime/1000) + " ms");
+        if (PrintScript == ON){
+            if(layerCount < DarkTimeScriptList.size()){
+                ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTimeScriptList.at(layerCount).toDouble()));
+            }
+        }
+        else{
+            ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTime/1000) + " ms");
+        }
         ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness*1000) + " um");
     }
     else if(MotionMode == 1){
@@ -1055,7 +1061,9 @@ void MainWindow::SetExposureTimer(int InitialExposureFlag, int PrintScript, int 
 void MainWindow::SetDarkTimer(int PrintScript)
 {
     if (PrintScript == ON){
-        QTimer::singleShot(DarkTimeScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        if(layerCount < DarkTimeScriptList.size()){
+            QTimer::singleShot(DarkTimeScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        }
     }
     else if(PrintScript == OFF){
         QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
@@ -1078,7 +1086,7 @@ void MainWindow::PrintInfuse()
 void MainWindow::on_SelectFile_clicked()
 {
     //Open files from last directory chosen (stored in settings), limited to bitmapped image file formats
-    QStringList file_name = QFileDialog::getOpenFileNames(this,"Open Object Image Files",ImageFileDirectory,"*.bmp *.png *.tiff *.tif *.svg");
+    QStringList file_name = QFileDialog::getOpenFileNames(this,"Open Object Image Files",ImageFileDirectory,"*.bmp *.png *.tiff *.tif");
     if (file_name.count() > 0) //If images were selected
     {
         QDir ImageDirectory = QFileInfo(file_name.at(0)).absoluteDir();
@@ -1128,6 +1136,13 @@ void MainWindow::on_UsePrintScript_clicked()
         ui->SelectPrintScript->setEnabled(true);
         ui->ClearPrintScript->setEnabled(true);
         ui->PrintScriptFile->setEnabled(true);
+
+        ui->ExposureTimeParam->setEnabled(false);
+        ui->SetExposureTime->setEnabled(false);
+        ui->UVIntensityParam->setEnabled(false);
+        ui->SetUVIntensity->setEnabled(false);
+        ui->DarkTimeParam->setEnabled(false);
+        ui->SetDarkTime->setEnabled(false);
     }
     else //printscript is not checked
     {
@@ -1135,6 +1150,13 @@ void MainWindow::on_UsePrintScript_clicked()
         ui->SelectPrintScript->setEnabled(false);
         ui->ClearPrintScript->setEnabled(false);
         ui->PrintScriptFile->setEnabled(false);
+
+        ui->ExposureTimeParam->setEnabled(true);
+        ui->SetExposureTime->setEnabled(true);
+        ui->UVIntensityParam->setEnabled(true);
+        ui->SetUVIntensity->setEnabled(true);
+        ui->DarkTimeParam->setEnabled(true);
+        ui->SetDarkTime->setEnabled(true);
     }
 }
 
@@ -1170,7 +1192,14 @@ void MainWindow::on_SelectPrintScript_clicked()
      //For testing
     for (int i= 0; i < ExposureScriptList.size(); i++)
     {
-        ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i) + "," + DarkTimeScriptList.at(i) + "," + InjectionVolumeScriptList.at(i) + "," + InjectionRateScriptList.at(i));
+        if(PrinterType == ICLIP){
+            ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i) + "," + DarkTimeScriptList.at(i) + "," + InjectionVolumeScriptList.at(i) + "," + InjectionRateScriptList.at(i));
+        }
+        else{
+            ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i) + "," + DarkTimeScriptList.at(i));
+        }
+
+
     }
     ui->ProgramPrints->append("Print List has: " + QString::number(ExposureScriptList.size()) + " exposure time entries");
     ui->ProgramPrints->append("Print List has: " + QString::number(LEDScriptList.size()) + " LED intensity entries");
@@ -1825,6 +1854,13 @@ bool MainWindow::initConfirmationScreen()
         DetailedText += "Printer set to iCLIP\n";
     }
 
+    if(ProjectionMode == POTF){
+        DetailedText += "POTF projection mode selected\n";
+    }
+    else if(ProjectionMode == VIDEOPATTERN){
+        DetailedText += "Video Pattern projection mode selected\n";
+    }
+
     if(MotionMode == STEPPED){
         DetailedText += "Motion mode set to stepped\n";
     }
@@ -1832,10 +1868,10 @@ bool MainWindow::initConfirmationScreen()
         DetailedText += "Motion mode set to continuous\n";
     }
 
-    if(PumpingMode == 0){
+    if(PumpingMode == OFF){
         DetailedText += "Pumping disabled\n";
     }
-    else if(PumpingMode == 1){
+    else if(PumpingMode == ON){
         DetailedText += "Pumping Enabled\n";
     }
 
@@ -1859,14 +1895,15 @@ bool MainWindow::initConfirmationScreen()
     {
         DetailedText += "Exposure Time controlled by print script\n";
         DetailedText += "UV Intensity controlled by print script\n";
+        DetailedText += "Dark Time controlled by print script\n";
     }
     else
     {
         DetailedText += "Exposure Time: " + QString::number(ExposureTime/1000) + " ms\n";
         DetailedText += "UV Intensity: " + QString::number(UVIntensity) + "\n";
+        DetailedText += "Dark Time " + QString::number(DarkTime/1000) + " ms\n";
     }
 
-    DetailedText += "Dark Time " + QString::number(DarkTime/1000) + " ms\n";
     DetailedText += "Stage Velocity: " + QString::number(StageVelocity) + " mm/s\n";
     DetailedText += "Stage Acceleration: " + QString::number(StageAcceleration) + " mm/s^2\n";
     DetailedText += "Max End Of Run: " + QString::number(MaxEndOfRun) + " mm\n";
@@ -1983,7 +2020,6 @@ void MainWindow::saveSettings()
     settings.setValue("LogFileDestination", LogFileDestination);
     settings.setValue("ImageFileDirectory", ImageFileDirectory);
 
-    settings.setValue("ProjectionMode", ProjectionMode);
     settings.setValue("PrinterType", PrinterType);
     settings.setValue("StageType", StageType);
 
@@ -2026,7 +2062,6 @@ void MainWindow::loadSettings()
         LogFileDestination = settings.value("LogFileDestination", "C://").toString();
         ImageFileDirectory = settings.value("ImageFileDirectory", "C://").toString();
 
-        ProjectionMode = settings.value("ProjectionMode", POTF).toDouble();
         PrinterType = settings.value("PrinterType", CLIP30UM).toDouble();
 
         MotionMode = settings.value("MotionMode", STEPPED).toDouble();
@@ -2064,13 +2099,6 @@ void MainWindow::initSettings()
     ui->MaxImageUpload->setValue(MaxImageUpload);
 
     ui->LogFileLocation->setText(LogFileDestination);
-
-    if(ProjectionMode == POTF){
-        //emit(on_POTFcheckbox_clicked());
-    }
-    else if (ProjectionMode == VIDEOPATTERN){
-        //emit(on_VP_HDMIcheckbox_clicked());
-    }
 
     if(PrinterType == CLIP30UM){
         ui->CLIPSelect->setChecked(true);
