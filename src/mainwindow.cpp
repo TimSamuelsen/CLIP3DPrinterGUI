@@ -674,7 +674,7 @@ void MainWindow::PrintProcess(void)
                         break;
                     }
             }
-            if (PrintScript == 1)
+            if (PrintScript == ON)
             {
                 ui->ProgramPrints->append("Using Print Script");
             }
@@ -1200,15 +1200,24 @@ void MainWindow::on_SelectPrintScript_clicked()
     ui->ProgramPrints->append("Print List has: " + QString::number(ExposureScriptList.size()) + " exposure time entries");
     ui->ProgramPrints->append("Print List has: " + QString::number(LEDScriptList.size()) + " LED intensity entries");
     ui->ProgramPrints->append("Print List has: " + QString::number(DarkTimeScriptList.size()) + " dark time entries");
-
-    ui->LiveValueList1->setCurrentIndex(1);
-    ui->LiveValueList2->setCurrentIndex(2);
-    ui->LiveValueList3->setCurrentIndex(3);
-    if(PrinterType == ICLIP){
-        ui->ProgramPrints->append("Print List has: " + QString::number(InjectionVolumeScriptList.size()) + " injection volume entries");
-        ui->ProgramPrints->append("Print List has: " + QString::number(InjectionRateScriptList.size()) + " injection rate entries");
-        ui->LiveValueList4->setCurrentIndex(4);
-        ui->LiveValueList5->setCurrentIndex(5);
+    if (ExposureScriptList.size() > 0)
+    {
+        ui->LiveValueList1->setCurrentIndex(1);
+        ui->LiveValue1->setText(QString::number(ExposureScriptList.at(0).toInt()));
+        ui->LiveValueList2->setCurrentIndex(2);
+        ui->LiveValue2->setText(QString::number(LEDScriptList.at(0).toInt()));
+        ui->LiveValueList3->setCurrentIndex(3);
+        ui->LiveValue3->setText(QString::number(DarkTimeScriptList.at(0).toInt()));
+        if(PrinterType == ICLIP){
+            if (InjectionVolumeScriptList.size() > 0 && InjectionRateScriptList.size() > 0){
+                ui->ProgramPrints->append("Print List has: " + QString::number(InjectionVolumeScriptList.size()) + " injection volume entries");
+                ui->ProgramPrints->append("Print List has: " + QString::number(InjectionRateScriptList.size()) + " injection rate entries");
+                ui->LiveValueList4->setCurrentIndex(4);
+                ui->LiveValue4->setText(QString::number(InjectionVolumeScriptList.at(0).toDouble()));
+                ui->LiveValueList5->setCurrentIndex(5);
+                ui->LiveValue5->setText(QString::number(InjectionRateScriptList.at(0).toDouble()));
+            }
+        }
     }
 }
 
@@ -2032,6 +2041,9 @@ void MainWindow::saveSettings()
 
     settings.setValue("InfusionRate", InfusionRate);
     settings.setValue("InfusionVolume", InfusionVolume);
+
+    settings.setValue("StageCOM", ui->COMPortSelect->currentIndex());
+    settings.setValue("PumpCOM", ui->COMPortSelectPump->currentIndex());
 }
 
 /**
@@ -2074,6 +2086,9 @@ void MainWindow::loadSettings()
         InfusionVolume = settings.value("InfusionVolume", 5).toDouble();
 
         loadSettingsFlag = true;
+
+        ui->COMPortSelect->setCurrentIndex(settings.value("StageCOM", 0).toInt());
+        ui->COMPortSelectPump->setCurrentIndex(settings.value("PumpCOM", 0).toInt());
     }
 }
 
@@ -2136,6 +2151,7 @@ void MainWindow::initSettings()
     ui->BitDepthParam->setValue(BitMode);
     ui->InfuseRateParam->setValue(InfusionRate);
     ui->VolPerLayerParam->setValue(InfusionVolume);
+
 }
 
 /*******************************************Plot Functions*********************************************/
