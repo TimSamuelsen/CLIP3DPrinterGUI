@@ -174,5 +174,6 @@ private:
     void SetExposureTimer(int InitialExposureFlag, int PrintScript, int PumpingMode);
     void PrintInfuse();
     void SetDarkTimer(int PrintScript);
+    void VP8bitWorkaround();
 };
 #endif // MAINWINDOW_H

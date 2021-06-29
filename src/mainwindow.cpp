@@ -2241,6 +2241,17 @@ void MainWindow::updatePlot()
     ui->LivePlot->replot(QCustomPlot::rpQueuedReplot);
 }
 /*************************************************************
+ * ********************Development***************************
+ * ***********************************************************/
+/**
+ * @brief MainWindow::VP8bitWorkaround
+ *
+ */
+void MainWindow::VP8bitWorkaround()
+{
+
+}
+/*************************************************************
  * ********************Graveyard***************************
  * ***********************************************************/
 //Snippets that may be useful in the future but the overall functionality has been deprecated
