@@ -34,7 +34,7 @@ bool DLP9000::InitProjector(void)
  * @brief MainWindow::on_addPatternsButton_clicked
  */
 //Make sure that input comes from
-void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int PrintScript, int CurrentImage, QStringList ExposureTimeList, int ProjectionMode, int BitMode, bool InitialExposure)
+void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int PrintScript, int CurrentImage, QStringList ExposureTimeList, QStringList DarkTimeList, int ProjectionMode, int BitMode, bool InitialExposure)
 {
     if(BitMode == 0){
         BitMode = 1; //Default bitmode to 1 if it somehow gets passed in undefined
@@ -57,14 +57,15 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                 if (PrintScript == 1)
                 {
                     pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
-                    printf("%d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000);
+                    pattern.darkPeriod = DarkTimeList.at(CurrentImage).toInt() * 1000;
+                    printf("%d, %d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000, DarkTimeList.at(CurrentImage).toInt() * 1000);
                     CurrentImage++; //Should this be done before?
                 }
                 else
                 {
                     pattern.exposure = ExposureTime;
+                    pattern.darkPeriod = DarkTime;
                 }
-                pattern.darkPeriod = DarkTime;
                 pattern.trigIn = false;
                 pattern.trigOut2 = true;
                 pattern.splashImageBitPos = 0;
@@ -79,14 +80,15 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                 if (PrintScript == 1)
                 {
                     pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
-                    printf("%d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000);
+                    pattern.darkPeriod = DarkTimeList.at(CurrentImage).toInt() * 1000;
+                    printf("%d, %d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000, DarkTimeList.at(CurrentImage).toInt() * 1000);
                     CurrentImage++; //Should this be done before?
                 }
                 else
                 {
                     pattern.exposure = ExposureTime;
+                    pattern.darkPeriod = DarkTime;
                 }
-                pattern.darkPeriod = DarkTime;
                 pattern.trigIn = false;
                 pattern.trigOut2 = true;
                 pattern.clear = true;
@@ -141,14 +143,15 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                 if (PrintScript == 1)
                 {
                     pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
-                    printf("%d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000);
+                    pattern.darkPeriod = DarkTimeList.at(CurrentImage).toInt() * 1000;
+                    printf("%d, %d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000, DarkTimeList.at(CurrentImage).toInt() * 1000);
                     CurrentImage++; //Should this be done before?
                 }
                 else
                 {
                     pattern.exposure = ExposureTime;
+                    pattern.darkPeriod = DarkTime;
                 }
-                pattern.darkPeriod = DarkTime;
                 pattern.trigIn = false;
                 pattern.trigOut2 = true;
                 pattern.clear = true;
@@ -161,14 +164,15 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                 if (PrintScript == 1)
                 {
                     pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
-                    printf("%d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000);
+                    pattern.darkPeriod = DarkTimeList.at(CurrentImage).toInt() * 1000;
+                    printf("%d, %d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000, DarkTimeList.at(CurrentImage).toInt() * 1000);
                     CurrentImage++; //Should this be done before?
                 }
                 else
                 {
                     pattern.exposure = ExposureTime;
+                    pattern.darkPeriod = DarkTime;
                 }
-                pattern.darkPeriod = DarkTime;
                 pattern.trigIn = false;
                 pattern.trigOut2 = true;
                 pattern.clear = true;
