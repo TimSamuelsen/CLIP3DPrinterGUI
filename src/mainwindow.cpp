@@ -676,6 +676,12 @@ void MainWindow::PrintProcess(void)
             if(MotionMode == STEPPED){
                 updatePlot();
             }
+            else if (MotionMode == CONTINUOUS){
+                if(PrinterType == ICLIP){
+                    PrintInfuse();
+                    ui->ProgramPrints->append("Injecting " + QString::number(InfusionVolume) + "ul at " + QString::number(InfusionRate) + "ul/s");
+                }
+            }
             double OldPosition = GetPosition;
             emit(on_GetPosition_clicked());
             ui->ProgramPrints->append("Stage moved: " + QString::number(OldPosition - GetPosition));
@@ -987,6 +993,7 @@ void MainWindow::SetExposureTimer(int InitialExposureFlag, int PrintScript, int 
 void MainWindow::PrintInfuse()
 {
     Pump.ClearVolume();
+    Sleep(15);
     Pump.StartInfusion();
 }
 /*********************************************File Handling*********************************************/
@@ -1819,7 +1826,7 @@ bool MainWindow::ValidateSettings(void)
         return false;
     }
     //Validate DarkTime
-    else if (DarkTime <= 0){
+    else if (DarkTime < 0){
         showError("Invalid Dark Time");
         ui->ProgramPrints->append("Invalid Dark Time");
         return false;
