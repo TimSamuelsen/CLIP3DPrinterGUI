@@ -716,6 +716,12 @@ void MainWindow::PrintProcess(void)
             if(MotionMode == STEPPED){
                 updatePlot();
             }
+            else if (MotionMode == CONTINUOUS){
+                if(PrinterType == ICLIP){
+                    PrintInfuse();
+                    ui->ProgramPrints->append("Injecting " + QString::number(InfusionVolume) + "ul at " + QString::number(InfusionRate) + "ul/s");
+                }
+            }
             double OldPosition = GetPosition;
             emit(on_GetPosition_clicked());
             ui->ProgramPrints->append("Stage moved: " + QString::number(OldPosition - GetPosition));
@@ -1076,6 +1082,7 @@ void MainWindow::SetDarkTimer(int PrintScript)
 void MainWindow::PrintInfuse()
 {
     Pump.ClearVolume();
+    Sleep(15);
     Pump.StartInfusion();
 }
 /*********************************************File Handling*********************************************/

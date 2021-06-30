@@ -180,7 +180,10 @@
     <number>5</number>
    </property>
    <property name="minimum">
-    <double>-99.989999999999995</double>
+    <double>-500.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>500.000000000000000</double>
    </property>
    <property name="value">
     <double>0.000000000000000</double>
@@ -509,7 +512,10 @@
     <number>5</number>
    </property>
    <property name="minimum">
-    <double>-99.000000000000000</double>
+    <double>-1000.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>1000.000000000000000</double>
    </property>
   </widget>
   <widget class="QScrollArea" name="scrollArea">

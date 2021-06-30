@@ -219,7 +219,7 @@ int ManualStageControl::StageInit(const char* COMPort, Stage_t StageType)
             int StepperReturn = StageSerial.writeString(StepperCommand.toLatin1().data());
             if (StepperReturn < 0) //if command failed
                 returnVal = -1; //return -1 for failed command
-            /*Sleep(400);
+            Sleep(500);
             for (uint8_t i = 0; i < 25; i++){
                 static char receivedString[] = "ThisIsMyTest";
                 char finalChar = '\n';
@@ -227,7 +227,7 @@ int ManualStageControl::StageInit(const char* COMPort, Stage_t StageType)
                 int ReadStatus = StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
                 ui->TerminalOut->append(receivedString);
                 Sleep(10);
-            }*/
+            }
         }
         else{ //Serial connection failed
             returnVal = -1;
@@ -353,7 +353,7 @@ char* ManualStageControl::StageGetPosition(Stage_t StageType)
         return SMC.GetPosition();
     }
     else if (StageType == STAGE_GCODE){
-        /*
+
         QString GetPositionCommand = "M114 R\r\n";
         int GetPositionReturn = StageSerial.writeString(GetPositionCommand.toLatin1().data());
         static char receivedString[] = "ThisIsMyTest";
@@ -363,7 +363,7 @@ char* ManualStageControl::StageGetPosition(Stage_t StageType)
         int ReadStatus = StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
         printf(receivedString);
         return receivedString;
-        */
+
     }
     return "NA";
 }
