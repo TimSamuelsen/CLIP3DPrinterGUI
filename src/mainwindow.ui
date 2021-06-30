@@ -1506,7 +1506,7 @@ QPushButton#AbortPrint:hover:!pressed {
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Pump Control&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Injection Control&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>
@@ -1532,7 +1532,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
+       <y>30</y>
        <width>141</width>
        <height>16</height>
       </rect>
@@ -1548,7 +1548,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>30</y>
+       <y>50</y>
        <width>81</width>
        <height>31</height>
       </rect>
@@ -1561,7 +1561,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>30</y>
+       <y>50</y>
        <width>51</width>
        <height>31</height>
       </rect>
@@ -1577,7 +1577,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>90</y>
+       <y>110</y>
        <width>81</width>
        <height>31</height>
       </rect>
@@ -1590,7 +1590,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>90</y>
+       <y>110</y>
        <width>51</width>
        <height>31</height>
       </rect>
@@ -1603,13 +1603,68 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>70</y>
+       <y>90</y>
        <width>141</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Infusion Rate (μl/s)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="radioButton">
+     <property name="geometry">
+      <rect>
+       <x>4</x>
+       <y>10</y>
+       <width>141</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 10pt &quot;MS Shell Dlg 2&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Continuous Injection</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="SetInitialVolume">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>170</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Set</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="InitialVolumeParam">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>170</y>
+       <width>81</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>14</x>
+       <y>150</y>
+       <width>131</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Initial Injection Volume (&lt;/span&gt;μl)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>
@@ -1754,7 +1809,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
      <property name="geometry">
       <rect>
-       <x>100</x>
+       <x>250</x>
        <y>90</y>
        <width>61</width>
        <height>31</height>
@@ -1767,14 +1822,14 @@ QPushButton#AbortPrint:hover:!pressed {
     <widget class="QLabel" name="PrintSpeedLabel">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>160</x>
        <y>70</y>
        <width>161</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Print Speed Auto (um/s)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Print Speed Auto (μm/s)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QDoubleSpinBox" name="PrintSpeedParam">
@@ -1783,7 +1838,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>170</x>
        <y>90</y>
        <width>71</width>
        <height>31</height>
@@ -1796,14 +1851,14 @@ QPushButton#AbortPrint:hover:!pressed {
     <widget class="QLabel" name="PrintSpeedLabel_2">
      <property name="geometry">
       <rect>
-       <x>170</x>
+       <x>320</x>
        <y>70</y>
        <width>161</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Print Height (um)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Print Height (μm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QSpinBox" name="PrintHeightParam">
@@ -1812,7 +1867,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
      <property name="geometry">
       <rect>
-       <x>180</x>
+       <x>330</x>
        <y>90</y>
        <width>71</width>
        <height>31</height>
@@ -1828,7 +1883,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>410</x>
        <y>90</y>
        <width>51</width>
        <height>31</height>
@@ -1841,7 +1896,7 @@ QPushButton#AbortPrint:hover:!pressed {
     <widget class="QCheckBox" name="AutoCheckBox">
      <property name="geometry">
       <rect>
-       <x>350</x>
+       <x>20</x>
        <y>80</y>
        <width>101</width>
        <height>41</height>
@@ -2003,16 +2058,16 @@ parameters</string>
       </rect>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Print Type&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Print Motion Mode&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QRadioButton" name="SteppedMotion">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>30</y>
+       <x>0</x>
+       <y>40</y>
        <width>111</width>
-       <height>31</height>
+       <height>21</height>
       </rect>
      </property>
      <property name="layoutDirection">
@@ -2037,10 +2092,10 @@ parameters</string>
     <widget class="QRadioButton" name="ContinuousMotion">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>60</y>
+       <x>0</x>
+       <y>70</y>
        <width>111</width>
-       <height>31</height>
+       <height>21</height>
       </rect>
      </property>
      <property name="layoutDirection">

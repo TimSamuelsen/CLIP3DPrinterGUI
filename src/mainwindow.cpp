@@ -849,13 +849,15 @@ void MainWindow::PrintProcessVP()
         Sleep(50);
         emit(on_GetPosition_clicked());
         Sleep(50);
-        if (MinEndOfRun > 0){
-            //SMC.AbsoluteMove(MinEndOfRun);
-            Stage.StageAbsoluteMove(MinEndOfRun, StageType);
-        }
-        else{
-           //SMC.AbsoluteMove(0);
-            Stage.StageAbsoluteMove(0, StageType);
+        if (PrinterType == CLIP30UM){
+            if (MinEndOfRun > 0){
+                //SMC.AbsoluteMove(MinEndOfRun);
+                Stage.StageAbsoluteMove(MinEndOfRun, StageType);
+            }
+            else{
+               //SMC.AbsoluteMove(0);
+                Stage.StageAbsoluteMove(0, StageType);
+            }
         }
         return;
     }
@@ -1889,7 +1891,9 @@ bool MainWindow::initConfirmationScreen()
     DetailedText += "Max Image Upload: " + QString::number(MaxImageUpload) + "images\n";
     DetailedText += "Bit Depth set to: " + QString::number(BitMode) + "\n";
     DetailedText += "Initial Exposure Time: " + QString::number(InitialExposure) + "s\n";
-    DetailedText += "Starting Position: " + QString::number(StartingPosition) + " mm\n";
+    if (PrinterType == CLIP30UM){
+        DetailedText += "Starting Position: " + QString::number(StartingPosition) + " mm\n";
+    }
     DetailedText += "Slice Thickness: " + QString::number(SliceThickness*1000) + " μm\n";
 
     if (AutoModeFlag)
@@ -1916,11 +1920,15 @@ bool MainWindow::initConfirmationScreen()
     }
 
     DetailedText += "Stage Velocity: " + QString::number(StageVelocity) + " mm/s\n";
-    DetailedText += "Stage Acceleration: " + QString::number(StageAcceleration) + " mm/s^2\n";
-    DetailedText += "Max End Of Run: " + QString::number(MaxEndOfRun) + " mm\n";
-    DetailedText += "Min End Of Run: " + QString::number(MinEndOfRun) + " mm\n";
-    DetailedText += "Infusion volume per layer: " + QString::number(InfusionVolume) + "ul\n";
-    DetailedText += "Infusion rate per layer: " + QString::number(InfusionRate) + "ul/s";
+    if (PrinterType == CLIP30UM){
+        DetailedText += "Stage Acceleration: " + QString::number(StageAcceleration) + " mm/s^2\n";
+        DetailedText += "Max End Of Run: " + QString::number(MaxEndOfRun) + " mm\n";
+        DetailedText += "Min End Of Run: " + QString::number(MinEndOfRun) + " mm\n";
+    }
+    else if (PrinterType == ICLIP){
+        DetailedText += "Infusion volume per layer: " + QString::number(InfusionVolume) + "ul\n";
+        DetailedText += "Infusion rate per layer: " + QString::number(InfusionRate) + "ul/s";
+    }
     confScreen.setDetailedText(DetailedText);
 
     confScreen.exec();
