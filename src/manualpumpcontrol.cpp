@@ -367,6 +367,13 @@ int manualpumpcontrol::CustomCommand(QString NewCommand)
     return returnval;
 }
 
+int manualpumpcontrol::IndefiniteRun()
+{
+    QString Command;
+    const char* CommandToSend = Command.toLatin1().data();
+    int returnVal = PSerial.writeString(CommandToSend);
+    return returnVal;
+}
 /******************************************Helper Functions******************************************/
 char* manualpumpcontrol::SerialRead()
 {

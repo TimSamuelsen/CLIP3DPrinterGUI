@@ -70,6 +70,10 @@ private slots:
 
     void on_SendCustomCommand_clicked();
 
+    void on_EnableEndStopCheckbox_clicked();
+
+    void on_DisableEndstopCheckbox_clicked();
+
 private:
     Ui::ManualStageControl *ui;
     void GetValues();

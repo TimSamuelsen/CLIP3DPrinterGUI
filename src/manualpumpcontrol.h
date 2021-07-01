@@ -30,6 +30,7 @@ public:
     int ClearTime();
     int ClearVolume();
     int CustomCommand(QString NewCommand);
+    int IndefiniteRun();
 
     QString GetTargetTime();
     QString GetTargetVolume();

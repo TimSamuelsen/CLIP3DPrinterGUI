@@ -128,6 +128,7 @@ static double PrintEnd;
 
 //Pumping parameter
 bool PumpingMode = 0;
+bool ContinuousInjection = false;
 double PumpingParameter;
 uint StageMode = 0; //Selects which stage to use
 
@@ -638,6 +639,9 @@ void MainWindow::on_StartPrint_clicked()
             PrintProcessVP();
             ui->ProgramPrints->append("Entering Video Pattern print process");
         }
+        if (ContinuousInjection == ON){
+            Pump.StartInfusion();
+        }
     }
 }
 
@@ -865,6 +869,9 @@ void MainWindow::PrintProcessVP()
                 Stage.StageAbsoluteMove(0, StageType);
             }
         }
+        else if(PrinterType == ICLIP){
+            Pump.Stop();
+        }
         return;
     }
 }
@@ -1081,9 +1088,11 @@ void MainWindow::SetDarkTimer(int PrintScript)
 
 void MainWindow::PrintInfuse()
 {
-    Pump.ClearVolume();
-    Sleep(15);
-    Pump.StartInfusion();
+    if (ContinuousInjection == OFF){
+        Pump.ClearVolume();
+        Sleep(15);
+        Pump.StartInfusion();
+    }
 }
 /*********************************************File Handling*********************************************/
 /**
@@ -1584,6 +1593,23 @@ void MainWindow::on_SetUVIntensity_clicked()
 }
 /*******************************************Pump Parameters********************************************/
 /**
+ * @brief MainWindow::on_ContinuousInjection_clicked
+ */
+void MainWindow::on_ContinuousInjection_clicked()
+{
+    if (ui->ContinuousInjection->isChecked() == true){
+        Pump.SetTargetVolume(0);
+        ContinuousInjection = true;
+        ui->ProgramPrints->append("Continuous Injection Selected");
+    }
+    else{
+        ContinuousInjection = false;
+        ui->ProgramPrints->append("Continuous Injection Disabled");
+    }
+}
+
+
+/**
  * @brief MainWindow::on_SetInfuseRate_clicked
  */
 void MainWindow::on_SetInfuseRate_clicked()
@@ -1603,6 +1629,11 @@ void MainWindow::on_SetVolPerLayer_clicked()
     Pump.SetTargetVolume(InfusionVolume);
     QString InfusionVolumeString = "Set Infusion Volume per layer to: " + QString::number(InfusionVolume) + " ul";
     ui->ProgramPrints->append(InfusionVolumeString);
+}
+
+void MainWindow::on_SetInitialVolume_clicked()
+{
+
 }
 
 /*******************************************Live Value Monitoring********************************************/
@@ -1694,7 +1725,6 @@ void MainWindow::saveText()
      QString Log = ui->ProgramPrints->toPlainText();
      QString LogDate = CurrentDateTime.toString("yyyy-MM-dd");
      QString LogTime = CurrentDateTime.toString("hh.mm.ss");
-     QString FileDirectory;
      QString LogTitle = LogFileDestination + "/CLIPGUITEST_" + LogDate + "_" + LogTime + ".txt";
      ui->ProgramPrints->append(LogTitle);
      QFile file(LogTitle);
@@ -1707,8 +1737,6 @@ void MainWindow::saveText()
      }
 }
 
-
-
 /**
  * @brief MainWindow::validateStartingPosition
  * Validates whether stage has reached it's starting position,
@@ -1716,7 +1744,6 @@ void MainWindow::saveText()
  */
 void MainWindow::validateStartingPosition()
 {
-    //QString CurrentPosition = SMC.GetPosition();
     QString CurrentPosition = Stage.StageGetPosition(StageType);
     CurrentPosition = CurrentPosition.remove(0,3);
     if (CurrentPosition.toInt() > (StartingPosition - 0.1) && CurrentPosition.toInt() < (StartingPosition +0.1))

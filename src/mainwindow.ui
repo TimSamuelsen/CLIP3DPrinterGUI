@@ -1612,25 +1612,6 @@ QPushButton#AbortPrint:hover:!pressed {
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Infusion Rate (μl/s)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="radioButton">
-     <property name="geometry">
-      <rect>
-       <x>4</x>
-       <y>10</y>
-       <width>141</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::RightToLeft</enum>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
-     </property>
-     <property name="text">
-      <string>Continuous Injection</string>
-     </property>
-    </widget>
     <widget class="QPushButton" name="SetInitialVolume">
      <property name="geometry">
       <rect>
@@ -1665,6 +1646,25 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Initial Injection Volume (&lt;/span&gt;μl)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="ContinuousInjection">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>141</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Continous Injection</string>
      </property>
     </widget>
    </widget>
@@ -2636,7 +2636,7 @@ parameters</string>
      <x>0</x>
      <y>0</y>
      <width>1774</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

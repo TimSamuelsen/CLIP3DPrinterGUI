@@ -3,9 +3,12 @@
 #include "SMC100C.h"
 #include "mainwindow.h"
 
+#define ON 1
+#define OFF 0
+
 static bool ConnectionFlag = false;
 static Stage_t StageType = STAGE_SMC; //Initialize stage type as SMC
-
+static bool EndStopState;
 static float FeedRate = 60;
 
 ManualStageControl::ManualStageControl(QWidget *parent) :
@@ -381,6 +384,40 @@ void ManualStageControl::on_SendCustomCommand_clicked()
 {
     QString Command = ui->CustomCommandLine->text() + "\r";
     const char* CommandToSend = Command.toLatin1().data();
-    int returnval = StageSerial.writeString(CommandToSend);
+    StageSerial.writeString(CommandToSend);
     ui->TerminalOut->append("Custom Command: " + ui->CustomCommandLine->text());
+}
+
+void ManualStageControl::on_EnableEndStopCheckbox_clicked()
+{
+    if(ui->EnableEndStopCheckbox->isChecked())
+    {
+        ui->DisableEndstopCheckbox->setChecked(false);
+        EndStopState = ON;
+        QString Command = "M120\r\n";
+        int returnVal = StageSerial.writeString(Command.toLatin1().data());
+        if (returnVal >= 0){
+            ui->TerminalOut->append("Endstop enabled");
+        }
+        else{
+            ui->TerminalOut->append("Failed to send command");
+        }
+    }
+}
+
+void ManualStageControl::on_DisableEndstopCheckbox_clicked()
+{
+    if(ui->DisableEndstopCheckbox->isChecked())
+    {
+        ui->EnableEndStopCheckbox->setChecked(false);
+        EndStopState = OFF;
+        QString Command = "M121\r\n";
+        int returnVal = StageSerial.writeString(Command.toLatin1().data());
+        if (returnVal >= 0){
+            ui->TerminalOut->append("Endstops disabled");
+        }
+        else{
+            ui->TerminalOut->append("Failed to send command");
+        }
+    }
 }

@@ -152,6 +152,10 @@ private slots:
 
     void on_SetVolPerLayer_clicked();
 
+    void on_ContinuousInjection_clicked();
+
+    void on_SetInitialVolume_clicked();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
