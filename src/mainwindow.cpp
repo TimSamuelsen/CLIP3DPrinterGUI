@@ -77,6 +77,7 @@ static int UVIntensity;
 static int MaxImageUpload = 20;
 static double InfusionRate;
 static double InfusionVolume;
+static double InitialVolume;
 
 //Auto parameter selection mode
 static double PrintSpeed;
@@ -238,7 +239,7 @@ void MainWindow::on_GetPosition_clicked()
     char* ReadPosition = Stage.StageGetPosition(StageType);
 
     //If the string length returned from SMC.GetPosition is > 1, then no errors have occurred
-    if (strlen(ReadPosition) > 1)
+    if (strlen(ReadPosition) >= 2)
     {
         QString CurrentPosition = QString::fromUtf8(ReadPosition); //convert char* to QString
         CurrentPosition.remove(0,3); //Removes address and command code
@@ -382,10 +383,13 @@ void MainWindow::on_DICLIPSelect_clicked()
     StageType = STAGE_GCODE;
     PrinterType = ICLIP;
 
+    ui->ContinuousInjection->setEnabled(true);
     ui->VolPerLayerParam->setEnabled(true);
     ui->SetVolPerLayer->setEnabled(true);
     ui->InfuseRateParam->setEnabled(true);
     ui->SetInfuseRate->setEnabled(true);
+    ui->InitialVolumeParam->setEnabled(true);
+    ui->SetInitialVolume->setEnabled(true);
 
     ui->StartingPositionParam->setEnabled(false);
     ui->SetStartingPosButton->setEnabled(false);
@@ -396,6 +400,7 @@ void MainWindow::on_DICLIPSelect_clicked()
     ui->SetMaxEndOfRun->setEnabled(false);
     ui->MinEndOfRunParam->setEnabled(false);
     ui->SetMinEndOfRun->setEnabled(false);
+
 }
 
 void MainWindow::on_CLIPSelect_clicked()
@@ -403,10 +408,13 @@ void MainWindow::on_CLIPSelect_clicked()
     StageType = STAGE_SMC;
     PrinterType = CLIP30UM;
 
+    ui->ContinuousInjection->setEnabled(false);
     ui->VolPerLayerParam->setEnabled(false);
     ui->SetVolPerLayer->setEnabled(false);
     ui->InfuseRateParam->setEnabled(false);
     ui->SetInfuseRate->setEnabled(false);
+    ui->InitialVolumeParam->setEnabled(false);
+    ui->SetInitialVolume->setEnabled(false);
 
     ui->StartingPositionParam->setEnabled(true);
     ui->SetStartingPosButton->setEnabled(true);
@@ -1625,7 +1633,7 @@ void MainWindow::on_SetInfuseRate_clicked()
  */
 void MainWindow::on_SetVolPerLayer_clicked()
 {
-    InfusionVolume = ui->InfuseRateParam->value();
+    InfusionVolume = ui->VolPerLayerParam->value();
     Pump.SetTargetVolume(InfusionVolume);
     QString InfusionVolumeString = "Set Infusion Volume per layer to: " + QString::number(InfusionVolume) + " ul";
     ui->ProgramPrints->append(InfusionVolumeString);
@@ -1633,7 +1641,7 @@ void MainWindow::on_SetVolPerLayer_clicked()
 
 void MainWindow::on_SetInitialVolume_clicked()
 {
-
+    InitialVolume = ui->InitialVolumeParam->value();
 }
 
 /*******************************************Live Value Monitoring********************************************/
@@ -1960,9 +1968,16 @@ bool MainWindow::initConfirmationScreen()
         DetailedText += "Min End Of Run: " + QString::number(MinEndOfRun) + " mm\n";
     }
     else if (PrinterType == ICLIP){
+        if(ContinuousInjection == ON){
+            DetailedText += "Continuous injection enabled";
+        }
+        else{
+            DetailedText += "Continuous injection disabled";
+        }
         DetailedText += "Infusion volume per layer: " + QString::number(InfusionVolume) + "ul\n";
         DetailedText += "Infusion rate per layer: " + QString::number(InfusionRate) + "ul/s";
     }
+    DetailedText += " \r\n \r\n";
     confScreen.setDetailedText(DetailedText);
 
     confScreen.exec();
@@ -2081,8 +2096,10 @@ void MainWindow::saveSettings()
     settings.setValue("PumpingParameter", PumpingParameter);
     settings.setValue("BitMode", BitMode);
 
+    settings.setValue("ContinuousInjection", ui->ContinuousInjection->isChecked());
     settings.setValue("InfusionRate", InfusionRate);
     settings.setValue("InfusionVolume", InfusionVolume);
+
 
     settings.setValue("StageCOM", ui->COMPortSelect->currentIndex());
     settings.setValue("PumpCOM", ui->COMPortSelectPump->currentIndex());
@@ -2127,6 +2144,7 @@ void MainWindow::loadSettings()
         InfusionRate = settings.value("InfusionRate", 5).toDouble();
         InfusionVolume = settings.value("InfusionVolume", 5).toDouble();
 
+        ContinuousInjection = settings.value("ContinuousInjection", OFF).toInt();
         loadSettingsFlag = true;
 
         ui->COMPortSelect->setCurrentIndex(settings.value("StageCOM", 0).toInt());
@@ -2168,6 +2186,10 @@ void MainWindow::initSettings()
         ui->DICLIPSelect->setChecked(true);
         ui->CLIPSelect->setChecked(false);
         emit(on_DICLIPSelect_clicked());
+        if(ContinuousInjection == ON){
+            ui->ContinuousInjection->setChecked(true);
+            emit(on_ContinuousInjection_clicked());
+        }
     }
 
     if(MotionMode == STEPPED){
@@ -2193,7 +2215,6 @@ void MainWindow::initSettings()
     ui->BitDepthParam->setValue(BitMode);
     ui->InfuseRateParam->setValue(InfusionRate);
     ui->VolPerLayerParam->setValue(InfusionVolume);
-
 }
 
 /*******************************************Plot Functions*********************************************/

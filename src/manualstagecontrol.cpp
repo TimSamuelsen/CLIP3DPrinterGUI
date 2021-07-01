@@ -394,7 +394,7 @@ void ManualStageControl::on_EnableEndStopCheckbox_clicked()
     {
         ui->DisableEndstopCheckbox->setChecked(false);
         EndStopState = ON;
-        QString Command = "M120\r\n";
+        QString Command = "M121\r\n";
         int returnVal = StageSerial.writeString(Command.toLatin1().data());
         if (returnVal >= 0){
             ui->TerminalOut->append("Endstop enabled");
@@ -411,7 +411,7 @@ void ManualStageControl::on_DisableEndstopCheckbox_clicked()
     {
         ui->EnableEndStopCheckbox->setChecked(false);
         EndStopState = OFF;
-        QString Command = "M121\r\n";
+        QString Command = "M120\r\n";
         int returnVal = StageSerial.writeString(Command.toLatin1().data());
         if (returnVal >= 0){
             ui->TerminalOut->append("Endstops disabled");
