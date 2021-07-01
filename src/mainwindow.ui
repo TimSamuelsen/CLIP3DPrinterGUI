@@ -1625,7 +1625,7 @@ QPushButton#AbortPrint:hover:!pressed {
       <enum>Qt::RightToLeft</enum>
      </property>
      <property name="styleSheet">
-      <string notr="true">font: 10pt &quot;MS Shell Dlg 2&quot;;</string>
+      <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
      </property>
      <property name="text">
       <string>Continuous Injection</string>
@@ -2636,7 +2636,7 @@ parameters</string>
      <x>0</x>
      <y>0</y>
      <width>1774</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

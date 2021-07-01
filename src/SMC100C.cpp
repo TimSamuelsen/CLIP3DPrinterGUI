@@ -565,7 +565,7 @@ bool SMC100C::SendCurrentCommand()
     //printf("Sending Command \r\n");
     //serialib serial;
     //Will move GetCharacter, CarriageReturnChar and NewLineChar out of this function eventually
-    static const char* GetCharacter = "?";
+    const char* GetCharacter = "?";
     //static const char* CarriageReturnChar = "\r";
     //static const char* NewLineChar = "\n";
     //Establishing Status Variable
@@ -604,7 +604,7 @@ bool SMC100C::SendCurrentCommand()
             //Create target char array for int
             char IntParam[10];
             //Populate target char array with converted int
-            sprintf(IntParam, "%d" , CurrentCommandParameter);
+            sprintf(IntParam, "%f" , CurrentCommandParameter);
             //Write IntParam to Serial
             serial.writeString(IntParam);
         }
@@ -722,52 +722,3 @@ char* SMC100C::SerialRead()
     }
 }
 /*----------------------------------------------------- Work in Progress Code -------------------------------------------------------*/
-/**************************************************************************************************************************************
-Function: 
-    QueryHardware
-Parameters:
-    
-Returns:
-    bool: false if error occurs, true otherwise
-Description: 
-    Get current state and last error status 
-Notes:
-    Based on SMC100CC User Manual p.64-65
-    Needs a lot of work to be functional, will probably require testing with device
-Author:
-    TimS, 1/17/21
-***************************************************************************************************************************************/
-bool SMC100C::QueryHardware()
-{
-    //Establishing variables
-    bool returnVal = true;
-    char* receivedString;
-    char finalChar;
-    //Set command to ErrorStatus check
-    SetCommand(CommandType::ErrorStatus, 0.0,CommandGetSetType::None);
-    //Send command
-    SendCurrentCommand();
-
-    //serialib serial;
-    //Have no idea whether this is a good value for this, will need some finetuning
-    unsigned int maxNbBytes = 100;
-    serial.readString(receivedString,finalChar,maxNbBytes);
-    //Make sure that the message received is from the ErrorStatus 
-    if (receivedString[0] == '1' && receivedString[1] == 'T' && receivedString[2] == 'S')
-    {
-        Status = ConvertStatus(strcat(&receivedString[7],&receivedString[8]));
-        char* ErrorCode;
-        for (int i=3; i<=7; i++)
-        {
-            strcat(ErrorCode, &receivedString[i]);
-        }
-        HardwareError = ErrorCode;
-    }
-    else 
-    {
-        returnVal = false;
-    };
-    return returnVal;
-};
-
-

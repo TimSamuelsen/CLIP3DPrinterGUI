@@ -68,6 +68,8 @@ private slots:
 
     void on_SetPositionValue_clicked();
 
+    void on_SendCustomCommand_clicked();
+
 private:
     Ui::ManualStageControl *ui;
     void GetValues();

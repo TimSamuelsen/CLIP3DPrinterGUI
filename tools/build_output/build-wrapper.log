@@ -1,7 +1,0 @@
-Tue Jun 15 18:19:19 2021: build-wrapper, version 6.21 (win-x86-64)
-Tue Jun 15 18:19:19 2021: isWow64: 0
-Tue Jun 15 18:19:19 2021: windows version: 6.2, service pack: 0.0, build number: 9200, product type: 1
-Tue Jun 15 18:19:19 2021: current directory: C:\Users\le54t\Documents\Stanford\Research\CLIP3DGUI\tools
-Tue Jun 15 18:19:19 2021: cwd: <C:\Users\le54t\Documents\Stanford\Research\CLIP3DGUI\tools>
-Tue Jun 15 18:19:19 2021: out-dir absolute path: <C:\Users\le54t\Documents\Stanford\Research\CLIP3DGUI\tools\build_output>
-Tue Jun 15 18:19:19 2021: command line received: <make clean all>

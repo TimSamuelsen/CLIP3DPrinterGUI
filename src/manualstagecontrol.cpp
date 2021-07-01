@@ -376,3 +376,11 @@ void ManualStageControl::on_SetPositionValue_clicked()
     StageSerial.writeString(SetPositionCommand.toLatin1().data());
     ui->TerminalOut->append("Set current position to: " + QString::number(PositionVal));
 }
+
+void ManualStageControl::on_SendCustomCommand_clicked()
+{
+    QString Command = ui->CustomCommandLine->text() + "\r";
+    const char* CommandToSend = Command.toLatin1().data();
+    int returnval = StageSerial.writeString(CommandToSend);
+    ui->TerminalOut->append("Custom Command: " + ui->CustomCommandLine->text());
+}

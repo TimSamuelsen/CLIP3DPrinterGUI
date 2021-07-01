@@ -5,7 +5,7 @@
    :alt: Project License
    
 .. image:: https://app.codacy.com/project/badge/Grade/3ef4974212ff485b98f1b2c5efc73679    
-   :target: https://www.codacy.com/gh/TimSamuelsen/CLIP3DPrinterGUI/dashboardutm_source=github.com&amp;utm_medium=referral&amp;utm_content=TimSamuelsen/CLIP3DPrinterGUI&amp;utm_campaign=Badge_Grade
+   :target: https://app.codacy.com/gh/TimSamuelsen/CLIP3DPrinterGUI/dashboard
    :alt: Codacy code quality grade
    
 .. image:: https://readthedocs.org/projects/clip3dgui/badge/?version=latest
@@ -19,8 +19,8 @@ CLIP 3D printers at Stanford University. It is designed to provide lab members w
 custom software solution that integrates all the features required to perform their experiments.
 
 * **Free software:** GPLv3 License
-* **Docs:** https://clip3dgui.readthedocs.io/
 * **Qt Version:** 6.0
+* **Docs:** https://clip3dgui.readthedocs.io/
 * **Lab:** https://desimonegroup.stanford.edu/
 
 Installation
