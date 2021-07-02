@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string>
+#include <string.h>
 #include <cstring>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -239,7 +239,7 @@ void MainWindow::on_GetPosition_clicked()
     char* ReadPosition = Stage.StageGetPosition(StageType);
 
     //If the string length returned from SMC.GetPosition is > 1, then no errors have occurred
-    if (strlen(ReadPosition) >= 2)
+    if (strnlen(ReadPosition,50) > 1)
     {
         QString CurrentPosition = QString::fromUtf8(ReadPosition); //convert char* to QString
         CurrentPosition.remove(0,3); //Removes address and command code
@@ -306,7 +306,6 @@ void MainWindow::Check4VideoLock()
 {
     QMessageBox VlockPopup;
     static uint8_t repeatCount = 0;
-    static bool repeat;
     unsigned char HWStatus, SysStatus, MainStatus;
     if (repeatCount == 0)
         ui->ProgramPrints->append("Attempting to Lock to Video Source");
@@ -315,7 +314,6 @@ void MainWindow::Check4VideoLock()
         if(MainStatus & BIT3){
             ui->ProgramPrints->append("External Video Source Locked");
             VideoLocked = true;
-            repeat = false;
             VlockPopup.close();
             if (LCR_SetMode(PTN_MODE_VIDEO) < 0)
             {
@@ -364,11 +362,11 @@ void MainWindow::initImagePopout()
     ImagePopoutUI->windowHandle()->setScreen(qApp->screens()[1]);
     ImagePopoutUI->showFullScreen();
     QStringList imageList;
-    QListWidgetItem * item;
     for(int i = 0; (i < (ui->FileList->count())); i++)
     {
-            item = ui->FileList->item(i);
-            imageList << item->text();
+        QListWidgetItem * item;
+        item = ui->FileList->item(i);
+        imageList << item->text();
     }
 }
 

@@ -12,8 +12,6 @@ int main(int argc, char *argv[])
     a.setOrganizationName("MyOrganization");
     a.setOrganizationDomain("MyDomain");
     a.setApplicationName("CLIP3DGUI");
-
-    QString CurrentPath = QDir::currentPath();
     a.setWindowIcon(QIcon(":/new/pics/testicon.ico"));
 
     QFile styleSheetFile(":/new/pics/Ubuntu.qss");

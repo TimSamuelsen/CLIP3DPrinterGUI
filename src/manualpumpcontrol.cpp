@@ -268,7 +268,7 @@ QString manualpumpcontrol::GetTargetTime()
     PSerial.writeString(CommandToSend);
 
     char* ReadTargetTime = SerialRead();
-    if (strlen(ReadTargetTime) > 1)
+    if (strnlen(ReadTargetTime,50) > 1)
     {
         TargetTime = ReadTargetTime;
     }
@@ -284,7 +284,7 @@ QString manualpumpcontrol::GetTargetVolume()
     PSerial.writeString(CommandToSend);
 
     char* ReadTargetVolume = SerialRead();
-    if (strlen(ReadTargetVolume) > 1)
+    if (strnlen(ReadTargetVolume,50) > 1)
     {
         TargetVolume = ReadTargetVolume;
     }
@@ -301,7 +301,7 @@ QString manualpumpcontrol::GetSyringeVolume()
     PSerial.writeString(CommandToSend);
 
     char* ReadSyringeVolume= SerialRead();
-    if (strlen(ReadSyringeVolume) > 1)
+    if (strnlen(ReadSyringeVolume,50) > 1)
     {
         SyringeVolume = ReadSyringeVolume;
     }
@@ -318,7 +318,7 @@ QString manualpumpcontrol::GetInfuseRate()
     PSerial.writeString(CommandToSend);
 
     char* ReadInfuseRate = SerialRead();
-    if (strlen(ReadInfuseRate) > 0)
+    if (strnlen(ReadInfuseRate, 50) > 0)
     {
         InfuseRate = ReadInfuseRate;
     }
@@ -335,7 +335,7 @@ QString manualpumpcontrol::GetWithdrawRate()
     PSerial.writeString(CommandToSend);
 
     char* ReadWithdrawRate = SerialRead();
-    if (strlen(ReadWithdrawRate) > 1)
+    if (strnlen(ReadWithdrawRate, 50) > 1)
     {
         WithdrawRate = ReadWithdrawRate;
     }
@@ -397,49 +397,24 @@ char* manualpumpcontrol::SerialRead()
     }
     else if(ReadStatus == 0)
     {
-        char* errString = "Timeout Reached";
+        //Error timeout reached
         return "A";
         //return  receivedString;
     }
     else if(ReadStatus == -1)
     {
-        char* errString = "Error Setting Timeout";
+        //Error setting timeout
         return  "B";
     }
     else if(ReadStatus == -2)
     {
-        char* errString = "Error while reading byte";
+        //Error while reading byte
         return "C";
     }
     else if(ReadStatus == -3)
     {
-        char* errString = "Max N bytes reached";
+        //Max N bytes reached, return receivedstring
         return  receivedString;
     }
-    if (ReadStatus > 0)
-    {
-        return receivedString;
-    }
-    else if(ReadStatus == 0)
-    {
-        char* errString = "Timeout Reached";
-        return  receivedString;
-    }
-    else if(ReadStatus == -1)
-    {
-        char* errString = "A";
-        return  errString;
-    }
-    else if(ReadStatus == -2)
-    {
-        char* errString = "B";
-        return  errString;
-    }
-    else if(ReadStatus == -3)
-    {
-        char* errString = "Max N bytes reached";
-        return  receivedString;
-    }
-
    return receivedString;
 }

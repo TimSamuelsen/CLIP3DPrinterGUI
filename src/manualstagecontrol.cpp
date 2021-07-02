@@ -358,12 +358,12 @@ char* ManualStageControl::StageGetPosition(Stage_t StageType)
     else if (StageType == STAGE_GCODE){
 
         QString GetPositionCommand = "M114 R\r\n";
-        int GetPositionReturn = StageSerial.writeString(GetPositionCommand.toLatin1().data());
+        StageSerial.writeString(GetPositionCommand.toLatin1().data());
         static char receivedString[] = "ThisIsMyTest";
         char finalChar = '\n';
         uint maxNbBytes = 100;//make sure to validate this
         Sleep(10);
-        int ReadStatus = StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
+        StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
         printf(receivedString);
         return receivedString;
 

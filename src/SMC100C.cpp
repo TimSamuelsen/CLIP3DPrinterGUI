@@ -565,7 +565,7 @@ bool SMC100C::SendCurrentCommand()
     //printf("Sending Command \r\n");
     //serialib serial;
     //Will move GetCharacter, CarriageReturnChar and NewLineChar out of this function eventually
-    const char* GetCharacter = "?";
+    char* GetCharacter = "?";
     //static const char* CarriageReturnChar = "\r";
     //static const char* NewLineChar = "\n";
     //Establishing Status Variable
@@ -696,22 +696,22 @@ char* SMC100C::SerialRead()
     }
     else if(ReadStatus == 0)
     {
-        char* errString = "Timeout Reached";
+        //Error timeout reached
         return "A";
-        //return  receivedString;
     }
     else if(ReadStatus == -1)
     {
-        char* errString = "Error Setting Timeout";
+        //Error setting timeout
         return  "B";
     }
     else if(ReadStatus == -2)
     {
-        char* errString = "Error while reading byte";
+        //Error while reading byte
         return "C";
     }
     else if(ReadStatus == -3)
     {
+        //Max N bytes was reached, still return recievedstring
         char* errString = "Max N bytes reached";
         return  receivedString;
     }
