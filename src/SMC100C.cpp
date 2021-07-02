@@ -565,7 +565,6 @@ bool SMC100C::SendCurrentCommand()
     //printf("Sending Command \r\n");
     //serialib serial;
     //Will move GetCharacter, CarriageReturnChar and NewLineChar out of this function eventually
-    char* GetCharacter = "?";
     //static const char* CarriageReturnChar = "\r";
     //static const char* NewLineChar = "\n";
     //Establishing Status Variable
@@ -592,7 +591,7 @@ bool SMC100C::SendCurrentCommand()
     if (CurrentCommandGetOrSet == CommandGetSetType::Get)
 	{
         //Write Get Character to Serial
-        serial.writeString(GetCharacter);
+        serial.writeString("?");
 	}
     //If the GetOrSet command type is Set 
     else if (CurrentCommandGetOrSet == CommandGetSetType::Set)
@@ -712,7 +711,6 @@ char* SMC100C::SerialRead()
     else if(ReadStatus == -3)
     {
         //Max N bytes was reached, still return recievedstring
-        char* errString = "Max N bytes reached";
         return  receivedString;
     }
     else
