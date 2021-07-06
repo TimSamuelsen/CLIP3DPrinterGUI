@@ -973,14 +973,17 @@ void MainWindow::ExposureTimeSlot(void)
         if (InjectionDelayFlag == PRE){
             PrintInfuse();
             QTimer::singleShot(InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove()));
+            ui->ProgramPrints->append("Pre-Injection Delay: " + QString::number(InjectionDelayParam));
         }
         else if(InjectionDelayFlag == POST){
             StageMove();
             QTimer::singleShot(InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove()));
+             ui->ProgramPrints->append("Post-Injection Delay: " + QString::number(InjectionDelayParam));
         }
         else{
             PrintInfuse();
             Stage.StageRelativeMove(-SliceThickness, StageType);
+            ui->ProgramPrints->append("No injection delay");
         }
         PrintInfuse();
         ui->ProgramPrints->append("Injecting " + QString::number(InfusionVolume) + "ul at " + QString::number(InfusionRate) + "ul/s");
@@ -1116,6 +1119,7 @@ void MainWindow::PrintInfuse()
         Pump.ClearVolume();
         Sleep(15);
         Pump.StartInfusion();
+        ui->ProgramPrints->append("PrintInfuse");
     }
 }
 /*********************************************File Handling*********************************************/
@@ -1693,7 +1697,8 @@ void MainWindow::on_PostMovementCheckbox_clicked()
 
 void MainWindow::on_SetInjectionDelay_clicked()
 {
-
+    InjectionDelayParam = ui->InjectionDelayParam->value();
+    ui->ProgramPrints->append("Injection delay set to: " + QString::number(InjectionDelayParam));
 }
 
 /*******************************************Live Value Monitoring********************************************/
@@ -2361,6 +2366,7 @@ void MainWindow::updatePlot()
 void MainWindow::StageMove()
 {
     Stage.StageRelativeMove(-SliceThickness, StageType);
+    ui->ProgramPrints->append("StageMove");
 }
 
 /**
