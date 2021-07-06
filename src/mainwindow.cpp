@@ -977,7 +977,7 @@ void MainWindow::ExposureTimeSlot(void)
         }
         else if(InjectionDelayFlag == POST){
             StageMove();
-            QTimer::singleShot(InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove()));
+            QTimer::singleShot(InjectionDelayParam, Qt::PreciseTimer, this, SLOT(PrintInfuse()));
              ui->ProgramPrints->append("Post-Injection Delay: " + QString::number(InjectionDelayParam));
         }
         else{
@@ -985,7 +985,6 @@ void MainWindow::ExposureTimeSlot(void)
             Stage.StageRelativeMove(-SliceThickness, StageType);
             ui->ProgramPrints->append("No injection delay");
         }
-        PrintInfuse();
         ui->ProgramPrints->append("Injecting " + QString::number(InfusionVolume) + "ul at " + QString::number(InfusionRate) + "ul/s");
     }
 
