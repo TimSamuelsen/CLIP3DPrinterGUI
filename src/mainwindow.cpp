@@ -398,8 +398,6 @@ void MainWindow::on_DICLIPSelect_clicked()
     ui->StartingPositionParam->setEnabled(false);
     ui->SetStartingPosButton->setEnabled(false);
 
-    ui->StageAccelParam->setEnabled(false);
-    ui->SetStageAcceleration->setEnabled(false);
     ui->MaxEndOfRun->setEnabled(false);
     ui->SetMaxEndOfRun->setEnabled(false);
     ui->MinEndOfRunParam->setEnabled(false);
