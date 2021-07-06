@@ -156,6 +156,16 @@ private slots:
 
     void on_SetInitialVolume_clicked();
 
+    void on_PreMovementCheckbox_clicked();
+
+    void on_PostMovementCheckbox_clicked();
+
+    void on_SetInjectionDelay_clicked();
+
+    void PrintInfuse();
+
+    void StageMove();
+
 private:
     Ui::MainWindow *ui;
     ManualStageControl *ManualStageUI;
@@ -176,7 +186,6 @@ private:
     void AutoMode();
     void initImagePopout();
     void SetExposureTimer(int InitialExposureFlag, int PrintScript, int PumpingMode);
-    void PrintInfuse();
     void SetDarkTimer(int PrintScript);
     void VP8bitWorkaround();
 };

@@ -1532,7 +1532,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>30</y>
+       <y>20</y>
        <width>141</width>
        <height>16</height>
       </rect>
@@ -1548,7 +1548,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>50</y>
+       <y>40</y>
        <width>81</width>
        <height>31</height>
       </rect>
@@ -1561,7 +1561,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>50</y>
+       <y>40</y>
        <width>51</width>
        <height>31</height>
       </rect>
@@ -1577,7 +1577,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>110</y>
+       <y>100</y>
        <width>81</width>
        <height>31</height>
       </rect>
@@ -1590,7 +1590,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>110</y>
+       <y>100</y>
        <width>51</width>
        <height>31</height>
       </rect>
@@ -1603,7 +1603,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>90</y>
+       <y>80</y>
        <width>141</width>
        <height>16</height>
       </rect>
@@ -1619,7 +1619,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>170</y>
+       <y>160</y>
        <width>51</width>
        <height>31</height>
       </rect>
@@ -1635,7 +1635,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>170</y>
+       <y>160</y>
        <width>81</width>
        <height>31</height>
       </rect>
@@ -1645,7 +1645,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>14</x>
-       <y>150</y>
+       <y>140</y>
        <width>131</width>
        <height>20</height>
       </rect>
@@ -1661,7 +1661,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
+       <y>0</y>
        <width>141</width>
        <height>20</height>
       </rect>
@@ -1674,6 +1674,74 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
      <property name="text">
       <string>Continous Injection</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="PreMovementCheckbox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>220</y>
+       <width>121</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="text">
+      <string>Pre-Movement</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="SetInjectionDelay">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>260</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Set</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="PostMovementCheckbox">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>240</y>
+       <width>121</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="text">
+      <string>Post-Movement</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="InjectionDelayParam">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>260</y>
+       <width>81</width>
+       <height>31</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>131</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Injection Delay (ms)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </widget>
@@ -1860,9 +1928,9 @@ QPushButton#AbortPrint:hover:!pressed {
     <widget class="QLabel" name="PrintSpeedLabel_2">
      <property name="geometry">
       <rect>
-       <x>320</x>
+       <x>340</x>
        <y>70</y>
-       <width>161</width>
+       <width>131</width>
        <height>20</height>
       </rect>
      </property>
@@ -1876,7 +1944,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
      <property name="geometry">
       <rect>
-       <x>330</x>
+       <x>340</x>
        <y>90</y>
        <width>71</width>
        <height>31</height>
@@ -1892,7 +1960,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
      <property name="geometry">
       <rect>
-       <x>410</x>
+       <x>420</x>
        <y>90</y>
        <width>51</width>
        <height>31</height>

@@ -574,3 +574,5 @@ int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware, 
 
     return 0;
 }
+
+

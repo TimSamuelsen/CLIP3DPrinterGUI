@@ -56,7 +56,8 @@
 //For selecting printer
 #define CLIP30UM 0
 #define ICLIP 1
-
+#define PRE 1
+#define POST 2
 
 DLP9000 DLP; //DLP object for calling functions from dlp9000.cpp, test if this still works without being a static
 //Module level variables
@@ -75,9 +76,14 @@ static double DarkTime;
 static uint InitialExposure;
 static int UVIntensity;
 static int MaxImageUpload = 20;
+
+//Injection parameters
 static double InfusionRate;
 static double InfusionVolume;
 static double InitialVolume;
+static double InjectionDelayParam;
+int InjectionDelayFlag = 0;
+
 
 //Auto parameter selection mode
 static double PrintSpeed;
@@ -86,7 +92,7 @@ static bool AutoModeFlag = false; //true when automode is on, false otherwise
 
 //Print Process Variables
 static uint nSlice = 0; //number of slices to be printed
-static uint layerCount = 0; //current layer
+static int layerCount = 0; //current layer
 static int remainingImages; //Keeps count of remaining images to be printed
 
 //Plot Variables
@@ -966,6 +972,18 @@ void MainWindow::ExposureTimeSlot(void)
                 }
             }
         }
+        if (InjectionDelayFlag == PRE){
+            PrintInfuse();
+            QTimer::singleShot(InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove()));
+        }
+        else if(InjectionDelayFlag == POST){
+            StageMove();
+            QTimer::singleShot(InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove()));
+        }
+        else{
+            PrintInfuse();
+            Stage.StageRelativeMove(-SliceThickness, StageType);
+        }
         PrintInfuse();
         ui->ProgramPrints->append("Injecting " + QString::number(InfusionVolume) + "ul at " + QString::number(InfusionRate) + "ul/s");
     }
@@ -979,7 +997,9 @@ void MainWindow::ExposureTimeSlot(void)
         }
         else{
             //SMC.RelativeMove(-SliceThickness);
-            Stage.StageRelativeMove(-SliceThickness, StageType);
+            if (PrinterType == CLIP30UM){
+                Stage.StageRelativeMove(-SliceThickness, StageType);
+            }
         }
 
         if(PrintScript == 1)
@@ -1506,6 +1526,7 @@ void MainWindow::on_SetSliceThickness_clicked()
     SliceThickness = (ui->SliceThicknessParam->value()/1000);
     QString ThicknessString = "Set Slice Thickness to: " + QString::number(SliceThickness*1000) + " μm";
     ui->ProgramPrints->append(ThicknessString);
+    VP8bitWorkaround();
 }
 /*******************************************Stage Parameters********************************************/
 /**
@@ -1640,6 +1661,41 @@ void MainWindow::on_SetVolPerLayer_clicked()
 void MainWindow::on_SetInitialVolume_clicked()
 {
     InitialVolume = ui->InitialVolumeParam->value();
+}
+
+void MainWindow::on_PreMovementCheckbox_clicked()
+{
+    if (ui->PreMovementCheckbox->isChecked() == true){
+        ui->PostMovementCheckbox->setChecked(false);
+        InjectionDelayFlag = PRE;
+        ui->ProgramPrints->append("Pre-Injection delay enabled");
+    }
+    else{
+        ui->PostMovementCheckbox->setChecked(false);
+        ui->PreMovementCheckbox->setChecked(false);
+        InjectionDelayFlag = OFF;
+        ui->ProgramPrints->append("Injection delay disabled");
+    }
+}
+
+void MainWindow::on_PostMovementCheckbox_clicked()
+{
+    if (ui->PostMovementCheckbox->isChecked() == true){
+        ui->PreMovementCheckbox->setChecked(false);
+        InjectionDelayFlag = POST;
+        ui->ProgramPrints->append("Post-Injection delay enabled");
+    }
+    else{
+        ui->PostMovementCheckbox->setChecked(false);
+        ui->PreMovementCheckbox->setChecked(false);
+        InjectionDelayFlag = OFF;
+        ui->ProgramPrints->append("Injection delay disabled");
+    }
+}
+
+void MainWindow::on_SetInjectionDelay_clicked()
+{
+
 }
 
 /*******************************************Live Value Monitoring********************************************/
@@ -2304,154 +2360,71 @@ void MainWindow::updatePlot()
 /*************************************************************
  * ********************Development***************************
  * ***********************************************************/
+void MainWindow::StageMove()
+{
+    Stage.StageRelativeMove(-SliceThickness, StageType);
+}
+
 /**
  * @brief MainWindow::VP8bitWorkaround
- *
+ * Used as a workaround for the exposure clipping
+ * seen in Video Pattern mode due to Bit Blanking
  */
 void MainWindow::VP8bitWorkaround()
 {
-
+    QListWidgetItem * item;
+    QStringList imageList;
+    QStringList ExposureTimeList;
+    QStringList DarkTimeList;
+    QStringList LEDlist;
+    QStringList FrameList;
+    double LayerCount = 0;
+    for (int i = 0; i < ui->FileList->count(); i++)
+    {
+        item = ui->FileList->item(i);
+        //if (i > layerCount + MaxImageReupload){
+            //break;
+        //}
+        double ExpTime;
+        double DTime;
+        if(PrintScript == ON){
+            ExpTime = ExposureScriptList.at(i).toDouble();
+            DTime = DarkTimeScriptList.at(i).toDouble();
+        }
+        else{
+            ExpTime = ExposureTime;
+            DTime= DarkTime;
+        }
+        bool FrameFinished = false;
+        while(!FrameFinished){
+            if(ExpTime > 33) //if exposure time > frame time
+            {
+                ExposureTimeList.append(QString::number(33));
+                DarkTimeList.append(QString::number(0));
+                LEDlist.append(LEDScriptList.at(i));
+                FrameList.append(QString::number(0));
+                ExpTime -= 33;
+                imageList << item->text();
+                LayerCount++;
+                ui->ProgramPrints->append("ET: 33, DT: 0, LED: " + LEDScriptList.at(i));
+            }
+            else{ //frame finished, add remaining exposure time now with dark time
+                ExposureTimeList.append(QString::number(ExpTime));
+                DarkTimeList.append(QString::number(DTime));
+                LEDlist.append(LEDScriptList.at(i));
+                FrameList.append(QString::number(1));
+                LayerCount++;
+                imageList << item->text();
+                FrameFinished = true;
+                ui->ProgramPrints->append("ET: " + QString::number(ExpTime) + ", DT: " + QString::number(DTime) + ", LED: " + LEDScriptList.at(i));
+            }
+        }
+        //update nSlice
+    }
+    ui->ProgramPrints->append("Etime: " + QString::number(ExposureTimeList.count()) + ", Dtime: " + QString::number(DarkTimeList.count()) + ", LEDlist: " + QString::number(LEDlist.count()) + ", Images: " + QString::number(imageList.count()));
 }
 /*************************************************************
  * ********************Graveyard***************************
  * ***********************************************************/
 //Snippets that may be useful in the future but the overall functionality has been deprecated
-#if 0
-void MainWindow::testFPS()
-{
-    if(SVG)
-    {
-        if (FPStestImage < ui->FileList->count())
-        {
-            QString filename =ui->FileList->item(FPStestImage)->text();
-            QSvgRenderer *renderer = new QSvgRenderer(filename);
-            QGraphicsSvgItem *testImage = new QGraphicsSvgItem(filename);
-            QImage image(900, 500, QImage::Format_Mono);
-            QPainter painter(&image);
-            renderer->render(&painter);
-            QPixmap pix = QPixmap::fromImage(image);
-            ui->PrintImage->setPixmap(pix);
-            //ui->ProgramPrints->append(QString::number(FPStestImage));
-            FPStestImage++;
-            //ui->svgImage->
-            //ui->svgImage->render(image);
-            QTimer::singleShot(1, Qt::PreciseTimer, this, SLOT(testFPS()));
-        }
-        else
-        {
-            QTime FPSupdateTime = QTime::currentTime();
-            double TimeElapsed = FPSStartTime.msecsTo(FPSupdateTime);
-            ui->ProgramPrints->append("Elapsed Time: " + QString::number(TimeElapsed));
-        }
-    }
-    else
-    {
-        if (FPStestImage < ui->FileList->count())
-        {
-            QString filename =ui->FileList->item(FPStestImage)->text();
-            QPixmap img(filename);
-            //QPixmap img2 = img.scaled(900,500, Qt::KeepAspectRatio);
-            ui->PrintImage->setPixmap(img);
-            ui->ProgramPrints->append(QString::number(FPStestImage));
-            FPStestImage++;
-            //testFPS();
-            QTimer::singleShot(1, Qt::PreciseTimer, this, SLOT(testFPS()));
-        }
-        else
-        {
-            QTime FPSupdateTime = QTime::currentTime();
-            double TimeElapsed = FPSStartTime.msecsTo(FPSupdateTime);
-            ui->ProgramPrints->append("Elapsed Time: " + QString::number(TimeElapsed));
-        }
-    }
-}
 
-
-void MainWindow::on_ManualLightEngine_clicked()
-{
-    //ManualProjUI = new manualLEcontrol();
-    //ManualProjUI->show();
-    uint Code = 100;
-
-    if (LCR_ReadErrorCode(&Code) >= 0)
-    {
-        ui->ProgramPrints->append("Last Error Code: " + QString::number(Code));
-    }
-    else
-    {
-        ui->ProgramPrints->append("Failed to get Error Code");
-    }
-    ui->ProgramPrints->append("Last Error Code: " + QString::number(Code));
-    unsigned char HWStatus, SysStatus, MainStatus;
-    if (LCR_GetStatus(&HWStatus, &SysStatus, &MainStatus) == 0)
-    {
-        if(SysStatus & BIT0)
-                   ui->ProgramPrints->append("Internal Memory Test Passed");
-        else
-                    ui->ProgramPrints->append("Internal Memory Test Failed");
-
-        if(HWStatus & BIT0)
-                    ui->ProgramPrints->append("Internal Initialization Succesful");
-        else
-                    ui->ProgramPrints->append("Internal Initialization Failed");
-        if(HWStatus & BIT1)
-                    ui->ProgramPrints->append("Incompatible Controller");
-        else
-                    ui->ProgramPrints->append("Controller is Compatible");
-
-        if(HWStatus & BIT4)
-                    ui->ProgramPrints->append("Slave Controller Ready and Present");
-        else
-                    ui->ProgramPrints->append("No Slave Controller Present");
-
-        if(HWStatus & BIT2)
-                    ui->ProgramPrints->append("DMD Reset Controller Error");
-        else
-                    ui->ProgramPrints->append("No DMD Reset Controller Error");
-
-        if(HWStatus & BIT3)
-                    ui->ProgramPrints->append("Forced Swap Error");
-        else
-                    ui->ProgramPrints->append("No Forced Swap Error");
-
-        if(HWStatus & BIT6)
-                    ui->ProgramPrints->append("Sequencer has detected an error condition causing an Abort");
-        else
-                    ui->Pr ogramPrints->append("No Sequencer Errors have Occured");
-
-        if(HWStatus & BIT7)
-                    ui->ProgramPrints->append("Sequencer has detected an error");
-        else
-                    ui->ProgramPrints->append("No Sequencer Error has Occurred");
-
-        if(MainStatus & BIT0)
-                    ui->ProgramPrints->append("DMD Micromirrors Parked");
-        else
-                    ui->ProgramPrints->append("DMD Micromirrors Not Parked");
-
-        if(MainStatus & BIT1)
-                    ui->ProgramPrints->append("Sequencer is Running Normally");
-        else
-                    ui->ProgramPrints->append("Sequencer is Stopped");
-
-        if(MainStatus & BIT2)
-                    ui->ProgramPrints->append("Video is Frozen (Display Single Frame)");
-        else
-                    ui->ProgramPrints->append("Video is Running (Normal Frame Change");
-
-        if(MainStatus & BIT3)
-                    ui->ProgramPrints->append("External Video Source Locked");
-        else
-                    ui->ProgramPrints->append("External Video Source Not Locked");
-    }
-    //else if(LCR_GetBLStatus(&BLStatus) == 0)
-    //{
-        //This means the device is in boot mode
-    //}
-    else
-    {
-        ui->ProgramPrints->append("Failed to get Status");
-    }
-
-}
-#endif

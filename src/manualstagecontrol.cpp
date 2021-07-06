@@ -294,7 +294,10 @@ int ManualStageControl::SetStageAcceleration(float AccelerationToSet, Stage_t St
         SMC.SetAcceleration(AccelerationToSet);
     }
     else if (StageType == STAGE_GCODE){
-
+        QString AccelCommand = "M201 Z" + QString::number(AccelerationToSet) + "\r\n";
+        int AccelReturn = StageSerial.writeString(AccelCommand.toLatin1().data());
+        if (AccelReturn < 0)
+            returnVal = -1;
     }
     return returnVal;
 }
