@@ -1528,7 +1528,7 @@ void MainWindow::on_SetSliceThickness_clicked()
     SliceThickness = (ui->SliceThicknessParam->value()/1000);
     QString ThicknessString = "Set Slice Thickness to: " + QString::number(SliceThickness*1000) + " μm";
     ui->ProgramPrints->append(ThicknessString);
-    VP8bitWorkaround();
+    //VP8bitWorkaround();
 }
 /*******************************************Stage Parameters********************************************/
 /**
