@@ -20,6 +20,7 @@ SOURCES += \
     src/mainwindow.cpp \
     src/manualpumpcontrol.cpp \
     src/manualstagecontrol.cpp \
+    src/prinstscriptdialog.cpp \
     src/qcustomplot/qcustomplot.cpp \
     src/serialib/serialib.cpp
 
@@ -33,6 +34,7 @@ HEADERS += \
     src/manualpumpcontrol.h \
     src/manualstagecontrol.h \
     src/patternelement.h \
+    src/prinstscriptdialog.h \
     src/qcustomplot/qcustomplot.h \
     src/serialib/serialib.h
 
@@ -41,7 +43,8 @@ FORMS += \
     src/imageprocessing.ui \
     src/mainwindow.ui \
     src/manualpumpcontrol.ui \
-    src/manualstagecontrol.ui
+    src/manualstagecontrol.ui \
+    src/prinstscriptdialog.ui
 
 #For Lightcrafter API"
 INCLUDEPATH += "src\\HiresLib"

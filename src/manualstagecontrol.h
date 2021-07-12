@@ -34,6 +34,7 @@ public:
     int StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageType);
     int StageRelativeMove(float RelativeMoveDistance, Stage_t StageType);
     char* StageGetPosition(Stage_t);
+    void ClearRead();
 
 private slots:
     void on_MoveRelative_clicked();

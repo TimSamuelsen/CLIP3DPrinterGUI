@@ -361,6 +361,8 @@ char* ManualStageControl::StageGetPosition(Stage_t StageType)
     else if (StageType == STAGE_GCODE){
 
         QString GetPositionCommand = "M114 R\r\n";
+        StageSerial.flushReceiver();
+        Sleep(5);
         StageSerial.writeString(GetPositionCommand.toLatin1().data());
         static char receivedString[] = "ThisIsMyTest";
         char finalChar = '\n';
@@ -374,6 +376,11 @@ char* ManualStageControl::StageGetPosition(Stage_t StageType)
     return "NA";
 }
 
+void ManualStageControl::ClearRead()
+{
+    static char receivedString[] = "ThisIsMyTest";
+    char finalChar;
+}
 
 void ManualStageControl::on_SetPositionValue_clicked()
 {

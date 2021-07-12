@@ -611,7 +611,6 @@ void MainWindow::on_StartPrint_clicked()
 {
     if (ValidateSettings() == true) //If settings are validated successfully and Initialization has been completed
     {
-        //SMC.SetVelocity(StageVelocity); //Update stage velocity
         Stage.SetStageVelocity(StageVelocity, StageType);
         Sleep(20); //Sleep to avoid spamming motor controller
         emit(on_GetPosition_clicked()); //Get stage position to validate that stage connection is working
@@ -2424,6 +2423,7 @@ void MainWindow::VP8bitWorkaround()
         }
         //update nSlice
     }
+    DLP.AddPatterns(imageList, ExposureTime, DarkTime, PrintScript, layerCount, ExposureTimeList, DarkTimeList, ProjectionMode, BitMode, false);
     ui->ProgramPrints->append("Etime: " + QString::number(ExposureTimeList.count()) + ", Dtime: " + QString::number(DarkTimeList.count()) + ", LEDlist: " + QString::number(LEDlist.count()) + ", Images: " + QString::number(imageList.count()));
 }
 /*************************************************************
