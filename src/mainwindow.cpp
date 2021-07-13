@@ -533,6 +533,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             {
                 firstImage << firstItem->text();
             }
+
             DLP.AddPatterns(firstImage, 1000*1000, 0, 0, 0, ExposureScriptList, DarkTimeScriptList,ProjectionMode, BitMode, InitialExposureFlag); //Printscript is set to 0 for initial exposure time, 0 for initial image
             if(ProjectionMode == POTF){
                 nSlice = ui->FileList->count();
@@ -1067,12 +1068,7 @@ void MainWindow::SetExposureTimer(int InitialExposureFlag, int PrintScript, int 
 {
     if (InitialExposureFlag == 1)
     {
-        if (PumpingMode == 1){
-            QTimer::singleShot(InitialExposure*1000, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
-        }
-        else{
-            QTimer::singleShot(InitialExposure*1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-        }
+        QTimer::singleShot(InitialExposure*1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
     }
     else
     {
