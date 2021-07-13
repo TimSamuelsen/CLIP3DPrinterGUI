@@ -127,6 +127,8 @@ int ReSyncCount = 0;
 
 //Bit depth selection parameters
 static int BitMode = 1;
+static int VP8Bit = OFF;
+QStringList FrameList;
 
 //Stepped motion parameters
 static int MotionMode = 0; //Set stepped motion as default
@@ -771,7 +773,6 @@ void MainWindow::PrintProcess(void)
            Stage.StageAbsoluteMove(0, StageType);
            //SMC.AbsoluteMove(0);
         }
-
         return;
     }
 }
@@ -2374,12 +2375,12 @@ void MainWindow::StageMove()
  */
 void MainWindow::VP8bitWorkaround()
 {
+    VP8Bit = ON;
     QListWidgetItem * item;
     QStringList imageList;
     QStringList ExposureTimeList;
     QStringList DarkTimeList;
     QStringList LEDlist;
-    QStringList FrameList;
     double LayerCount = 0;
     for (int i = 0; i < ui->FileList->count(); i++)
     {
