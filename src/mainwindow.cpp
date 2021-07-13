@@ -701,6 +701,9 @@ void MainWindow::PrintProcess(void)
             layerCount++;
             Sleep(50);
             DLP.startPatSequence();
+            if(PrinterType == ICLIP){
+                Sleep(500);
+            }
             SetExposureTimer(0, PrintScript, PumpingMode);
             if(MotionMode == 1){
                 //SMC.AbsoluteMove(PrintEnd);
@@ -818,7 +821,13 @@ void MainWindow::PrintProcessVP()
                 ui->ProgramPrints->append(QString::number(count) + " patterns uploaded");
             }
             //Add pattern data to buffer to prepare for pattern upload
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0);
+            if (ProjectionMode == VIDEOPATTERN && BitMode == 8){
+                VP8bitWorkaround();
+                ui->ProgramPrints->append("Using VP 8-bit workaround");
+            }
+            else{
+                DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0);
+            }
             DLP.updateLUT(ProjectionMode); //update LUT on light engine to upload pattern data
             DLP.clearElements(); //clear pattern data buffer
             Sleep(50); //small delay to ensure that the new patterns are uploaded
