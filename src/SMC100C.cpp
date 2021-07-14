@@ -684,7 +684,7 @@ char* SMC100C::SerialRead()
     unsigned int maxNbBytes = 13;
     int ReadStatus;
     ReadStatus = serial.readString(receivedString,finalChar,maxNbBytes,10);
-    printf("at serialread: %s, status: %d\r\n", receivedString, ReadStatus);
+    printf("at serialread: %s", receivedString, ReadStatus);
 
     //char* outputString = '\0';
 

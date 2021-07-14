@@ -115,6 +115,9 @@ QStringList LEDScriptList;
 QStringList DarkTimeScriptList;
 QStringList InjectionVolumeScriptList;
 QStringList InjectionRateScriptList;
+QStringList StageVelocityScriptList;
+QStringList StageAccelerationScriptList;
+QStringList PumpHeightScriptList;
 static int PrintScript = 0; //For selecting type of printscript, currently: 0 = no printscript, 1 = exposure time print script
 
 //Projection mode parameters
@@ -302,7 +305,6 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
         //API_VideoConnector_t hdmi = VIDEO_CON_HDMI;
         //LCR_SetIT6535PowerMode(hdmi);
         Check4VideoLock();
-
     }
 }
 
@@ -441,6 +443,7 @@ void MainWindow::on_SetBitDepth_clicked()
 {
     BitMode = ui->BitDepthParam->value();
     ui->ProgramPrints->append("Bit-Depth set to: " + QString::number(BitMode));
+    VP8bitWorkaround();
 }
 
 /**
@@ -651,7 +654,8 @@ void MainWindow::on_StartPrint_clicked()
             PrintProcessVP();
             ui->ProgramPrints->append("Entering Video Pattern print process");
         }
-        if (ContinuousInjection == ON){
+
+        if (ContinuousInjection == ON){ //If continuous injection is on then start pump infusion
             Pump.StartInfusion();
         }
     }

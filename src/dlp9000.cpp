@@ -27,9 +27,6 @@ bool DLP9000::InitProjector(void)
     }
 }
 
-
-
-
 /**
  * @brief MainWindow::on_addPatternsButton_clicked
  */
@@ -101,7 +98,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                     if (BitPos > 23){
                         BitPos = 0;
                     }
-                    printf("BP: %d,", BitPos);
+                    printf(",BP: %d,", BitPos);
                     pattern.splashImageBitPos = BitPos;
                     BitPos += BitMode;
                     printf("BitPos: %d \r\n", pattern.splashImageBitPos);
@@ -116,7 +113,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
     }
     else //POTF mode
     {
-        printf("POTF pattern upload");
+        printf("POTF pattern upload\r\n");
         if(fileNames.isEmpty())
         {
             Main.showError("No image file found");
@@ -242,13 +239,13 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware)
             if(ei != splashImageCount)
                 continue;
             int bitpos = m_elements[i].splashImageBitPos;
-            printf("UPbp: %d", m_elements[i].splashImageBitPos);
+            printf("UPbp: %d ", m_elements[i].splashImageBitPos);
             int bitdepth = m_elements[i].bits;
             PtnImage image(m_elements[i].name);
             merge_image.merge(image,bitpos,bitdepth);
 
         }
-
+        printf("\r\n");
         merge_image.swapColors(PTN_COLOR_RED, PTN_COLOR_BLUE, PTN_COLOR_GREEN);
         uint08* splash_block = NULL;
 
@@ -395,7 +392,7 @@ void DLP9000::updateLUT(int ProjectionMode)
         }
         else
         {
-            printf("i:%d\r\n exp:%d",i,m_elements[i].exposure);
+            printf("i:%d, exp:%d \r\n",i,m_elements[i].exposure);
         }
     }
 
@@ -407,7 +404,7 @@ void DLP9000::updateLUT(int ProjectionMode)
     }
 
     ret = LCR_SetPatternConfig(m_elements.size(), m_elements.size());
-    printf("elements size: %d",m_elements.size());
+    printf("elements size: %d\r\n",m_elements.size());
     if (ret < 0)
     {
         Main.showError("Sending pattern LUT size failed!");
