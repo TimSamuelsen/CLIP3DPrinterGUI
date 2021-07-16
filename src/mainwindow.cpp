@@ -444,7 +444,7 @@ void MainWindow::on_SetBitDepth_clicked()
 {
     BitMode = ui->BitDepthParam->value();
     ui->ProgramPrints->append("Bit-Depth set to: " + QString::number(BitMode));
-    VP8bitWorkaround();
+    //VP8bitWorkaround();
 }
 
 /**
@@ -827,8 +827,9 @@ void MainWindow::PrintProcessVP()
             }
             //Add pattern data to buffer to prepare for pattern upload
             if (ProjectionMode == VIDEOPATTERN && BitMode == 8){
-                VP8bitWorkaround();
-                ui->ProgramPrints->append("Using VP 8-bit workaround");
+                //VP8bitWorkaround();
+                //ui->ProgramPrints->append("Using VP 8-bit workaround");
+                DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0);
             }
             else{
                 DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0);
@@ -1266,8 +1267,8 @@ void MainWindow::on_SelectPrintScript_clicked()
                                       + "," + StageAccelerationScriptList.at(i) + "," + PumpHeightScriptList.at(i) + "," + InjectionVolumeScriptList.at(i) + "," + InjectionRateScriptList.at(i));
         }
         else{
-            ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i) + "," + LayerThicknessScriptList.at(i) + "," + StageVelocityScriptList.at(i)
-                                      + "," + StageAccelerationScriptList.at(i) + "," + PumpHeightScriptList.at(i) + "," + DarkTimeScriptList.at(i));
+            ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i) + "," + DarkTimeScriptList.at(i) + "," + LayerThicknessScriptList.at(i) + "," + StageVelocityScriptList.at(i)
+                                      + "," + StageAccelerationScriptList.at(i) + "," + PumpHeightScriptList.at(i));
         }
     }
     ui->ProgramPrints->append("Print List has: " + QString::number(ExposureScriptList.size()) + " exposure time entries");
