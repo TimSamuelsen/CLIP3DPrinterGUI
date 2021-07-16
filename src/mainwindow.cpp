@@ -92,7 +92,7 @@ static bool AutoModeFlag = false; //true when automode is on, false otherwise
 
 //Print Process Variables
 static uint nSlice = 0; //number of slices to be printed
-static int layerCount = 0; //current layer
+static uint layerCount = 0; //current layer
 static int remainingImages; //Keeps count of remaining images to be printed
 
 //Plot Variables
