@@ -118,6 +118,7 @@ QStringList InjectionRateScriptList;
 QStringList StageVelocityScriptList;
 QStringList StageAccelerationScriptList;
 QStringList PumpHeightScriptList;
+QStringList LayerThicknessScriptList;
 static int PrintScript = 0; //For selecting type of printscript, currently: 0 = no printscript, 1 = exposure time print script
 
 //Projection mode parameters
@@ -909,8 +910,16 @@ void MainWindow::pumpingSlot(void)
 {
     QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
     //SMC.RelativeMove(-PumpingParameter); //Move the stage back the desired pumping distance
-    Stage.StageRelativeMove(-PumpingParameter, StageType);
-    ui->ProgramPrints->append("Pumping " + QString::number(PumpingParameter*1000) +" um");
+    if(PrintScript == ON){
+        if (layerCount < PumpHeightScriptList.size()){
+            Stage.StageRelativeMove(-PumpHeightScriptList.at(layerCount).toDouble(), StageType);
+            ui->ProgramPrints->append("Pumping " + QString::number(PumpHeightScriptList.at(layerCount).toDouble()*1000) +" um");
+        }
+    }
+    else{
+        Stage.StageRelativeMove(-PumpingParameter, StageType);
+        ui->ProgramPrints->append("Pumping " + QString::number(PumpingParameter*1000) +" um");
+    }
 }
 
 /**
@@ -996,7 +1005,8 @@ void MainWindow::ExposureTimeSlot(void)
         }
         else{
             PrintInfuse();
-            Stage.StageRelativeMove(-SliceThickness, StageType);
+            //Stage.StageRelativeMove(-SliceThickness, StageType);
+            StageMove();
             ui->ProgramPrints->append("No injection delay");
         }
         ui->ProgramPrints->append("Injecting " + QString::number(InfusionVolume) + "ul at " + QString::number(InfusionRate) + "ul/s");
@@ -1006,13 +1016,15 @@ void MainWindow::ExposureTimeSlot(void)
         if(PumpingMode == 1){
             emit(on_GetPosition_clicked());
             updatePlot();
-            Stage.StageRelativeMove(PumpingParameter - SliceThickness, StageType);
+            StageMove();
+            //Stage.StageRelativeMove(PumpingParameter - SliceThickness, StageType);
             //SMC.RelativeMove((PumpingParameter - SliceThickness)); //pumping param is in um, slicethickness is in mm
         }
         else{
             //SMC.RelativeMove(-SliceThickness);
             if (PrinterType == CLIP30UM){
-                Stage.StageRelativeMove(-SliceThickness, StageType);
+               //Stage.StageRelativeMove(-SliceThickness, StageType);
+                StageMove();
             }
         }
 
@@ -1038,6 +1050,7 @@ void MainWindow::ExposureTimeSlot(void)
             else{
                 ui->ProgramPrints->append(QString::number(layerCount) + QString::number(sizeof(LEDScriptList)));
             }
+
         }
         if (PrintScript == ON){
             if(layerCount < DarkTimeScriptList.size()){
@@ -1236,24 +1249,35 @@ void MainWindow::on_SelectPrintScript_clicked()
             ExposureScriptList.append(line.split(',').at(0));
             LEDScriptList.append(line.split(',').at(1));
             DarkTimeScriptList.append(line.split(',').at(2));
+            LayerThicknessScriptList.append(line.split(',').at(3));
+            StageVelocityScriptList.append(line.split(',').at(4));
+            StageAccelerationScriptList.append(line.split(',').at(5));
+            PumpHeightScriptList.append(line.split(',').at(6));
             if(PrinterType == ICLIP){
-                InjectionVolumeScriptList.append(line.split(',').at(3));
-                InjectionRateScriptList.append(line.split(',').at(4));
+                InjectionVolumeScriptList.append(line.split(',').at(7));
+                InjectionRateScriptList.append(line.split(',').at(8));
             }
     }
      //For testing
     for (int i= 0; i < ExposureScriptList.size(); i++)
     {
         if(PrinterType == ICLIP){
-            ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i) + "," + DarkTimeScriptList.at(i) + "," + InjectionVolumeScriptList.at(i) + "," + InjectionRateScriptList.at(i));
+            ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i) + "," + DarkTimeScriptList.at(i) + "," + LayerThicknessScriptList.at(i) + "," + StageVelocityScriptList.at(i)
+                                      + "," + StageAccelerationScriptList.at(i) + "," + PumpHeightScriptList.at(i) + "," + InjectionVolumeScriptList.at(i) + "," + InjectionRateScriptList.at(i));
         }
         else{
-            ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i) + "," + DarkTimeScriptList.at(i));
+            ui->ProgramPrints->append(ExposureScriptList.at(i) + "," + LEDScriptList.at(i) + "," + LayerThicknessScriptList.at(i) + "," + StageVelocityScriptList.at(i)
+                                      + "," + StageAccelerationScriptList.at(i) + "," + PumpHeightScriptList.at(i) + "," + DarkTimeScriptList.at(i));
         }
     }
     ui->ProgramPrints->append("Print List has: " + QString::number(ExposureScriptList.size()) + " exposure time entries");
     ui->ProgramPrints->append("Print List has: " + QString::number(LEDScriptList.size()) + " LED intensity entries");
     ui->ProgramPrints->append("Print List has: " + QString::number(DarkTimeScriptList.size()) + " dark time entries");
+    ui->ProgramPrints->append("Print List has: " + QString::number(LayerThicknessScriptList.size()) + " layer thickness entries");
+    ui->ProgramPrints->append("Print List has: " + QString::number(StageVelocityScriptList.size()) + " stage velocity entries");
+    ui->ProgramPrints->append("Print List has: " + QString::number(StageAccelerationScriptList.size()) + " stage acceleration entries");
+    ui->ProgramPrints->append("Print List has: " + QString::number(PumpHeightScriptList.size()) + + " pump height entries");
+
     if (ExposureScriptList.size() > 0)
     {
         ui->LiveValueList1->setCurrentIndex(1);
@@ -1644,7 +1668,6 @@ void MainWindow::on_ContinuousInjection_clicked()
         ui->ProgramPrints->append("Continuous Injection Disabled");
     }
 }
-
 
 /**
  * @brief MainWindow::on_SetInfuseRate_clicked
@@ -2373,7 +2396,45 @@ void MainWindow::updatePlot()
  * ***********************************************************/
 void MainWindow::StageMove()
 {
-    Stage.StageRelativeMove(-SliceThickness, StageType);
+    if (PrintScript == ON){
+        if (layerCount > 0){
+            if(layerCount < StageVelocityScriptList.size() && layerCount < StageAccelerationScriptList.size()){
+                    if(StageVelocityScriptList.at(layerCount).toDouble() == StageVelocityScriptList.at(layerCount-1).toDouble()){
+                        //do nothing as velocity is the same
+                    }
+                    else{
+                        Stage.SetStageVelocity(StageVelocityScriptList.at(layerCount).toDouble(), StageType);
+                        ui->ProgramPrints->append("New stage velocity set to: " + QString::number(StageVelocityScriptList.at(layerCount).toDouble()) + " mm/s");
+                        Sleep(10); //delay for stage com
+                    }
+                    if(StageAccelerationScriptList.at(layerCount).toDouble() == StageVelocityScriptList.at(layerCount-1).toDouble()){
+                        //do nothing as acceleration is the same
+                    }
+                    else{
+                        Stage.SetStageAcceleration(StageVelocityScriptList.at(layerCount).toDouble(), StageType);
+                        ui->ProgramPrints->append("New stage acceleration set to: " + QString::number(StageAccelerationScriptList.at(layerCount).toDouble()) + " mm/s");
+                        Sleep(10); //delay for stage com
+                    }
+                }
+            if (layerCount < LayerThicknessScriptList.size() && layerCount < StageAccelerationScriptList.size()){
+                double LayerThickness = LayerThicknessScriptList.at(layerCount).toDouble();
+                ui->ProgramPrints->append("Layer Thickness set to: " + QString::number(LayerThicknessScriptList.at(layerCount).toDouble()) + " um");
+                Stage.StageRelativeMove(-LayerThickness, StageType);
+                if (PumpingMode == ON){
+                    double PumpParam = PumpHeightScriptList.at(layerCount).toDouble();
+                    Stage.StageRelativeMove(PumpParam - LayerThickness, StageType);
+                }
+            }
+        }
+    }
+    else{
+        if (PumpingMode == ON){
+            Stage.StageRelativeMove(PumpingParameter - SliceThickness, StageType);
+        }
+        else{
+            Stage.StageRelativeMove(-SliceThickness, StageType);
+        }
+    }
     ui->ProgramPrints->append("StageMove");
 }
 
