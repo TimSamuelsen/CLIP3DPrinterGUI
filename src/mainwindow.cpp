@@ -1058,12 +1058,13 @@ void MainWindow::ExposureTimeSlot(void)
                 ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTimeScriptList.at(layerCount).toDouble()));
                 ui->LiveValue1->setText(QString::number(ExposureScriptList.at(layerCount).toInt()));
                 ui->LiveValue3->setText(QString::number(DarkTimeScriptList.at(layerCount).toInt()));
+                ui->ProgramPrints->append("Moving Stage: " + QString::number(LayerThicknessScriptList.at(layerCount).toDouble()) + " um");
             }
         }
         else{
             ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTime/1000) + " ms");
+            ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness*1000) + " um");
         }
-        ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness*1000) + " um");
     }
     else if(MotionMode == 1){
         if (inMotion == false){
@@ -1125,6 +1126,9 @@ void MainWindow::SetDarkTimer(int PrintScript)
     if (PrintScript == ON){
         if(layerCount < DarkTimeScriptList.size()){
             QTimer::singleShot(DarkTimeScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        }
+        else{
+            QTimer::singleShot(DarkTimeScriptList.at(layerCount-2).toDouble(), Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
         }
     }
     else if(PrintScript == OFF){
@@ -2408,7 +2412,7 @@ void MainWindow::StageMove()
                         ui->ProgramPrints->append("New stage velocity set to: " + QString::number(StageVelocityScriptList.at(layerCount).toDouble()) + " mm/s");
                         Sleep(10); //delay for stage com
                     }
-                    if(StageAccelerationScriptList.at(layerCount).toDouble() == StageVelocityScriptList.at(layerCount-1).toDouble()){
+                    if(StageAccelerationScriptList.at(layerCount).toDouble() == StageAccelerationScriptList.at(layerCount-1).toDouble()){
                         //do nothing as acceleration is the same
                     }
                     else{
@@ -2418,7 +2422,7 @@ void MainWindow::StageMove()
                     }
                 }
             if (layerCount < LayerThicknessScriptList.size() && layerCount < StageAccelerationScriptList.size()){
-                double LayerThickness = LayerThicknessScriptList.at(layerCount).toDouble();
+                double LayerThickness = LayerThicknessScriptList.at(layerCount).toDouble()/1000;
                 ui->ProgramPrints->append("Layer Thickness set to: " + QString::number(LayerThicknessScriptList.at(layerCount).toDouble()) + " um");
                 Stage.StageRelativeMove(-LayerThickness, StageType);
                 if (PumpingMode == ON){
