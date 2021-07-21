@@ -11,7 +11,17 @@
 #include "dlp9000.h"
 #include "serialib.h"
 
-
+typedef enum DynamicVariable{
+    EXPOSURE_TIME,
+    LED_INTENSITY,
+    DARK_TIME,
+    LAYER_THICKNESS,
+    STAGE_VELOCITY,
+    STAGE_ACCELERATION,
+    PUMP_HEIGHT,
+    INJECTION_VOLUME,
+    INJECTION_RATE,
+}DynamicVariable_t;
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -186,7 +196,9 @@ private:
     void AutoMode();
     void initImagePopout();
     void SetExposureTimer(int InitialExposureFlag, int PrintScript, int PumpingMode);
-    void SetDarkTimer(int PrintScript);
+    void SetDarkTimer(int PrintScript, int MotionMode);
     void VP8bitWorkaround();
+    bool PrintScriptApply(uint layerCount, QStringList Script, DynamicVariable_t DynamicParam);
+    void PrintComplete();
 };
 #endif // MAINWINDOW_H

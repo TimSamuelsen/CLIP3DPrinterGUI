@@ -123,7 +123,6 @@ static int PrintScript = 0; //For selecting type of printscript, currently: 0 = 
 
 //Projection mode parameters
 static int ProjectionMode = POTF; //For selecting projection mode, 0 = POTF mode, 1 = Video Pattern HDMI
-static bool VideoLocked;
 int BitLayer = 1;
 int FrameCount = 0;
 int ReSyncFlag = 0;
@@ -185,7 +184,6 @@ void MainWindow::timerTimeout(void)
 MainWindow::~MainWindow()
 {
     saveSettings(); //Save settings upon closing application main window
-    //SMC.SMC100CClose();
     delete ui;
 }
 
@@ -254,8 +252,13 @@ void MainWindow::on_GetPosition_clicked()
     if (strnlen(ReadPosition,50) > 1)
     {
         QString CurrentPosition = QString::fromUtf8(ReadPosition); //convert char* to QString
-        CurrentPosition.remove(0,3); //Removes address and command code
-        CurrentPosition.chop(2); //To be removed...
+        if (PrinterType == CLIP30UM){
+            CurrentPosition.remove(0,3); //Removes address and command code
+            CurrentPosition.chop(2); //To be removed...
+        }
+        else if(PrinterType == ICLIP){
+
+        }
         ui->CurrentPositionIndicator->setText(CurrentPosition); //Update current position indicator
         ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + " mm"); //Print to terminal
         ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble()); //Update slider position
@@ -315,46 +318,57 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
  */
 void MainWindow::Check4VideoLock()
 {
-    QMessageBox VlockPopup;
-    static uint8_t repeatCount = 0;
-    unsigned char HWStatus, SysStatus, MainStatus;
+    QMessageBox VlockPopup; //prep video popout
+    static uint8_t repeatCount = 0; //start repeatCount at 0
+    unsigned char HWStatus, SysStatus, MainStatus; //Prep variables for LCR_GetStatus
+
+    //If first attempt
     if (repeatCount == 0)
         ui->ProgramPrints->append("Attempting to Lock to Video Source");
+
+    //if attempt to get status is succesful
     if (LCR_GetStatus(&HWStatus, &SysStatus, &MainStatus) == 0)
     {
+        //If BIT3 in main status is set, then video source has already been locked
         if(MainStatus & BIT3){
             ui->ProgramPrints->append("External Video Source Locked");
-            VideoLocked = true;
             VlockPopup.close();
+
+            //If attempt to set to Video pattern mode is not succesful
             if (LCR_SetMode(PTN_MODE_VIDEO) < 0)
             {
                 showError("Unable to switch to video pattern mode");
-                ui->VP_HDMIcheckbox->setChecked(false);
+                ui->VP_HDMIcheckbox->setChecked(false); //Uncheck video pattern mode
+
+                //Reset to POTF mode
                 ui->POTFcheckbox->setChecked(true);
                 emit(on_POTFcheckbox_clicked());
             }
             ui->ProgramPrints->append("Video Pattern Mode Enabled");
             return;
         }
-        else{
+        else{ //Video source is currently not locked
             ui->ProgramPrints->append("External Video Source Not Locked, Please Wait");
-            //API_VideoConnector_t testVC;
-            //LCR_GetIT6535PowerMode(&testVC);
+
+            //Get current display mode and print to terminal, used for debug
             API_DisplayMode_t testDM;
             LCR_GetMode(&testDM);
             ui->ProgramPrints->append(QString::number(testDM));
 
-            VideoLocked = false;
-            if(repeatCount < 15) //Repeats 15 times (15 seconds) before telling user that an error has occurred
+            //Repeats 15 times (15 seconds) before telling user that an error has occurred
+            if(repeatCount < 15)
             {
+                //Start 1 second timer, after it expires check if video source is locked
                 QTimer::singleShot(1000, this, SLOT(Check4VideoLock()));
                 repeatCount++;
             }
-            else
+            else //System has attempted 15 times to lock to video source, and attempt is determined to be a failure
             {
                 ui->ProgramPrints->append("External Video Source Lock Failed");
                 showError("External Video Source Lock Failed");
-                ui->VP_HDMIcheckbox->setChecked(false);
+                ui->VP_HDMIcheckbox->setChecked(false); //Uncheck video pattern mode
+
+                //Reset to POTF mode
                 ui->POTFcheckbox->setChecked(true);
                 emit(on_POTFcheckbox_clicked());
             }
@@ -368,11 +382,14 @@ void MainWindow::Check4VideoLock()
  */
 void MainWindow::initImagePopout()
 {
-    ImagePopoutUI = new imagepopout;
-    ImagePopoutUI->show();
-    ImagePopoutUI->windowHandle()->setScreen(qApp->screens()[1]);
-    ImagePopoutUI->showFullScreen();
+    ImagePopoutUI = new imagepopout; //prep new image popout window
+    ImagePopoutUI->show(); //Display new window
+    ImagePopoutUI->windowHandle()->setScreen(qApp->screens()[1]); //Set window to extended display
+    ImagePopoutUI->showFullScreen(); //set window to fullscreen
+
+    //Prep image list for video pattern mode
     QStringList imageList;
+    //For every file in the file list, enter it into imageList
     for(int i = 0; (i < (ui->FileList->count())); i++)
     {
         QListWidgetItem * item;
@@ -383,15 +400,14 @@ void MainWindow::initImagePopout()
 
 /**
  * @brief MainWindow::on_DICLIPSelect_clicked
- * Currently just a dummy fuction used for testing
+ * Preps the system for use with iCLIP printer
  */
 void MainWindow::on_DICLIPSelect_clicked()
 {
-    //initImagePopout();
-    //ProjectionMode = 1;
-    StageType = STAGE_GCODE;
-    PrinterType = ICLIP;
+    StageType = STAGE_GCODE; //Set stage to Gcode for the iCLIP printer
+    PrinterType = ICLIP; //Update printer type
 
+    //Enable the injection parameters
     ui->ContinuousInjection->setEnabled(true);
     ui->VolPerLayerParam->setEnabled(true);
     ui->SetVolPerLayer->setEnabled(true);
@@ -400,9 +416,11 @@ void MainWindow::on_DICLIPSelect_clicked()
     ui->InitialVolumeParam->setEnabled(true);
     ui->SetInitialVolume->setEnabled(true);
 
+    //Disable the starting position selection
     ui->StartingPositionParam->setEnabled(false);
     ui->SetStartingPosButton->setEnabled(false);
 
+    //Disable the stage software limits
     ui->MaxEndOfRun->setEnabled(false);
     ui->SetMaxEndOfRun->setEnabled(false);
     ui->MinEndOfRunParam->setEnabled(false);
@@ -410,11 +428,16 @@ void MainWindow::on_DICLIPSelect_clicked()
 
 }
 
+/**
+ * @brief MainWindow::on_CLIPSelect_clicked
+ * Preps the system for use with the 30 um printer
+ */
 void MainWindow::on_CLIPSelect_clicked()
 {
-    StageType = STAGE_SMC;
-    PrinterType = CLIP30UM;
+    StageType = STAGE_SMC; //Set stage to SMC100CC for the 30 um CLIP printer
+    PrinterType = CLIP30UM; //Update printer type
 
+    //Disable injection parameters
     ui->ContinuousInjection->setEnabled(false);
     ui->VolPerLayerParam->setEnabled(false);
     ui->SetVolPerLayer->setEnabled(false);
@@ -423,9 +446,11 @@ void MainWindow::on_CLIPSelect_clicked()
     ui->InitialVolumeParam->setEnabled(false);
     ui->SetInitialVolume->setEnabled(false);
 
+    //Enable starting position selection
     ui->StartingPositionParam->setEnabled(true);
     ui->SetStartingPosButton->setEnabled(true);
 
+    //Enable stage acceleration and software limits
     ui->StageAccelParam->setEnabled(true);
     ui->SetStageAcceleration->setEnabled(true);
     ui->MaxEndOfRun->setEnabled(true);
@@ -442,9 +467,8 @@ void MainWindow::on_CLIPSelect_clicked()
  */
 void MainWindow::on_SetBitDepth_clicked()
 {
-    BitMode = ui->BitDepthParam->value();
+    BitMode = ui->BitDepthParam->value(); //Grab value from GUI bit depth parameter
     ui->ProgramPrints->append("Bit-Depth set to: " + QString::number(BitMode));
-    //VP8bitWorkaround();
 }
 
 /**
@@ -453,12 +477,13 @@ void MainWindow::on_SetBitDepth_clicked()
  */
 void MainWindow::on_SteppedMotion_clicked()
 {
+    //If the stepped motion checkbox is checked
     if(ui->SteppedMotion->isChecked() == true)
     {
-        MotionMode = 0;
-        ui->ContinuousMotion->setChecked(false);
+        MotionMode = STEPPED; //Set MotionMode to STEPPED
+        ui->ContinuousMotion->setChecked(false); //Updates UI to reflect stepped mode
         ui->ProgramPrints->append("Stepped Motion Selected");
-        ui->SetDarkTime->setEnabled(true);
+        ui->SetDarkTime->setEnabled(true); //Enable dark time selection
     }
 }
 
@@ -468,11 +493,14 @@ void MainWindow::on_SteppedMotion_clicked()
  */
 void MainWindow::on_ContinuousMotion_clicked()
 {
+    //If the continuos motion checkbox is checked
     if(ui->ContinuousMotion->isChecked() == true)
     {
-        MotionMode = 1;
-        ui->SteppedMotion->setChecked(false);
+        MotionMode = CONTINUOUS; //Set MotionMode to Continuous
+        ui->SteppedMotion->setChecked(false); //Update UI to reflect continuous mode
         ui->ProgramPrints->append("Continuous Motion Selected");
+
+        //Disable dark time and set it to 0, because there is no dark time in Continuous mode
         DarkTime = 0;
         ui->DarkTimeParam->setValue(0);
         ui->SetDarkTime->setEnabled(false);
@@ -486,14 +514,19 @@ void MainWindow::on_ContinuousMotion_clicked()
  */
 void MainWindow::on_pumpingCheckBox_clicked()
 {
+    //If pumping checkbox is checked
     if(ui->pumpingCheckBox->isChecked() == true){
-        PumpingMode = 1;
+        PumpingMode = ON; //Enable pumping mode
+
+        //Update UI
         ui->pumpingParameter->setEnabled(true);
         ui->setPumping->setEnabled(true);
         ui->ProgramPrints->append("Pumping Enabled");
     }
     else{
-        PumpingMode = 0;
+        PumpingMode = OFF; //Disable pumping mode
+
+        //Update UI
         ui->pumpingParameter->setEnabled(false);
         ui->setPumping->setEnabled(false);
         ui->ProgramPrints->append("Pumping Disabled");
@@ -506,11 +539,12 @@ void MainWindow::on_pumpingCheckBox_clicked()
  */
 void MainWindow::on_setPumping_clicked()
 {
-    if(PumpingMode == 1){
-        PumpingParameter = ui->pumpingParameter->value()/1000;
+    //If pumping is currently enabled
+    if(PumpingMode == ON){
+        PumpingParameter = ui->pumpingParameter->value()/1000; //Grab value from UI and divide by 1000 to scale units
         ui->ProgramPrints->append("Pumping depth set to: " + QString::number(PumpingParameter*1000) + " μm");
     }
-    else{
+    else{ //Pumping is currently disabled
         ui->ProgramPrints->append("Please enable pumping before setting pumping parameter");
     }
 }
@@ -522,60 +556,77 @@ void MainWindow::on_setPumping_clicked()
  */
 void MainWindow::on_InitializeAndSynchronize_clicked()
 {
+    //If the confirmation screen was approved by user
     if (initConfirmationScreen())
     {
         LCR_PatternDisplay(0); //Turn off any projection
         initStageSlot(); //Initializes stage with correct parameters and moves controlled to starting position
 
+        //If file list is not empty
         if (ui->FileList->count() > 0)
         {
             //Upload images for initial exposure
             QListWidgetItem * firstItem = ui->FileList->item(0); //Get first image
             QStringList firstImage;
+
             //Create an imagelist that contain n copies of first image, where n = InitialExposure in integer seconds
             for (uint i = 0; i < InitialExposure; i++)
             {
                 firstImage << firstItem->text();
             }
 
-            DLP.AddPatterns(firstImage, 1000*1000, 0, 0, 0, ExposureScriptList, DarkTimeScriptList,ProjectionMode, BitMode, InitialExposureFlag); //Printscript is set to 0 for initial exposure time, 0 for initial image
+            //Add initial exposure patterns to local memory
+            DLP.AddPatterns(firstImage, 1000*1000, 0, 0, 0, ExposureScriptList, DarkTimeScriptList,ProjectionMode, BitMode, InitialExposureFlag);
+
+            //If in POTF mode
             if(ProjectionMode == POTF){
                 nSlice = ui->FileList->count();
-            }
-            else if (ProjectionMode == VIDEOPATTERN){
-                nSlice = (24/BitMode)*ui->FileList->count();
-                DLP.updateLUT(ProjectionMode);
-                DLP.clearElements();
-            }
-            ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
-            QListWidgetItem * item;
-            QStringList imageList;
-            for(int i = 1; (i < (ui->FileList->count())); i++)
-            {
-                    item = ui->FileList->item(i);
-                    imageList << item->text();
-                    if ((i + InitialExposure) > MaxImageUpload)
-                    {
-                        break;
-                    }
-            }
-            if (PrintScript == 1)
-            {
-                ui->ProgramPrints->append("Using Print Script");
-            }
-            if (ProjectionMode == POTF){
+
+                //Grab images from the file list up until the max image upload is reached
+                QListWidgetItem * item;
+                QStringList imageList;
+                for(int i = 1; (i < (ui->FileList->count())); i++)
+                {
+                        item = ui->FileList->item(i);
+                        imageList << item->text();
+                        if ((i + InitialExposure) > MaxImageUpload)
+                        {
+                            break;
+                        }
+                }
+
+                //Add patterns first to local memory, send to light engine, and clear local memory
                 DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, 0, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0); //Set initial image to 0
                 DLP.updateLUT(ProjectionMode);
                 DLP.clearElements();
                 remainingImages = MaxImageUpload - InitialExposure;
+
+                //Get directory of images and print to terminal
+                QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
+                ui->ProgramPrints->append(dir.absolutePath());
             }
-            QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
-            ui->ProgramPrints->append(dir.absolutePath());
-            emit(on_GetPosition_clicked());
-            initPlot();
-            updatePlot();
-            ui->StartPrint->setEnabled(true);
-            if(MotionMode == 1){
+            //If in Video pattern mode
+            else if (ProjectionMode == VIDEOPATTERN){
+                nSlice = (24/BitMode)*ui->FileList->count(); //Calc nSlice based on bitMode and # of files
+                DLP.updateLUT(ProjectionMode); //Send pattern data to light engine
+                DLP.clearElements(); //Clear local memory
+
+                //Get image from file list and display in popout window
+
+                QString filename =ui->FileList->item(layerCount)->text();
+                QPixmap img(filename);
+                ImagePopoutUI->showImage(img);
+
+            }
+            ui->ProgramPrints->append(QString::number(nSlice) + " layers to print");
+
+            emit(on_GetPosition_clicked()); //get stage position
+            initPlot(); //Initialize plot
+            updatePlot(); //Update plot
+            ui->StartPrint->setEnabled(true); //Enable the start print button
+
+            //If in continuous motion mode, calculate the print end position
+            if(MotionMode == CONTINUOUS){
                 if(PrinterType == CLIP30UM){
                     PrintEnd = StartingPosition - (ui->FileList->count()*SliceThickness);
                 }
@@ -586,11 +637,6 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
                     showError("PrinterType Error, on_InitializeAndSynchronize_clicked");
                 }
                 ui->ProgramPrints->append("Print End for continous motion print set to: " + QString::number(PrintEnd));
-            }
-            if(ProjectionMode == VIDEOPATTERN){
-                QString filename =ui->FileList->item(layerCount)->text();
-                QPixmap img(filename);
-                ImagePopoutUI->showImage(img);
             }
         }
     }
@@ -604,8 +650,8 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
 void MainWindow::on_AbortPrint_clicked()
 {
     LCR_PatternDisplay(0); //Turn off light engine projection
-    //SMC.StopMotion(); //Stop stage movement
-    Stage.StageStop(StageType);
+    Stage.StageStop(StageType); //Stop stage movement
+    //Add pump stop here
     layerCount = 0xFFFFFF; //Set layer count high to stop print process
     ui->ProgramPrints->append("PRINT ABORTED");
 }
@@ -616,21 +662,16 @@ void MainWindow::on_AbortPrint_clicked()
  */
 void MainWindow::on_StartPrint_clicked()
 {
-    if (ValidateSettings() == true) //If settings are validated successfully and Initialization has been completed
+    //If settings are validated successfully and Initialization has been completed
+    if (ValidateSettings() == true)
     {
-        Stage.SetStageVelocity(StageVelocity, StageType);
-        Sleep(20); //Sleep to avoid spamming motor controller
+        Stage.SetStageVelocity(StageVelocity, StageType); //Update stage velocity
+        Sleep(10); //Sleep to avoid spamming motor controller
         emit(on_GetPosition_clicked()); //Get stage position to validate that stage connection is working
-        Sleep(20);
-        emit(on_GetPosition_clicked());
-        if(ProjectionMode == POTF){
-            nSlice = ui->FileList->count();  //# of images selected = # of slices
-        }
-        else if (ProjectionMode == VIDEOPATTERN){
-            nSlice = (24/BitMode)*ui->FileList->count();
-        }
-
+        Sleep(10);
+        emit(on_GetPosition_clicked()); //Repeat get stage position
         ui->ProgramPrints->append("Entering Printing Procedure");
+
         //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
         if (PrintScript == ON){ //If printscript is on
             LCR_SetLedCurrents(0,0,(LEDScriptList.at(0).toInt())); //Set LED intensity to first value in printscript
@@ -638,25 +679,29 @@ void MainWindow::on_StartPrint_clicked()
         else{ //if printscript is off
             LCR_SetLedCurrents(0, 0, UVIntensity); //set static LED intensity
         }
+
         if (MotionMode == CONTINUOUS){ //continuous motion mode
             double ContStageVelocity = (SliceThickness)/(ExposureTime/(1e6)); //Multiply Exposure time by 1e6 to convert from us to s to get to proper units
             ui->ProgramPrints->append("Continuous Stage Velocity set to " + QString::number(SliceThickness) + "/" + QString::number(ExposureTime) + " = " + QString::number(ContStageVelocity) + " mm/s");
-            //SMC.SetVelocity(ContStageVelocity); //Set stage velocity to the calculated velocity
             Stage.SetStageVelocity(ContStageVelocity, StageType);
         }
+
         PrintStartTime = QTime::currentTime(); //Get print start time from current time
         DLP.startPatSequence(); //Start projection
+
+        //Based on projection mode enter correct print process
         if (ProjectionMode == POTF){ //if in POTF mode
             PrintProcess(); //Start print process
             ui->ProgramPrints->append("Entering POTF print process");
         }
         else{ //else in Video Pattern Mode
             DLP.clearElements();
-            PrintProcessVP();
+            PrintProcessVP(); //Start video pattern print process
             ui->ProgramPrints->append("Entering Video Pattern print process");
         }
 
-        if (ContinuousInjection == ON){ //If continuous injection is on then start pump infusion
+        //If continuous injection is on then start pump infusion
+        if (ContinuousInjection == ON){
             Pump.StartInfusion();
         }
     }
@@ -668,15 +713,19 @@ void MainWindow::on_StartPrint_clicked()
  */
 void MainWindow::PrintProcess(void)
 {
+    //If not at the end of the print
     if (layerCount +1 <= nSlice)
     {
+        //If there are no remaining images, reupload
         if (remainingImages <= 0)
         {
-            if (MotionMode == 1){
-                //SMC.StopMotion();
+            //If motion mode is set to continuous, pause stage movement during re-upload
+            if (MotionMode == CONTINUOUS){
                 Stage.StageStop(StageType);
             }
-            LCR_PatternDisplay(0);
+            LCR_PatternDisplay(0); //Stop projection
+
+            //Grab new images from the imageList starting at current layerCount, capped at max image upload
             QListWidgetItem * item;
             QStringList imageList;
             uint count = 0;
@@ -695,48 +744,48 @@ void MainWindow::PrintProcess(void)
                         break;
                     }
             }
-            if (PrintScript == ON)
-            {
-                ui->ProgramPrints->append("Using Print Script");
-            }
+
+            //Add patterns to local memory, upload to light engine, then clear local memory
             DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0);
             DLP.updateLUT(ProjectionMode);
             DLP.clearElements();
-            remainingImages = count - 1;
-            layerCount++;
-            Sleep(50);
-            DLP.startPatSequence();
-            if(PrinterType == ICLIP){
+
+            remainingImages = count - 1; //Set the remaining images to the # of images uploaded - 1
+            layerCount++; //Update layer count
+            Sleep(50); //Add delay to allow for light engine process to run
+            DLP.startPatSequence(); //Start projection
+            if(PrinterType == ICLIP){ //delay is needed for iCLIP printer only
                 Sleep(500);
             }
-            SetExposureTimer(0, PrintScript, PumpingMode);
-            if(MotionMode == 1){
-                //SMC.AbsoluteMove(PrintEnd);
+            SetExposureTimer(0, PrintScript, PumpingMode); //Set the exposure time
+
+            //if in continuous motion mode restart movement
+            if(MotionMode == CONTINUOUS){
                 Stage.StageAbsoluteMove(PrintEnd, StageType);
-            }
-            else{
-                //updatePlot();
+                inMotion = true;
             }
             ui->ProgramPrints->append("Reupload succesful, current layer: " + QString::number(layerCount));
             ui->ProgramPrints->append(QString::number(remainingImages + 1) + " images uploaded");
         }
+        //If in intial exposure mode
         else if (InitialExposureFlag == true)
         {
-            SetExposureTimer(InitialExposureFlag, PrintScript, PumpingMode);
+            SetExposureTimer(InitialExposureFlag, PrintScript, PumpingMode); //Set exposure timer with InitialExposureFlag high
             updatePlot();
-            InitialExposureFlag = false;
+            InitialExposureFlag = false; //Set InitialExposureFlag low
+            inMotion = false; //Stage is currently not in motion, used for continuos stage movement
             ui->ProgramPrints->append("POTF Exposing Initial Layer " + QString::number(InitialExposure) + "s");
-            inMotion = false;
         }
         else
         {
-            SetExposureTimer(0, PrintScript, PumpingMode);
+            SetExposureTimer(0, PrintScript, PumpingMode); //set exposure time
             ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
+
+            //Grab the current image file name and print to
             QString filename =ui->FileList->item(layerCount)->text();
-            ui->ProgramPrints->append("POTF Exposing: " + QString::number(ExposureTime/1000) + " ms");
             ui->ProgramPrints->append("Image File: " + filename);
-            layerCount++;
-            remainingImages--;
+            layerCount++; //Update layerCount for new layer
+            remainingImages--; //Decrement remaining image counter
             if(MotionMode == STEPPED){
                 updatePlot();
             }
@@ -749,40 +798,12 @@ void MainWindow::PrintProcess(void)
             double OldPosition = GetPosition;
             emit(on_GetPosition_clicked());
             ui->ProgramPrints->append("Stage moved: " + QString::number(OldPosition - GetPosition));
-            if (ProjectionMode == 1)
-            {
-                QPixmap img(filename);
-                ImagePopoutUI->showImage(img);
-            }
         }
         return;
     }
     else
     {
-        ui->ProgramPrints->append("Print Complete");
-        saveText();
-        saveSettings();
-
-        //SMC.StopMotion();
-        Stage.StageStop(StageType);
-        LCR_PatternDisplay(0);
-        Sleep(50);
-        //SMC.SetVelocity(2);
-        Stage.SetStageVelocity(2, StageType);
-        Sleep(50);
-        emit(on_GetPosition_clicked());
-        Sleep(50);
-        if (MinEndOfRun > 0)
-        {
-            Stage.StageAbsoluteMove(MinEndOfRun, StageType);
-            //SMC.AbsoluteMove(MinEndOfRun);
-        }
-        else
-        {
-           Stage.StageAbsoluteMove(0, StageType);
-           //SMC.AbsoluteMove(0);
-        }
-        return;
+        PrintComplete();
     }
 }
 
@@ -803,12 +824,6 @@ void MainWindow::PrintProcessVP()
             QListWidgetItem * item;
             QStringList imageList;
             uint count = 0;
-            //if (BitMode == 8){
-              //  uploadCount = 16;
-            //}
-            //else{
-             //   uploadCount = 5;
-            //}
             for(int i = FrameCount; i < FrameCount + (5*BitMode); i++)
             {
                 for (int j = 0; j < (24/BitMode); j++)
@@ -852,7 +867,6 @@ void MainWindow::PrintProcessVP()
             ReSyncFlag = 1; //resync after intial exposure
             ui->ProgramPrints->append("VP Exposing Initial Layer " + QString::number(InitialExposure) + "s");
             InitialExposureFlag = 0;
-            //layerCount++;
         }
         else //Normal print process
         {
@@ -873,32 +887,7 @@ void MainWindow::PrintProcessVP()
     }
     else //print complete
     {
-        //USB_Close();
-        ui->ProgramPrints->append("Print Complete");
-        saveText();
-        saveSettings();
-        Stage.StageStop(StageType);
-        //SMC.StopMotion();
-        Sleep(50);
-        Stage.SetStageVelocity(2, StageType);
-        //SMC.SetVelocity(2);
-        Sleep(50);
-        emit(on_GetPosition_clicked());
-        Sleep(50);
-        if (PrinterType == CLIP30UM){
-            if (MinEndOfRun > 0){
-                //SMC.AbsoluteMove(MinEndOfRun);
-                Stage.StageAbsoluteMove(MinEndOfRun, StageType);
-            }
-            else{
-               //SMC.AbsoluteMove(0);
-                Stage.StageAbsoluteMove(0, StageType);
-            }
-        }
-        else if(PrinterType == ICLIP){
-            Pump.Stop();
-        }
-        return;
+        PrintComplete();
     }
 }
 
@@ -910,7 +899,6 @@ void MainWindow::PrintProcessVP()
 void MainWindow::pumpingSlot(void)
 {
     QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-    //SMC.RelativeMove(-PumpingParameter); //Move the stage back the desired pumping distance
     if(PrintScript == ON){
         if (layerCount < PumpHeightScriptList.size()){
             Stage.StageRelativeMove(-PumpHeightScriptList.at(layerCount).toDouble(), StageType);
@@ -929,71 +917,54 @@ void MainWindow::pumpingSlot(void)
  */
 void MainWindow::ExposureTimeSlot(void)
 {
-    if (MotionMode == 0){
-        SetDarkTimer(PrintScript);
-        ui->ProgramPrints->append(QTime::currentTime().toString("hh.mm.ss.zzz"));
-    }
+    //Set dark timer first for most accurate timing
+    SetDarkTimer(PrintScript, MotionMode); //Set dark timer first for best timing
+    //Record current time in terminal
+    ui->ProgramPrints->append(QTime::currentTime().toString("hh.mm.ss.zzz"));
+    updatePlot(); //update plot early in dark time
 
-    updatePlot();
-
+    //Video pattern mode handling
     if (ProjectionMode == VIDEOPATTERN) //If in video pattern mode
     {
-        //Add if statement here if last exposure time
-        if (PrintScript == ON && layerCount > 0)
-        {
-            if((ExposureScriptList.at(layerCount).toInt()) != ExposureScriptList.at(layerCount - 1).toInt())
-            {
-
-            }
-        }
         if (BitLayer > 24) //If end of frame has been reached
         {
             FrameCount++; //increment frame counter
             ui->ProgramPrints->append("New Frame: " + QString::number(FrameCount));
-            if (FrameCount < ui->FileList->count()){
+            if (FrameCount < ui->FileList->count()){ //if not at end of file list
                 QPixmap img(ui->FileList->item(FrameCount)->text()); //select next image
                 ImagePopoutUI->showImage(img); //display next image
             }
-            BitLayer = 1;
-            ReSyncCount++;
+            BitLayer = 1; //Reset BitLayer to first layer
+            ReSyncCount++; //Add to the resync count
+            //If 120 frames have been reached, prepare for resync
             if (ReSyncCount > (120-24)/(24/BitMode)){
                 ReSyncFlag = 1;
                 ReSyncCount = 0;
             }
         }
-        emit(on_GetPosition_clicked());
     }
+
+    //Print Script handling
+    if(PrintScript == ON)
+    {
+        PrintScriptApply(layerCount, ExposureScriptList, EXPOSURE_TIME);
+        PrintScriptApply(layerCount, LEDScriptList, LED_INTENSITY);
+        PrintScriptApply(layerCount, DarkTimeScriptList, DARK_TIME);
+        PrintScriptApply(layerCount, LayerThicknessScriptList, LAYER_THICKNESS);
+        PrintScriptApply(layerCount, StageVelocityScriptList, STAGE_VELOCITY);
+        PrintScriptApply(layerCount, StageAccelerationScriptList, STAGE_ACCELERATION);
+        if (PumpingMode == ON){
+            PrintScriptApply(layerCount, PumpHeightScriptList, PUMP_HEIGHT);
+        }
+        if (PrinterType == ICLIP){
+            PrintScriptApply(layerCount, InjectionVolumeScriptList, INJECTION_VOLUME);
+            PrintScriptApply(layerCount, InjectionRateScriptList, INJECTION_RATE);
+        }
+    }
+
+    //Injection handling
     if (PrinterType == ICLIP)
     {
-        if (PrintScript == ON)
-        {
-            if(layerCount < InjectionRateScriptList.size() && layerCount < InjectionVolumeScriptList.size())
-            {
-                if (layerCount > 0){
-                    if ((InjectionRateScriptList.at(layerCount).toInt()) == InjectionRateScriptList.at(layerCount-1).toInt()){
-                        //do nothing, this avoids spamming the light engine when LED intensity is constant
-                    }
-                    else{
-                         Pump.SetInfuseRate(InjectionRateScriptList.at(layerCount).toDouble());
-                         ui->LiveValue5->setText(QString::number(InjectionRateScriptList.at(layerCount).toDouble()));
-                         Sleep(10);
-                    }
-                    if ((InjectionVolumeScriptList.at(layerCount).toInt()) == InjectionVolumeScriptList.at(layerCount-1).toInt()){
-                        //do nothing, this avoids spamming the light engine when LED intensity is constant
-
-                    }
-                    else{
-                         Pump.SetTargetVolume(InjectionVolumeScriptList.at(layerCount).toDouble());
-                         ui->LiveValue4->setText(QString::number(InjectionVolumeScriptList.at(layerCount).toDouble()));
-                    }
-                }
-                else{
-                    Pump.SetInfuseRate(InjectionRateScriptList.at(layerCount).toDouble());
-                    Sleep(10);
-                    Pump.SetTargetVolume(InjectionVolumeScriptList.at(layerCount).toDouble());
-                }
-            }
-        }
         if (InjectionDelayFlag == PRE){
             PrintInfuse();
             QTimer::singleShot(InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove()));
@@ -1012,66 +983,10 @@ void MainWindow::ExposureTimeSlot(void)
         }
         ui->ProgramPrints->append("Injecting " + QString::number(InfusionVolume) + "ul at " + QString::number(InfusionRate) + "ul/s");
     }
-
-    if(MotionMode == 0){
-        if(PumpingMode == 1){
-            emit(on_GetPosition_clicked());
-            updatePlot();
-            StageMove();
-            //Stage.StageRelativeMove(PumpingParameter - SliceThickness, StageType);
-            //SMC.RelativeMove((PumpingParameter - SliceThickness)); //pumping param is in um, slicethickness is in mm
-        }
-        else{
-            //SMC.RelativeMove(-SliceThickness);
-            if (PrinterType == CLIP30UM){
-               //Stage.StageRelativeMove(-SliceThickness, StageType);
-                StageMove();
-            }
-        }
-
-        if(PrintScript == 1)
-        {
-            if (layerCount < LEDScriptList.size()){
-                if (layerCount > 0)
-                {
-                    if ((LEDScriptList.at(layerCount).toInt()) == LEDScriptList.at(layerCount-1).toInt()){
-                        //do nothing, this avoids spamming the light engine when LED intensity is constant
-                    }
-                    else{
-                         LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
-                         ui->LiveValue2->setText(QString::number(LEDScriptList.at(layerCount).toInt()));
-                    }
-                }
-                else
-                {
-                    LCR_SetLedCurrents(0, 0, (LEDScriptList.at(layerCount).toInt()));
-                }
-                ui->ProgramPrints->append("LED Intensity: " + LEDScriptList.at(layerCount));
-            }
-            else{
-                ui->ProgramPrints->append(QString::number(layerCount) + QString::number(sizeof(LEDScriptList)));
-            }
-
-        }
-        if (PrintScript == ON){
-            if(layerCount < DarkTimeScriptList.size()){
-                ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTimeScriptList.at(layerCount).toDouble()));
-                ui->LiveValue1->setText(QString::number(ExposureScriptList.at(layerCount).toInt()));
-                ui->LiveValue3->setText(QString::number(DarkTimeScriptList.at(layerCount).toInt()));
-                ui->ProgramPrints->append("Moving Stage: " + QString::number(LayerThicknessScriptList.at(layerCount).toDouble()) + " um");
-            }
-        }
-        else{
-            ui->ProgramPrints->append("Dark Time: " + QString::number(DarkTime/1000) + " ms");
-            ui->ProgramPrints->append("Moving Stage: " + QString::number(SliceThickness*1000) + " um");
-        }
-    }
-    else if(MotionMode == 1){
-        if (inMotion == false){
-            //SMC.AbsoluteMove(PrintEnd);
-            Stage.StageAbsoluteMove(PrintEnd, StageType);
-        }
-        PrintProcess();
+    else{
+        StageMove();
+        Sleep(5); //5 ms delay for stage com
+        emit(on_GetPosition_clicked());
     }
 }
 
@@ -1121,24 +1036,38 @@ void MainWindow::SetExposureTimer(int InitialExposureFlag, int PrintScript, int 
     }
 }
 
-void MainWindow::SetDarkTimer(int PrintScript)
+void MainWindow::SetDarkTimer(int PrintScript, int MotionMode)
 {
-    if (PrintScript == ON){
-        if(layerCount < DarkTimeScriptList.size()){
-            QTimer::singleShot(DarkTimeScriptList.at(layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+    double DarkTimeSelect = DarkTime;
+    if (MotionMode == STEPPED)
+    {
+        if (PrintScript == ON){
+            if(layerCount < DarkTimeScriptList.size()){
+                DarkTimeSelect = DarkTimeScriptList.at(layerCount).toDouble();
+            }
+            else{
+                DarkTimeSelect = DarkTimeScriptList.at(layerCount-2).toDouble();
+            }
         }
         else{
-            QTimer::singleShot(DarkTimeScriptList.at(layerCount-2).toDouble(), Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+            showError("Dark time settings error, SetDarkTime");
+
         }
-    }
-    else if(PrintScript == OFF){
-        QTimer::singleShot(DarkTime/1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        QTimer::singleShot(DarkTimeSelect/1000,  Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        ui->ProgramPrints->append("Dark time: " + QString::number(DarkTimeSelect));
     }
     else{
-        showError("Dark time settings error, SetDarkTime");
+        if (inMotion == false){
+            Stage.StageAbsoluteMove(PrintEnd, StageType);
+        }
+        PrintProcess();
     }
 }
 
+/**
+ * @brief MainWindow::PrintInfuse
+ * Function for handling injection for iCLIP
+ */
 void MainWindow::PrintInfuse()
 {
     if (ContinuousInjection == OFF){
@@ -1148,6 +1077,8 @@ void MainWindow::PrintInfuse()
         ui->ProgramPrints->append("PrintInfuse");
     }
 }
+
+
 /*********************************************File Handling*********************************************/
 /**
  * @brief MainWindow::on_SelectFile_clicked
@@ -1191,7 +1122,6 @@ void MainWindow::on_LogFileBrowse_clicked()
 void MainWindow::on_ClearImageFiles_clicked()
 {
     ui->FileList->clear();
-    //initConfirmationScreen();
 }
 
 /**
@@ -1805,6 +1735,7 @@ void MainWindow::on_LiveValueList6_activated(const QString &arg1)
  */
 void MainWindow::showError(QString errMsg)
 {
+    ui->ProgramPrints->append("ERROR: " + errMsg);
     QMessageBox errMsgBox;
     char errStr[128];
 
@@ -2399,32 +2330,129 @@ void MainWindow::updatePlot()
 /*************************************************************
  * ********************Development***************************
  * ***********************************************************/
+/**
+ * @brief MainWindow::PrintEnd
+ */
+void MainWindow::PrintComplete()
+{
+    ui->ProgramPrints->append("Print Complete");
+    saveText();
+    saveSettings();
+    Stage.StageStop(StageType);
+    Sleep(50);
+    Stage.SetStageVelocity(2, StageType);
+    Sleep(50);
+    emit(on_GetPosition_clicked());
+    Sleep(50);
+    if (PrinterType == CLIP30UM){
+        if (MinEndOfRun > 0){
+            Stage.StageAbsoluteMove(MinEndOfRun, StageType);
+        }
+        else{
+            Stage.StageAbsoluteMove(0, StageType);
+        }
+    }
+    else if(PrinterType == ICLIP){
+        Pump.Stop();
+    }
+}
+
+/**
+ * @brief MainWindow::PrintScriptValidate
+ * @param layerCount
+ * @param Script
+ * @return
+ * Validating printscript to avoid segmentation faults
+ */
+bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, DynamicVariable_t DynamicVar)
+{
+    bool returnVal = false; //set default to be false
+    if (layerCount > 0){
+        if (layerCount < Script.size()){
+            if (Script.at(layerCount).toDouble() == Script.at(layerCount - 1).toDouble()){
+                //do nothing to avoid spamming
+            }
+            else{
+                returnVal = true;
+                switch(DynamicVar)
+                {
+                    case EXPOSURE_TIME:
+                        //don't need to account for this atm
+                        ui->LiveValue1->setText(QString::number(ExposureScriptList.at(layerCount).toInt()));
+                        break;
+                    case LED_INTENSITY:
+                        LCR_SetLedCurrents(0, 0, (Script.at(layerCount).toInt()));
+                        ui->LiveValue2->setText(QString::number(Script.at(layerCount).toInt()));
+                        ui->ProgramPrints->append("LED Intensity set to: " + QString::number(Script.at(layerCount).toInt()));
+                        break;
+                    case DARK_TIME:
+                        ui->ProgramPrints->append("Dark Time set to: " + QString::number(Script.at(layerCount).toDouble()));
+                        ui->LiveValue3->setText(QString::number(Script.at(layerCount).toInt()));
+                        break;
+                    case LAYER_THICKNESS:
+                        //Currently handled by StageMove() function
+                        break;
+                    case STAGE_VELOCITY:
+                        Stage.SetStageVelocity(Script.at(layerCount).toDouble(), StageType);
+                        ui->ProgramPrints->append("New stage velocity set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
+                        Sleep(10); //delay for stage com
+                        break;
+                    case STAGE_ACCELERATION:
+                        Stage.SetStageAcceleration(Script.at(layerCount).toDouble(), StageType);
+                        ui->ProgramPrints->append("New stage acceleration set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
+                        Sleep(10); //delay for stage com
+                        break;
+                    case PUMP_HEIGHT:
+                        //currently handled by StageMove function
+                        break;
+                    case INJECTION_VOLUME:
+                        Pump.SetTargetVolume(InjectionVolumeScriptList.at(layerCount).toDouble());
+                        ui->LiveValue4->setText(QString::number(InjectionVolumeScriptList.at(layerCount).toDouble()));
+                        ui->ProgramPrints->append("Injection Volume set to : " + QString::number(InjectionVolumeScriptList.at(layerCount).toDouble()));
+                        break;
+                    case INJECTION_RATE:
+                        Pump.SetInfuseRate(InjectionRateScriptList.at(layerCount).toDouble());
+                        ui->LiveValue5->setText(QString::number(InjectionRateScriptList.at(layerCount).toDouble()));
+                        ui->ProgramPrints->append("Injection Rate set to: " + QString::number(InjectionRateScriptList.at(layerCount).toDouble()));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+    else{ //If layercount = 0, or first layer
+        switch(DynamicVar)
+        {
+            case INJECTION_VOLUME:
+                Pump.SetInfuseRate(InjectionRateScriptList.at(layerCount).toDouble());
+                break;
+            case INJECTION_RATE:
+                Pump.SetTargetVolume(InjectionVolumeScriptList.at(layerCount).toDouble());
+                break;
+            default:
+                break;
+        }
+
+    }
+    return returnVal;
+}
+
+/**
+ * @brief MainWindow::StageMove
+ *
+ */
 void MainWindow::StageMove()
 {
+    //If printscript is active, filter out layerCount = 0 and layerCount is greater than script length
     if (PrintScript == ON){
         if (layerCount > 0){
-            if(layerCount < StageVelocityScriptList.size() && layerCount < StageAccelerationScriptList.size()){
-                    if(StageVelocityScriptList.at(layerCount).toDouble() == StageVelocityScriptList.at(layerCount-1).toDouble()){
-                        //do nothing as velocity is the same
-                    }
-                    else{
-                        Stage.SetStageVelocity(StageVelocityScriptList.at(layerCount).toDouble(), StageType);
-                        ui->ProgramPrints->append("New stage velocity set to: " + QString::number(StageVelocityScriptList.at(layerCount).toDouble()) + " mm/s");
-                        Sleep(10); //delay for stage com
-                    }
-                    if(StageAccelerationScriptList.at(layerCount).toDouble() == StageAccelerationScriptList.at(layerCount-1).toDouble()){
-                        //do nothing as acceleration is the same
-                    }
-                    else{
-                        Stage.SetStageAcceleration(StageVelocityScriptList.at(layerCount).toDouble(), StageType);
-                        ui->ProgramPrints->append("New stage acceleration set to: " + QString::number(StageAccelerationScriptList.at(layerCount).toDouble()) + " mm/s");
-                        Sleep(10); //delay for stage com
-                    }
-                }
             if (layerCount < LayerThicknessScriptList.size() && layerCount < StageAccelerationScriptList.size()){
-                double LayerThickness = LayerThicknessScriptList.at(layerCount).toDouble()/1000;
-                ui->ProgramPrints->append("Layer Thickness set to: " + QString::number(LayerThicknessScriptList.at(layerCount).toDouble()) + " um");
-                Stage.StageRelativeMove(-LayerThickness, StageType);
+                double LayerThickness = LayerThicknessScriptList.at(layerCount).toDouble()/1000; //grab layer thickness from script list
+                ui->ProgramPrints->append("Moving Stage: " + QString::number(LayerThicknessScriptList.at(layerCount).toDouble()) + " um");
+                Stage.StageRelativeMove(-LayerThickness, StageType); //Move stage 1 layer thickness
+
+                //If pumping mode is active, grab pump height from script and move stage Pump height - layer thickness
                 if (PumpingMode == ON){
                     double PumpParam = PumpHeightScriptList.at(layerCount).toDouble();
                     Stage.StageRelativeMove(PumpParam - LayerThickness, StageType);
@@ -2435,12 +2463,13 @@ void MainWindow::StageMove()
     else{
         if (PumpingMode == ON){
             Stage.StageRelativeMove(PumpingParameter - SliceThickness, StageType);
+            ui->ProgramPrints->append("Pumping active, moving stage: " + QString::number(PumpingParameter - SliceThickness) + " um");
         }
         else{
             Stage.StageRelativeMove(-SliceThickness, StageType);
+            ui->ProgramPrints->append("Moving stage: " + QString::number(SliceThickness) + " um");
         }
     }
-    ui->ProgramPrints->append("StageMove");
 }
 
 /**
