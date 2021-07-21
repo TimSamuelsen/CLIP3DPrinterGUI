@@ -90,7 +90,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    images/CLIP3Dresources.qrc
+    images/CLIP3Dresources.qrc \
+    images/breeze.qrc
 
 win32: LIBS += -lSetupAPI
 #OpenCV libs

@@ -14,7 +14,8 @@ int main(int argc, char *argv[])
     a.setApplicationName("CLIP3DGUI");
     a.setWindowIcon(QIcon(":/new/pics/testicon.ico"));
 
-    QFile styleSheetFile(":/new/pics/Ubuntu.qss");
+    //QFile styleSheetFile(":/images/dark/stylesheet.qss");
+    QFile styleSheetFile(":/light/stylesheet.qss");
     styleSheetFile.open(QFile::ReadOnly);
     QString styleSheet { QLatin1String(styleSheetFile.readAll()) };
     a.setStyleSheet(styleSheet);

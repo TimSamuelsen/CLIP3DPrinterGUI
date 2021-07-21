@@ -770,9 +770,9 @@ QPushButton#AbortPrint:hover:!pressed {
    <widget class="QLabel" name="StageConnectTitle">
     <property name="geometry">
      <rect>
-      <x>800</x>
+      <x>820</x>
       <y>640</y>
-      <width>121</width>
+      <width>101</width>
       <height>31</height>
      </rect>
     </property>
@@ -1119,6 +1119,9 @@ QPushButton#AbortPrint:hover:!pressed {
       <height>301</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255);</string>
+    </property>
     <property name="frameShape">
      <enum>QFrame::Box</enum>
     </property>
@@ -1126,7 +1129,7 @@ QPushButton#AbortPrint:hover:!pressed {
      <enum>QFrame::Raised</enum>
     </property>
     <property name="lineWidth">
-     <number>1</number>
+     <number>3</number>
     </property>
     <widget class="QFrame" name="frame_4">
      <property name="geometry">
