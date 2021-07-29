@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Image Processing</string>
   </property>
   <widget class="QLabel" name="ImageDisplay">
    <property name="geometry">
@@ -51,6 +51,9 @@
      <height>192</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);</string>
+   </property>
   </widget>
   <widget class="QTextBrowser" name="TerminalOut">
    <property name="geometry">
@@ -60,6 +63,9 @@
      <width>281</width>
      <height>541</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);</string>
    </property>
   </widget>
   <widget class="QPushButton" name="ClearImageFiles">
@@ -177,6 +183,9 @@
      <width>301</width>
      <height>211</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);</string>
    </property>
   </widget>
   <widget class="QProgressBar" name="encodeProgress">

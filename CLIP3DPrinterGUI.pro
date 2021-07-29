@@ -11,6 +11,9 @@ INCLUDEPATH += "src"
 INCLUDEPATH += "src/serialib"
 INCLUDEPATH += "src/qcustomplot"
 
+
+RC_ICONS = DeSimoneLogo.ico
+
 SOURCES += \
     src/SMC100C.cpp \
     src/dlp9000.cpp \

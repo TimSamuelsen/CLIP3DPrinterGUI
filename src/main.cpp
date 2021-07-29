@@ -12,10 +12,10 @@ int main(int argc, char *argv[])
     a.setOrganizationName("MyOrganization");
     a.setOrganizationDomain("MyDomain");
     a.setApplicationName("CLIP3DGUI");
-    a.setWindowIcon(QIcon(":/new/pics/testicon.ico"));
 
-    //QFile styleSheetFile(":/images/dark/stylesheet.qss");
+    //QFile styleSheetFile(":/dark/stylesheet.qss");
     QFile styleSheetFile(":/light/stylesheet.qss");
+    //QFile styleSheetFile(":/new/pics/Ubuntu.qss");
     styleSheetFile.open(QFile::ReadOnly);
     QString styleSheet { QLatin1String(styleSheetFile.readAll()) };
     a.setStyleSheet(styleSheet);

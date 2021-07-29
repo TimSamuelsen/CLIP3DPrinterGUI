@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/new/pics">
         <file>desimone_lab_wordmark-nobg.png</file>
-        <file>testicon.ico</file>
         <file>Ubuntu.qss</file>
     </qresource>
 </RCC>

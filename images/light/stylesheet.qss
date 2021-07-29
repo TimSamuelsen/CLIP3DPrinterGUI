@@ -744,9 +744,9 @@ QPushButton
     background-color: #eaebec;
     border: 0.04em solid #bab9b8;
     padding: 0.23em;
-    border-radius: 0.09em;
     outline: none;
     min-height: 1.1em;
+	border-radius: 6px;
 }
 
 QComboBox:open,
@@ -754,12 +754,14 @@ QPushButton:open
 {
     border-width: 0.04em;
     border-color: #bab9b8;
+	border-radius: 6px;
 }
 
 QComboBox:closed,
 QPushButton:closed
 {
     border-width: 0.04em;
+	border-radius: 6px;
     border-color: #bab9b8;
 }
 
@@ -773,7 +775,7 @@ QPushButton:disabled
     padding-bottom: 0.23em;
     padding-left: 1ex;
     padding-right: 1ex;
-    border-radius: 0.04em;
+    border-radius: 6px;
     color: #b4b4b4;
 }
 
@@ -787,6 +789,7 @@ QPushButton:pressed
     background-color: #bedfec;
     padding-top: -0.65em;
     padding-bottom: -0.74em;
+	border-radius: 6px;
     color: #31363b;
 }
 
@@ -807,6 +810,7 @@ QPushButton:checked
 {
     background-color: #c7c7c6;
     border: 0.04em solid #bab9b8;
+	border-radius: 6px;
     color: #31363b;
 }
 
@@ -814,6 +818,7 @@ QPushButton:hover
 {
     background-color: #eaebec;
     border: 0.04em solid rgba(51, 164, 223, 0.5);
+	border-radius: 6px;
     color: #31363b;
 }
 
@@ -821,6 +826,7 @@ QPushButton:checked:hover
 {
     background-color: #c7c7c6;
     border: 0.04em solid rgba(51, 164, 223, 0.5);
+	border-radius: 6px;
     color: #31363b;
 }
 
@@ -1838,7 +1844,6 @@ QToolBox
 QToolBox::tab
 {
     border-bottom: 0.09em solid #bab9b8;
-    margin-left: 1.5em;
 }
 
 QToolBox::tab:selected,

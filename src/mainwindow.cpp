@@ -277,6 +277,7 @@ void MainWindow::on_POTFcheckbox_clicked()
     if (ui->POTFcheckbox->isChecked())
     {
         ui->VP_HDMIcheckbox->setChecked(false); //Uncheck the Video Pattern checkbox
+        EnableParameter(MAX_IMAGE, ON);
         ProjectionMode = POTF; //Set projection mode to POTF
         DLP.setIT6535Mode(0); //Turn off HDMI connection
         LCR_SetMode(PTN_MODE_OTF); //Set light engine to POTF mode
@@ -293,6 +294,7 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
     if (ui->VP_HDMIcheckbox->isChecked())
     {
         ui->POTFcheckbox->setChecked(false); //Uncheck the Video Pattern checkbox
+        EnableParameter(MAX_IMAGE, OFF);
         initImagePopout(); //Open projection window
         ProjectionMode = VIDEOPATTERN; //Set projection mode to video pattern
 
@@ -408,24 +410,18 @@ void MainWindow::on_DICLIPSelect_clicked()
     PrinterType = ICLIP; //Update printer type
 
     //Enable the injection parameters
-    ui->ContinuousInjection->setEnabled(true);
-    ui->VolPerLayerParam->setEnabled(true);
-    ui->SetVolPerLayer->setEnabled(true);
-    ui->InfuseRateParam->setEnabled(true);
-    ui->SetInfuseRate->setEnabled(true);
-    ui->InitialVolumeParam->setEnabled(true);
-    ui->SetInitialVolume->setEnabled(true);
+    EnableParameter(CONTINUOUS_INJECTION, ON);
+    EnableParameter(INJECTION_VOLUME, ON);
+    EnableParameter(INJECTION_RATE, ON);
+    EnableParameter(INITIAL_VOLUME, ON);
+    EnableParameter(INJECTION_DELAY, ON);
 
     //Disable the starting position selection
-    ui->StartingPositionParam->setEnabled(false);
-    ui->SetStartingPosButton->setEnabled(false);
+    EnableParameter(STARTING_POSITION, OFF);
 
     //Disable the stage software limits
-    ui->MaxEndOfRun->setEnabled(false);
-    ui->SetMaxEndOfRun->setEnabled(false);
-    ui->MinEndOfRunParam->setEnabled(false);
-    ui->SetMinEndOfRun->setEnabled(false);
-
+    EnableParameter(MAX_END, OFF);
+    EnableParameter(MIN_END, OFF);
 }
 
 /**
@@ -437,26 +433,19 @@ void MainWindow::on_CLIPSelect_clicked()
     StageType = STAGE_SMC; //Set stage to SMC100CC for the 30 um CLIP printer
     PrinterType = CLIP30UM; //Update printer type
 
-    //Disable injection parameters
-    ui->ContinuousInjection->setEnabled(false);
-    ui->VolPerLayerParam->setEnabled(false);
-    ui->SetVolPerLayer->setEnabled(false);
-    ui->InfuseRateParam->setEnabled(false);
-    ui->SetInfuseRate->setEnabled(false);
-    ui->InitialVolumeParam->setEnabled(false);
-    ui->SetInitialVolume->setEnabled(false);
+    //Disable the injection parameters
+    EnableParameter(CONTINUOUS_INJECTION, OFF);
+    EnableParameter(INJECTION_VOLUME, OFF);
+    EnableParameter(INJECTION_RATE, OFF);
+    EnableParameter(INITIAL_VOLUME, OFF);
+    EnableParameter(INJECTION_DELAY, OFF);
 
-    //Enable starting position selection
-    ui->StartingPositionParam->setEnabled(true);
-    ui->SetStartingPosButton->setEnabled(true);
+    //Enable the starting position selection
+    EnableParameter(STARTING_POSITION, ON);
 
-    //Enable stage acceleration and software limits
-    ui->StageAccelParam->setEnabled(true);
-    ui->SetStageAcceleration->setEnabled(true);
-    ui->MaxEndOfRun->setEnabled(true);
-    ui->SetMaxEndOfRun->setEnabled(true);
-    ui->MinEndOfRunParam->setEnabled(true);
-    ui->SetMinEndOfRun->setEnabled(true);
+    //Enable the stage software limits
+    EnableParameter(MAX_END, ON);
+    EnableParameter(MIN_END, ON);
 }
 
 
@@ -483,7 +472,7 @@ void MainWindow::on_SteppedMotion_clicked()
         MotionMode = STEPPED; //Set MotionMode to STEPPED
         ui->ContinuousMotion->setChecked(false); //Updates UI to reflect stepped mode
         ui->ProgramPrints->append("Stepped Motion Selected");
-        ui->SetDarkTime->setEnabled(true); //Enable dark time selection
+        EnableParameter(DARK_TIME, ON); //Enable dark time selection
     }
 }
 
@@ -502,8 +491,8 @@ void MainWindow::on_ContinuousMotion_clicked()
 
         //Disable dark time and set it to 0, because there is no dark time in Continuous mode
         DarkTime = 0;
+        EnableParameter(DARK_TIME, OFF);
         ui->DarkTimeParam->setValue(0);
-        ui->SetDarkTime->setEnabled(false);
     }
 }
 
@@ -519,16 +508,14 @@ void MainWindow::on_pumpingCheckBox_clicked()
         PumpingMode = ON; //Enable pumping mode
 
         //Update UI
-        ui->pumpingParameter->setEnabled(true);
-        ui->setPumping->setEnabled(true);
+        EnableParameter(PUMP_HEIGHT, ON);
         ui->ProgramPrints->append("Pumping Enabled");
     }
     else{
         PumpingMode = OFF; //Disable pumping mode
 
         //Update UI
-        ui->pumpingParameter->setEnabled(false);
-        ui->setPumping->setEnabled(false);
+        EnableParameter(PUMP_HEIGHT, OFF);
         ui->ProgramPrints->append("Pumping Disabled");
     }
 }
@@ -1137,12 +1124,15 @@ void MainWindow::on_UsePrintScript_clicked()
         ui->ClearPrintScript->setEnabled(true);
         ui->PrintScriptFile->setEnabled(true);
 
-        ui->ExposureTimeParam->setEnabled(false);
-        ui->SetExposureTime->setEnabled(false);
-        ui->UVIntensityParam->setEnabled(false);
-        ui->SetUVIntensity->setEnabled(false);
-        ui->DarkTimeParam->setEnabled(false);
-        ui->SetDarkTime->setEnabled(false);
+        EnableParameter(EXPOSURE_TIME, OFF);
+        EnableParameter(LED_INTENSITY, OFF);
+        EnableParameter(DARK_TIME, OFF);
+        EnableParameter(LAYER_THICKNESS, OFF);
+        EnableParameter(STAGE_VELOCITY, OFF);
+        EnableParameter(STAGE_ACCELERATION, OFF);
+        EnableParameter(PUMP_HEIGHT, OFF);
+        EnableParameter(INJECTION_VOLUME, OFF);
+        EnableParameter(INJECTION_RATE, OFF);
     }
     else //printscript is not checked
     {
@@ -1151,12 +1141,15 @@ void MainWindow::on_UsePrintScript_clicked()
         ui->ClearPrintScript->setEnabled(false);
         ui->PrintScriptFile->setEnabled(false);
 
-        ui->ExposureTimeParam->setEnabled(true);
-        ui->SetExposureTime->setEnabled(true);
-        ui->UVIntensityParam->setEnabled(true);
-        ui->SetUVIntensity->setEnabled(true);
-        ui->DarkTimeParam->setEnabled(true);
-        ui->SetDarkTime->setEnabled(true);
+        EnableParameter(EXPOSURE_TIME, ON);
+        EnableParameter(LED_INTENSITY, ON);
+        EnableParameter(DARK_TIME, ON);
+        EnableParameter(LAYER_THICKNESS, ON);
+        EnableParameter(STAGE_VELOCITY, ON);
+        EnableParameter(STAGE_ACCELERATION, ON);
+        EnableParameter(PUMP_HEIGHT, ON);
+        EnableParameter(INJECTION_VOLUME, ON);
+        EnableParameter(INJECTION_RATE, ON);
     }
 }
 
@@ -2297,7 +2290,7 @@ void MainWindow::updatePlot()
     QCPItemText *textLabel1 = new QCPItemText(ui->LivePlot);
     textLabel1->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
     textLabel1->position->setType(QCPItemPosition::ptAxisRectRatio);
-    textLabel1->position->setCoords(0.98, 0.05); // place position at center/top of axis rect
+    textLabel1->position->setCoords(0.98, 0.07); // place position at center/top of axis rect
     textLabel1->setText(Layer);
     textLabel1->setFont(QFont(font().family(), 12)); // make font a bit larger
     textLabel1->setPen(QPen(Qt::black)); // show black border around text
@@ -2330,6 +2323,93 @@ void MainWindow::updatePlot()
 /*************************************************************
  * ********************Development***************************
  * ***********************************************************/
+
+void MainWindow::EnableParameter(Parameter_t Parameter, bool State)
+{
+    switch(Parameter)
+    {
+        case EXPOSURE_TIME:
+            ui->ExposureTimeParam->setEnabled(State);
+            ui->SetExposureTime->setEnabled(State);
+            ui->ExposureTimeBox->setEnabled(State);
+            break;
+        case LED_INTENSITY:
+            ui->UVIntensityParam->setEnabled(State);
+            ui->SetUVIntensity->setEnabled(State);
+            ui->UVIntensityBox->setEnabled(State);
+            break;
+        case DARK_TIME:
+            ui->DarkTimeParam->setEnabled(State);
+            ui->SetDarkTime->setEnabled(State);
+            ui->DarkTimeBox->setEnabled(State);
+            break;
+        case LAYER_THICKNESS:
+            ui->SliceThicknessParam->setEnabled(State);
+            ui->SetSliceThickness->setEnabled(State);
+            ui->LayerThicknessBox->setEnabled(State);
+            break;
+        case STAGE_VELOCITY:
+            ui->StageVelocityParam->setEnabled(State);
+            ui->SetStageVelocity->setEnabled(State);
+            ui->StageVelocityBox->setEnabled(State);
+            break;
+        case STAGE_ACCELERATION:
+            ui->StageAccelParam->setEnabled(State);
+            ui->SetStageAcceleration->setEnabled(State);
+            ui->StageAccelerationBox->setEnabled(State);
+            break;
+        case PUMP_HEIGHT:
+            ui->pumpingParameter->setEnabled(State);
+            ui->setPumping->setEnabled(State);
+            break;
+        case INJECTION_VOLUME:
+            ui->VolPerLayerParam->setEnabled(State);
+            ui->SetVolPerLayer->setEnabled(State);
+            ui->VolPerLayerBox->setEnabled(State);
+            break;
+        case INJECTION_RATE:
+            ui->InfuseRateParam->setEnabled(State);
+            ui->SetInfuseRate->setEnabled(State);
+            ui->InfusionRateBox->setEnabled(State);
+            break;
+        case MAX_IMAGE:
+            ui->MaxImageUpload->setEnabled(State);
+            ui->SetMaxImageUpload->setEnabled(State);
+            ui->MaxImageUploadBox->setEnabled(State);
+            break;
+        case INITIAL_VOLUME:
+            ui->InitialVolumeParam->setEnabled(State);
+            ui->SetInitialVolume->setEnabled(State);
+            ui->InitialVolumeBox->setEnabled(State);
+            break;
+        case CONTINUOUS_INJECTION:
+            ui->ContinuousInjection->setEnabled(State);
+            break;
+        case STARTING_POSITION:
+            ui->StartingPositionParam->setEnabled(State);
+            ui->SetStartingPosButton->setEnabled(State);
+            ui->StartingPositionBox->setEnabled(State);
+            break;
+        case MAX_END:
+            ui->MaxEndOfRun->setEnabled(State);
+            ui->SetMaxEndOfRun->setEnabled(State);
+            ui->MaxEndOfRunBox->setEnabled(State);
+            break;
+        case MIN_END:
+            ui->MinEndOfRunParam->setEnabled(State);
+            ui->SetMinEndOfRun->setEnabled(State);
+            ui->MinEndOfRunBox->setEnabled(State);
+            break;
+        case INJECTION_DELAY:
+            ui->InjectionDelayParam->setEnabled(State);
+            ui->SetInjectionDelay->setEnabled(State);
+            ui->InjectionDelayBox->setEnabled(State);
+            break;
+        default:
+            break;
+    }
+}
+
 /**
  * @brief MainWindow::PrintEnd
  */
@@ -2364,7 +2444,7 @@ void MainWindow::PrintComplete()
  * @return
  * Validating printscript to avoid segmentation faults
  */
-bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, DynamicVariable_t DynamicVar)
+bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter_t DynamicVar)
 {
     bool returnVal = false; //set default to be false
     if (layerCount > 0){
@@ -2433,7 +2513,6 @@ bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, DynamicVa
             default:
                 break;
         }
-
     }
     return returnVal;
 }
