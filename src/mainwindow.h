@@ -46,6 +46,7 @@ public:
     imagepopout popout;
     manualpumpcontrol Pump;
     ManualStageControl Stage;
+    QList<PrintControls> mw_PrintControls;
 
 
 
@@ -192,11 +193,11 @@ private:
     manualpumpcontrol *ManualPumpUI;
     imageprocessing *ImageProcessUI;
     imagepopout *ImagePopoutUI;
-    QList<PrintScripts> m_PrintScript;
-    QList<PrintSettings> m_PrintSettings;
-    QList<PrintControls> m_PrintControls;
-    QList<InjectionSettings> m_InjectionSettings;
-    QList<MotionSettings> m_MotionSetttings;
+    PrintScripts m_PrintScript;
+    PrintSettings m_PrintSettings;
+    PrintControls m_PrintControls;
+    InjectionSettings m_InjectionSettings;
+    MotionSettings m_MotionSettings;
 
     bool ValidateSettings(void);
     void loadSettings();

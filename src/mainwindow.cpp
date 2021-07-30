@@ -50,10 +50,10 @@ static bool InitialExposureFlag = true; //Flag to indicate print process to do i
 //Settings are static so they can be accessed from outside anywhere in this module
 
 //Module level variables for print parameters
-static double SliceThickness;
-static double StageVelocity;
-static double StageAcceleration;
-static double StartingPosition;
+//*static double m_PrintSettings.LayerThickness;
+//*static double StageVelocity;
+//*static double StageAcceleration;
+//*static double StartingPosition;
 static double MaxEndOfRun;
 static double MinEndOfRun;
 static double ExposureTime;
@@ -107,7 +107,7 @@ QStringList LayerThicknessScriptList;
 static int PrintScript = 0; //For selecting type of printscript, currently: 0 = no printscript, 1 = exposure time print script
 
 //Projection mode parameters
-static int ProjectionMode = POTF; //For selecting projection mode, 0 = POTF mode, 1 = Video Pattern HDMI
+//*static int ProjectionMode = POTF; //For selecting projection mode, 0 = POTF mode, 1 = Video Pattern HDMI
 int BitLayer = 1;
 int FrameCount = 0;
 int ReSyncFlag = 0;
@@ -262,7 +262,7 @@ void MainWindow::on_POTFcheckbox_clicked()
     {
         ui->VP_HDMIcheckbox->setChecked(false); //Uncheck the Video Pattern checkbox
         EnableParameter(MAX_IMAGE, ON);
-        ProjectionMode = POTF; //Set projection mode to POTF
+        m_PrintSettings.ProjectionMode = POTF; //Set projection mode to POTF
         DLP.setIT6535Mode(0); //Turn off HDMI connection
         LCR_SetMode(PTN_MODE_OTF); //Set light engine to POTF mode
     }
@@ -280,7 +280,7 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
         ui->POTFcheckbox->setChecked(false); //Uncheck the Video Pattern checkbox
         EnableParameter(MAX_IMAGE, OFF);
         initImagePopout(); //Open projection window
-        ProjectionMode = VIDEOPATTERN; //Set projection mode to video pattern
+        m_PrintSettings.ProjectionMode = VIDEOPATTERN; //Set projection mode to video pattern
 
         //Set video display off
         if (LCR_SetMode(PTN_MODE_DISABLE) < 0)
@@ -547,10 +547,9 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             }
 
             //Add initial exposure patterns to local memory
-            DLP.AddPatterns(firstImage, 1000*1000, 0, 0, 0, ExposureScriptList, DarkTimeScriptList,ProjectionMode, BitMode, InitialExposureFlag);
-
+            DLP.AddPatterns(firstImage, m_PrintSettings, m_PrintScript, m_PrintControls);
             //If in POTF mode
-            if(ProjectionMode == POTF){
+            if(m_PrintSettings.ProjectionMode == POTF){
                 nSlice = ui->FileList->count();
 
                 //Grab images from the file list up until the max image upload is reached
@@ -567,8 +566,8 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
                 }
 
                 //Add patterns first to local memory, send to light engine, and clear local memory
-                DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, 0, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0); //Set initial image to 0
-                DLP.updateLUT(ProjectionMode);
+                DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls); //Set initial image to 0
+                DLP.updateLUT(m_PrintSettings.ProjectionMode);
                 DLP.clearElements();
                 remainingImages = MaxImageUpload - InitialExposure;
 
@@ -577,9 +576,9 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
                 ui->ProgramPrints->append(dir.absolutePath());
             }
             //If in Video pattern mode
-            else if (ProjectionMode == VIDEOPATTERN){
+            else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
                 nSlice = (24/BitMode)*ui->FileList->count(); //Calc nSlice based on bitMode and # of files
-                DLP.updateLUT(ProjectionMode); //Send pattern data to light engine
+                DLP.updateLUT(m_PrintSettings.ProjectionMode); //Send pattern data to light engine
                 DLP.clearElements(); //Clear local memory
 
                 //Get image from file list and display in popout window
@@ -599,10 +598,10 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             //If in continuous motion mode, calculate the print end position
             if(MotionMode == CONTINUOUS){
                 if(PrinterType == CLIP30UM){
-                    PrintEnd = StartingPosition - (ui->FileList->count()*SliceThickness);
+                    PrintEnd = m_PrintSettings.StartingPosition - (ui->FileList->count()*m_PrintSettings.LayerThickness);
                 }
                 else if (PrinterType == ICLIP){
-                    PrintEnd = ui->FileList->count()*SliceThickness; //Make sure stage is zeroed
+                    PrintEnd = ui->FileList->count()*m_PrintSettings.LayerThickness; //Make sure stage is zeroed
                 }
                 else{
                     showError("PrinterType Error, on_InitializeAndSynchronize_clicked");
@@ -636,7 +635,7 @@ void MainWindow::on_StartPrint_clicked()
     //If settings are validated successfully and Initialization has been completed
     if (ValidateSettings() == true)
     {
-        Stage.SetStageVelocity(StageVelocity, StageType); //Update stage velocity
+        Stage.SetStageVelocity(m_PrintSettings.StageVelocity, StageType); //Update stage velocity
         Sleep(10); //Sleep to avoid spamming motor controller
         emit(on_GetPosition_clicked()); //Get stage position to validate that stage connection is working
         Sleep(10);
@@ -652,8 +651,8 @@ void MainWindow::on_StartPrint_clicked()
         }
 
         if (MotionMode == CONTINUOUS){ //continuous motion mode
-            double ContStageVelocity = (SliceThickness)/(ExposureTime/(1e6)); //Multiply Exposure time by 1e6 to convert from us to s to get to proper units
-            ui->ProgramPrints->append("Continuous Stage Velocity set to " + QString::number(SliceThickness) + "/" + QString::number(ExposureTime) + " = " + QString::number(ContStageVelocity) + " mm/s");
+            double ContStageVelocity = (m_PrintSettings.StageVelocity)/(ExposureTime/(1e6)); //Multiply Exposure time by 1e6 to convert from us to s to get to proper units
+            ui->ProgramPrints->append("Continuous Stage Velocity set to " + QString::number(m_PrintSettings.StageVelocity) + "/" + QString::number(ExposureTime) + " = " + QString::number(ContStageVelocity) + " mm/s");
             Stage.SetStageVelocity(ContStageVelocity, StageType);
         }
 
@@ -661,7 +660,7 @@ void MainWindow::on_StartPrint_clicked()
         DLP.startPatSequence(); //Start projection
 
         //Based on projection mode enter correct print process
-        if (ProjectionMode == POTF){ //if in POTF mode
+        if (m_PrintSettings.ProjectionMode == POTF){ //if in POTF mode
             PrintProcess(); //Start print process
             ui->ProgramPrints->append("Entering POTF print process");
         }
@@ -717,8 +716,8 @@ void MainWindow::PrintProcess(void)
             }
 
             //Add patterns to local memory, upload to light engine, then clear local memory
-            DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0);
-            DLP.updateLUT(ProjectionMode);
+            DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
+            DLP.updateLUT(m_PrintSettings.ProjectionMode);
             DLP.clearElements();
 
             remainingImages = count - 1; //Set the remaining images to the # of images uploaded - 1
@@ -812,15 +811,15 @@ void MainWindow::PrintProcessVP()
                 ui->ProgramPrints->append(QString::number(count) + " patterns uploaded");
             }
             //Add pattern data to buffer to prepare for pattern upload
-            if (ProjectionMode == VIDEOPATTERN && BitMode == 8){
+            if (m_PrintSettings.ProjectionMode == VIDEOPATTERN && BitMode == 8){
                 //VP8bitWorkaround();
                 //ui->ProgramPrints->append("Using VP 8-bit workaround");
-                DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0);
+                DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
             }
             else{
-                DLP.AddPatterns(imageList,ExposureTime,DarkTime, PrintScript, layerCount, ExposureScriptList, DarkTimeScriptList, ProjectionMode, BitMode, 0);
+                DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
             }
-            DLP.updateLUT(ProjectionMode); //update LUT on light engine to upload pattern data
+            DLP.updateLUT(m_PrintSettings.ProjectionMode); //update LUT on light engine to upload pattern data
             DLP.clearElements(); //clear pattern data buffer
             Sleep(50); //small delay to ensure that the new patterns are uploaded
             ui->ProgramPrints->append("Resync succesful, frame: " + QString::number(FrameCount) + " layer: " + QString::number(layerCount) + "New Patterns: " + QString::number(count));
@@ -895,7 +894,7 @@ void MainWindow::ExposureTimeSlot(void)
     updatePlot(); //update plot early in dark time
 
     //Video pattern mode handling
-    if (ProjectionMode == VIDEOPATTERN) //If in video pattern mode
+    if (m_PrintSettings.ProjectionMode == VIDEOPATTERN) //If in video pattern mode
     {
         if (BitLayer > 24) //If end of frame has been reached
         {
@@ -948,7 +947,7 @@ void MainWindow::ExposureTimeSlot(void)
         }
         else{
             PrintInfuse();
-            //Stage.StageRelativeMove(-SliceThickness, StageType);
+            //Stage.StageRelativeMove(-m_PrintSettings.LayerThickness, StageType);
             StageMove();
             ui->ProgramPrints->append("No injection delay");
         }
@@ -967,10 +966,10 @@ void MainWindow::ExposureTimeSlot(void)
  */
 void MainWindow::DarkTimeSlot(void)
 {
-    if(ProjectionMode == POTF){
+    if(m_PrintSettings.ProjectionMode == POTF){
         PrintProcess();
     }
-    else if(ProjectionMode == VIDEOPATTERN){
+    else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
         PrintProcessVP();
     }
     else{
@@ -1453,8 +1452,8 @@ void MainWindow::on_SetIntialAdhesionTimeButton_clicked()
  */
 void MainWindow::on_SetStartingPosButton_clicked()
 {
-    StartingPosition = (ui->StartingPositionParam->value());
-    QString StartingPositionString = "Set Starting Position to: " + QString::number(StartingPosition) + " mm";
+    m_PrintSettings.StartingPosition = (ui->StartingPositionParam->value());
+    QString StartingPositionString = "Set Starting Position to: " + QString::number(m_PrintSettings.StartingPosition) + " mm";
     ui->ProgramPrints->append(StartingPositionString);
     //QString CurrentPosition = SMC.GetPosition();
     QString CurrentPosition = Stage.StageGetPosition(StageType);
@@ -1464,13 +1463,13 @@ void MainWindow::on_SetStartingPosButton_clicked()
 }
 
 /**
- * @brief MainWindow::on_SetSliceThickness_clicked
- * Sets Slicethickness variable from the value inputted by the user
+ * @brief MainWindow::on_Setm_PrintSettings.LayerThickness_clicked
+ * Sets m_PrintSettings.LayerThickness variable from the value inputted by the user
  */
 void MainWindow::on_SetSliceThickness_clicked()
 {
-    SliceThickness = (ui->SliceThicknessParam->value()/1000);
-    QString ThicknessString = "Set Slice Thickness to: " + QString::number(SliceThickness*1000) + " μm";
+    m_PrintSettings.LayerThickness = (ui->SliceThicknessParam->value()/1000);
+    QString ThicknessString = "Set Slice Thickness to: " + QString::number(m_PrintSettings.LayerThickness*1000) + " μm";
     ui->ProgramPrints->append(ThicknessString);
     //VP8bitWorkaround();
 }
@@ -1482,10 +1481,10 @@ void MainWindow::on_SetSliceThickness_clicked()
  */
 void MainWindow::on_SetStageVelocity_clicked()
 {
-    StageVelocity = (ui->StageVelocityParam->value());
+    m_PrintSettings.StageVelocity = (ui->StageVelocityParam->value());
     //SMC.SetVelocity(StageVelocity); //Sends command to stage
-    Stage.SetStageVelocity(StageVelocity, StageType);
-    QString VelocityString = "Set Stage Velocity to: " + QString::number(StageVelocity) +" mm/s";
+    Stage.SetStageVelocity(m_PrintSettings.StageVelocity, StageType);
+    QString VelocityString = "Set Stage Velocity to: " + QString::number(m_PrintSettings.StageVelocity) +" mm/s";
     ui->ProgramPrints->append(VelocityString);
 }
 
@@ -1496,10 +1495,10 @@ void MainWindow::on_SetStageVelocity_clicked()
  */
 void MainWindow::on_SetStageAcceleration_clicked()
 {
-    StageAcceleration = (ui->StageAccelParam->value());
+    m_PrintSettings.StageAcceleration = (ui->StageAccelParam->value());
     //SMC.SetAcceleration(StageAcceleration); //Sends command to stage
-    Stage.SetStageAcceleration(StageAcceleration, StageType);
-    QString AccelerationString = "Set Stage Acceleration to: " + QString::number(StageAcceleration) + " mm/s";
+    Stage.SetStageAcceleration(m_PrintSettings.StageAcceleration, StageType);
+    QString AccelerationString = "Set Stage Acceleration to: " + QString::number(m_PrintSettings.StageAcceleration) + " mm/s";
     ui->ProgramPrints->append(AccelerationString);
 }
 
@@ -1755,7 +1754,7 @@ void MainWindow::validateStartingPosition()
 {
     QString CurrentPosition = Stage.StageGetPosition(StageType);
     CurrentPosition = CurrentPosition.remove(0,3);
-    if (CurrentPosition.toInt() > (StartingPosition - 0.1) && CurrentPosition.toInt() < (StartingPosition +0.1))
+    if (CurrentPosition.toInt() > (m_PrintSettings.StartingPosition - 0.1) && CurrentPosition.toInt() < (m_PrintSettings.StartingPosition +0.1))
     {
         ui->ProgramPrints->append("Stage has reached Starting Position");
         ui->StartPrint->setEnabled(true);
@@ -1775,7 +1774,7 @@ void MainWindow::initStageSlot(void)
     emit(on_GetPosition_clicked());
     if (StageType == STAGE_SMC)
     {
-        if (GetPosition < (StartingPosition-3.2))
+        if (GetPosition < (m_PrintSettings.StartingPosition-3.2))
         {
             if (StagePrep1 == false)
             {
@@ -1783,7 +1782,7 @@ void MainWindow::initStageSlot(void)
                 Stage.SetStageVelocity(3, StageType);
                 Sleep(20);
                 //SMC.AbsoluteMove((StartingPosition-3));
-                Stage.StageAbsoluteMove(StartingPosition-3, StageType);
+                Stage.StageAbsoluteMove(m_PrintSettings.StartingPosition-3, StageType);
                 Sleep(20);
                 //QString MoveTime = SMC.GetMotionTime();
                 //MoveTime.remove(0,3);
@@ -1812,7 +1811,7 @@ void MainWindow::fineMovement()
 {
     emit(on_GetPosition_clicked());
 
-    if (GetPosition > StartingPosition -0.01 && GetPosition < StartingPosition + 0.01)
+    if (GetPosition > m_PrintSettings.StartingPosition -0.01 && GetPosition < m_PrintSettings.StartingPosition + 0.01)
     {
         verifyStageParams();
     }
@@ -1825,7 +1824,7 @@ void MainWindow::fineMovement()
             Stage.SetStageVelocity(0.3, StageType);
             Sleep(20);
             //SMC.AbsoluteMove(StartingPosition);
-            Stage.StageAbsoluteMove(StartingPosition, StageType);
+            Stage.StageAbsoluteMove(m_PrintSettings.StartingPosition, StageType);
             ui->ProgramPrints->append("Fine Stage Movement");
             StagePrep2 = true;
         }
@@ -1842,7 +1841,7 @@ void MainWindow::verifyStageParams()
     ui->ProgramPrints->append("Verifying Stage Parameters");
     Sleep(50);
     //SMC.SetAcceleration(StageAcceleration);
-    Stage.SetStageAcceleration(StageAcceleration, StageType);
+    Stage.SetStageAcceleration(m_PrintSettings.StageAcceleration, StageType);
     Sleep(50);
     //SMC.SetNegativeLimit(MinEndOfRun);
     Stage.SetStageNegativeLimit(MinEndOfRun, StageType);
@@ -1851,7 +1850,7 @@ void MainWindow::verifyStageParams()
     Stage.SetStagePositiveLimit(MaxEndOfRun, StageType);
     Sleep(50);
     //SMC.SetVelocity(StageVelocity);
-    Stage.SetStageVelocity(StageVelocity, StageType);
+    Stage.SetStageVelocity(m_PrintSettings.StageVelocity, StageType);
 }
 
 /**
@@ -1874,9 +1873,9 @@ void MainWindow::AutoMode()
             ui->ExposureTimeParam->setValue(ExposureTime);
             ui->ProgramPrints->append("Calculated Exposure Time: " + QString::number(ExposureTime) + " ms");
 
-            SliceThickness = PrintHeight / SliceCount;
-            ui->SliceThicknessParam->setValue(SliceThickness);
-            ui->ProgramPrints->append("Calculated Slice Thickness: " + QString::number(SliceThickness) + " um");
+            m_PrintSettings.LayerThickness = PrintHeight / SliceCount;
+            ui->SliceThicknessParam->setValue(m_PrintSettings.LayerThickness);
+            ui->ProgramPrints->append("Calculated Slice Thickness: " + QString::number(m_PrintSettings.LayerThickness) + " um");
         }
         else
         {
@@ -1910,10 +1909,10 @@ bool MainWindow::initConfirmationScreen()
         DetailedText += "Printer set to iCLIP\n";
     }
 
-    if(ProjectionMode == POTF){
+    if(m_PrintSettings.ProjectionMode == POTF){
         DetailedText += "POTF projection mode selected\n";
     }
-    else if(ProjectionMode == VIDEOPATTERN){
+    else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
         DetailedText += "Video Pattern projection mode selected\n";
     }
 
@@ -1935,9 +1934,9 @@ bool MainWindow::initConfirmationScreen()
     DetailedText += "Bit Depth set to: " + QString::number(BitMode) + "\n";
     DetailedText += "Initial Exposure Time: " + QString::number(InitialExposure) + "s\n";
     if (PrinterType == CLIP30UM){
-        DetailedText += "Starting Position: " + QString::number(StartingPosition) + " mm\n";
+        DetailedText += "Starting Position: " + QString::number(m_PrintSettings.StartingPosition) + " mm\n";
     }
-    DetailedText += "Slice Thickness: " + QString::number(SliceThickness*1000) + " μm\n";
+    DetailedText += "Slice Thickness: " + QString::number(m_PrintSettings.LayerThickness*1000) + " μm\n";
 
     if (AutoModeFlag)
     {
@@ -1962,9 +1961,9 @@ bool MainWindow::initConfirmationScreen()
         DetailedText += "Dark Time " + QString::number(DarkTime/1000) + " ms\n";
     }
 
-    DetailedText += "Stage Velocity: " + QString::number(StageVelocity) + " mm/s\n";
+    DetailedText += "Stage Velocity: " + QString::number(m_PrintSettings.StageVelocity) + " mm/s\n";
     if (PrinterType == CLIP30UM){
-        DetailedText += "Stage Acceleration: " + QString::number(StageAcceleration) + " mm/s^2\n";
+        DetailedText += "Stage Acceleration: " + QString::number(m_PrintSettings.StageAcceleration) + " mm/s^2\n";
         DetailedText += "Max End Of Run: " + QString::number(MaxEndOfRun) + " mm\n";
         DetailedText += "Min End Of Run: " + QString::number(MinEndOfRun) + " mm\n";
     }
@@ -2009,20 +2008,20 @@ bool MainWindow::initConfirmationScreen()
  */
 bool MainWindow::ValidateSettings(void)
 {
-    //Validate Slicethickness
-    if (SliceThickness <= 0){
+    //Validate m_PrintSettings.LayerThickness
+    if (m_PrintSettings.LayerThickness <= 0){
         showError("Invalid Slice Thickness");
         ui->ProgramPrints->append("Invalid Slice Thickness");
         return false;
     }
     //Validate StageVelocity
-    else if (StageVelocity <= 0 || StageVelocity > 10){
+    else if (m_PrintSettings.StageVelocity <= 0 || m_PrintSettings.StageVelocity > 10){
         showError("Invalid Stage Velocity");
         ui->ProgramPrints->append("Invalid Stage Velocity");
         return false;
     }
     //Validate StageAcceleration
-    else if (StageAcceleration <= 0 || StageAcceleration > 10){
+    else if (m_PrintSettings.StageAcceleration <= 0 || m_PrintSettings.StageAcceleration > 10){
         showError("Invalid Stage Acceleration");
         ui->ProgramPrints->append("Invalid Stage Acceleration");
         return false;
@@ -2073,13 +2072,13 @@ void MainWindow::saveSettings()
     settings.setValue("DarkTime", DarkTime);
     settings.setValue("UVIntensity", UVIntensity);
 
-    settings.setValue("StageVelocity", StageVelocity);
-    settings.setValue("StageAcceleration", StageAcceleration);
+    settings.setValue("StageVelocity", m_PrintSettings.StageVelocity);
+    settings.setValue("StageAcceleration", m_PrintSettings.StageAcceleration);
     settings.setValue("MaxEndOfRun", MaxEndOfRun);
     settings.setValue("MinEndOfRun", MinEndOfRun);
 
-    settings.setValue("SliceThickness", SliceThickness);
-    settings.setValue("StartingPosition", StartingPosition);
+    settings.setValue("m_PrintSettings.LayerThickness", m_PrintSettings.LayerThickness);
+    settings.setValue("StartingPosition", m_PrintSettings.StartingPosition);
     settings.setValue("InitialExposure", InitialExposure);
     settings.setValue("PrintSpeed", PrintSpeed);
     settings.setValue("PrintHeight", PrintHeight);
@@ -2119,15 +2118,15 @@ void MainWindow::loadSettings()
         DarkTime = settings.value("DarkTime", 1000).toDouble();
         UVIntensity = settings.value("UVIntensity", 12).toDouble();
 
-        StageVelocity = settings.value("StageVelocity", 10).toDouble();
-        StageAcceleration = settings.value("StageAcceleration", 5).toDouble();
+        m_PrintSettings.StageVelocity = settings.value("StageVelocity", 10).toDouble();
+        m_PrintSettings.StageAcceleration = settings.value("StageAcceleration", 5).toDouble();
         MaxEndOfRun = settings.value("MaxEndOfRun", 60).toDouble();
         MinEndOfRun = settings.value("MinEndOfRun", 0).toDouble();
 
 
-        StartingPosition = settings.value("StartingPosition", 5).toDouble();
+        m_PrintSettings.StartingPosition = settings.value("StartingPosition", 5).toDouble();
         InitialExposure = settings.value("InitialExposure", 10).toDouble();
-        SliceThickness = settings.value("SliceThickness", 200).toDouble();
+        m_PrintSettings.LayerThickness = settings.value("m_PrintSettings.LayerThickness", 200).toDouble();
         PrintSpeed = settings.value("PrintSpeed", 40).toDouble();
         PrintHeight = settings.value("PrintHeight", 5000).toDouble();
 
@@ -2163,13 +2162,13 @@ void MainWindow::initSettings()
     ui->DarkTimeParam->setValue(DarkTime/1000);
     ui->UVIntensityParam->setValue(UVIntensity);
 
-    ui->StageVelocityParam->setValue(StageVelocity);
-    ui->StageAccelParam->setValue(StageAcceleration);
+    ui->StageVelocityParam->setValue(m_PrintSettings.StageVelocity);
+    ui->StageAccelParam->setValue(m_PrintSettings.StageAcceleration);
     ui->MaxEndOfRun->setValue(MaxEndOfRun);
     ui->MinEndOfRunParam->setValue(MinEndOfRun);
 
-    ui->SliceThicknessParam->setValue(SliceThickness*1000);
-    ui->StartingPositionParam->setValue(StartingPosition);
+    ui->SliceThicknessParam->setValue(m_PrintSettings.LayerThickness*1000);
+    ui->StartingPositionParam->setValue(m_PrintSettings.StartingPosition);
     ui->InitialAdhesionParameter->setValue(InitialExposure);
     ui->PrintSpeedParam->setValue(PrintSpeed);
     ui->PrintHeightParam->setValue(PrintHeight);
@@ -2248,7 +2247,7 @@ void MainWindow::initPlot()
     {
         ui->LivePlot->xAxis->setRange(0, InitialExposure+5+0.1*nSlice+(1.5*(nSlice*(ExposureTime+DarkTime))/(1000*1000)));
     }
-    ui->LivePlot->yAxis->setRange(0.9*(StartingPosition - nSlice*SliceThickness),1.1*StartingPosition);
+    ui->LivePlot->yAxis->setRange(0.9*(m_PrintSettings.StartingPosition - nSlice*m_PrintSettings.LayerThickness),1.1*m_PrintSettings.StartingPosition);
     ui->LivePlot->replot();
 }
 
@@ -2261,7 +2260,7 @@ void MainWindow::updatePlot()
     QTime updateTime = QTime::currentTime();
     int TimeElapsed = PrintStartTime.secsTo(updateTime);
 
-    double CurrentPos = GetPosition;//StartingPosition - (layerCount*SliceThickness);
+    double CurrentPos = GetPosition;//StartingPosition - (layerCount*m_PrintSettings.LayerThickness);
 
     qv_x.append(TimeElapsed);
     qv_y.append(CurrentPos);
@@ -2525,12 +2524,12 @@ void MainWindow::StageMove()
     }
     else{
         if (PumpingMode == ON){
-            Stage.StageRelativeMove(PumpingParameter - SliceThickness, StageType);
-            ui->ProgramPrints->append("Pumping active, moving stage: " + QString::number(PumpingParameter - SliceThickness) + " um");
+            Stage.StageRelativeMove(PumpingParameter - m_PrintSettings.LayerThickness, StageType);
+            ui->ProgramPrints->append("Pumping active, moving stage: " + QString::number(PumpingParameter - m_PrintSettings.LayerThickness) + " um");
         }
         else{
-            Stage.StageRelativeMove(-SliceThickness, StageType);
-            ui->ProgramPrints->append("Moving stage: " + QString::number(SliceThickness) + " um");
+            Stage.StageRelativeMove(-m_PrintSettings.LayerThickness, StageType);
+            ui->ProgramPrints->append("Moving stage: " + QString::number(m_PrintSettings.LayerThickness) + " um");
         }
     }
 }
@@ -2591,7 +2590,7 @@ void MainWindow::VP8bitWorkaround()
         }
         //update nSlice
     }
-    DLP.AddPatterns(imageList, ExposureTime, DarkTime, PrintScript, layerCount, ExposureTimeList, DarkTimeList, ProjectionMode, BitMode, false);
+    DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
     ui->ProgramPrints->append("Etime: " + QString::number(ExposureTimeList.count()) + ", Dtime: " + QString::number(DarkTimeList.count()) + ", LEDlist: " + QString::number(LEDlist.count()) + ", Images: " + QString::number(imageList.count()));
 }
 /*************************************************************
