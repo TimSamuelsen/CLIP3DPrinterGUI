@@ -10,6 +10,7 @@
 #include "SMC100C.h"
 #include "dlp9000.h"
 #include "serialib.h"
+#include "PrintElements.h"
 
 typedef enum Parameter{
     EXPOSURE_TIME,
@@ -29,6 +30,7 @@ typedef enum Parameter{
     MIN_END,
     INJECTION_DELAY,
 }Parameter_t;
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -44,6 +46,7 @@ public:
     imagepopout popout;
     manualpumpcontrol Pump;
     ManualStageControl Stage;
+
 
 
 public slots:
@@ -189,6 +192,12 @@ private:
     manualpumpcontrol *ManualPumpUI;
     imageprocessing *ImageProcessUI;
     imagepopout *ImagePopoutUI;
+    QList<PrintScripts> m_PrintScript;
+    QList<PrintSettings> m_PrintSettings;
+    QList<PrintControls> m_PrintControls;
+    QList<InjectionSettings> m_InjectionSettings;
+    QList<MotionSettings> m_MotionSetttings;
+
     bool ValidateSettings(void);
     void loadSettings();
     void saveSettings();

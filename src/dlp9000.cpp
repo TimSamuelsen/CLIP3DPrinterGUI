@@ -30,18 +30,20 @@ bool DLP9000::InitProjector(void)
 /**
  * @brief MainWindow::on_addPatternsButton_clicked
  */
-//Make sure that input comes from
-void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int PrintScript, int CurrentImage, QStringList ExposureTimeList, QStringList DarkTimeList, int ProjectionMode, int BitMode, bool InitialExposure)
+void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, PrintScripts m_PrintScripts, PrintControls m_PrintControls)
+//void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int PrintScript, int CurrentImage, QStringList ExposureTimeList, QStringList DarkTimeList, int ProjectionMode, int BitMode, bool InitialExposure)
 {
-    if(BitMode == 0){
-        BitMode = 1; //Default bitmode to 1 if it somehow gets passed in undefined
+    if(m_PrintSettings.BitMode == 0){
+        m_PrintSettings.BitMode = 1; //Default bitmode to 1 if it somehow gets passed in undefined
     }
+    uint CurrentImage = m_PrintControls.layerCount;
     int i;
     int BitPos = 0;
     int numPatAdded = 0;
     MainWindow Main;
-    if (ProjectionMode == 1)//Video Pattern Mode
+    if (m_PrintSettings.ProjectionMode == 1)//Video Pattern Mode
     {
+
         printf("VP pattern upload");
         for(i = 0; i < fileNames.size(); i++)
         {
@@ -49,48 +51,48 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
 
             if(m_elements.size()==0)
             {
-                pattern.bits = BitMode;
+                pattern.bits = m_PrintSettings.BitMode;
                 pattern.color = PatternElement::BLUE;
-                if (PrintScript == 1)
+                if (m_PrintScripts.PrintScript == 1)
                 {
-                    pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
-                    pattern.darkPeriod = DarkTimeList.at(CurrentImage).toInt() * 1000;
-                    printf("%d, %d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000, DarkTimeList.at(CurrentImage).toInt() * 1000);
+                    pattern.exposure = m_PrintScripts.ExposureScriptList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
+                    pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(CurrentImage).toInt() * 1000;
+                    printf("%d, %d \r\n", pattern.exposure, pattern.darkPeriod);
                     CurrentImage++; //Should this be done before?
                 }
                 else
                 {
-                    pattern.exposure = ExposureTime;
-                    pattern.darkPeriod = DarkTime;
+                    pattern.exposure = m_PrintSettings.ExposureTime;
+                    pattern.darkPeriod = m_PrintSettings.DarkTime;
                 }
                 pattern.trigIn = false;
                 pattern.trigOut2 = true;
                 pattern.splashImageBitPos = 0;
                 pattern.splashImageIndex = 0;
                 pattern.clear = true;
-                BitPos += BitMode;
+                BitPos += m_PrintSettings.BitMode;
             }
             else
             {
-                pattern.bits = BitMode;
+                pattern.bits = m_PrintSettings.BitMode;
                 pattern.color = PatternElement::BLUE;
-                if (PrintScript == 1)
+                if (m_PrintScripts.PrintScript == ON)
                 {
-                    pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
-                    pattern.darkPeriod = DarkTimeList.at(CurrentImage).toInt() * 1000;
-                    printf("%d, %d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000, DarkTimeList.at(CurrentImage).toInt() * 1000);
+                    pattern.exposure = m_PrintScripts.ExposureScriptList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
+                    pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(CurrentImage).toInt() * 1000;
+                    printf("%d, %d \r\n", pattern.exposure, pattern.darkPeriod);
                     CurrentImage++; //Should this be done before?
                 }
                 else
                 {
-                    pattern.exposure = ExposureTime;
-                    pattern.darkPeriod = DarkTime;
+                    pattern.exposure = m_PrintSettings.ExposureTime;
+                    pattern.darkPeriod = m_PrintSettings.DarkTime;
                 }
                 pattern.trigIn = false;
                 pattern.trigOut2 = true;
                 pattern.clear = true;
                 pattern.splashImageIndex = 0;
-                if (InitialExposure){
+                if (m_PrintControls.InitialExposureFlag){
                     pattern.splashImageBitPos = 0;
                 }
                 else{
@@ -100,7 +102,7 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
                     }
                     printf(",BP: %d,", BitPos);
                     pattern.splashImageBitPos = BitPos;
-                    BitPos += BitMode;
+                    BitPos += m_PrintSettings.BitMode;
                     printf("BitPos: %d \r\n", pattern.splashImageBitPos);
                 }
             }
@@ -135,19 +137,19 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
 
             if(m_elements.size()==0)
             {
-                pattern.bits = BitMode;
+                pattern.bits = m_PrintSettings.BitMode;
                 pattern.color = PatternElement::BLUE;
-                if (PrintScript == 1)
+                if (m_PrintScripts.PrintScript == ON)
                 {
-                    pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
-                    pattern.darkPeriod = DarkTimeList.at(CurrentImage).toInt() * 1000;
-                    printf("%d, %d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000, DarkTimeList.at(CurrentImage).toInt() * 1000);
+                    pattern.exposure = m_PrintScripts.ExposureScriptList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
+                    pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(CurrentImage).toInt() * 1000;
+                    printf("%d, %d \r\n", pattern.exposure, pattern.darkPeriod);
                     CurrentImage++; //Should this be done before?
                 }
                 else
                 {
-                    pattern.exposure = ExposureTime;
-                    pattern.darkPeriod = DarkTime;
+                    pattern.exposure = m_PrintSettings.ExposureTime;
+                    pattern.darkPeriod = m_PrintSettings.DarkTime;
                 }
                 pattern.trigIn = false;
                 pattern.trigOut2 = true;
@@ -156,19 +158,19 @@ void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double Dar
             }
             else
             {
-                pattern.bits = BitMode;
+                pattern.bits = m_PrintSettings.BitMode;
                 pattern.color = PatternElement::BLUE;
-                if (PrintScript == 1)
+                if (m_PrintScripts.PrintScript == ON)
                 {
-                    pattern.exposure = ExposureTimeList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
-                    pattern.darkPeriod = DarkTimeList.at(CurrentImage).toInt() * 1000;
-                    printf("%d, %d \r\n", ExposureTimeList.at(CurrentImage).toInt() * 1000, DarkTimeList.at(CurrentImage).toInt() * 1000);
+                    pattern.exposure = m_PrintScripts.ExposureScriptList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
+                    pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(CurrentImage).toInt() * 1000;
+                    printf("%d, %d \r\n", pattern.exposure, pattern.darkPeriod);
                     CurrentImage++; //Should this be done before?
                 }
                 else
                 {
-                    pattern.exposure = ExposureTime;
-                    pattern.darkPeriod = DarkTime;
+                    pattern.exposure = m_PrintSettings.ExposureTime;
+                    pattern.darkPeriod = m_PrintSettings.DarkTime;
                 }
                 pattern.trigIn = false;
                 pattern.trigOut2 = true;

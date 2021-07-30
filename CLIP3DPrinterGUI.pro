@@ -24,10 +24,12 @@ SOURCES += \
     src/manualpumpcontrol.cpp \
     src/manualstagecontrol.cpp \
     src/prinstscriptdialog.cpp \
+    src/printprocess.cpp \
     src/qcustomplot/qcustomplot.cpp \
     src/serialib/serialib.cpp
 
 HEADERS += \
+    src/PrintElements.h \
     src/PtnImage.h \
     src/SMC100C.h \
     src/dlp9000.h \
@@ -38,6 +40,7 @@ HEADERS += \
     src/manualstagecontrol.h \
     src/patternelement.h \
     src/prinstscriptdialog.h \
+    src/printprocess.h \
     src/qcustomplot/qcustomplot.h \
     src/serialib/serialib.h
 

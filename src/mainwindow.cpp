@@ -43,23 +43,8 @@
 #include "imagepopout.h"
 #include <opencv2/opencv.hpp>
 
-#define NormalTime
-#define QuickTime
-#define ON   1
-#define OFF  0
-//For selecting motion mode
-#define CONTINUOUS  1
-#define STEPPED     0
-//For selecting projection mode
-#define VIDEOPATTERN 1
-#define POTF 0
-//For selecting printer
-#define CLIP30UM 0
-#define ICLIP 1
-#define PRE 1
-#define POST 2
-
 DLP9000 DLP; //DLP object for calling functions from dlp9000.cpp, test if this still works without being a static
+
 //Module level variables
 static bool InitialExposureFlag = true; //Flag to indicate print process to do intial expore first, set false after intial exposure never set true again
 //Settings are static so they can be accessed from outside anywhere in this module
@@ -142,7 +127,6 @@ static double PrintEnd;
 bool PumpingMode = 0;
 bool ContinuousInjection = false;
 double PumpingParameter;
-uint StageMode = 0; //Selects which stage to use
 
 //Stage select parameter
 static Stage_t StageType = STAGE_SMC;
