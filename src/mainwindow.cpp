@@ -63,11 +63,11 @@ static bool InitialExposureFlag = true; //Flag to indicate print process to do i
 //*static int MaxImageUpload = 20;
 
 //Injection parameters
-static double InfusionRate;
-static double InfusionVolume;
-static double InitialVolume;
-static double InjectionDelayParam;
-int InjectionDelayFlag = 0;
+//*static double InfusionRate;
+//*static double InfusionVolume;
+//*static double InitialVolume;
+//*static double InjectionDelayParam;
+//*int InjectionDelayFlag = 0;
 
 
 //Auto parameter selection mode
@@ -762,7 +762,7 @@ void MainWindow::PrintProcess(void)
             else if (MotionMode == CONTINUOUS){
                 if(PrinterType == ICLIP){
                     PrintInfuse();
-                    ui->ProgramPrints->append("Injecting " + QString::number(InfusionVolume) + "ul at " + QString::number(InfusionRate) + "ul/s");
+                    ui->ProgramPrints->append("Injecting " + QString::number(m_InjectionSettings.InfusionVolume) + "ul at " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s");
                 }
             }
             double OldPosition = GetPosition;
@@ -934,15 +934,15 @@ void MainWindow::ExposureTimeSlot(void)
     //Injection handling
     if (PrinterType == ICLIP)
     {
-        if (InjectionDelayFlag == PRE){
+        if (m_InjectionSettings.InjectionDelayFlag == PRE){
             PrintInfuse();
-            QTimer::singleShot(InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove()));
-            ui->ProgramPrints->append("Pre-Injection Delay: " + QString::number(InjectionDelayParam));
+            QTimer::singleShot(m_InjectionSettings.InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove()));
+            ui->ProgramPrints->append("Pre-Injection Delay: " + QString::number(m_InjectionSettings.InjectionDelayParam));
         }
-        else if(InjectionDelayFlag == POST){
+        else if(m_InjectionSettings.InjectionDelayFlag == POST){
             StageMove();
-            QTimer::singleShot(InjectionDelayParam, Qt::PreciseTimer, this, SLOT(PrintInfuse()));
-             ui->ProgramPrints->append("Post-Injection Delay: " + QString::number(InjectionDelayParam));
+            QTimer::singleShot(m_InjectionSettings.InjectionDelayParam, Qt::PreciseTimer, this, SLOT(PrintInfuse()));
+             ui->ProgramPrints->append("Post-Injection Delay: " + QString::number(m_InjectionSettings.InjectionDelayParam));
         }
         else{
             PrintInfuse();
@@ -950,7 +950,7 @@ void MainWindow::ExposureTimeSlot(void)
             StageMove();
             ui->ProgramPrints->append("No injection delay");
         }
-        ui->ProgramPrints->append("Injecting " + QString::number(InfusionVolume) + "ul at " + QString::number(InfusionRate) + "ul/s");
+        ui->ProgramPrints->append("Injecting " + QString::number(m_InjectionSettings.InfusionVolume) + "ul at " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s");
     }
     else{
         StageMove();
@@ -1582,9 +1582,9 @@ void MainWindow::on_ContinuousInjection_clicked()
  */
 void MainWindow::on_SetInfuseRate_clicked()
 {
-    InfusionRate = ui->InfuseRateParam->value();
-    Pump.SetInfuseRate(InfusionRate);
-    QString InfusionRateString = "Set Infusion Rate to: " + QString::number(InfusionRate) + " μl/s";
+    m_InjectionSettings.InfusionRate = ui->InfuseRateParam->value();
+    Pump.SetInfuseRate(m_InjectionSettings.InfusionRate);
+    QString InfusionRateString = "Set Infusion Rate to: " + QString::number(m_InjectionSettings.InfusionRate) + " μl/s";
     ui->ProgramPrints->append(InfusionRateString);
 }
 
@@ -1593,28 +1593,28 @@ void MainWindow::on_SetInfuseRate_clicked()
  */
 void MainWindow::on_SetVolPerLayer_clicked()
 {
-    InfusionVolume = ui->VolPerLayerParam->value();
-    Pump.SetTargetVolume(InfusionVolume);
-    QString InfusionVolumeString = "Set Infusion Volume per layer to: " + QString::number(InfusionVolume) + " ul";
+    m_InjectionSettings.InfusionVolume = ui->VolPerLayerParam->value();
+    Pump.SetTargetVolume(m_InjectionSettings.InfusionVolume);
+    QString InfusionVolumeString = "Set Infusion Volume per layer to: " + QString::number(m_InjectionSettings.InfusionVolume) + " ul";
     ui->ProgramPrints->append(InfusionVolumeString);
 }
 
 void MainWindow::on_SetInitialVolume_clicked()
 {
-    InitialVolume = ui->InitialVolumeParam->value();
+    m_InjectionSettings.InitialVolume = ui->InitialVolumeParam->value();
 }
 
 void MainWindow::on_PreMovementCheckbox_clicked()
 {
     if (ui->PreMovementCheckbox->isChecked() == true){
         ui->PostMovementCheckbox->setChecked(false);
-        InjectionDelayFlag = PRE;
+        m_InjectionSettings.InjectionDelayFlag = PRE;
         ui->ProgramPrints->append("Pre-Injection delay enabled");
     }
     else{
         ui->PostMovementCheckbox->setChecked(false);
         ui->PreMovementCheckbox->setChecked(false);
-        InjectionDelayFlag = OFF;
+        m_InjectionSettings.InjectionDelayFlag = OFF;
         ui->ProgramPrints->append("Injection delay disabled");
     }
 }
@@ -1623,21 +1623,21 @@ void MainWindow::on_PostMovementCheckbox_clicked()
 {
     if (ui->PostMovementCheckbox->isChecked() == true){
         ui->PreMovementCheckbox->setChecked(false);
-        InjectionDelayFlag = POST;
+        m_InjectionSettings.InjectionDelayFlag = POST;
         ui->ProgramPrints->append("Post-Injection delay enabled");
     }
     else{
         ui->PostMovementCheckbox->setChecked(false);
         ui->PreMovementCheckbox->setChecked(false);
-        InjectionDelayFlag = OFF;
+        m_InjectionSettings.InjectionDelayFlag = OFF;
         ui->ProgramPrints->append("Injection delay disabled");
     }
 }
 
 void MainWindow::on_SetInjectionDelay_clicked()
 {
-    InjectionDelayParam = ui->InjectionDelayParam->value();
-    ui->ProgramPrints->append("Injection delay set to: " + QString::number(InjectionDelayParam));
+    m_InjectionSettings.InjectionDelayParam = ui->InjectionDelayParam->value();
+    ui->ProgramPrints->append("Injection delay set to: " + QString::number(m_InjectionSettings.InjectionDelayParam));
 }
 
 /*******************************************Live Value Monitoring********************************************/
@@ -1968,8 +1968,8 @@ bool MainWindow::initConfirmationScreen()
         else{
             DetailedText += "Continuous injection disabled";
         }
-        DetailedText += "Infusion volume per layer: " + QString::number(InfusionVolume) + "ul\n";
-        DetailedText += "Infusion rate per layer: " + QString::number(InfusionRate) + "ul/s";
+        DetailedText += "Infusion volume per layer: " + QString::number(m_InjectionSettings.InfusionVolume) + "ul\n";
+        DetailedText += "Infusion rate per layer: " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s";
     }
     DetailedText += " \r\n \r\n";
     confScreen.setDetailedText(DetailedText);
@@ -2091,8 +2091,8 @@ void MainWindow::saveSettings()
     settings.setValue("BitMode", m_PrintSettings.BitMode);
 
     settings.setValue("ContinuousInjection", ui->ContinuousInjection->isChecked());
-    settings.setValue("InfusionRate", InfusionRate);
-    settings.setValue("InfusionVolume", InfusionVolume);
+    settings.setValue("InfusionRate", m_InjectionSettings.InfusionRate);
+    settings.setValue("InfusionVolume", m_InjectionSettings.InfusionVolume);
 
 
     settings.setValue("StageCOM", ui->COMPortSelect->currentIndex());
@@ -2135,8 +2135,8 @@ void MainWindow::loadSettings()
         PumpingMode = settings.value("PumpingMode", 0).toDouble();
         PumpingParameter = settings.value("PumpingParameter", 0).toDouble();
         m_PrintSettings.BitMode = settings.value("BitMode", 1).toDouble();
-        InfusionRate = settings.value("InfusionRate", 5).toDouble();
-        InfusionVolume = settings.value("InfusionVolume", 5).toDouble();
+        m_InjectionSettings.InfusionRate = settings.value("InfusionRate", 5).toDouble();
+        m_InjectionSettings.InfusionVolume = settings.value("InfusionVolume", 5).toDouble();
 
         ContinuousInjection = settings.value("ContinuousInjection", OFF).toInt();
         loadSettingsFlag = true;
@@ -2207,8 +2207,8 @@ void MainWindow::initSettings()
 
     ui->pumpingParameter->setValue(PumpingParameter);
     ui->BitDepthParam->setValue(m_PrintSettings.BitMode);
-    ui->InfuseRateParam->setValue(InfusionRate);
-    ui->VolPerLayerParam->setValue(InfusionVolume);
+    ui->InfuseRateParam->setValue(m_InjectionSettings.InfusionRate);
+    ui->VolPerLayerParam->setValue(m_InjectionSettings.InfusionVolume);
 }
 
 /*******************************************Plot Functions*********************************************/
