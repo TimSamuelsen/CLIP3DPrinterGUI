@@ -88,6 +88,7 @@ struct InjectionSettings
     double InfusionVolume;
     double InitialVolume;
 
+    bool ContinuousInjection = false;
     int InjectionDelayFlag;
     double InjectionDelayParam;
 };
@@ -99,7 +100,6 @@ struct MotionSettings
     double PrintEnd;
 
     bool PumpingMode = 0;
-    bool ContinuousInjection = false;
     double PumpingParameter;
 };
 

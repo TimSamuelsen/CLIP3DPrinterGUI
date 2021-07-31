@@ -213,7 +213,7 @@ private:
     void AutoMode();
     void initImagePopout();
     void SetExposureTimer(int InitialExposureFlag, int PrintScript, int PumpingMode);
-    void SetDarkTimer(int PrintScript, int MotionMode);
+    void SetDarkTimer(int PrintScript, int DarkMotionMode);
     void VP8bitWorkaround();
     bool PrintScriptApply(uint layerCount, QStringList Script, Parameter_t DynamicParam);
     void PrintComplete();

@@ -119,14 +119,14 @@ static int VP8Bit = OFF;
 QStringList FrameList;
 
 //Stepped motion parameters
-static int MotionMode = 0; //Set stepped motion as default
-static bool inMotion;
-static double PrintEnd;
+//*static int MotionMode = 0; //Set stepped motion as default
+//*static bool inMotion;
+//*static double PrintEnd;
 
 //Pumping parameter
-bool PumpingMode = 0;
-bool ContinuousInjection = false;
-double PumpingParameter;
+//*bool PumpingMode = 0;
+//*bool ContinuousInjection = false;
+//*double PumpingParameter;
 
 //Stage select parameter
 //*static Stage_t StageType = STAGE_SMC;
@@ -453,7 +453,7 @@ void MainWindow::on_SteppedMotion_clicked()
     //If the stepped motion checkbox is checked
     if(ui->SteppedMotion->isChecked() == true)
     {
-        MotionMode = STEPPED; //Set MotionMode to STEPPED
+        m_MotionSettings.MotionMode = STEPPED; //Set MotionMode to STEPPED
         ui->ContinuousMotion->setChecked(false); //Updates UI to reflect stepped mode
         ui->ProgramPrints->append("Stepped Motion Selected");
         EnableParameter(DARK_TIME, ON); //Enable dark time selection
@@ -469,7 +469,7 @@ void MainWindow::on_ContinuousMotion_clicked()
     //If the continuos motion checkbox is checked
     if(ui->ContinuousMotion->isChecked() == true)
     {
-        MotionMode = CONTINUOUS; //Set MotionMode to Continuous
+        m_MotionSettings.MotionMode = CONTINUOUS; //Set MotionMode to Continuous
         ui->SteppedMotion->setChecked(false); //Update UI to reflect continuous mode
         ui->ProgramPrints->append("Continuous Motion Selected");
 
@@ -489,14 +489,14 @@ void MainWindow::on_pumpingCheckBox_clicked()
 {
     //If pumping checkbox is checked
     if(ui->pumpingCheckBox->isChecked() == true){
-        PumpingMode = ON; //Enable pumping mode
+        m_MotionSettings.PumpingMode = ON; //Enable pumping mode
 
         //Update UI
         EnableParameter(PUMP_HEIGHT, ON);
         ui->ProgramPrints->append("Pumping Enabled");
     }
     else{
-        PumpingMode = OFF; //Disable pumping mode
+        m_MotionSettings.PumpingMode = OFF; //Disable pumping mode
 
         //Update UI
         EnableParameter(PUMP_HEIGHT, OFF);
@@ -511,9 +511,9 @@ void MainWindow::on_pumpingCheckBox_clicked()
 void MainWindow::on_setPumping_clicked()
 {
     //If pumping is currently enabled
-    if(PumpingMode == ON){
-        PumpingParameter = ui->pumpingParameter->value()/1000; //Grab value from UI and divide by 1000 to scale units
-        ui->ProgramPrints->append("Pumping depth set to: " + QString::number(PumpingParameter*1000) + " μm");
+    if(m_MotionSettings.PumpingMode == ON){
+        m_MotionSettings.PumpingParameter = ui->pumpingParameter->value()/1000; //Grab value from UI and divide by 1000 to scale units
+        ui->ProgramPrints->append("Pumping depth set to: " + QString::number(m_MotionSettings.PumpingParameter*1000) + " μm");
     }
     else{ //Pumping is currently disabled
         ui->ProgramPrints->append("Please enable pumping before setting pumping parameter");
@@ -596,17 +596,17 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             ui->StartPrint->setEnabled(true); //Enable the start print button
 
             //If in continuous motion mode, calculate the print end position
-            if(MotionMode == CONTINUOUS){
+            if(m_MotionSettings.MotionMode == CONTINUOUS){
                 if(PrinterType == CLIP30UM){
-                    PrintEnd = m_PrintSettings.StartingPosition - (ui->FileList->count()*m_PrintSettings.LayerThickness);
+                    m_MotionSettings.PrintEnd = m_PrintSettings.StartingPosition - (ui->FileList->count()*m_PrintSettings.LayerThickness);
                 }
                 else if (PrinterType == ICLIP){
-                    PrintEnd = ui->FileList->count()*m_PrintSettings.LayerThickness; //Make sure stage is zeroed
+                    m_MotionSettings.PrintEnd = ui->FileList->count()*m_PrintSettings.LayerThickness; //Make sure stage is zeroed
                 }
                 else{
                     showError("PrinterType Error, on_InitializeAndSynchronize_clicked");
                 }
-                ui->ProgramPrints->append("Print End for continous motion print set to: " + QString::number(PrintEnd));
+                ui->ProgramPrints->append("Print End for continous motion print set to: " + QString::number(m_MotionSettings.PrintEnd));
             }
         }
     }
@@ -650,7 +650,7 @@ void MainWindow::on_StartPrint_clicked()
             LCR_SetLedCurrents(0, 0, m_PrintSettings.UVIntensity); //set static LED intensity
         }
 
-        if (MotionMode == CONTINUOUS){ //continuous motion mode
+        if (m_MotionSettings.MotionMode == CONTINUOUS){ //continuous motion mode
             double ContStageVelocity = (m_PrintSettings.StageVelocity)/(m_PrintSettings.ExposureTime/(1e6)); //Multiply Exposure time by 1e6 to convert from us to s to get to proper units
             ui->ProgramPrints->append("Continuous Stage Velocity set to " + QString::number(m_PrintSettings.StageVelocity) + "/" + QString::number(m_PrintSettings.ExposureTime) + " = " + QString::number(ContStageVelocity) + " mm/s");
             Stage.SetStageVelocity(ContStageVelocity, m_PrintSettings.StageType);
@@ -671,7 +671,7 @@ void MainWindow::on_StartPrint_clicked()
         }
 
         //If continuous injection is on then start pump infusion
-        if (ContinuousInjection == ON){
+        if (m_InjectionSettings.ContinuousInjection == ON){
             Pump.StartInfusion();
         }
     }
@@ -690,7 +690,7 @@ void MainWindow::PrintProcess(void)
         if (remainingImages <= 0)
         {
             //If motion mode is set to continuous, pause stage movement during re-upload
-            if (MotionMode == CONTINUOUS){
+            if (m_MotionSettings.MotionMode == CONTINUOUS){
                 Stage.StageStop(m_PrintSettings.StageType);
             }
             LCR_PatternDisplay(0); //Stop projection
@@ -727,12 +727,12 @@ void MainWindow::PrintProcess(void)
             if(PrinterType == ICLIP){ //delay is needed for iCLIP printer only
                 Sleep(500);
             }
-            SetExposureTimer(0, PrintScript, PumpingMode); //Set the exposure time
+            SetExposureTimer(0, PrintScript, m_MotionSettings.PumpingMode); //Set the exposure time
 
             //if in continuous motion mode restart movement
-            if(MotionMode == CONTINUOUS){
-                Stage.StageAbsoluteMove(PrintEnd, m_PrintSettings.StageType);
-                inMotion = true;
+            if(m_MotionSettings.MotionMode == CONTINUOUS){
+                Stage.StageAbsoluteMove(m_MotionSettings.PrintEnd, m_PrintSettings.StageType);
+                m_MotionSettings.inMotion = true;
             }
             ui->ProgramPrints->append("Reupload succesful, current layer: " + QString::number(layerCount));
             ui->ProgramPrints->append(QString::number(remainingImages + 1) + " images uploaded");
@@ -740,15 +740,15 @@ void MainWindow::PrintProcess(void)
         //If in intial exposure mode
         else if (InitialExposureFlag == true)
         {
-            SetExposureTimer(InitialExposureFlag, PrintScript, PumpingMode); //Set exposure timer with InitialExposureFlag high
+            SetExposureTimer(InitialExposureFlag, PrintScript, m_MotionSettings.PumpingMode); //Set exposure timer with InitialExposureFlag high
             updatePlot();
             InitialExposureFlag = false; //Set InitialExposureFlag low
-            inMotion = false; //Stage is currently not in motion, used for continuos stage movement
+            m_MotionSettings.inMotion = false; //Stage is currently not in motion, used for continuos stage movement
             ui->ProgramPrints->append("POTF Exposing Initial Layer " + QString::number(m_PrintSettings.InitialExposure) + "s");
         }
         else
         {
-            SetExposureTimer(0, PrintScript, PumpingMode); //set exposure time
+            SetExposureTimer(0, PrintScript, m_MotionSettings.PumpingMode); //set exposure time
             ui->ProgramPrints->append("Layer: " + QString::number(layerCount));
 
             //Grab the current image file name and print to
@@ -756,10 +756,10 @@ void MainWindow::PrintProcess(void)
             ui->ProgramPrints->append("Image File: " + filename);
             layerCount++; //Update layerCount for new layer
             remainingImages--; //Decrement remaining image counter
-            if(MotionMode == STEPPED){
+            if(m_MotionSettings.MotionMode == STEPPED){
                 updatePlot();
             }
-            else if (MotionMode == CONTINUOUS){
+            else if (m_MotionSettings.MotionMode == CONTINUOUS){
                 if(PrinterType == ICLIP){
                     PrintInfuse();
                     ui->ProgramPrints->append("Injecting " + QString::number(m_InjectionSettings.InfusionVolume) + "ul at " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s");
@@ -825,14 +825,14 @@ void MainWindow::PrintProcessVP()
             ui->ProgramPrints->append("Resync succesful, frame: " + QString::number(FrameCount) + " layer: " + QString::number(layerCount) + "New Patterns: " + QString::number(count));
             DLP.startPatSequence();
             Sleep(5);
-            SetExposureTimer(0, PrintScript, PumpingMode);
+            SetExposureTimer(0, PrintScript, m_MotionSettings.PumpingMode);
             layerCount++; //increment layer counter
             remainingImages--; //decrement remaining images
             BitLayer += m_PrintSettings.BitMode;
         }
         else if (InitialExposureFlag == true) //Initial Exposure
         {
-            SetExposureTimer(InitialExposureFlag, PrintScript, PumpingMode);
+            SetExposureTimer(InitialExposureFlag, PrintScript, m_MotionSettings.PumpingMode);
             BitLayer = 1; //set to first bitlayer
             ReSyncFlag = 1; //resync after intial exposure
             ui->ProgramPrints->append("VP Exposing Initial Layer " + QString::number(m_PrintSettings.InitialExposure) + "s");
@@ -841,7 +841,7 @@ void MainWindow::PrintProcessVP()
         else //Normal print process
         {
             //Start exposuretime timers
-            SetExposureTimer(0, PrintScript, PumpingMode);
+            SetExposureTimer(0, PrintScript, m_MotionSettings.PumpingMode);
             //Print information to log
             ui->ProgramPrints->append("VP Layer: " + QString::number(layerCount));
             QString filename =ui->FileList->item(FrameCount)->text();
@@ -875,8 +875,8 @@ void MainWindow::pumpingSlot(void)
         }
     }
     else{
-        Stage.StageRelativeMove(-PumpingParameter, m_PrintSettings.StageType);
-        ui->ProgramPrints->append("Pumping " + QString::number(PumpingParameter*1000) +" um");
+        Stage.StageRelativeMove(-m_MotionSettings.PumpingParameter, m_PrintSettings.StageType);
+        ui->ProgramPrints->append("Pumping " + QString::number(m_MotionSettings.PumpingParameter*1000) +" um");
     }
 }
 
@@ -887,7 +887,7 @@ void MainWindow::pumpingSlot(void)
 void MainWindow::ExposureTimeSlot(void)
 {
     //Set dark timer first for most accurate timing
-    SetDarkTimer(PrintScript, MotionMode); //Set dark timer first for best timing
+    SetDarkTimer(PrintScript, m_MotionSettings.MotionMode); //Set dark timer first for best timing
     //Record current time in terminal
     ui->ProgramPrints->append(QTime::currentTime().toString("hh.mm.ss.zzz"));
     updatePlot(); //update plot early in dark time
@@ -922,7 +922,7 @@ void MainWindow::ExposureTimeSlot(void)
         PrintScriptApply(layerCount, LayerThicknessScriptList, LAYER_THICKNESS);
         PrintScriptApply(layerCount, StageVelocityScriptList, STAGE_VELOCITY);
         PrintScriptApply(layerCount, StageAccelerationScriptList, STAGE_ACCELERATION);
-        if (PumpingMode == ON){
+        if (m_MotionSettings.PumpingMode == ON){
             PrintScriptApply(layerCount, PumpHeightScriptList, PUMP_HEIGHT);
         }
         if (PrinterType == ICLIP){
@@ -1005,10 +1005,10 @@ void MainWindow::SetExposureTimer(int InitialExposureFlag, int PrintScript, int 
     }
 }
 
-void MainWindow::SetDarkTimer(int PrintScript, int MotionMode)
+void MainWindow::SetDarkTimer(int PrintScript, int DarkMotionMode)
 {
     double DarkTimeSelect = m_PrintSettings.DarkTime;
-    if (MotionMode == STEPPED)
+    if (DarkMotionMode == STEPPED)
     {
         if (PrintScript == ON){
             if(layerCount < DarkTimeScriptList.size()){
@@ -1026,8 +1026,8 @@ void MainWindow::SetDarkTimer(int PrintScript, int MotionMode)
         ui->ProgramPrints->append("Dark time: " + QString::number(DarkTimeSelect));
     }
     else{
-        if (inMotion == false){
-            Stage.StageAbsoluteMove(PrintEnd, m_PrintSettings.StageType);
+        if (m_MotionSettings.inMotion == false){
+            Stage.StageAbsoluteMove(m_MotionSettings.PrintEnd, m_PrintSettings.StageType);
         }
         PrintProcess();
     }
@@ -1039,7 +1039,7 @@ void MainWindow::SetDarkTimer(int PrintScript, int MotionMode)
  */
 void MainWindow::PrintInfuse()
 {
-    if (ContinuousInjection == OFF){
+    if (m_InjectionSettings.ContinuousInjection == OFF){
         Pump.ClearVolume();
         Sleep(15);
         Pump.StartInfusion();
@@ -1568,11 +1568,11 @@ void MainWindow::on_ContinuousInjection_clicked()
 {
     if (ui->ContinuousInjection->isChecked() == true){
         Pump.SetTargetVolume(0);
-        ContinuousInjection = true;
+        m_InjectionSettings.ContinuousInjection = true;
         ui->ProgramPrints->append("Continuous Injection Selected");
     }
     else{
-        ContinuousInjection = false;
+        m_InjectionSettings.ContinuousInjection = false;
         ui->ProgramPrints->append("Continuous Injection Disabled");
     }
 }
@@ -1910,17 +1910,17 @@ bool MainWindow::initConfirmationScreen()
         DetailedText += "Video Pattern projection mode selected\n";
     }
 
-    if(MotionMode == STEPPED){
+    if(m_MotionSettings.MotionMode == STEPPED){
         DetailedText += "Motion mode set to stepped\n";
     }
-    else if(MotionMode == CONTINUOUS){
+    else if(m_MotionSettings.MotionMode == CONTINUOUS){
         DetailedText += "Motion mode set to continuous\n";
     }
 
-    if(PumpingMode == OFF){
+    if(m_MotionSettings.PumpingMode == OFF){
         DetailedText += "Pumping disabled\n";
     }
-    else if(PumpingMode == ON){
+    else if(m_MotionSettings.PumpingMode == ON){
         DetailedText += "Pumping Enabled\n";
     }
 
@@ -1962,7 +1962,7 @@ bool MainWindow::initConfirmationScreen()
         DetailedText += "Min End Of Run: " + QString::number(m_PrintSettings.MinEndOfRun) + " mm\n";
     }
     else if (PrinterType == ICLIP){
-        if(ContinuousInjection == ON){
+        if(m_InjectionSettings.ContinuousInjection == ON){
             DetailedText += "Continuous injection enabled";
         }
         else{
@@ -2085,9 +2085,9 @@ void MainWindow::saveSettings()
     settings.setValue("PrinterType", PrinterType);
     settings.setValue("StageType", m_PrintSettings.StageType);
 
-    settings.setValue("MotionMode", MotionMode);
-    settings.setValue("PumpingMode",PumpingMode);
-    settings.setValue("PumpingParameter", PumpingParameter);
+    settings.setValue("MotionMode", m_MotionSettings.MotionMode);
+    settings.setValue("PumpingMode",m_MotionSettings.PumpingMode);
+    settings.setValue("PumpingParameter", m_MotionSettings.PumpingParameter);
     settings.setValue("BitMode", m_PrintSettings.BitMode);
 
     settings.setValue("ContinuousInjection", ui->ContinuousInjection->isChecked());
@@ -2131,14 +2131,14 @@ void MainWindow::loadSettings()
 
         PrinterType = settings.value("PrinterType", CLIP30UM).toDouble();
 
-        MotionMode = settings.value("MotionMode", STEPPED).toDouble();
-        PumpingMode = settings.value("PumpingMode", 0).toDouble();
-        PumpingParameter = settings.value("PumpingParameter", 0).toDouble();
+        m_MotionSettings.MotionMode = settings.value("MotionMode", STEPPED).toDouble();
+        m_MotionSettings.PumpingMode = settings.value("PumpingMode", 0).toDouble();
+        m_MotionSettings.PumpingParameter = settings.value("PumpingParameter", 0).toDouble();
         m_PrintSettings.BitMode = settings.value("BitMode", 1).toDouble();
         m_InjectionSettings.InfusionRate = settings.value("InfusionRate", 5).toDouble();
         m_InjectionSettings.InfusionVolume = settings.value("InfusionVolume", 5).toDouble();
 
-        ContinuousInjection = settings.value("ContinuousInjection", OFF).toInt();
+        m_InjectionSettings.ContinuousInjection = settings.value("ContinuousInjection", OFF).toInt();
         loadSettingsFlag = true;
 
         ui->COMPortSelect->setCurrentIndex(settings.value("StageCOM", 0).toInt());
@@ -2180,32 +2180,32 @@ void MainWindow::initSettings()
         ui->DICLIPSelect->setChecked(true);
         ui->CLIPSelect->setChecked(false);
         emit(on_DICLIPSelect_clicked());
-        if(ContinuousInjection == ON){
+        if(m_InjectionSettings.ContinuousInjection == ON){
             ui->ContinuousInjection->setChecked(true);
             emit(on_ContinuousInjection_clicked());
         }
     }
 
-    if(MotionMode == STEPPED){
+    if(m_MotionSettings.MotionMode == STEPPED){
         ui->SteppedMotion->setChecked(true);
         ui->ContinuousMotion->setChecked(false);
         emit(on_SteppedMotion_clicked());
     }
-    else if(MotionMode == CONTINUOUS){
+    else if(m_MotionSettings.MotionMode == CONTINUOUS){
         ui->ContinuousMotion->setChecked(true);
         ui->SteppedMotion->setChecked(false);
         emit(on_ContinuousMotion_clicked());
     }
 
-    if(PumpingMode == ON){
+    if(m_MotionSettings.PumpingMode == ON){
         ui->pumpingCheckBox->setChecked(true);
         emit(on_pumpingCheckBox_clicked());
     }
-    else if(PumpingMode == OFF){
+    else if(m_MotionSettings.PumpingMode == OFF){
         ui->pumpingCheckBox->setChecked(false);
     }
 
-    ui->pumpingParameter->setValue(PumpingParameter);
+    ui->pumpingParameter->setValue(m_MotionSettings.PumpingParameter);
     ui->BitDepthParam->setValue(m_PrintSettings.BitMode);
     ui->InfuseRateParam->setValue(m_InjectionSettings.InfusionRate);
     ui->VolPerLayerParam->setValue(m_InjectionSettings.InfusionVolume);
@@ -2509,7 +2509,7 @@ void MainWindow::StageMove()
                 Stage.StageRelativeMove(-LayerThickness, m_PrintSettings.StageType); //Move stage 1 layer thickness
 
                 //If pumping mode is active, grab pump height from script and move stage Pump height - layer thickness
-                if (PumpingMode == ON){
+                if (m_MotionSettings.PumpingMode == ON){
                     double PumpParam = PumpHeightScriptList.at(layerCount).toDouble();
                     Stage.StageRelativeMove(PumpParam - LayerThickness, m_PrintSettings.StageType);
                 }
@@ -2517,9 +2517,9 @@ void MainWindow::StageMove()
         }
     }
     else{
-        if (PumpingMode == ON){
-            Stage.StageRelativeMove(PumpingParameter - m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
-            ui->ProgramPrints->append("Pumping active, moving stage: " + QString::number(PumpingParameter - m_PrintSettings.LayerThickness) + " um");
+        if (m_MotionSettings.PumpingMode == ON){
+            Stage.StageRelativeMove(m_MotionSettings.PumpingParameter - m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
+            ui->ProgramPrints->append("Pumping active, moving stage: " + QString::number(m_MotionSettings.PumpingParameter - m_PrintSettings.LayerThickness) + " um");
         }
         else{
             Stage.StageRelativeMove(-m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
