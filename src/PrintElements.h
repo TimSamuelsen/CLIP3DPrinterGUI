@@ -43,6 +43,7 @@ struct PrintScripts
 
 struct PrintSettings
 {
+    int PrinterType = CLIP30UM;
     int ProjectionMode = POTF;
     Stage_t StageType;
     int BitMode = 1;
@@ -76,7 +77,7 @@ struct PrintControls
     double RemainingPrintTime;
 
     //Video Pattern specific
-    int Bitlayer = 1;
+    int BitLayer = 1;
     int FrameCount = 0;
     int ReSyncFlag = 0;
     int ReSyncCount = 0;
