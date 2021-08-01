@@ -10,7 +10,18 @@
 
 class DLP9000
 {
+
 public:
+    static DLP9000& Instance() {
+        static DLP9000 myInstance;
+        return myInstance;
+    }
+
+    DLP9000(DLP9000 const&) = delete;               //Copy construct
+    DLP9000(DLP9000&&) = delete;                    //Move contstruct
+    DLP9000& operator=(DLP9000 const&) = delete;    //Copy assign
+    DLP9000& operator=(DLP9000 &&) = delete;        //Move assign
+
     bool InitProjector(void);
     void AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, PrintScripts m_PrintScripts, PrintControls m_PrintControls);
     int UpdatePatternMemory(int totalSplashImages, bool firmware);
@@ -27,8 +38,15 @@ private:
     QString m_ptnImagePath;
     QList<PatternElement> m_elements;
     int calculateSplashImageDetails(int *totalSplashImages, bool firmware, int ProjectionMode);
+
+protected:
+    DLP9000() {
+
+    }
+
+    ~DLP9000() {
+
+    }
+
 };
-
-
-
 #endif // DLP9000_H

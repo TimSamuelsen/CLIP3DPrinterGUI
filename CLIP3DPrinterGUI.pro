@@ -24,6 +24,7 @@ SOURCES += \
     src/manualpumpcontrol.cpp \
     src/manualstagecontrol.cpp \
     src/prinstscriptdialog.cpp \
+    src/printprocess.cpp \
     src/qcustomplot/qcustomplot.cpp \
     src/serialib/serialib.cpp
 

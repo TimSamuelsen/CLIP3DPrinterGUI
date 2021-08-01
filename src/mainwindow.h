@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTime>
 #include "manualstagecontrol.h"
 #include "manualpumpcontrol.h"
 #include "imageprocessing.h"
@@ -31,6 +32,7 @@ typedef enum Parameter{
     INJECTION_DELAY,
 }Parameter_t;
 
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -46,8 +48,6 @@ public:
     imagepopout popout;
     manualpumpcontrol Pump;
     ManualStageControl Stage;
-    QList<PrintControls> mw_PrintControls;
-
 
 
 public slots:
@@ -198,6 +198,8 @@ private:
     PrintControls m_PrintControls;
     InjectionSettings m_InjectionSettings;
     MotionSettings m_MotionSettings;
+    QTime PrintStartTime;
+    double GetPosition;
 
     bool ValidateSettings(void);
     void loadSettings();
