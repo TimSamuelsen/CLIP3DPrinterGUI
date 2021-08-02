@@ -54,8 +54,6 @@ public slots:
     void showError(QString errMsg);
 
 private slots:
-    void timerTimeout(void);
-
     void on_ManualStage_clicked();
 
     void on_SetSliceThickness_clicked();
@@ -220,5 +218,7 @@ private:
     bool PrintScriptApply(uint layerCount, QStringList Script, Parameter_t DynamicParam);
     void PrintComplete();
     void EnableParameter(Parameter_t Parameter, bool State);
+
+    QStringList GetImageList(PrintControls m_PrintControls, PrintSettings m_PrintSettings);
 };
 #endif // MAINWINDOW_H

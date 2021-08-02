@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <cstring>
 #include <time.h>
+#include <windows.h>
 
 #include <Qt>
 #include <QElapsedTimer>
@@ -17,15 +18,6 @@
 #include <QSettings>
 
 #include "API.h"
-#include "string.h"
-#include "usb.h"
-#include "firmware.h"
-#include "splash.h"
-#include "flashloader.h"
-#include "batchfile.h"
-#include <string>
-#include <windows.h>
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "manualstagecontrol.h"
@@ -79,15 +71,6 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 /**
- * @brief MainWindow::timerTimeout
- * Currently not in use, to be used for ui refresh rate
- */
-void MainWindow::timerTimeout(void)
-{
-    //emit(on_GetPosition_clicked());
-}
-
-/**
  * @brief MainWindow::~MainWindow
  * Called when the main window is closed
  */
@@ -109,13 +92,13 @@ void MainWindow::on_ManualStage_clicked()
     ManualStageUI->show();
 
     //Initialize stage for manual stage control
-    //SMC.Home(); //Home command is issued to make sure the stage is referenced upon startup
+    //Home command is issued to make sure the stage is referenced upon startup
     Stage.StageHome(m_PrintSettings.StageType);
-    //SMC.SMC100CClose(); //Close main window connection to allow manual stage control to take over, ideally this would not be needed and it would stay on the same connection.
+    //Close main window connection to allow manual stage control to take over, ideally this would not be needed and it would stay on the same connection.
     Stage.StageClose(m_PrintSettings.StageType);
 
     //Update Terminal and Stage Connection Indicator
-    ui->ProgramPrints->append("Manual Stage Control Entered"); //Print to terminal
+    PrintToTerminal("Manual Stage Control Entered"); //Print to terminal
     ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 255); border: 1px solid black;"); //Set color of indicator to teal to indicate in manual stage control
     ui->StageConnectionIndicator->setText("Manual Control"); //Set text on indicator to indicate in manual stage control
 }
@@ -131,7 +114,7 @@ void MainWindow::on_pushButton_clicked()
     ManualPumpUI = new manualpumpcontrol();
     ManualPumpUI->show();
 
-    ui->ProgramPrints->append("Manual Pump Control Entered"); //Print to terminal
+    PrintToTerminal("Manual Pump Control Entered"); //Print to terminal
     Pump.PSerial.closeDevice(); //Closes main window pump connection to allow manual pump control to take over
 }
 
@@ -144,7 +127,7 @@ void MainWindow::on_ImageProcess_clicked()
     //Create new image processing window
     ImageProcessUI = new imageprocessing();
     ImageProcessUI->show();
-    ui->ProgramPrints->append("Opening Image Processing");
+    PrintToTerminal("Opening Image Processing");
 }
 
 /**
@@ -155,7 +138,6 @@ void MainWindow::on_ImageProcess_clicked()
 void MainWindow::on_GetPosition_clicked()
 {
     //Get position and store it in char*, could store directly in QString but if result is null it can cause issues
-    //char* ReadPosition = SMC.GetPosition();
     char* ReadPosition = Stage.StageGetPosition(m_PrintSettings.StageType);
 
     //If the string length returned from SMC.GetPosition is > 1, then no errors have occurred
@@ -170,7 +152,7 @@ void MainWindow::on_GetPosition_clicked()
 
         }
         ui->CurrentPositionIndicator->setText(CurrentPosition); //Update current position indicator
-        ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + " mm"); //Print to terminal
+        PrintToTerminal("Stage is currently at: " + CurrentPosition + " mm"); //Print to terminal
         ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble()); //Update slider position
         GetPosition = CurrentPosition.toDouble(); //Update module variable GetPosition (to be accessed from other functions)
     }
@@ -234,14 +216,14 @@ void MainWindow::Check4VideoLock()
 
     //If first attempt
     if (repeatCount == 0)
-        ui->ProgramPrints->append("Attempting to Lock to Video Source");
+        PrintToTerminal("Attempting to Lock to Video Source");
 
     //if attempt to get status is succesful
     if (LCR_GetStatus(&HWStatus, &SysStatus, &MainStatus) == 0)
     {
         //If BIT3 in main status is set, then video source has already been locked
         if(MainStatus & BIT3){
-            ui->ProgramPrints->append("External Video Source Locked");
+            PrintToTerminal("External Video Source Locked");
             VlockPopup.close();
 
             //If attempt to set to Video pattern mode is not succesful
@@ -254,16 +236,16 @@ void MainWindow::Check4VideoLock()
                 ui->POTFcheckbox->setChecked(true);
                 emit(on_POTFcheckbox_clicked());
             }
-            ui->ProgramPrints->append("Video Pattern Mode Enabled");
+            PrintToTerminal("Video Pattern Mode Enabled");
             return;
         }
         else{ //Video source is currently not locked
-            ui->ProgramPrints->append("External Video Source Not Locked, Please Wait");
+            PrintToTerminal("External Video Source Not Locked, Please Wait");
 
             //Get current display mode and print to terminal, used for debug
             API_DisplayMode_t testDM;
             LCR_GetMode(&testDM);
-            ui->ProgramPrints->append(QString::number(testDM));
+            PrintToTerminal(QString::number(testDM));
 
             //Repeats 15 times (15 seconds) before telling user that an error has occurred
             if(repeatCount < 15)
@@ -274,7 +256,7 @@ void MainWindow::Check4VideoLock()
             }
             else //System has attempted 15 times to lock to video source, and attempt is determined to be a failure
             {
-                ui->ProgramPrints->append("External Video Source Lock Failed");
+                PrintToTerminal("External Video Source Lock Failed");
                 showError("External Video Source Lock Failed");
                 ui->VP_HDMIcheckbox->setChecked(false); //Uncheck video pattern mode
 
@@ -365,7 +347,7 @@ void MainWindow::on_CLIPSelect_clicked()
 void MainWindow::on_SetBitDepth_clicked()
 {
     m_PrintSettings.BitMode = ui->BitDepthParam->value(); //Grab value from GUI bit depth parameter
-    ui->ProgramPrints->append("Bit-Depth set to: " + QString::number(m_PrintSettings.BitMode));
+    PrintToTerminal("Bit-Depth set to: " + QString::number(m_PrintSettings.BitMode));
 }
 
 /**
@@ -379,7 +361,7 @@ void MainWindow::on_SteppedMotion_clicked()
     {
         m_MotionSettings.MotionMode = STEPPED; //Set MotionMode to STEPPED
         ui->ContinuousMotion->setChecked(false); //Updates UI to reflect stepped mode
-        ui->ProgramPrints->append("Stepped Motion Selected");
+        PrintToTerminal("Stepped Motion Selected");
         EnableParameter(DARK_TIME, ON); //Enable dark time selection
     }
 }
@@ -395,7 +377,7 @@ void MainWindow::on_ContinuousMotion_clicked()
     {
         m_MotionSettings.MotionMode = CONTINUOUS; //Set MotionMode to Continuous
         ui->SteppedMotion->setChecked(false); //Update UI to reflect continuous mode
-        ui->ProgramPrints->append("Continuous Motion Selected");
+        PrintToTerminal("Continuous Motion Selected");
 
         //Disable dark time and set it to 0, because there is no dark time in Continuous mode
         m_PrintSettings.DarkTime = 0;
@@ -417,14 +399,14 @@ void MainWindow::on_pumpingCheckBox_clicked()
 
         //Update UI
         EnableParameter(PUMP_HEIGHT, ON);
-        ui->ProgramPrints->append("Pumping Enabled");
+        PrintToTerminal("Pumping Enabled");
     }
     else{
         m_MotionSettings.PumpingMode = OFF; //Disable pumping mode
 
         //Update UI
         EnableParameter(PUMP_HEIGHT, OFF);
-        ui->ProgramPrints->append("Pumping Disabled");
+        PrintToTerminal("Pumping Disabled");
     }
 }
 
@@ -437,10 +419,10 @@ void MainWindow::on_setPumping_clicked()
     //If pumping is currently enabled
     if(m_MotionSettings.PumpingMode == ON){
         m_MotionSettings.PumpingParameter = ui->pumpingParameter->value()/1000; //Grab value from UI and divide by 1000 to scale units
-        ui->ProgramPrints->append("Pumping depth set to: " + QString::number(m_MotionSettings.PumpingParameter*1000) + " μm");
+        PrintToTerminal("Pumping depth set to: " + QString::number(m_MotionSettings.PumpingParameter*1000) + " μm");
     }
     else{ //Pumping is currently disabled
-        ui->ProgramPrints->append("Please enable pumping before setting pumping parameter");
+        PrintToTerminal("Please enable pumping before setting pumping parameter");
     }
 }
 
@@ -466,10 +448,10 @@ void MainWindow::on_SelectFile_clicked()
     }
     else
     {
-        ui->ProgramPrints->append("Please select more images");
+        PrintToTerminal("Please select more images");
     }
     int SliceCount = ui->FileList->count();
-    ui->ProgramPrints->append(QString::number(SliceCount) + " Images Currently Selected");
+    PrintToTerminal(QString::number(SliceCount) + " Images Currently Selected");
 }
 
 /**
@@ -570,21 +552,21 @@ void MainWindow::on_SelectPrintScript_clicked()
     for (int i= 0; i < m_PrintScript.ExposureScriptList.size(); i++)
     {
         if(m_PrintSettings.PrinterType == ICLIP){
-            ui->ProgramPrints->append(m_PrintScript.ExposureScriptList.at(i) + "," + m_PrintScript.LEDScriptList.at(i) + "," + m_PrintScript.DarkTimeScriptList.at(i) + "," + m_PrintScript.LayerThicknessScriptList.at(i) + "," + m_PrintScript.StageVelocityScriptList.at(i)
+            PrintToTerminal(m_PrintScript.ExposureScriptList.at(i) + "," + m_PrintScript.LEDScriptList.at(i) + "," + m_PrintScript.DarkTimeScriptList.at(i) + "," + m_PrintScript.LayerThicknessScriptList.at(i) + "," + m_PrintScript.StageVelocityScriptList.at(i)
                                       + "," + m_PrintScript.StageAccelerationScriptList.at(i) + "," + m_PrintScript.PumpHeightScriptList.at(i) + "," + m_PrintScript.InjectionVolumeScriptList.at(i) + "," + m_PrintScript.InjectionRateScriptList.at(i));
         }
         else{
-            ui->ProgramPrints->append(m_PrintScript.ExposureScriptList.at(i) + "," + m_PrintScript.LEDScriptList.at(i) + "," + m_PrintScript.DarkTimeScriptList.at(i) + "," + m_PrintScript.LayerThicknessScriptList.at(i) + "," + m_PrintScript.StageVelocityScriptList.at(i)
+            PrintToTerminal(m_PrintScript.ExposureScriptList.at(i) + "," + m_PrintScript.LEDScriptList.at(i) + "," + m_PrintScript.DarkTimeScriptList.at(i) + "," + m_PrintScript.LayerThicknessScriptList.at(i) + "," + m_PrintScript.StageVelocityScriptList.at(i)
                                       + "," + m_PrintScript.StageAccelerationScriptList.at(i) + "," + m_PrintScript.PumpHeightScriptList.at(i));
         }
     }
-    ui->ProgramPrints->append("Print List has: " + QString::number(m_PrintScript.ExposureScriptList.size()) + " exposure time entries");
-    ui->ProgramPrints->append("Print List has: " + QString::number(m_PrintScript.LEDScriptList.size()) + " LED intensity entries");
-    ui->ProgramPrints->append("Print List has: " + QString::number(m_PrintScript.DarkTimeScriptList.size()) + " dark time entries");
-    ui->ProgramPrints->append("Print List has: " + QString::number(m_PrintScript.LayerThicknessScriptList.size()) + " layer thickness entries");
-    ui->ProgramPrints->append("Print List has: " + QString::number(m_PrintScript.StageVelocityScriptList.size()) + " stage velocity entries");
-    ui->ProgramPrints->append("Print List has: " + QString::number(m_PrintScript.StageAccelerationScriptList.size()) + " stage acceleration entries");
-    ui->ProgramPrints->append("Print List has: " + QString::number(m_PrintScript.PumpHeightScriptList.size()) + + " pump height entries");
+    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.ExposureScriptList.size()) + " exposure time entries");
+    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.LEDScriptList.size()) + " LED intensity entries");
+    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.DarkTimeScriptList.size()) + " dark time entries");
+    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.LayerThicknessScriptList.size()) + " layer thickness entries");
+    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.StageVelocityScriptList.size()) + " stage velocity entries");
+    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.StageAccelerationScriptList.size()) + " stage acceleration entries");
+    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.PumpHeightScriptList.size()) + + " pump height entries");
 
     if (m_PrintScript.ExposureScriptList.size() > 0)
     {
@@ -596,8 +578,8 @@ void MainWindow::on_SelectPrintScript_clicked()
         ui->LiveValue3->setText(QString::number(m_PrintScript.DarkTimeScriptList.at(0).toInt()));
         if(m_PrintSettings.PrinterType == ICLIP){
             if (m_PrintScript.InjectionVolumeScriptList.size() > 0 && m_PrintScript.InjectionRateScriptList.size() > 0){
-                ui->ProgramPrints->append("Print List has: " + QString::number(m_PrintScript.InjectionVolumeScriptList.size()) + " injection volume entries");
-                ui->ProgramPrints->append("Print List has: " + QString::number(m_PrintScript.InjectionRateScriptList.size()) + " injection rate entries");
+                PrintToTerminal("Print List has: " + QString::number(m_PrintScript.InjectionVolumeScriptList.size()) + " injection volume entries");
+                PrintToTerminal("Print List has: " + QString::number(m_PrintScript.InjectionRateScriptList.size()) + " injection rate entries");
                 ui->LiveValueList4->setCurrentIndex(4);
                 ui->LiveValue4->setText(QString::number(m_PrintScript.InjectionVolumeScriptList.at(0).toDouble()));
                 ui->LiveValueList5->setCurrentIndex(5);
@@ -614,10 +596,6 @@ void MainWindow::on_SelectPrintScript_clicked()
 void MainWindow::on_ClearPrintScript_clicked()
 {
     ui->PrintScriptFile->clear();
-    if (m_PrintScript.PrintScript == 0)
-    {
-
-    }
 }
 /*******************************************Peripheral Connections*********************************************/
 /**
@@ -629,23 +607,23 @@ void MainWindow::on_LightEngineConnectButton_clicked()
 {
     if (DLP.InitProjector())
     {
-        ui->ProgramPrints->append("Light Engine Connected");
+        PrintToTerminal("Light Engine Connected");
         ui->LightEngineIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
         ui->LightEngineIndicator->setText("Connected");
         uint Code;
         //Their GUI does not call reader Errorcode
         if (LCR_ReadErrorCode(&Code) >= 0)
         {
-            ui->ProgramPrints->append("Last Error Code: " + QString::number(Code));
+            PrintToTerminal("Last Error Code: " + QString::number(Code));
         }
         else
         {
-            ui->ProgramPrints->append("Failed to get last error code");
+            PrintToTerminal("Failed to get last error code");
         }
     }
     else
     {
-        ui->ProgramPrints->append("Light Engine Connection Failed");
+        PrintToTerminal("Light Engine Connection Failed");
         ui->LightEngineIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
         ui->LightEngineIndicator->setText("Disconnected");
     }
@@ -658,15 +636,13 @@ void MainWindow::on_LightEngineConnectButton_clicked()
  */
 void MainWindow::on_StageConnectButton_clicked()
 {
-    //SMC.SMC100CClose();
     Stage.StageClose(m_PrintSettings.StageType);
     QString COMSelect = ui->COMPortSelect->currentText();
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
-    //if (SMC.SMC100CInit(COM) == true && SMC.Home() == true)
     if (Stage.StageInit(COM, m_PrintSettings.StageType) == true && Stage.StageHome(m_PrintSettings.StageType) == true)
     {
-        ui->ProgramPrints->append("Stage Connected");
+        PrintToTerminal("Stage Connected");
         ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
         ui->StageConnectionIndicator->setText("Connected");
         Sleep(10);
@@ -674,7 +650,7 @@ void MainWindow::on_StageConnectButton_clicked()
     }
     else
     {
-        ui->ProgramPrints->append("Stage Connection Failed");
+        PrintToTerminal("Stage Connection Failed");
         ui->StageConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
         ui->StageConnectionIndicator->setText("Disconnected");
     }
@@ -692,13 +668,13 @@ void MainWindow::on_PumpConnectButton_clicked()
     char* COM = array.data();
     if (Pump.PSerial.openDevice(COM,9600) == 1)
     {
-        ui->ProgramPrints->append("Pump Connected");
+        PrintToTerminal("Pump Connected");
         ui->PumpConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
         ui->PumpConnectionIndicator->setText("Connected");
     }
     else
     {
-        ui->ProgramPrints->append("Pump Connection Failed");
+        PrintToTerminal("Pump Connection Failed");
         ui->PumpConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
         ui->PumpConnectionIndicator->setText("Disconnected");
     }
@@ -712,7 +688,7 @@ void MainWindow::on_PumpConnectButton_clicked()
  */
 void MainWindow::on_ResinSelect_activated(const QString &arg1)
 {
-    ui->ProgramPrints->append(arg1 + " Selected");
+    PrintToTerminal(arg1 + " Selected");
 }
 
 /**
@@ -745,7 +721,7 @@ void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
         else //With no images selected auto mode does not worked and the program reverts to normal operation
         {
             ui->AutoCheckBox->setChecked(false);
-            ui->ProgramPrints->append("No Object Image Files Detected, Please Select Image Files First");
+            PrintToTerminal("No Object Image Files Detected, Please Select Image Files First");
         }
     }
     else //Automode is not checked, revert to normal operation
@@ -775,8 +751,7 @@ void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
 void MainWindow::on_AutoCheckBox_clicked()
 {
     int SliceCount = ui->FileList->count();
-    if (SliceCount < 1)
-    {
+    if (SliceCount < 1){
         ui->AutoCheckBox->setChecked(false);
     }
 }
@@ -793,9 +768,9 @@ void MainWindow::on_SetMaxImageUpload_clicked()
     {
         MaxImageVal = m_PrintSettings.InitialExposure + 1;
     }
-    else if (MaxImageVal > 398) //Verifies that max image upload is not greater than the storage limit on light engine
+    else if (MaxImageVal > 395) //Verifies that max image upload is not greater than the storage limit on light engine
     {
-        MaxImageVal = 398;
+        MaxImageVal = 395;
     }
     else //If MaxImageVal is is an acceptable range
     {
@@ -803,7 +778,7 @@ void MainWindow::on_SetMaxImageUpload_clicked()
     }
     m_PrintSettings.MaxImageUpload = MaxImageVal;
     QString MaxImageUploadString = "Set Max Image Upload to: " + QString::number(m_PrintSettings.MaxImageUpload);
-    ui->ProgramPrints->append(MaxImageUploadString);
+    PrintToTerminal(MaxImageUploadString);
 }
 
 
@@ -814,8 +789,7 @@ void MainWindow::on_SetMaxImageUpload_clicked()
 void MainWindow::on_setPrintSpeed_clicked()
 {
     PrintSpeed = (ui->PrintSpeedParam->value());
-    QString PrintSpeedString = "Set Print Speed to: " + QString::number(PrintSpeed) + " um/s";
-    ui->ProgramPrints->append(PrintSpeedString);
+    PrintToTerminal("Set Print Speed to: " + QString::number(PrintSpeed) + " um/s");
     AutoMode();
 }
 
@@ -826,8 +800,7 @@ void MainWindow::on_setPrintSpeed_clicked()
 void MainWindow::on_SetPrintHeight_clicked()
 {
     PrintHeight = (ui->PrintHeightParam->value());
-    QString PrintHeightString = "Set Print Speed to: " + QString::number(PrintHeight) + "" ;
-    ui->ProgramPrints->append(PrintHeightString);
+    PrintToTerminal("Set Print Speed to: " + QString::number(PrintHeight) + "");
     AutoMode();
 }
 
@@ -838,8 +811,7 @@ void MainWindow::on_SetPrintHeight_clicked()
 void MainWindow::on_SetIntialAdhesionTimeButton_clicked()
 {
     m_PrintSettings.InitialExposure = (ui->InitialAdhesionParameter->value());
-    QString InitialExposureString = "Set Initial Exposure to: " + QString::number(m_PrintSettings.InitialExposure) + " s";
-    ui->ProgramPrints->append(InitialExposureString);
+    PrintToTerminal("Set Initial Exposure to: " + QString::number(m_PrintSettings.InitialExposure) + " s");
 }
 
 /**
@@ -850,25 +822,21 @@ void MainWindow::on_SetIntialAdhesionTimeButton_clicked()
 void MainWindow::on_SetStartingPosButton_clicked()
 {
     m_PrintSettings.StartingPosition = (ui->StartingPositionParam->value());
-    QString StartingPositionString = "Set Starting Position to: " + QString::number(m_PrintSettings.StartingPosition) + " mm";
-    ui->ProgramPrints->append(StartingPositionString);
-    //QString CurrentPosition = SMC.GetPosition();
+    PrintToTerminal("Set Starting Position to: " + QString::number(m_PrintSettings.StartingPosition) + " mm");
     QString CurrentPosition = Stage.StageGetPosition(m_PrintSettings.StageType);
     CurrentPosition = CurrentPosition.remove(0,3);
-    ui->ProgramPrints->append("Stage is currently at: " + CurrentPosition + "mm");
+    PrintToTerminal("Stage is currently at: " + CurrentPosition + "mm");
     ui->CurrentPositionIndicator->setText(CurrentPosition);
 }
 
 /**
- * @brief MainWindow::on_Setm_PrintSettings.LayerThickness_clicked
+ * @brief MainWindow::on_SetSliceThickness_clicked
  * Sets m_PrintSettings.LayerThickness variable from the value inputted by the user
  */
 void MainWindow::on_SetSliceThickness_clicked()
 {
     m_PrintSettings.LayerThickness = (ui->SliceThicknessParam->value()/1000);
-    QString ThicknessString = "Set Slice Thickness to: " + QString::number(m_PrintSettings.LayerThickness*1000) + " μm";
-    ui->ProgramPrints->append(ThicknessString);
-    //VP8bitWorkaround();
+    PrintToTerminal("Set Slice Thickness to: " + QString::number(m_PrintSettings.LayerThickness*1000) + " μm");
 }
 /*******************************************Stage Parameters********************************************/
 /**
@@ -879,10 +847,8 @@ void MainWindow::on_SetSliceThickness_clicked()
 void MainWindow::on_SetStageVelocity_clicked()
 {
     m_PrintSettings.StageVelocity = (ui->StageVelocityParam->value());
-    //SMC.SetVelocity(StageVelocity); //Sends command to stage
     Stage.SetStageVelocity(m_PrintSettings.StageVelocity, m_PrintSettings.StageType);
-    QString VelocityString = "Set Stage Velocity to: " + QString::number(m_PrintSettings.StageVelocity) +" mm/s";
-    ui->ProgramPrints->append(VelocityString);
+    PrintToTerminal("Set Stage Velocity to: " + QString::number(m_PrintSettings.StageVelocity) +" mm/s");
 }
 
 /**
@@ -893,10 +859,8 @@ void MainWindow::on_SetStageVelocity_clicked()
 void MainWindow::on_SetStageAcceleration_clicked()
 {
     m_PrintSettings.StageAcceleration = (ui->StageAccelParam->value());
-    //SMC.SetAcceleration(StageAcceleration); //Sends command to stage
     Stage.SetStageAcceleration(m_PrintSettings.StageAcceleration, m_PrintSettings.StageType);
-    QString AccelerationString = "Set Stage Acceleration to: " + QString::number(m_PrintSettings.StageAcceleration) + " mm/s";
-    ui->ProgramPrints->append(AccelerationString);
+    PrintToTerminal("Set Stage Acceleration to: " + QString::number(m_PrintSettings.StageAcceleration) + " mm/s");
 }
 
 /**
@@ -908,8 +872,7 @@ void MainWindow::on_SetMaxEndOfRun_clicked()
 {
     m_PrintSettings.MaxEndOfRun = (ui->MaxEndOfRun->value());
     Stage.SetStagePositiveLimit(m_PrintSettings.MaxEndOfRun, m_PrintSettings.StageType);
-    QString MaxEndOfRunString = "Set Max End Of Run to: " + QString::number(m_PrintSettings.MaxEndOfRun) + " mm";
-    ui->ProgramPrints->append(MaxEndOfRunString);
+    PrintToTerminal("Set Max End Of Run to: " + QString::number(m_PrintSettings.MaxEndOfRun) + " mm");
 }
 
 /**
@@ -921,8 +884,7 @@ void MainWindow::on_SetMinEndOfRun_clicked()
 {
     m_PrintSettings.MinEndOfRun = (ui->MinEndOfRunParam->value());
     Stage.SetStageNegativeLimit(m_PrintSettings.MinEndOfRun, m_PrintSettings.StageType);
-    QString MinEndOfRunString = "Set Min End Of Run to: " + QString::number(m_PrintSettings.MinEndOfRun) + " mm";
-    ui->ProgramPrints->append(MinEndOfRunString);
+    PrintToTerminal("Set Min End Of Run to: " + QString::number(m_PrintSettings.MinEndOfRun) + " mm");
 }
 
 /******************************************Light Engine Parameters********************************************/
@@ -933,8 +895,7 @@ void MainWindow::on_SetMinEndOfRun_clicked()
 void MainWindow::on_SetDarkTime_clicked()
 {
     m_PrintSettings.DarkTime = (ui->DarkTimeParam->value()*1000);
-    QString DarkTimeString = "Set Dark Time to: " + QString::number(m_PrintSettings.DarkTime/1000) + " ms";
-    ui->ProgramPrints->append(DarkTimeString);
+    PrintToTerminal("Set Dark Time to: " + QString::number(m_PrintSettings.DarkTime/1000) + " ms");
 }
 
 /**
@@ -944,8 +905,7 @@ void MainWindow::on_SetDarkTime_clicked()
 void MainWindow::on_SetExposureTime_clicked()
 {
     m_PrintSettings.ExposureTime = (ui->ExposureTimeParam->value()*1000);
-    QString ExposureTimeString = "Set Exposure Time to: " + QString::number(m_PrintSettings.ExposureTime/1000) + " ms";
-    ui->ProgramPrints->append(ExposureTimeString);
+    PrintToTerminal("Set Exposure Time to: " + QString::number(m_PrintSettings.ExposureTime/1000) + " ms");
 }
 
 /**
@@ -955,8 +915,7 @@ void MainWindow::on_SetExposureTime_clicked()
 void MainWindow::on_SetUVIntensity_clicked()
 {
     m_PrintSettings.UVIntensity = (ui->UVIntensityParam->value());
-    QString UVIntensityString = "Set UV Intensity to: " + QString::number(m_PrintSettings.UVIntensity);
-    ui->ProgramPrints->append(UVIntensityString);
+    PrintToTerminal("Set UV Intensity to: " + QString::number(m_PrintSettings.UVIntensity));
 }
 /*******************************************Pump Parameters********************************************/
 /**
@@ -967,11 +926,11 @@ void MainWindow::on_ContinuousInjection_clicked()
     if (ui->ContinuousInjection->isChecked() == true){
         Pump.SetTargetVolume(0);
         m_InjectionSettings.ContinuousInjection = true;
-        ui->ProgramPrints->append("Continuous Injection Selected");
+        PrintToTerminal("Continuous Injection Selected");
     }
     else{
         m_InjectionSettings.ContinuousInjection = false;
-        ui->ProgramPrints->append("Continuous Injection Disabled");
+        PrintToTerminal("Continuous Injection Disabled");
     }
 }
 
@@ -982,8 +941,7 @@ void MainWindow::on_SetInfuseRate_clicked()
 {
     m_InjectionSettings.InfusionRate = ui->InfuseRateParam->value();
     Pump.SetInfuseRate(m_InjectionSettings.InfusionRate);
-    QString InfusionRateString = "Set Infusion Rate to: " + QString::number(m_InjectionSettings.InfusionRate) + " μl/s";
-    ui->ProgramPrints->append(InfusionRateString);
+    PrintToTerminal("Set Infusion Rate to: " + QString::number(m_InjectionSettings.InfusionRate) + " μl/s");
 }
 
 /**
@@ -993,13 +951,13 @@ void MainWindow::on_SetVolPerLayer_clicked()
 {
     m_InjectionSettings.InfusionVolume = ui->VolPerLayerParam->value();
     Pump.SetTargetVolume(m_InjectionSettings.InfusionVolume);
-    QString InfusionVolumeString = "Set Infusion Volume per layer to: " + QString::number(m_InjectionSettings.InfusionVolume) + " ul";
-    ui->ProgramPrints->append(InfusionVolumeString);
+    PrintToTerminal("Set Infusion Volume per layer to: " + QString::number(m_InjectionSettings.InfusionVolume) + " ul");
 }
 
 void MainWindow::on_SetInitialVolume_clicked()
 {
     m_InjectionSettings.InitialVolume = ui->InitialVolumeParam->value();
+    PrintToTerminal("Intial injection volume set to: QString::number(m_InjectionSettings.InitialVolume)");
 }
 
 void MainWindow::on_PreMovementCheckbox_clicked()
@@ -1007,13 +965,13 @@ void MainWindow::on_PreMovementCheckbox_clicked()
     if (ui->PreMovementCheckbox->isChecked() == true){
         ui->PostMovementCheckbox->setChecked(false);
         m_InjectionSettings.InjectionDelayFlag = PRE;
-        ui->ProgramPrints->append("Pre-Injection delay enabled");
+        PrintToTerminal("Pre-Injection delay enabled");
     }
     else{
         ui->PostMovementCheckbox->setChecked(false);
         ui->PreMovementCheckbox->setChecked(false);
         m_InjectionSettings.InjectionDelayFlag = OFF;
-        ui->ProgramPrints->append("Injection delay disabled");
+        PrintToTerminal("Injection delay disabled");
     }
 }
 
@@ -1022,82 +980,22 @@ void MainWindow::on_PostMovementCheckbox_clicked()
     if (ui->PostMovementCheckbox->isChecked() == true){
         ui->PreMovementCheckbox->setChecked(false);
         m_InjectionSettings.InjectionDelayFlag = POST;
-        ui->ProgramPrints->append("Post-Injection delay enabled");
+        PrintToTerminal("Post-Injection delay enabled");
     }
     else{
         ui->PostMovementCheckbox->setChecked(false);
         ui->PreMovementCheckbox->setChecked(false);
         m_InjectionSettings.InjectionDelayFlag = OFF;
-        ui->ProgramPrints->append("Injection delay disabled");
+        PrintToTerminal("Injection delay disabled");
     }
 }
 
 void MainWindow::on_SetInjectionDelay_clicked()
 {
     m_InjectionSettings.InjectionDelayParam = ui->InjectionDelayParam->value();
-    ui->ProgramPrints->append("Injection delay set to: " + QString::number(m_InjectionSettings.InjectionDelayParam));
+    PrintToTerminal("Injection delay set to: " + QString::number(m_InjectionSettings.InjectionDelayParam));
 }
 
-/*******************************************Live Value Monitoring********************************************/
-/**
- * @brief MainWindow::on_LiveValueList1_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList1_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append("LV1: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList2_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList2_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append("LV2: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList3_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList3_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append("LV3: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList4_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList4_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append("LV4: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList5_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList5_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append("LV5: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList6_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList6_activated(const QString &arg1)
-{
-    ui->ProgramPrints->append("LV6: " + arg1);
-}
 /*******************************************Helper Functions********************************************/
 /**
  * @brief MainWindow::showError
@@ -1106,7 +1004,7 @@ void MainWindow::on_LiveValueList6_activated(const QString &arg1)
  */
 void MainWindow::showError(QString errMsg)
 {
-    ui->ProgramPrints->append("ERROR: " + errMsg);
+    PrintToTerminal("ERROR: " + errMsg);
     QMessageBox errMsgBox;
     char errStr[128];
 
@@ -1129,7 +1027,7 @@ void MainWindow::saveText()
      QString LogDate = CurrentDateTime.toString("yyyy-MM-dd");
      QString LogTime = CurrentDateTime.toString("hh.mm.ss");
      QString LogTitle = LogFileDestination + "/CLIPGUITEST_" + LogDate + "_" + LogTime + ".txt";
-     ui->ProgramPrints->append(LogTitle);
+     PrintToTerminal(LogTitle);
      QFile file(LogTitle);
      if (file.open(QIODevice::WriteOnly | QFile::Text))
      {
@@ -1151,7 +1049,7 @@ void MainWindow::validateStartingPosition()
     CurrentPosition = CurrentPosition.remove(0,3);
     if (CurrentPosition.toInt() > (m_PrintSettings.StartingPosition - 0.1) && CurrentPosition.toInt() < (m_PrintSettings.StartingPosition +0.1))
     {
-        ui->ProgramPrints->append("Stage has reached Starting Position");
+        PrintToTerminal("Stage has reached Starting Position");
         ui->StartPrint->setEnabled(true);
     }
     else
@@ -1173,16 +1071,12 @@ void MainWindow::initStageSlot(void)
         {
             if (StagePrep1 == false)
             {
-                //SMC.SetVelocity(3);
                 Stage.SetStageVelocity(3, m_PrintSettings.StageType);
                 Sleep(20);
-                //SMC.AbsoluteMove((StartingPosition-3));
                 Stage.StageAbsoluteMove(m_PrintSettings.StartingPosition-3, m_PrintSettings.StageType);
                 Sleep(20);
-                //QString MoveTime = SMC.GetMotionTime();
-                //MoveTime.remove(0,3);
                 StagePrep1 = true;
-                ui->ProgramPrints->append("Performing Rough Stage Movement");
+                PrintToTerminal("Performing Rough Stage Movement");
             }
             QTimer::singleShot(1000, this, SLOT(initStageSlot()));
         }
@@ -1193,7 +1087,7 @@ void MainWindow::initStageSlot(void)
     }
     else //stage is in gcode mode
     {
-        ui->ProgramPrints->append("Auto stage initialization disabled for iCLIP, please move stage to endstop with manual controls");
+        PrintToTerminal("Auto stage initialization disabled for iCLIP, please move stage to endstop with manual controls");
     }
 }
 
@@ -1215,12 +1109,10 @@ void MainWindow::fineMovement()
         if (StagePrep2 == false)
         {
             Sleep(20);
-            //SMC.SetVelocity(0.3);
             Stage.SetStageVelocity(0.3, m_PrintSettings.StageType);
             Sleep(20);
-            //SMC.AbsoluteMove(StartingPosition);
             Stage.StageAbsoluteMove(m_PrintSettings.StartingPosition, m_PrintSettings.StageType);
-            ui->ProgramPrints->append("Fine Stage Movement");
+            PrintToTerminal("Fine Stage Movement");
             StagePrep2 = true;
         }
         QTimer::singleShot(1000, this, SLOT(fineMovement()));
@@ -1233,7 +1125,7 @@ void MainWindow::fineMovement()
  */
 void MainWindow::verifyStageParams()
 {
-    ui->ProgramPrints->append("Verifying Stage Parameters");
+    PrintToTerminal("Verifying Stage Parameters");
     Sleep(50);
     Stage.SetStageAcceleration(m_PrintSettings.StageAcceleration, m_PrintSettings.StageType);
     Sleep(50);
@@ -1241,7 +1133,6 @@ void MainWindow::verifyStageParams()
     Sleep(50);
     Stage.SetStagePositiveLimit(m_PrintSettings.MaxEndOfRun, m_PrintSettings.StageType);
     Sleep(50);
-    //SMC.SetVelocity(StageVelocity);
     Stage.SetStageVelocity(m_PrintSettings.StageVelocity, m_PrintSettings.StageType);
 }
 
@@ -1257,21 +1148,21 @@ void MainWindow::AutoMode()
         int SliceCount = ui->FileList->count();
         if (SliceCount > 0)
         {
-            ui->ProgramPrints->append("WARNING: Auto Mode is not accurate if you have not selected all your object image files");
+            PrintToTerminal("WARNING: Auto Mode is not accurate if you have not selected all your object image files");
             int TotalPrintTime = PrintHeight / PrintSpeed;  //  um/(um/s) = s
-            //ui->ProgramPrints->append("PrintHeight: " + QString::number(PrintHeight) + " PrintSpeed: " + QString::number(PrintSpeed) + "  TotalPrintTime: " + QString::number(TotalPrintTime));
+            //PrintToTerminal("PrintHeight: " + QString::number(PrintHeight) + " PrintSpeed: " + QString::number(PrintSpeed) + "  TotalPrintTime: " + QString::number(TotalPrintTime));
             m_PrintSettings.ExposureTime = (TotalPrintTime*1000) / SliceCount;
-            //ui->ProgramPrints->append("Total Print Time: " + QString::number(TotalPrintTime) + " Slice Count" + QString::number(SliceCount) + "  ExposureTime: " + QString::number(ExposureTime));
+            //PrintToTerminal("Total Print Time: " + QString::number(TotalPrintTime) + " Slice Count" + QString::number(SliceCount) + "  ExposureTime: " + QString::number(ExposureTime));
             ui->ExposureTimeParam->setValue(m_PrintSettings.ExposureTime);
-            ui->ProgramPrints->append("Calculated Exposure Time: " + QString::number(m_PrintSettings.ExposureTime) + " ms");
+            PrintToTerminal("Calculated Exposure Time: " + QString::number(m_PrintSettings.ExposureTime) + " ms");
 
             m_PrintSettings.LayerThickness = PrintHeight / SliceCount;
             ui->SliceThicknessParam->setValue(m_PrintSettings.LayerThickness);
-            ui->ProgramPrints->append("Calculated Slice Thickness: " + QString::number(m_PrintSettings.LayerThickness) + " um");
+            PrintToTerminal("Calculated Slice Thickness: " + QString::number(m_PrintSettings.LayerThickness) + " um");
         }
         else
         {
-            ui->ProgramPrints->append("No Object Image Files Detected, Please Select Image Files First");
+            PrintToTerminal("No Object Image Files Detected, Please Select Image Files First");
             ui->AutoCheckBox->setChecked(false);
             emit(on_AutoCheckBox_stateChanged(1));
         }
@@ -1376,19 +1267,19 @@ bool MainWindow::initConfirmationScreen()
 
     if (confScreen.clickedButton() == cancelButton)
     {
-        ui->ProgramPrints->append("Print Parameters Not Confirmed");
-        ui->ProgramPrints->append("Cancelling Print");
+        PrintToTerminal("Print Parameters Not Confirmed");
+        PrintToTerminal("Cancelling Print");
     }
     else if (confScreen.clickedButton() == okButton)
     {
-        ui->ProgramPrints->append("Print Parameters Confirmed");
-        ui->ProgramPrints->append(DetailedText);
-        ui->ProgramPrints->append("Proceding to Stage Movement and Image Upload");
+        PrintToTerminal("Print Parameters Confirmed");
+        PrintToTerminal(DetailedText);
+        PrintToTerminal("Proceding to Stage Movement and Image Upload");
         retVal = true;
     }
     else
     {
-        ui->ProgramPrints->append("ConfScreen Error");
+        PrintToTerminal("ConfScreen Error");
     }
     return retVal;
 }
@@ -1403,52 +1294,52 @@ bool MainWindow::ValidateSettings(void)
     //Validate m_PrintSettings.LayerThickness
     if (m_PrintSettings.LayerThickness <= 0){
         showError("Invalid Slice Thickness");
-        ui->ProgramPrints->append("Invalid Slice Thickness");
+        PrintToTerminal("Invalid Slice Thickness");
         return false;
     }
     //Validate StageVelocity
     else if (m_PrintSettings.StageVelocity <= 0 || m_PrintSettings.StageVelocity > 10){
         showError("Invalid Stage Velocity");
-        ui->ProgramPrints->append("Invalid Stage Velocity");
+        PrintToTerminal("Invalid Stage Velocity");
         return false;
     }
     //Validate StageAcceleration
     else if (m_PrintSettings.StageAcceleration <= 0 || m_PrintSettings.StageAcceleration > 10){
         showError("Invalid Stage Acceleration");
-        ui->ProgramPrints->append("Invalid Stage Acceleration");
+        PrintToTerminal("Invalid Stage Acceleration");
         return false;
     }
     //Validate MaxEndOfRun
     else if (m_PrintSettings.MaxEndOfRun < -5 || m_PrintSettings.MaxEndOfRun > 65 || m_PrintSettings.MinEndOfRun >= m_PrintSettings.MaxEndOfRun){
         showError("Invalid Max End Of Run");
-        ui->ProgramPrints->append("Invalid Max End Of Run");
+        PrintToTerminal("Invalid Max End Of Run");
         return false;
     }
     //Validate StageMinEndOfRun
     else if (m_PrintSettings.MinEndOfRun < -5 || m_PrintSettings.MinEndOfRun > 65 || m_PrintSettings.MinEndOfRun >= m_PrintSettings.MaxEndOfRun){
         showError("Invalid Min End Of Run");
-        ui->ProgramPrints->append("Invalid Min End Of Run");
+        PrintToTerminal("Invalid Min End Of Run");
         return false;
     }
     //Validate DarkTime
     else if (m_PrintSettings.DarkTime < 0){
         showError("Invalid Dark Time");
-        ui->ProgramPrints->append("Invalid Dark Time");
+        PrintToTerminal("Invalid Dark Time");
         return false;
     }
     //Validate ExposureTime
     else if (m_PrintSettings.ExposureTime <= 0){
         showError("Invalid Exposure Time");
-        ui->ProgramPrints->append("Invalid Exposure Time");
+        PrintToTerminal("Invalid Exposure Time");
         return false;
     }
     //Validate UVIntensity
     else if (m_PrintSettings.UVIntensity < 1 || m_PrintSettings.UVIntensity > 255){
         showError("Invalid UV Intensity");
-        ui->ProgramPrints->append("Invalid UVIntensity");
+        PrintToTerminal("Invalid UVIntensity");
         return false;
     }
-    ui->ProgramPrints->append("All Settings Valid");
+    PrintToTerminal("All Settings Valid");
     return true;
 }
 
@@ -1625,9 +1516,9 @@ void MainWindow::initPlot()
         m_PrintControls.TotalPrintTime = 0;
         for (int i= 0; i < m_PrintScript.ExposureScriptList.size(); i++)
             {
-                //ui->ProgramPrints->append("Exp. Time: " + QString::number(ExposureScriptList.at(i).toDouble()/1000));
+                //PrintToTerminal("Exp. Time: " + QString::number(ExposureScriptList.at(i).toDouble()/1000));
                 m_PrintControls.TotalPrintTime += m_PrintScript.ExposureScriptList.at(i).toDouble()/1000;
-                //ui->ProgramPrints->append("Current Total :" + QString::number(TotalPrintTimeS));
+                //PrintToTerminal("Current Total :" + QString::number(TotalPrintTimeS));
             }
         m_PrintControls.TotalPrintTime += m_PrintControls.nSlice * (m_PrintSettings.DarkTime/(1000*1000));
         m_PrintControls.TotalPrintTime += m_PrintSettings.InitialExposure + 5;
@@ -1790,7 +1681,7 @@ void MainWindow::EnableParameter(Parameter_t Parameter, bool State)
  */
 void MainWindow::PrintComplete()
 {
-    ui->ProgramPrints->append("Print Complete");
+    PrintToTerminal("Print Complete");
     saveText();
     saveSettings();
     Stage.StageStop(m_PrintSettings.StageType);
@@ -1838,10 +1729,10 @@ bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter
                     case LED_INTENSITY:
                         LCR_SetLedCurrents(0, 0, (Script.at(layerCount).toInt()));
                         ui->LiveValue2->setText(QString::number(Script.at(layerCount).toInt()));
-                        ui->ProgramPrints->append("LED Intensity set to: " + QString::number(Script.at(layerCount).toInt()));
+                        PrintToTerminal("LED Intensity set to: " + QString::number(Script.at(layerCount).toInt()));
                         break;
                     case DARK_TIME:
-                        ui->ProgramPrints->append("Dark Time set to: " + QString::number(Script.at(layerCount).toDouble()));
+                        PrintToTerminal("Dark Time set to: " + QString::number(Script.at(layerCount).toDouble()));
                         ui->LiveValue3->setText(QString::number(Script.at(layerCount).toInt()));
                         break;
                     case LAYER_THICKNESS:
@@ -1849,12 +1740,12 @@ bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter
                         break;
                     case STAGE_VELOCITY:
                         Stage.SetStageVelocity(Script.at(layerCount).toDouble(), m_PrintSettings.StageType);
-                        ui->ProgramPrints->append("New stage velocity set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
+                        PrintToTerminal("New stage velocity set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
                         Sleep(10); //delay for stage com
                         break;
                     case STAGE_ACCELERATION:
                         Stage.SetStageAcceleration(Script.at(layerCount).toDouble(), m_PrintSettings.StageType);
-                        ui->ProgramPrints->append("New stage acceleration set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
+                        PrintToTerminal("New stage acceleration set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
                         Sleep(10); //delay for stage com
                         break;
                     case PUMP_HEIGHT:
@@ -1863,12 +1754,12 @@ bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter
                     case INJECTION_VOLUME:
                         Pump.SetTargetVolume(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble());
                         ui->LiveValue4->setText(QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
-                        ui->ProgramPrints->append("Injection Volume set to : " + QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
+                        PrintToTerminal("Injection Volume set to : " + QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
                         break;
                     case INJECTION_RATE:
                         Pump.SetInfuseRate(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble());
                         ui->LiveValue5->setText(QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
-                        ui->ProgramPrints->append("Injection Rate set to: " + QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
+                        PrintToTerminal("Injection Rate set to: " + QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
                         break;
                     default:
                         break;
@@ -1903,7 +1794,7 @@ void MainWindow::StageMove()
         if (m_PrintControls.layerCount > 0){
             if (m_PrintControls.layerCount < m_PrintScript.LayerThicknessScriptList.size() && m_PrintControls.layerCount < m_PrintScript.StageAccelerationScriptList.size()){
                 double LayerThickness = m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()/1000; //grab layer thickness from script list
-                ui->ProgramPrints->append("Moving Stage: " + QString::number(m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()) + " um");
+                PrintToTerminal("Moving Stage: " + QString::number(m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()) + " um");
                 Stage.StageRelativeMove(-LayerThickness, m_PrintSettings.StageType); //Move stage 1 layer thickness
 
                 //If pumping mode is active, grab pump height from script and move stage Pump height - layer thickness
@@ -1917,11 +1808,11 @@ void MainWindow::StageMove()
     else{
         if (m_MotionSettings.PumpingMode == ON){
             Stage.StageRelativeMove(m_MotionSettings.PumpingParameter - m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
-            ui->ProgramPrints->append("Pumping active, moving stage: " + QString::number(m_MotionSettings.PumpingParameter - m_PrintSettings.LayerThickness) + " um");
+            PrintToTerminal("Pumping active, moving stage: " + QString::number(m_MotionSettings.PumpingParameter - m_PrintSettings.LayerThickness) + " um");
         }
         else{
             Stage.StageRelativeMove(-m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
-            ui->ProgramPrints->append("Moving stage: " + QString::number(m_PrintSettings.LayerThickness) + " um");
+            PrintToTerminal("Moving stage: " + QString::number(m_PrintSettings.LayerThickness) + " um");
         }
     }
 }
@@ -1967,7 +1858,7 @@ void MainWindow::VP8bitWorkaround()
                 ExpTime -= 33;
                 imageList << item->text();
                 LayerCount++;
-                ui->ProgramPrints->append("ET: 33, DT: 0, LED: " + m_PrintScript.LEDScriptList.at(i));
+                PrintToTerminal("ET: 33, DT: 0, LED: " + m_PrintScript.LEDScriptList.at(i));
             }
             else{ //frame finished, add remaining exposure time now with dark time
                 ExposureTimeList.append(QString::number(ExpTime));
@@ -1977,18 +1868,79 @@ void MainWindow::VP8bitWorkaround()
                 LayerCount++;
                 imageList << item->text();
                 FrameFinished = true;
-                ui->ProgramPrints->append("ET: " + QString::number(ExpTime) + ", DT: " + QString::number(DTime) + ", LED: " + m_PrintScript.LEDScriptList.at(i));
+                PrintToTerminal("ET: " + QString::number(ExpTime) + ", DT: " + QString::number(DTime) + ", LED: " + m_PrintScript.LEDScriptList.at(i));
             }
         }
         //update nSlice
     }
     DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
-    ui->ProgramPrints->append("Etime: " + QString::number(ExposureTimeList.count()) + ", Dtime: " + QString::number(DarkTimeList.count()) + ", LEDlist: " + QString::number(LEDlist.count()) + ", Images: " + QString::number(imageList.count()));
+    PrintToTerminal("Etime: " + QString::number(ExposureTimeList.count()) + ", Dtime: " + QString::number(DarkTimeList.count()) + ", LEDlist: " + QString::number(LEDlist.count()) + ", Images: " + QString::number(imageList.count()));
 }
 
 void MainWindow::PrintToTerminal(QString StringToPrint)
 {
     ui->ProgramPrints->append(StringToPrint);
+}
+
+/*******************************************Live Value Monitoring********************************************/
+/**
+ * @brief MainWindow::on_LiveValueList1_activated
+ * @param arg1
+ * Currently Not In Use
+ */
+void MainWindow::on_LiveValueList1_activated(const QString &arg1)
+{
+    PrintToTerminal("LV1: " + arg1);
+}
+
+/**
+ * @brief MainWindow::on_LiveValueList2_activated
+ * @param arg1
+ * Currently Not In Use
+ */
+void MainWindow::on_LiveValueList2_activated(const QString &arg1)
+{
+    PrintToTerminal("LV2: " + arg1);
+}
+
+/**
+ * @brief MainWindow::on_LiveValueList3_activated
+ * @param arg1
+ * Currently Not In Use
+ */
+void MainWindow::on_LiveValueList3_activated(const QString &arg1)
+{
+    PrintToTerminal("LV3: " + arg1);
+}
+
+/**
+ * @brief MainWindow::on_LiveValueList4_activated
+ * @param arg1
+ * Currently Not In Use
+ */
+void MainWindow::on_LiveValueList4_activated(const QString &arg1)
+{
+    PrintToTerminal("LV4: " + arg1);
+}
+
+/**
+ * @brief MainWindow::on_LiveValueList5_activated
+ * @param arg1
+ * Currently Not In Use
+ */
+void MainWindow::on_LiveValueList5_activated(const QString &arg1)
+{
+    PrintToTerminal("LV5: " + arg1);
+}
+
+/**
+ * @brief MainWindow::on_LiveValueList6_activated
+ * @param arg1
+ * Currently Not In Use
+ */
+void MainWindow::on_LiveValueList6_activated(const QString &arg1)
+{
+    PrintToTerminal("LV6: " + arg1);
 }
 /*************************************************************
  * ********************Graveyard***************************
