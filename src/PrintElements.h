@@ -4,7 +4,6 @@
 #include <QStringList>
 #include <string.h>
 
-#include "mainwindow.h"
 
 #define NormalTime
 #define QuickTime
@@ -21,6 +20,11 @@
 #define ICLIP 1
 #define PRE 1
 #define POST 2
+
+typedef enum StageType{
+    STAGE_SMC,
+    STAGE_GCODE,
+}Stage_t;
 
 struct PrintScripts
 {
@@ -45,7 +49,10 @@ struct PrintSettings
 {
     int PrinterType = CLIP30UM;
     int ProjectionMode = POTF;
-    Stage_t StageType;
+    Stage_t StageType = STAGE_SMC;
+    int MotionMode = STEPPED;
+    bool PumpingMode = 0;
+
     int BitMode = 1;
 
     double LayerThickness;
@@ -59,6 +66,8 @@ struct PrintSettings
     uint InitialExposure;
     int UVIntensity;
     int MaxImageUpload = 20;
+
+    double PumpingParameter;
 };
 
 /**
@@ -81,6 +90,10 @@ struct PrintControls
     int FrameCount = 0;
     int ReSyncFlag = 0;
     int ReSyncCount = 0;
+
+    //Motion Specific
+    bool inMotion;
+    double PrintEnd;
 };
 
 struct InjectionSettings
@@ -92,16 +105,6 @@ struct InjectionSettings
     bool ContinuousInjection = false;
     int InjectionDelayFlag;
     double InjectionDelayParam;
-};
-
-struct MotionSettings
-{
-    int MotionMode = STEPPED;
-    bool inMotion;
-    double PrintEnd;
-
-    bool PumpingMode = 0;
-    double PumpingParameter;
 };
 
 #endif // PRINTELEMENTS_H

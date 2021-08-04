@@ -183,6 +183,8 @@ void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, 
 
 
             pattern.name = fileNames.at(i);
+            printf(pattern.name.toLatin1());
+            printf("\r\n");
             pattern.selected = true;
 
             m_elements.append(pattern);

@@ -2,14 +2,20 @@
 #include "ui_manualstagecontrol.h"
 #include "SMC100C.h"
 #include "mainwindow.h"
+#include <QTimer>
 
 #define ON 1
 #define OFF 0
+
+//MainWindow Main;
 
 static bool ConnectionFlag = false;
 static Stage_t StageType = STAGE_SMC; //Initialize stage type as SMC
 static bool EndStopState;
 static float FeedRate = 60;
+static bool StagePrep1 = false;
+static bool StagePrep2 = false;
+static PrintSettings s_PrintSettings;
 
 ManualStageControl::ManualStageControl(QWidget *parent) :
     QWidget(parent),
@@ -353,10 +359,16 @@ int ManualStageControl::StageRelativeMove(float RelativeMoveDistance, Stage_t St
     return returnVal;
 }
 
-char* ManualStageControl::StageGetPosition(Stage_t StageType)
+QString ManualStageControl::StageGetPosition(Stage_t StageType)
 {
     if(StageType == STAGE_SMC){
-        return SMC.GetPosition();
+        char* ReadPosition = SMC.GetPosition();
+        if (strnlen(ReadPosition,50) > 1){
+            QString CurrentPosition = QString::fromUtf8(ReadPosition);
+            CurrentPosition.remove(0,3); //Removes address and command
+            CurrentPosition.chop(2);
+            return CurrentPosition;
+        }
     }
     else if (StageType == STAGE_GCODE){
 
@@ -430,4 +442,70 @@ void ManualStageControl::on_DisableEndstopCheckbox_clicked()
             ui->TerminalOut->append("Failed to send command");
         }
     }
+}
+
+/****************************Helper Functions****************************/
+void ManualStageControl::initStagePosition(PrintSettings si_PrintSettings)
+{
+    s_PrintSettings = si_PrintSettings;
+    initStageSlot();
+}
+
+void ManualStageControl::initStageSlot()
+{
+    MainWindow Main;
+    if (s_PrintSettings.StageType == STAGE_SMC){
+        double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
+        if (CurrentPosition < (s_PrintSettings.StartingPosition - 3.2)){
+            if (StagePrep1 == false){
+                SetStageVelocity(3, s_PrintSettings.StageType);
+                Sleep(20);
+                StageAbsoluteMove(s_PrintSettings.StartingPosition-3, s_PrintSettings.StageType);
+                Sleep(20);
+                StagePrep1 = true;
+                Main.PrintToTerminal("Performing Rough Stage Movement");
+            }
+            QTimer::singleShot(1000, this, SLOT(initStageSlot()));
+        }
+        else{
+            fineMovement();
+        }
+    }
+    else{
+        Main.PrintToTerminal("Auto stage initialization disabled for iCLIP, please move stage to endstop with manual controls");
+    }
+}
+
+void ManualStageControl::fineMovement()
+{
+    MainWindow Main;
+    double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
+    if (CurrentPosition > s_PrintSettings.StartingPosition-0.01 && CurrentPosition < s_PrintSettings.StartingPosition+0.01){
+        verifyStageParams(s_PrintSettings);
+    }
+    else{
+        if (StagePrep2 == false){
+            Sleep(20);
+            SetStageVelocity(0.3, s_PrintSettings.StageType);
+            Sleep(20);
+            StageAbsoluteMove(s_PrintSettings.StartingPosition, s_PrintSettings.StageType);
+            Main.PrintToTerminal("Fine Stage Movement");
+            StagePrep2 = true;
+        }
+        QTimer::singleShot(1000, this, SLOT(fineMovement(s_PrintSettings)));
+    }
+}
+
+void ManualStageControl::verifyStageParams(PrintSettings s_PrintSettings)
+{
+    MainWindow Main;
+    Main.PrintToTerminal("Verifying Stage Parameters");
+    Sleep(20);
+    SetStageAcceleration(s_PrintSettings.StageAcceleration, s_PrintSettings.StageType);
+    Sleep(20);
+    SetStageNegativeLimit(s_PrintSettings.MinEndOfRun, s_PrintSettings.StageType);
+    Sleep(20);
+    SetStagePositiveLimit(s_PrintSettings.MaxEndOfRun, s_PrintSettings.StageType);
+    Sleep(20);
+    SetStageVelocity(s_PrintSettings.StageVelocity, s_PrintSettings.StageType);
 }

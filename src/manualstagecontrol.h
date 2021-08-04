@@ -3,11 +3,8 @@
 
 #include <QWidget>
 #include "SMC100C.h"
+#include "PrintElements.h"
 
-typedef enum StageType{
-    STAGE_SMC,
-    STAGE_GCODE,
-}Stage_t;
 
 namespace Ui {
 class ManualStageControl;
@@ -33,8 +30,9 @@ public:
     int SetStageNegativeLimit(float NegativeLimit, Stage_t StageType);
     int StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageType);
     int StageRelativeMove(float RelativeMoveDistance, Stage_t StageType);
-    char* StageGetPosition(Stage_t);
+    QString StageGetPosition(Stage_t);
     void ClearRead();
+    void initStagePosition(PrintSettings si_PrintSettings);
 
 private slots:
     void on_MoveRelative_clicked();
@@ -75,9 +73,16 @@ private slots:
 
     void on_DisableEndstopCheckbox_clicked();
 
+    void initStageSlot();
+
+    void fineMovement();
+
 private:
     Ui::ManualStageControl *ui;
     void GetValues();
+
+    void verifyStageParams(PrintSettings s_PrintSettings);
+
 };
 
 #endif // MANUALSTAGECONTROL_H

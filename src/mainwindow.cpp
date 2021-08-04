@@ -138,12 +138,12 @@ void MainWindow::on_ImageProcess_clicked()
 void MainWindow::on_GetPosition_clicked()
 {
     //Get position and store it in char*, could store directly in QString but if result is null it can cause issues
-    char* ReadPosition = Stage.StageGetPosition(m_PrintSettings.StageType);
+    QString CurrentPosition = Stage.StageGetPosition(m_PrintSettings.StageType);
 
     //If the string length returned from SMC.GetPosition is > 1, then no errors have occurred
-    if (strnlen(ReadPosition,50) > 1)
-    {
-        QString CurrentPosition = QString::fromUtf8(ReadPosition); //convert char* to QString
+    //if (strnlen(ReadPosition,50) > 1)
+    //{
+        //QString CurrentPosition = QString::fromUtf8(ReadPosition); //convert char* to QString
         if (m_PrintSettings.PrinterType == CLIP30UM){
             CurrentPosition.remove(0,3); //Removes address and command code
             CurrentPosition.chop(2); //To be removed...
@@ -155,7 +155,7 @@ void MainWindow::on_GetPosition_clicked()
         PrintToTerminal("Stage is currently at: " + CurrentPosition + " mm"); //Print to terminal
         ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble()); //Update slider position
         GetPosition = CurrentPosition.toDouble(); //Update module variable GetPosition (to be accessed from other functions)
-    }
+    //}
 }
 
 /*********************************************Mode Selection*********************************************/
@@ -359,7 +359,7 @@ void MainWindow::on_SteppedMotion_clicked()
     //If the stepped motion checkbox is checked
     if(ui->SteppedMotion->isChecked() == true)
     {
-        m_MotionSettings.MotionMode = STEPPED; //Set MotionMode to STEPPED
+        m_PrintSettings.MotionMode = STEPPED; //Set MotionMode to STEPPED
         ui->ContinuousMotion->setChecked(false); //Updates UI to reflect stepped mode
         PrintToTerminal("Stepped Motion Selected");
         EnableParameter(DARK_TIME, ON); //Enable dark time selection
@@ -375,7 +375,7 @@ void MainWindow::on_ContinuousMotion_clicked()
     //If the continuos motion checkbox is checked
     if(ui->ContinuousMotion->isChecked() == true)
     {
-        m_MotionSettings.MotionMode = CONTINUOUS; //Set MotionMode to Continuous
+        m_PrintSettings.MotionMode = CONTINUOUS; //Set MotionMode to Continuous
         ui->SteppedMotion->setChecked(false); //Update UI to reflect continuous mode
         PrintToTerminal("Continuous Motion Selected");
 
@@ -395,14 +395,14 @@ void MainWindow::on_pumpingCheckBox_clicked()
 {
     //If pumping checkbox is checked
     if(ui->pumpingCheckBox->isChecked() == true){
-        m_MotionSettings.PumpingMode = ON; //Enable pumping mode
+        m_PrintSettings.PumpingMode = ON; //Enable pumping mode
 
         //Update UI
         EnableParameter(PUMP_HEIGHT, ON);
         PrintToTerminal("Pumping Enabled");
     }
     else{
-        m_MotionSettings.PumpingMode = OFF; //Disable pumping mode
+        m_PrintSettings.PumpingMode = OFF; //Disable pumping mode
 
         //Update UI
         EnableParameter(PUMP_HEIGHT, OFF);
@@ -417,9 +417,9 @@ void MainWindow::on_pumpingCheckBox_clicked()
 void MainWindow::on_setPumping_clicked()
 {
     //If pumping is currently enabled
-    if(m_MotionSettings.PumpingMode == ON){
-        m_MotionSettings.PumpingParameter = ui->pumpingParameter->value()/1000; //Grab value from UI and divide by 1000 to scale units
-        PrintToTerminal("Pumping depth set to: " + QString::number(m_MotionSettings.PumpingParameter*1000) + " μm");
+    if(m_PrintSettings.PumpingMode == ON){
+        m_PrintSettings.PumpingParameter = ui->pumpingParameter->value()/1000; //Grab value from UI and divide by 1000 to scale units
+        PrintToTerminal("Pumping depth set to: " + QString::number(m_PrintSettings.PumpingParameter*1000) + " μm");
     }
     else{ //Pumping is currently disabled
         PrintToTerminal("Please enable pumping before setting pumping parameter");
@@ -1039,104 +1039,6 @@ void MainWindow::saveText()
 }
 
 /**
- * @brief MainWindow::validateStartingPosition
- * Validates whether stage has reached it's starting position,
- * repeats at 1 Hz until starting position is reached. Deprecated??
- */
-void MainWindow::validateStartingPosition()
-{
-    QString CurrentPosition = Stage.StageGetPosition(m_PrintSettings.StageType);
-    CurrentPosition = CurrentPosition.remove(0,3);
-    if (CurrentPosition.toInt() > (m_PrintSettings.StartingPosition - 0.1) && CurrentPosition.toInt() < (m_PrintSettings.StartingPosition +0.1))
-    {
-        PrintToTerminal("Stage has reached Starting Position");
-        ui->StartPrint->setEnabled(true);
-    }
-    else
-    {
-        QTimer::singleShot(1000, this, SLOT(validateStartingPosition));
-    }
-}
-
-/**
- * @brief MainWindow::initStageSlot
- * Initializes stage and moves it to starting position
- */
-void MainWindow::initStageSlot(void)
-{
-    emit(on_GetPosition_clicked());
-    if (m_PrintSettings.StageType == STAGE_SMC)
-    {
-        if (GetPosition < (m_PrintSettings.StartingPosition-3.2))
-        {
-            if (StagePrep1 == false)
-            {
-                Stage.SetStageVelocity(3, m_PrintSettings.StageType);
-                Sleep(20);
-                Stage.StageAbsoluteMove(m_PrintSettings.StartingPosition-3, m_PrintSettings.StageType);
-                Sleep(20);
-                StagePrep1 = true;
-                PrintToTerminal("Performing Rough Stage Movement");
-            }
-            QTimer::singleShot(1000, this, SLOT(initStageSlot()));
-        }
-        else
-        {
-            fineMovement();
-        }
-    }
-    else //stage is in gcode mode
-    {
-        PrintToTerminal("Auto stage initialization disabled for iCLIP, please move stage to endstop with manual controls");
-    }
-}
-
-/**
- * @brief MainWindow::fineMovement
- * Once the stage is within 3 mm of the window move to slow movement to
- * avoid creating bubbles in the resin
- */
-void MainWindow::fineMovement()
-{
-    emit(on_GetPosition_clicked());
-
-    if (GetPosition > m_PrintSettings.StartingPosition -0.01 && GetPosition < m_PrintSettings.StartingPosition + 0.01)
-    {
-        verifyStageParams();
-    }
-    else
-    {
-        if (StagePrep2 == false)
-        {
-            Sleep(20);
-            Stage.SetStageVelocity(0.3, m_PrintSettings.StageType);
-            Sleep(20);
-            Stage.StageAbsoluteMove(m_PrintSettings.StartingPosition, m_PrintSettings.StageType);
-            PrintToTerminal("Fine Stage Movement");
-            StagePrep2 = true;
-        }
-        QTimer::singleShot(1000, this, SLOT(fineMovement()));
-    }
-}
-
-/**
- * @brief MainWindow::verifyStageParams
- * Resends the correct stage parameter to the stage
- */
-void MainWindow::verifyStageParams()
-{
-    PrintToTerminal("Verifying Stage Parameters");
-    Sleep(50);
-    Stage.SetStageAcceleration(m_PrintSettings.StageAcceleration, m_PrintSettings.StageType);
-    Sleep(50);
-    Stage.SetStageNegativeLimit(m_PrintSettings.MinEndOfRun, m_PrintSettings.StageType);
-    Sleep(50);
-    Stage.SetStagePositiveLimit(m_PrintSettings.MaxEndOfRun, m_PrintSettings.StageType);
-    Sleep(50);
-    Stage.SetStageVelocity(m_PrintSettings.StageVelocity, m_PrintSettings.StageType);
-}
-
-/**
  * @brief MainWindow::AutoMode
  * Calculates exposure time and slice thickness based on input
  * print height and print speed
@@ -1199,17 +1101,17 @@ bool MainWindow::initConfirmationScreen()
         DetailedText += "Video Pattern projection mode selected\n";
     }
 
-    if(m_MotionSettings.MotionMode == STEPPED){
+    if(m_PrintSettings.MotionMode == STEPPED){
         DetailedText += "Motion mode set to stepped\n";
     }
-    else if(m_MotionSettings.MotionMode == CONTINUOUS){
+    else if(m_PrintSettings.MotionMode == CONTINUOUS){
         DetailedText += "Motion mode set to continuous\n";
     }
 
-    if(m_MotionSettings.PumpingMode == OFF){
+    if(m_PrintSettings.PumpingMode == OFF){
         DetailedText += "Pumping disabled\n";
     }
-    else if(m_MotionSettings.PumpingMode == ON){
+    else if(m_PrintSettings.PumpingMode == ON){
         DetailedText += "Pumping Enabled\n";
     }
 
@@ -1374,9 +1276,9 @@ void MainWindow::saveSettings()
     settings.setValue("PrinterType", m_PrintSettings.PrinterType);
     settings.setValue("StageType", m_PrintSettings.StageType);
 
-    settings.setValue("MotionMode", m_MotionSettings.MotionMode);
-    settings.setValue("PumpingMode",m_MotionSettings.PumpingMode);
-    settings.setValue("PumpingParameter", m_MotionSettings.PumpingParameter);
+    settings.setValue("MotionMode", m_PrintSettings.MotionMode);
+    settings.setValue("PumpingMode",m_PrintSettings.PumpingMode);
+    settings.setValue("PumpingParameter", m_PrintSettings.PumpingParameter);
     settings.setValue("BitMode", m_PrintSettings.BitMode);
 
     settings.setValue("ContinuousInjection", ui->ContinuousInjection->isChecked());
@@ -1420,9 +1322,9 @@ void MainWindow::loadSettings()
 
         m_PrintSettings.PrinterType = settings.value("PrinterType", CLIP30UM).toDouble();
 
-        m_MotionSettings.MotionMode = settings.value("MotionMode", STEPPED).toDouble();
-        m_MotionSettings.PumpingMode = settings.value("PumpingMode", 0).toDouble();
-        m_MotionSettings.PumpingParameter = settings.value("PumpingParameter", 0).toDouble();
+        m_PrintSettings.MotionMode = settings.value("MotionMode", STEPPED).toDouble();
+        m_PrintSettings.PumpingMode = settings.value("PumpingMode", 0).toDouble();
+        m_PrintSettings.PumpingParameter = settings.value("PumpingParameter", 0).toDouble();
         m_PrintSettings.BitMode = settings.value("BitMode", 1).toDouble();
         m_InjectionSettings.InfusionRate = settings.value("InfusionRate", 5).toDouble();
         m_InjectionSettings.InfusionVolume = settings.value("InfusionVolume", 5).toDouble();
@@ -1475,26 +1377,26 @@ void MainWindow::initSettings()
         }
     }
 
-    if(m_MotionSettings.MotionMode == STEPPED){
+    if(m_PrintSettings.MotionMode == STEPPED){
         ui->SteppedMotion->setChecked(true);
         ui->ContinuousMotion->setChecked(false);
         emit(on_SteppedMotion_clicked());
     }
-    else if(m_MotionSettings.MotionMode == CONTINUOUS){
+    else if(m_PrintSettings.MotionMode == CONTINUOUS){
         ui->ContinuousMotion->setChecked(true);
         ui->SteppedMotion->setChecked(false);
         emit(on_ContinuousMotion_clicked());
     }
 
-    if(m_MotionSettings.PumpingMode == ON){
+    if(m_PrintSettings.PumpingMode == ON){
         ui->pumpingCheckBox->setChecked(true);
         emit(on_pumpingCheckBox_clicked());
     }
-    else if(m_MotionSettings.PumpingMode == OFF){
+    else if(m_PrintSettings.PumpingMode == OFF){
         ui->pumpingCheckBox->setChecked(false);
     }
 
-    ui->pumpingParameter->setValue(m_MotionSettings.PumpingParameter);
+    ui->pumpingParameter->setValue(m_PrintSettings.PumpingParameter);
     ui->BitDepthParam->setValue(m_PrintSettings.BitMode);
     ui->InfuseRateParam->setValue(m_InjectionSettings.InfusionRate);
     ui->VolPerLayerParam->setValue(m_InjectionSettings.InfusionVolume);
@@ -1798,7 +1700,7 @@ void MainWindow::StageMove()
                 Stage.StageRelativeMove(-LayerThickness, m_PrintSettings.StageType); //Move stage 1 layer thickness
 
                 //If pumping mode is active, grab pump height from script and move stage Pump height - layer thickness
-                if (m_MotionSettings.PumpingMode == ON){
+                if (m_PrintSettings.PumpingMode == ON){
                     double PumpParam = m_PrintScript.PumpHeightScriptList.at(m_PrintControls.layerCount).toDouble();
                     Stage.StageRelativeMove(PumpParam - LayerThickness, m_PrintSettings.StageType);
                 }
@@ -1806,9 +1708,9 @@ void MainWindow::StageMove()
         }
     }
     else{
-        if (m_MotionSettings.PumpingMode == ON){
-            Stage.StageRelativeMove(m_MotionSettings.PumpingParameter - m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
-            PrintToTerminal("Pumping active, moving stage: " + QString::number(m_MotionSettings.PumpingParameter - m_PrintSettings.LayerThickness) + " um");
+        if (m_PrintSettings.PumpingMode == ON){
+            Stage.StageRelativeMove(m_PrintSettings.PumpingParameter - m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
+            PrintToTerminal("Pumping active, moving stage: " + QString::number(m_PrintSettings.PumpingParameter - m_PrintSettings.LayerThickness) + " um");
         }
         else{
             Stage.StageRelativeMove(-m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
@@ -1882,6 +1784,57 @@ void MainWindow::PrintToTerminal(QString StringToPrint)
     ui->ProgramPrints->append(StringToPrint);
 }
 
+QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSettings m_PrintSettings)
+{
+    QStringList ImageList;
+    QListWidgetItem * item;
+    static uint InitialExposureCount = m_PrintSettings.InitialExposure;
+    if (m_PrintControls.InitialExposureFlag == ON){ //If in initial POTF upload
+        m_PrintControls.nSlice = ui->FileList->count();
+            item = ui->FileList->item(0);
+        for (int i = 1; (m_PrintSettings.InitialExposure); i++){
+            ImageList << item->text();
+        }
+        if (m_PrintSettings.ProjectionMode == POTF){
+            for (int i = 1; i < ui->FileList->count(); i++){
+                item = ui->FileList->item(i);
+                ImageList << item->text();
+                if ((i + m_PrintSettings.InitialExposure) > m_PrintSettings.MaxImageUpload){
+                        break;
+                    }
+            }
+        }
+    }
+    else if (m_PrintSettings.ProjectionMode == POTF){
+        //else in re-upload
+        for (int i = m_PrintControls.layerCount; i< ui->FileList->count(); i++){
+            item = ui->FileList->item(i);
+            ImageList << item->text();
+            if (i > m_PrintControls.layerCount + m_PrintSettings.MaxImageUpload){
+                break;
+            }
+        }
+    }
+    else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
+        int j = 0;
+        for(int i = m_PrintControls.FrameCount; i < m_PrintControls.FrameCount + (5*m_PrintSettings.BitMode); i++)
+        {
+            for (j = 0; j < (24/m_PrintSettings.BitMode); j++)
+            {
+                if (i < ui->FileList->count()){
+                    item = ui->FileList->item(i);
+                    ImageList << item->text();
+                }
+                else{
+                    ui->ProgramPrints->append("VP Image segmentation fault");
+                    break;
+                }
+            }
+            ui->ProgramPrints->append(QString::number(j) + " patterns uploaded");
+        }
+    }
+    return ImageList;
+}
 /*******************************************Live Value Monitoring********************************************/
 /**
  * @brief MainWindow::on_LiveValueList1_activated

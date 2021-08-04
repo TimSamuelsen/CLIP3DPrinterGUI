@@ -130,12 +130,6 @@ private slots:
 
     void on_AutoCheckBox_clicked();
 
-    void initStageSlot();
-
-    void fineMovement();
-
-    void verifyStageParams();
-
     void on_UsePrintScript_clicked();
 
     void on_SelectPrintScript_clicked();
@@ -195,7 +189,6 @@ private:
     PrintSettings m_PrintSettings;
     PrintControls m_PrintControls;
     InjectionSettings m_InjectionSettings;
-    MotionSettings m_MotionSettings;
     QTime PrintStartTime;
     double GetPosition;
 
@@ -208,7 +201,6 @@ private:
     void addPlotData();
     QVector<double> qv_x, qv_y;
     void printParameters();
-    void validateStartingPosition();
     bool initConfirmationScreen();
     void AutoMode();
     void initImagePopout();
@@ -218,7 +210,10 @@ private:
     bool PrintScriptApply(uint layerCount, QStringList Script, Parameter_t DynamicParam);
     void PrintComplete();
     void EnableParameter(Parameter_t Parameter, bool State);
-
+    double CalcPrintEnd(PrintControls m_PrintControls, PrintSettings m_PrintSettings);
     QStringList GetImageList(PrintControls m_PrintControls, PrintSettings m_PrintSettings);
+
+    void InitializeMW();
+    void Initialize1(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript);
 };
 #endif // MAINWINDOW_H
