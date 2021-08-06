@@ -33,6 +33,7 @@ public:
     QString StageGetPosition(Stage_t);
     void ClearRead();
     void initStagePosition(PrintSettings si_PrintSettings);
+    void initStageStart(PrintSettings si_PrintSettings);
 
 private slots:
     void on_MoveRelative_clicked();

@@ -211,9 +211,11 @@ private:
     void PrintComplete();
     void EnableParameter(Parameter_t Parameter, bool State);
     double CalcPrintEnd(PrintControls m_PrintControls, PrintSettings m_PrintSettings);
+    double CalcContinuousVelocity(PrintSettings m_PrintSettings);
     QStringList GetImageList(PrintControls m_PrintControls, PrintSettings m_PrintSettings);
 
     void InitializeMW();
-    void Initialize1(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript);
+    void StartPrint();
+    void PrintProcess2();
 };
 #endif // MAINWINDOW_H

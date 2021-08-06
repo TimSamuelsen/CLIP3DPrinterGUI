@@ -509,3 +509,13 @@ void ManualStageControl::verifyStageParams(PrintSettings s_PrintSettings)
     Sleep(20);
     SetStageVelocity(s_PrintSettings.StageVelocity, s_PrintSettings.StageType);
 }
+
+void ManualStageControl::initStageStart(PrintSettings si_PrintSettings)
+{
+    MainWindow Main;
+    SetStageVelocity(si_PrintSettings.StageVelocity, si_PrintSettings.StageType);
+    Sleep(10);
+    emit(on_GetPosition_clicked());
+    Sleep(10);
+    emit(on_GetPosition_clicked());
+}

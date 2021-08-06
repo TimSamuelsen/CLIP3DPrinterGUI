@@ -576,4 +576,29 @@ int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware, 
     return 0;
 }
 
+void DLP9000::SetLEDIntensity(PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript)
+{
+    //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
+    if (dlp_PrintScript.PrintScript == ON){ //If printscript is on
+        LCR_SetLedCurrents(0,0,(dlp_PrintScript.LEDScriptList.at(0).toInt())); //Set LED intensity to first value in printscript
+    }
+    else{ //if printscript is off
+        LCR_SetLedCurrents(0, 0, dlp_PrintSettings.UVIntensity); //set static LED intensity
+    }
+}
+
+int DLP9000::PatternUpload(QStringList ImageList, PrintControls dlp_PrintControls, PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript)
+{
+    int nPatterns = ImageList.count();
+    LCR_PatternDisplay(0);
+    if (dlp_PrintControls.nSlice > 0)
+    {
+        AddPatterns(ImageList, dlp_PrintSettings, dlp_PrintScript, dlp_PrintControls);
+        updateLUT(dlp_PrintSettings.ProjectionMode);
+        clearElements();
+    }
+    return nPatterns;
+}
+
+
 

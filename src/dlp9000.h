@@ -30,6 +30,8 @@ public:
     void startPatSequence(void);
     void clearElements(void);
     void setIT6535Mode(int Mode);
+    void SetLEDIntensity(PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript);
+    int PatternUpload(QStringList ImageList, PrintControls dlp_PrintControls, PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript);
 
 private:
     bool m_dualAsic = true;
