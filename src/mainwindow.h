@@ -12,6 +12,7 @@
 #include "dlp9000.h"
 #include "serialib.h"
 #include "PrintElements.h"
+#include "printcontrol.h"
 
 typedef enum Parameter{
     EXPOSURE_TIME,
@@ -48,7 +49,7 @@ public:
     imagepopout popout;
     manualpumpcontrol Pump;
     ManualStageControl Stage;
-
+    printcontrol PrintControl;
 
 public slots:
     void showError(QString errMsg);

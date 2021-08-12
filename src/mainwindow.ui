@@ -2485,8 +2485,7 @@ QPushButton#StartPrint:hover:!pressed {
      </property>
      <property name="text">
       <string>Initialize
- and
- Synchronize</string>
+ System</string>
      </property>
     </widget>
     <widget class="QPushButton" name="AbortPrint">

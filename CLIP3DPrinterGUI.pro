@@ -23,8 +23,9 @@ SOURCES += \
     src/mainwindow.cpp \
     src/manualpumpcontrol.cpp \
     src/manualstagecontrol.cpp \
+    src/mw_helpers.cpp \
     src/prinstscriptdialog.cpp \
-    src/printprocess.cpp \
+    src/printcontrol.cpp \
     src/qcustomplot/qcustomplot.cpp \
     src/serialib/serialib.cpp
 
@@ -40,6 +41,7 @@ HEADERS += \
     src/manualstagecontrol.h \
     src/patternelement.h \
     src/prinstscriptdialog.h \
+    src/printcontrol.h \
     src/qcustomplot/qcustomplot.h \
     src/serialib/serialib.h
 

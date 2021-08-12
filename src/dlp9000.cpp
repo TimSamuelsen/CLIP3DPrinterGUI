@@ -600,5 +600,10 @@ int DLP9000::PatternUpload(QStringList ImageList, PrintControls dlp_PrintControl
     return nPatterns;
 }
 
+void DLP9000::PatternDisplay(int DisplaySetting)
+{
+    LCR_PatternDisplay(DisplaySetting);
+}
+
 
 

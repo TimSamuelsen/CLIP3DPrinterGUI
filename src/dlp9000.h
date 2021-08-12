@@ -32,6 +32,8 @@ public:
     void setIT6535Mode(int Mode);
     void SetLEDIntensity(PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript);
     int PatternUpload(QStringList ImageList, PrintControls dlp_PrintControls, PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript);
+    void PatternDisplay(int DisplaySetting);
+
 
 private:
     bool m_dualAsic = true;
