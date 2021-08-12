@@ -80,6 +80,13 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//TestClass * testClass = new TestClass();
+//initConnections();
+void MainWindow::initConnections()
+{
+
+}
+
 /**
  * @brief MainWindow::on_ManualStage_clicked
  * Open the manual stage control window, sends home
@@ -1193,6 +1200,12 @@ bool MainWindow::initConfirmationScreen()
  */
 bool MainWindow::ValidateSettings(void)
 {
+    if (m_PrintSettings.InitialExposure < 0 || m_PrintSettings.InitialExposure > 400)
+    {
+        showError("Invalid initial exposure time");
+        PrintToTerminal("InvalidSliceThickness");
+    }
+
     //Validate m_PrintSettings.LayerThickness
     if (m_PrintSettings.LayerThickness <= 0){
         showError("Invalid Slice Thickness");
@@ -1792,7 +1805,7 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
     if (m_PrintControls.InitialExposureFlag == ON){ //If in initial POTF upload
         m_PrintControls.nSlice = ui->FileList->count();
             item = ui->FileList->item(0);
-        for (int i = 1; (m_PrintSettings.InitialExposure); i++){
+        for (uint i = 1; i < (m_PrintSettings.InitialExposure); i++){
             ImageList << item->text();
         }
         if (m_PrintSettings.ProjectionMode == POTF){
@@ -1930,94 +1943,4 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         printf("%f",m_PrintControls.PrintEnd);
     }
 }
-/*
-        //If file list is not empty
-        if (ui->FileList->count() > 0)
-        {
-            //Get image list for
-            QListWidgetItem * firstItem = ui->FileList->item(0); //Get first image
-            QStringList firstImage;
-
-            //Create an imagelist that contain n copies of first image, where n = InitialExposure in integer seconds
-            for (uint i = 0; i < m_PrintSettings.InitialExposure; i++)
-            {
-                firstImage << firstItem->text();
-            }
-
-            //Add initial exposure patterns to local memory
-            p_DLP.AddPatterns(firstImage, m_PrintSettings, m_PrintScript, m_PrintControls);
-            //If in POTF mode
-            if(m_PrintSettings.ProjectionMode == POTF){
-                m_PrintControls.nSlice = ui->FileList->count();
-
-                //Grab images from the file list up until the max image upload is reached
-                QListWidgetItem * item;
-                QStringList imageList;
-                for(int i = 1; (i < (ui->FileList->count())); i++)
-                {
-                        item = ui->FileList->item(i);
-                        imageList << item->text();
-                        if ((i + m_PrintSettings.InitialExposure) > m_PrintSettings.MaxImageUpload)
-                        {
-                            break;
-                        }
-                }
-
-                //Add patterns first to local memory, send to light engine, and clear local memory
-                p_DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls); //Set initial image to 0
-                p_DLP.updateLUT(m_PrintSettings.ProjectionMode);
-                p_DLP.clearElements();
-                m_PrintControls.remainingImages = m_PrintSettings.MaxImageUpload - m_PrintSettings.InitialExposure;
-
-                //Get directory of images and print to terminal
-                QDir dir = QFileInfo(QFile(imageList.at(0))).absoluteDir();
-                ui->ProgramPrints->append(dir.absolutePath());
-            }
-            //If in Video pattern mode
-            else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
-                m_PrintControls.nSlice = (24/m_PrintSettings.BitMode)*ui->FileList->count(); //Calc nSlice based on bitMode and # of files
-                p_DLP.updateLUT(m_PrintSettings.ProjectionMode); //Send pattern data to light engine
-                p_DLP.clearElements(); //Clear local memory
-
-                //Get image from file list and display in popout window
-
-                QString filename =ui->FileList->item(m_PrintControls.layerCount)->text();
-                QPixmap img(filename);
-                ImagePopoutUI->showImage(img);
-
-            }
-            ui->ProgramPrints->append(QString::number(m_PrintControls.nSlice) + " layers to print");
-
-            emit(on_GetPosition_clicked()); //get stage position
-            initPlot(); //Initialize plot
-            updatePlot(); //Update plot
-            ui->StartPrint->setEnabled(true); //Enable the start print button
-
-            //If in continuous motion mode, calculate the print end position
-            if(m_PrintSettings.MotionMode == CONTINUOUS){
-                if(m_PrintSettings.PrinterType == CLIP30UM){
-                    m_PrintControls.PrintEnd = m_PrintSettings.StartingPosition - (ui->FileList->count()*m_PrintSettings.LayerThickness);
-                }
-                else if (m_PrintSettings.PrinterType == ICLIP){
-                    m_PrintControls.PrintEnd = ui->FileList->count()*m_PrintSettings.LayerThickness; //Make sure stage is zeroed
-                }
-                else{
-                    showError("PrinterType Error, on_InitializeAndSynchronize_clicked");
-                }
-                ui->ProgramPrints->append("Print End for continous motion print set to: " + QString::number(m_PrintControls.PrintEnd));
-            }
-        }
-    }
-    //new code
-    if(m_PrintSettings.ProjectionMode == POTF){
-        m_PrintControls.nSlice = ui->FileList->count();
-        m_PrintControls.remainingImages = m_PrintSettings.MaxImageUpload - m_PrintSettings.InitialExposure;
-    }
-    else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
-        m_PrintControls.nSlice = (24/m_PrintSettings.BitMode)*ui->FileList->count();
-        QString filename = ui->FileList->item(m_PrintControls.layerCount)->text();
-        QPixmap img(filename);
-        ImagePopoutUI->showImage(img);
-    }
-    */
 

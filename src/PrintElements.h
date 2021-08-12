@@ -55,19 +55,19 @@ struct PrintSettings
 
     int BitMode = 1;
 
-    double LayerThickness;
-    double StageVelocity;
-    double StageAcceleration;
-    double StartingPosition;
-    double MaxEndOfRun;
-    double MinEndOfRun;
-    double ExposureTime;
-    double DarkTime;
-    uint InitialExposure;
-    int UVIntensity;
+    double LayerThickness = 0;
+    double StageVelocity = 0;
+    double StageAcceleration = 0;
+    double StartingPosition = 0;
+    double MaxEndOfRun = 0;
+    double MinEndOfRun = 0;
+    double ExposureTime = 0;
+    double DarkTime = 0;
+    uint InitialExposure = 0;
+    int UVIntensity = 0;
     int MaxImageUpload = 20;
 
-    double PumpingParameter;
+    double PumpingParameter = 0;
 };
 
 /**
@@ -79,11 +79,11 @@ struct PrintControls
     bool InitialExposureFlag = true;
     uint nSlice = 0;
     uint layerCount = 0;
-    int remainingImages;
+    int remainingImages = 0;
 
 
     double TotalPrintTime = 0;
-    double RemainingPrintTime;
+    double RemainingPrintTime = 0;
 
     //Video Pattern specific
     int BitLayer = 1;
@@ -92,19 +92,19 @@ struct PrintControls
     int ReSyncCount = 0;
 
     //Motion Specific
-    bool inMotion;
-    double PrintEnd;
+    bool inMotion = 0;
+    double PrintEnd = 0;
 };
 
 struct InjectionSettings
 {
-    double InfusionRate;
-    double InfusionVolume;
-    double InitialVolume;
+    double InfusionRate = 0;
+    double InfusionVolume = 0;
+    double InitialVolume = 0;
 
     bool ContinuousInjection = false;
-    int InjectionDelayFlag;
-    double InjectionDelayParam;
+    int InjectionDelayFlag = 0;
+    double InjectionDelayParam = 0;
 };
 
 #endif // PRINTELEMENTS_H

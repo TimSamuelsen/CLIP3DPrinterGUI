@@ -429,28 +429,6 @@ double MainWindow::CalcContinuousVelocity(PrintSettings m_PrintSettings)
     return ContStageVelocity;
 }
 
-void MainWindow::InitializeMW()
-{
-    if(m_PrintSettings.ProjectionMode == POTF){
-        m_PrintControls.nSlice = ui->FileList->count();
-        m_PrintControls.remainingImages = m_PrintSettings.MaxImageUpload - m_PrintSettings.InitialExposure;
-    }
-    else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
-        m_PrintControls.nSlice = (24/m_PrintSettings.BitMode)*ui->FileList->count();
-        QString filename = ui->FileList->item(m_PrintControls.layerCount)->text();
-        QPixmap img(filename);
-        ImagePopoutUI->showImage(img);
-    }
-
-    Stage.initStagePosition(m_PrintSettings);
-    QStringList ImageList = GetImageList(m_PrintControls, m_PrintSettings);
-    p_DLP.PatternUpload(ImageList, m_PrintControls, m_PrintSettings, m_PrintScript);
-    emit(on_GetPosition_clicked()); //get stage position
-    initPlot(); //Initialize plot
-    updatePlot(); //Update plot
-    ui->StartPrint->setEnabled(true);
-}
-
 void MainWindow::StartPrint()
 {
     if (ValidateSettings() == true)

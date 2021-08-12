@@ -182,14 +182,14 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    ManualStageControl *ManualStageUI;
-    manualpumpcontrol *ManualPumpUI;
-    imageprocessing *ImageProcessUI;
-    imagepopout *ImagePopoutUI;
     PrintScripts m_PrintScript;
     PrintSettings m_PrintSettings;
     PrintControls m_PrintControls;
     InjectionSettings m_InjectionSettings;
+    ManualStageControl *ManualStageUI;
+    manualpumpcontrol *ManualPumpUI;
+    imageprocessing *ImageProcessUI;
+    imagepopout *ImagePopoutUI;
     QTime PrintStartTime;
     double GetPosition;
 
@@ -218,5 +218,6 @@ private:
     void InitializeMW();
     void StartPrint();
     void PrintProcess2();
+    void initConnections();
 };
 #endif // MAINWINDOW_H

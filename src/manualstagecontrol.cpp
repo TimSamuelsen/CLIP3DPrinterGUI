@@ -453,7 +453,7 @@ void ManualStageControl::initStagePosition(PrintSettings si_PrintSettings)
 
 void ManualStageControl::initStageSlot()
 {
-    MainWindow Main;
+    //MainWindow Main;
     if (s_PrintSettings.StageType == STAGE_SMC){
         double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
         if (CurrentPosition < (s_PrintSettings.StartingPosition - 3.2)){
@@ -463,7 +463,7 @@ void ManualStageControl::initStageSlot()
                 StageAbsoluteMove(s_PrintSettings.StartingPosition-3, s_PrintSettings.StageType);
                 Sleep(20);
                 StagePrep1 = true;
-                Main.PrintToTerminal("Performing Rough Stage Movement");
+                //Main.PrintToTerminal("Performing Rough Stage Movement");
             }
             QTimer::singleShot(1000, this, SLOT(initStageSlot()));
         }
@@ -472,13 +472,13 @@ void ManualStageControl::initStageSlot()
         }
     }
     else{
-        Main.PrintToTerminal("Auto stage initialization disabled for iCLIP, please move stage to endstop with manual controls");
+        //Main.PrintToTerminal("Auto stage initialization disabled for iCLIP, please move stage to endstop with manual controls");
     }
 }
 
 void ManualStageControl::fineMovement()
 {
-    MainWindow Main;
+    //MainWindow Main;
     double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
     if (CurrentPosition > s_PrintSettings.StartingPosition-0.01 && CurrentPosition < s_PrintSettings.StartingPosition+0.01){
         verifyStageParams(s_PrintSettings);
@@ -489,7 +489,7 @@ void ManualStageControl::fineMovement()
             SetStageVelocity(0.3, s_PrintSettings.StageType);
             Sleep(20);
             StageAbsoluteMove(s_PrintSettings.StartingPosition, s_PrintSettings.StageType);
-            Main.PrintToTerminal("Fine Stage Movement");
+            //Main.PrintToTerminal("Fine Stage Movement");
             StagePrep2 = true;
         }
         QTimer::singleShot(1000, this, SLOT(fineMovement(s_PrintSettings)));
@@ -498,8 +498,8 @@ void ManualStageControl::fineMovement()
 
 void ManualStageControl::verifyStageParams(PrintSettings s_PrintSettings)
 {
-    MainWindow Main;
-    Main.PrintToTerminal("Verifying Stage Parameters");
+    //MainWindow Main;
+    //Main.PrintToTerminal("Verifying Stage Parameters");
     Sleep(20);
     SetStageAcceleration(s_PrintSettings.StageAcceleration, s_PrintSettings.StageType);
     Sleep(20);
@@ -512,7 +512,7 @@ void ManualStageControl::verifyStageParams(PrintSettings s_PrintSettings)
 
 void ManualStageControl::initStageStart(PrintSettings si_PrintSettings)
 {
-    MainWindow Main;
+    //MainWindow Main;
     SetStageVelocity(si_PrintSettings.StageVelocity, si_PrintSettings.StageType);
     Sleep(10);
     emit(on_GetPosition_clicked());
