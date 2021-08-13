@@ -1,6 +1,7 @@
 #ifndef DLP9000_H
 #define DLP9000_H
 
+#include <QObject>
 #include "patternelement.h"
 #include "mainwindow.h"
 #include "PrintElements.h"
@@ -8,8 +9,9 @@
 #define PTN_WIDTH_WQXGA     2560
 #define PTN_HEIGHT_WQXGA    1600
 
-class DLP9000
+class DLP9000: public QObject
 {
+    Q_OBJECT
 
 public:
     static DLP9000& Instance() {
@@ -34,6 +36,9 @@ public:
     int PatternUpload(QStringList ImageList, PrintControls dlp_PrintControls, PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript);
     void PatternDisplay(int DisplaySetting);
 
+signals:
+    void DLPPrintSignal(QString StringToPrint);
+    void DLPError(QString ErrorString);
 
 private:
     bool m_dualAsic = true;

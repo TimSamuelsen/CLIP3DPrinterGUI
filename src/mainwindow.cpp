@@ -43,8 +43,8 @@ QString LogFileDestination; //for storing log file destination in settings
 QString ImageFileDirectory; //For storing image file directory in settings
 QTime PrintStartTime; //Get start time for log
 //static double GetPosition; //Holds current position
-static bool StagePrep1 = false; //For lowering stage
-static bool StagePrep2 = false; //For lowering stage
+//static bool StagePrep1 = false; //For lowering stage
+//static bool StagePrep2 = false; //For lowering stage
 
 //For vp8bit workaround
 static int VP8Bit = OFF;
@@ -63,6 +63,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui = (new Ui::MainWindow);
     ui->setupUi(this);
 
+    //
+    //ManualStageControl * pStage = new ManualStageControl;
+    QObject::connect(&Stage, SIGNAL(StagePrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
+    QObject::connect(&Stage, SIGNAL(StageError(QString)), this, SLOT(showError(QString)));
+
+    QObject::connect(&DLP, SIGNAL(DLPPrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
+    QObject::connect(&DLP, SIGNAL(DLPError(QString)), this, SLOT(showError(QString)));
     //Initialize features
     CurrentDateTime = QDateTime::currentDateTime(); //get current time for startup time
     loadSettings(); //load settings from settings file
@@ -80,12 +87,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//TestClass * testClass = new TestClass();
-//initConnections();
-void MainWindow::initConnections()
-{
 
-}
 
 /**
  * @brief MainWindow::on_ManualStage_clicked

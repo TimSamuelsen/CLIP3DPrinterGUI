@@ -16,6 +16,9 @@
 
 bool DLP9000::InitProjector(void)
 {
+    QString dlpTest = "dlpTest";
+    emit DLPPrintSignal("dlpTest2222");
+    emit DLPError("dlpTest2222");
     if (USB_Open() == 0)
     {
         LCR_SetMode(PTN_MODE_OTF);
@@ -33,6 +36,7 @@ bool DLP9000::InitProjector(void)
 void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, PrintScripts m_PrintScripts, PrintControls m_PrintControls)
 //void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int PrintScript, int CurrentImage, QStringList ExposureTimeList, QStringList DarkTimeList, int ProjectionMode, int BitMode, bool InitialExposure)
 {
+    emit DLPError("dlpTest2222");
     if(m_PrintSettings.BitMode == 0){
         m_PrintSettings.BitMode = 1; //Default bitmode to 1 if it somehow gets passed in undefined
     }
@@ -122,7 +126,7 @@ void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, 
             return;
         }
 
-        fileNames.sort();
+        //fileNames.sort();
 
         QDir dir = QFileInfo(QFile(fileNames.at(0))).absoluteDir();
         m_ptnImagePath = dir.absolutePath();

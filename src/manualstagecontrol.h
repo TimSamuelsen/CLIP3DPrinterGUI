@@ -34,6 +34,9 @@ public:
     void ClearRead();
     void initStagePosition(PrintSettings si_PrintSettings);
     void initStageStart(PrintSettings si_PrintSettings);
+signals:
+    void StagePrintSignal(QString StringToPrint);
+    void StageError(QString ErrorString);
 
 private slots:
     void on_MoveRelative_clicked();

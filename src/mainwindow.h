@@ -45,14 +45,14 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void PrintToTerminal(QString StringToPrint);
     imagepopout popout;
     manualpumpcontrol Pump;
-    ManualStageControl Stage;
+    //ManualStageControl Stage;
     printcontrol PrintControl;
 
 public slots:
     void showError(QString errMsg);
+    void PrintToTerminal(QString StringToPrint);
 
 private slots:
     void on_ManualStage_clicked();

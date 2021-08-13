@@ -11,7 +11,7 @@ printcontrol::printcontrol()
 void printcontrol::InitializeSystem(QStringList ImageList, PrintSettings m_PrintSettings, PrintControls *pPrintControls, PrintScripts m_PrintScript)
 {
     pc_DLP.PatternDisplay(OFF);
-    Stage.initStagePosition(m_PrintSettings);
+    //Stage.initStagePosition(m_PrintSettings);
     pc_DLP.PatternUpload(ImageList, *pPrintControls, m_PrintSettings, m_PrintScript);
     pPrintControls->PrintEnd = CalcPrintEnd(*pPrintControls, m_PrintSettings);
 }

@@ -284,6 +284,10 @@ int ManualStageControl::StageStop(Stage_t StageType)
 }
 int ManualStageControl::SetStageVelocity(float VelocityToSet, Stage_t StageType)
 {
+    printf("This is a stage velocity test");
+    QString mystring = "velocity test";
+    emit StagePrintSignal(mystring);
+    emit StageError(mystring);
     int returnVal = 0;
     if(StageType == STAGE_SMC){
         SMC.SetVelocity(VelocityToSet);
@@ -449,11 +453,15 @@ void ManualStageControl::initStagePosition(PrintSettings si_PrintSettings)
 {
     s_PrintSettings = si_PrintSettings;
     initStageSlot();
+
 }
 
 void ManualStageControl::initStageSlot()
 {
-    //MainWindow Main;
+    printf("**************");
+    QString test = "this is my test";
+    emit StagePrintSignal(test);
+    emit StageError(test);
     if (s_PrintSettings.StageType == STAGE_SMC){
         double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
         if (CurrentPosition < (s_PrintSettings.StartingPosition - 3.2)){
@@ -513,6 +521,7 @@ void ManualStageControl::verifyStageParams(PrintSettings s_PrintSettings)
 void ManualStageControl::initStageStart(PrintSettings si_PrintSettings)
 {
     //MainWindow Main;
+
     SetStageVelocity(si_PrintSettings.StageVelocity, si_PrintSettings.StageType);
     Sleep(10);
     emit(on_GetPosition_clicked());
