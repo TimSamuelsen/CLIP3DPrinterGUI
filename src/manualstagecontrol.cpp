@@ -18,7 +18,6 @@ ManualStageControl::ManualStageControl(QWidget *parent) :
     ui(new Ui::ManualStageControl)
 {
     ui->setupUi(this);
-
 }
 
 ManualStageControl::~ManualStageControl()

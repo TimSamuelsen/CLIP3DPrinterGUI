@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include "patternelement.h"
-#include "mainwindow.h"
 #include "PrintElements.h"
 
 #define PTN_WIDTH_WQXGA     2560

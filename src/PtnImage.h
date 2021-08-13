@@ -7,10 +7,10 @@
 #ifndef PTN_IMAGE_H
 #define PTN_IMAGE_H
 
-#include "Pattern.h"
-#include "Splash.h"
-#include "QImage.h"
-#include "QPixmap.h"
+#include "pattern.h"
+#include "splash.h"
+#include "qimage.h"
+#include "qpixmap.h"
 #include <QImageWriter>
 /**
  * Class for loading, storing and manipulating the pattern image.

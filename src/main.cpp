@@ -1,9 +1,7 @@
 #include "mainwindow.h"
-//#include "QtTheme.h"
 #include <QApplication>
 #include <QFile>
 #include <QDir>
-//#include <QString>
 
 
 int main(int argc, char *argv[])

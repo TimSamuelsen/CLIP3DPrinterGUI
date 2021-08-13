@@ -13,7 +13,6 @@ public:
         static StageCommands myInstance;
         return myInstance;
     }
-
     StageCommands(StageCommands const&) = delete;               //Copy construct
     StageCommands(StageCommands&&) = delete;                    //Move contstruct
     StageCommands& operator=(StageCommands const&) = delete;    //Copy assign
@@ -56,7 +55,6 @@ protected:
     ~StageCommands() {
 
     }
-
 };
 
 #endif // STAGECOMMANDS_H

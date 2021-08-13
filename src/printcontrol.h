@@ -2,14 +2,12 @@
 #define PRINTCONTROL_H
 
 #include "PrintElements.h"
-#include "manualstagecontrol.h"
 #include "manualpumpcontrol.h"
 
 class printcontrol
 {
 public:
     printcontrol();
-    //ManualStageControl Stage;
     manualpumpcontrol Pump;
     void InitializeSystem(QStringList ImageList, PrintSettings p_PrintSettings, PrintControls *pPrintControls, PrintScripts m_PrintScript);
 

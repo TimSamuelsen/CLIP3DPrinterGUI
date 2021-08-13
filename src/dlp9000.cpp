@@ -1,6 +1,5 @@
 #include "dlp9000.h"
 #include "API.h"
-#include "mainwindow.h"
 #include "usb.h"
 #include "patternelement.h"
 #include "PtnImage.h"
@@ -12,13 +11,8 @@
 #include <QTimer>
 #include <QProgressDialog>
 
-//MainWindow Main;
-
 bool DLP9000::InitProjector(void)
 {
-    QString dlpTest = "dlpTest";
-    emit DLPPrintSignal("dlpTest2222");
-    emit DLPError("dlpTest2222");
     if (USB_Open() == 0)
     {
         LCR_SetMode(PTN_MODE_OTF);
@@ -26,17 +20,16 @@ bool DLP9000::InitProjector(void)
     }
     else
     {
+        emit DLPError("Light Engine Connection Failed");
         return false;
     }
 }
 
 /**
- * @brief MainWindow::on_addPatternsButton_clicked
+ * @brief DLP9000::on_addPatternsButton_clicked
  */
 void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, PrintScripts m_PrintScripts, PrintControls m_PrintControls)
-//void DLP9000::AddPatterns(QStringList fileNames, double ExposureTime, double DarkTime, int PrintScript, int CurrentImage, QStringList ExposureTimeList, QStringList DarkTimeList, int ProjectionMode, int BitMode, bool InitialExposure)
 {
-    emit DLPError("dlpTest2222");
     if(m_PrintSettings.BitMode == 0){
         m_PrintSettings.BitMode = 1; //Default bitmode to 1 if it somehow gets passed in undefined
     }
@@ -44,7 +37,6 @@ void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, 
     int i;
     int BitPos = 0;
     int numPatAdded = 0;
-    //MainWindow Main;
     if (m_PrintSettings.ProjectionMode == 1)//Video Pattern Mode
     {
 
@@ -122,7 +114,7 @@ void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, 
         printf("POTF pattern upload\r\n");
         if(fileNames.isEmpty())
         {
-            //Main.showError("No image file found");
+            emit DLPError("No image file found");
             return;
         }
 
@@ -130,7 +122,6 @@ void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, 
 
         QDir dir = QFileInfo(QFile(fileNames.at(0))).absoluteDir();
         m_ptnImagePath = dir.absolutePath();
-    //    settings.setValue("PtnImagePath",m_ptnImagePath);
 
         for(i=0;i<m_elements.size();i++)
             m_elements[i].selected=false;
@@ -228,7 +219,6 @@ void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, 
  */
 int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware)
 {
-    //MainWindow Main;
     for(int image = 0; image < totalSplashImages; image++)
     {
 
@@ -275,19 +265,19 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware)
 
                 if(splashSizeMaster <= 0 || splashSizeSlave <= 0)
                 {
-                    //Main.showError("splashSize <= 0");
+                    emit DLPError("splashSize <= 0");
                     return -1;
                 }
 
                 if(uploadPatternToEVM(true, splashImageCount, splashSizeMaster, splash_block_master) == -1)
                 {
-                    //Main.showError("Master Upload Pattern to EVM failed");
+                    emit DLPError("Master Upload Pattern to EVM failed");
                     return -1;
                 }
 
                 if(uploadPatternToEVM(false, splashImageCount, splashSizeSlave, splash_block_slave) == -1)
                 {
-                    //Main.showError("Slave Upload Pattern to EVM failed");
+                    emit DLPError("Slave Upload Pattern to EVM failed");
                     return -1;
                 }
     }
@@ -306,7 +296,6 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware)
 int DLP9000::uploadPatternToEVM(bool master, int splashImageCount, int splash_size, uint08* splash_block)
 {
     int origSize = splash_size;
-    //MainWindow Main;
     LCR_InitPatternMemLoad(master, splashImageCount, splash_size);
 
     QProgressDialog imgDataDownload("Image data download", "Abort", 0, splash_size);
@@ -329,11 +318,11 @@ int DLP9000::uploadPatternToEVM(bool master, int splashImageCount, int splash_si
             imgDataDownload.close();
             if (master)
             {
-               // Main.showError("Master Downloading Failed");
+               emit DLPError("Master Downloading Failed");
             }
             else
             {
-                //Main.showError("Slave Downloading Failed");
+                emit DLPError("Slave Downloading Failed");
             }
             return -1;
         }
@@ -350,7 +339,7 @@ int DLP9000::uploadPatternToEVM(bool master, int splashImageCount, int splash_si
         {
             imgDataDownload.setValue(splash_size);
             imgDataDownload.close();
-            //Main.showError("imgDataDownLoad was canceled");
+            emit DLPError("imgDataDownLoad was canceled");
             return -1;
         }
     }
@@ -366,7 +355,7 @@ int DLP9000::uploadPatternToEVM(bool master, int splashImageCount, int splash_si
 
 
 /**
- * @brief MainWindow::on_updateLUT_Button_clicked
+ * @brief DLP9000::on_updateLUT_Button_clicked
  */
 void DLP9000::updateLUT(int ProjectionMode)
 {
@@ -374,12 +363,11 @@ void DLP9000::updateLUT(int ProjectionMode)
     int ret;
     QTime waitEndTime;
     char errStr[255];
-    //MainWindow Main;
 
     if(m_elements.size() <= 0)
     {
 
-        //Main.showError("No pattern sequence to send");
+        emit DLPError("No pattern sequence to send");
         printf("Error: No pattern sequence to send");
         return;
     }
@@ -395,7 +383,7 @@ void DLP9000::updateLUT(int ProjectionMode)
         if(LCR_AddToPatLut(i, m_elements[i].exposure, m_elements[i].clear, m_elements[i].bits, m_elements[i].color, m_elements[i].trigIn, m_elements[i].darkPeriod, m_elements[i].trigOut2, m_elements[i].splashImageIndex, m_elements[i].splashImageBitPos)<0)
         {
             sprintf(errStr,"Unable to add pattern number %d to the LUT",i);
-            //Main.showError(QString::fromLocal8Bit(errStr));
+            emit DLPError(QString::fromLocal8Bit(errStr));
             break;
         }
         else
@@ -406,7 +394,7 @@ void DLP9000::updateLUT(int ProjectionMode)
 
     if (LCR_SendPatLut() < 0)
     {
-        //Main.showError("Sending pattern LUT failed!");
+        emit DLPError("Sending pattern LUT failed!");
         //printf("Sending pattern LUT failed");
         return;
     }
@@ -415,7 +403,7 @@ void DLP9000::updateLUT(int ProjectionMode)
     printf("elements size: %d\r\n",m_elements.size());
     if (ret < 0)
     {
-        //Main.showError("Sending pattern LUT size failed!");
+        emit DLPError("Sending pattern LUT size failed!");
         return;
     }
 
@@ -434,16 +422,14 @@ void DLP9000::updateLUT(int ProjectionMode)
 }
 
 /**
- * @brief MainWindow::on_startPatSequence_Button_clicked
+ * @brief DLP9000::on_startPatSequence_Button_clicked
  */
 void DLP9000::startPatSequence(void)
 {
-    //MainWindow Main; //Redefining this all the time might be bad practice
-
     if (LCR_PatternDisplay(2) < 0)
     {
     }
-        //Main.showError("Unable to start pattern display");
+        emit DLPError("Unable to start pattern display");
 }
 
 void DLP9000::clearElements(void)
@@ -453,15 +439,14 @@ void DLP9000::clearElements(void)
 
 void DLP9000::setIT6535Mode(int Mode)
 {
-    //MainWindow Main;
     unsigned int dataPort, pixelClock, dataEnable, syncSelect;
     dataPort = 0; //Select data port 1
     pixelClock = 0; //Select pixelClock 1
     dataEnable = 0; //Select dataEnable 1
     syncSelect = 0;  //Select port 1 sync
 
-    if(LCR_SetPortConfig(dataPort,pixelClock,dataEnable,syncSelect)<0){}
-  //      Main.showError("Unable to set port configuration!");
+    if(LCR_SetPortConfig(dataPort,pixelClock,dataEnable,syncSelect)<0)
+      emit DLPError("Unable to set port configuration!");
     API_VideoConnector_t ProjectMode;
     switch (Mode){
         case 0:
@@ -481,7 +466,7 @@ void DLP9000::setIT6535Mode(int Mode)
 }
 
 /**
- * @brief MainWindow::calculateSplashImageDetails
+ * @brief DLP9000::calculateSplashImageDetails
  * for each of the pattern image on the pattern settings page, calculates the
  * total number of splash images of bit depth 24 based on the bit depth of each image
  * Also calculates the bitposition of each pattern element in the splash Image
@@ -493,7 +478,6 @@ void DLP9000::setIT6535Mode(int Mode)
  */
 int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware, int ProjectionMode)
 {
-    //MainWindow Main;
     int maxbits = 400;
     if(ProjectionMode == 1){
         maxbits = 5000;
@@ -526,7 +510,7 @@ int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware, 
                 sprintf(dispStr, "Error:Total Bit Depth cannot exceed 400");
             else
                 sprintf(dispStr, "Error:Total Bit Depth cannot exceed 3984");
-           // Main.showError(dispStr);
+            emit DLPError(dispStr);
             return -1;
         }
 

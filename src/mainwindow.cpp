@@ -20,18 +20,13 @@
 #include "API.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "manualstagecontrol.h"
-#include "manualpumpcontrol.h"
 #include "stagecommands.h"
-#include "imagepopout.h"
-
-#include "serialib.h"
-#include "SMC100C.h"
+#include "pumpcommands.h"
 #include "dlp9000.h"
-#include <opencv2/opencv.hpp>
 
 DLP9000& DLP = DLP9000::Instance();
 StageCommands& Stage = StageCommands::Instance();
+PumpCommands& Pump = PumpCommands::Instance();
 
 //Auto parameter selection mode
 static double PrintSpeed;
@@ -123,7 +118,7 @@ void MainWindow::on_pushButton_clicked()
     ManualPumpUI->show();
 
     PrintToTerminal("Manual Pump Control Entered"); //Print to terminal
-    Pump.PSerial.closeDevice(); //Closes main window pump connection to allow manual pump control to take over
+    Pump.PumpSerial.closeDevice(); //Closes main window pump connection to allow manual pump control to take over
 }
 
 /**
@@ -670,11 +665,11 @@ void MainWindow::on_StageConnectButton_clicked()
  */
 void MainWindow::on_PumpConnectButton_clicked()
 {
-    Pump.PSerial.closeDevice();
+    Pump.PumpSerial.closeDevice();
     QString COMSelect = ui->COMPortSelectPump->currentText();
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
-    if (Pump.PSerial.openDevice(COM,9600) == 1)
+    if (Pump.PumpSerial.openDevice(COM,9600) == 1)
     {
         PrintToTerminal("Pump Connected");
         ui->PumpConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");

@@ -7,10 +7,6 @@
 #include "manualpumpcontrol.h"
 #include "imageprocessing.h"
 #include "imagepopout.h"
-#include "patternelement.h"
-#include "SMC100C.h"
-#include "dlp9000.h"
-#include "serialib.h"
 #include "PrintElements.h"
 #include "printcontrol.h"
 
@@ -47,7 +43,6 @@ public:
     ~MainWindow();
     imagepopout popout;
     printcontrol PrintControl;
-    manualpumpcontrol Pump;
 
 public slots:
     void showError(QString errMsg);

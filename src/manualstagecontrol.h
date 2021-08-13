@@ -2,7 +2,6 @@
 #define MANUALSTAGECONTROL_H
 
 #include <QWidget>
-#include "SMC100C.h"
 #include "PrintElements.h"
 
 

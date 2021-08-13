@@ -15,28 +15,6 @@ class manualpumpcontrol : public QWidget
 public:
     explicit manualpumpcontrol(QWidget *parent = nullptr);
     ~manualpumpcontrol();
-    serialib PSerial;
-
-    int StartInfusion();
-    int StartWithdraw();
-    int Stop();
-
-    int SetTargetTime(double T_Time);
-    int SetTargetVolume(double T_Vol);
-    int SetSyringeVolume(double S_Vol);
-    int SetInfuseRate(double I_Rate);
-    int SetWithdrawRate(double W_Rate);
-
-    int ClearTime();
-    int ClearVolume();
-    int CustomCommand(QString NewCommand);
-    int IndefiniteRun();
-
-    QString GetTargetTime();
-    QString GetTargetVolume();
-    QString GetSyringeVolume();
-    QString GetInfuseRate();
-    QString GetWithdrawRate();
 
 private slots:
     void on_ConnectButton_clicked();
@@ -75,8 +53,6 @@ private slots:
 
 private:
     Ui::manualpumpcontrol *ui;
-    char* SerialRead();
-    void CommandBufferUpdate();
 };
 
 #endif // MANUALPUMPCONTROL_H

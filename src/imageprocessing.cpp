@@ -1,4 +1,4 @@
-  #include "imageprocessing.h"
+#include "imageprocessing.h"
 #include "ui_imageprocessing.h"
 #include <QFileDialog>
 

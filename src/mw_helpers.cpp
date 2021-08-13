@@ -3,9 +3,11 @@
 #include "API.h"
 #include "dlp9000.h"
 #include "stagecommands.h"
+#include "pumpcommands.h"
 
 DLP9000& p_DLP = DLP9000::Instance();
 StageCommands& p_Stage = StageCommands::Instance();
+PumpCommands& p_Pump = PumpCommands::Instance();
 /***************************************Print Functionality*********************************************/
 /**
  * @brief MainWindow::on_AbortPrint_clicked
@@ -67,7 +69,7 @@ void MainWindow::on_StartPrint_clicked()
 
         //If continuous injection is on then start pump infusion
         if (m_InjectionSettings.ContinuousInjection == ON){
-            Pump.StartInfusion();
+            p_Pump.StartInfusion();
         }
     }
 }
@@ -413,9 +415,9 @@ void MainWindow::SetDarkTimer(int PrintScript, int DarkMotionMode)
 void MainWindow::PrintInfuse()
 {
     if (m_InjectionSettings.ContinuousInjection == OFF){
-        Pump.ClearVolume();
+        p_Pump.ClearVolume();
         Sleep(15);
-        Pump.StartInfusion();
+        p_Pump.StartInfusion();
         ui->ProgramPrints->append("PrintInfuse");
     }
 }
@@ -457,7 +459,7 @@ void MainWindow::StartPrint()
 
         //If continuous injection is on then start pump infusion
         if (m_InjectionSettings.ContinuousInjection == ON){
-            Pump.StartInfusion();
+            p_Pump.StartInfusion();
         }
     }
 }

@@ -1,4 +1,4 @@
-    #ifndef PRINTELEMENTS_H
+#ifndef PRINTELEMENTS_H
 #define PRINTELEMENTS_H
 
 #include <QStringList>
