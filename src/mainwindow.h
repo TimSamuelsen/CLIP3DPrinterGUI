@@ -46,9 +46,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     imagepopout popout;
-    manualpumpcontrol Pump;
-    //ManualStageControl Stage;
     printcontrol PrintControl;
+    manualpumpcontrol Pump;
 
 public slots:
     void showError(QString errMsg);

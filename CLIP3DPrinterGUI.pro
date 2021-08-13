@@ -27,7 +27,8 @@ SOURCES += \
     src/prinstscriptdialog.cpp \
     src/printcontrol.cpp \
     src/qcustomplot/qcustomplot.cpp \
-    src/serialib/serialib.cpp
+    src/serialib/serialib.cpp \
+    src/stagecommands.cpp
 
 HEADERS += \
     src/PrintElements.h \
@@ -43,7 +44,8 @@ HEADERS += \
     src/prinstscriptdialog.h \
     src/printcontrol.h \
     src/qcustomplot/qcustomplot.h \
-    src/serialib/serialib.h
+    src/serialib/serialib.h \
+    src/stagecommands.h
 
 FORMS += \
     src/imagepopout.ui \

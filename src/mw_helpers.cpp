@@ -2,9 +2,10 @@
 #include "ui_mainwindow.h"
 #include "API.h"
 #include "dlp9000.h"
+#include "stagecommands.h"
 
 DLP9000& p_DLP = DLP9000::Instance();
-
+StageCommands& p_Stage = StageCommands::Instance();
 /***************************************Print Functionality*********************************************/
 /**
  * @brief MainWindow::on_AbortPrint_clicked
@@ -14,7 +15,7 @@ DLP9000& p_DLP = DLP9000::Instance();
 void MainWindow::on_AbortPrint_clicked()
 {
     LCR_PatternDisplay(0); //Turn off light engine projection
-    Stage.StageStop(m_PrintSettings.StageType); //Stop stage movement
+    p_Stage.StageStop(m_PrintSettings.StageType); //Stop stage movement
     //Add pump stop here
     m_PrintControls.layerCount = 0xFFFFFF; //Set layer count high to stop print process
     ui->ProgramPrints->append("PRINT ABORTED");
@@ -29,7 +30,7 @@ void MainWindow::on_StartPrint_clicked()
     //If settings are validated successfully and Initialization has been completed
     if (ValidateSettings() == true)
     {
-        Stage.SetStageVelocity(m_PrintSettings.StageVelocity, m_PrintSettings.StageType); //Update stage velocity
+        p_Stage.SetStageVelocity(m_PrintSettings.StageVelocity, m_PrintSettings.StageType); //Update stage velocity
         Sleep(10); //Sleep to avoid spamming motor controller
         emit(on_GetPosition_clicked()); //Get stage position to validate that stage connection is working
         Sleep(10);
@@ -47,7 +48,7 @@ void MainWindow::on_StartPrint_clicked()
         if (m_PrintSettings.MotionMode == CONTINUOUS){ //continuous motion mode
             double ContStageVelocity = (m_PrintSettings.StageVelocity)/(m_PrintSettings.ExposureTime/(1e6)); //Multiply Exposure time by 1e6 to convert from us to s to get to proper units
             ui->ProgramPrints->append("Continuous Stage Velocity set to " + QString::number(m_PrintSettings.StageVelocity) + "/" + QString::number(m_PrintSettings.ExposureTime) + " = " + QString::number(ContStageVelocity) + " mm/s");
-            Stage.SetStageVelocity(ContStageVelocity, m_PrintSettings.StageType);
+            p_Stage.SetStageVelocity(ContStageVelocity, m_PrintSettings.StageType);
         }
 
         PrintStartTime = QTime::currentTime(); //Get print start time from current time
@@ -85,7 +86,7 @@ void MainWindow::PrintProcess(void)
         {
             //If motion mode is set to continuous, pause stage movement during re-upload
             if (m_PrintSettings.MotionMode == CONTINUOUS){
-                Stage.StageStop(m_PrintSettings.StageType);
+                p_Stage.StageStop(m_PrintSettings.StageType);
             }
             LCR_PatternDisplay(0); //Stop projection
 
@@ -125,7 +126,7 @@ void MainWindow::PrintProcess(void)
 
             //if in continuous motion mode restart movement
             if(m_PrintSettings.MotionMode == CONTINUOUS){
-                Stage.StageAbsoluteMove(m_PrintControls.PrintEnd, m_PrintSettings.StageType);
+                p_Stage.StageAbsoluteMove(m_PrintControls.PrintEnd, m_PrintSettings.StageType);
                 m_PrintControls.inMotion = true;
             }
             ui->ProgramPrints->append("Reupload succesful, current layer: " + QString::number(m_PrintControls.layerCount));
@@ -246,12 +247,12 @@ void MainWindow::pumpingSlot(void)
     QTimer::singleShot(m_PrintSettings.DarkTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
     if(m_PrintScript.PrintScript == ON){
         if (m_PrintControls.layerCount < m_PrintScript.PumpHeightScriptList.size()){
-            Stage.StageRelativeMove(-m_PrintScript.PumpHeightScriptList.at(m_PrintControls.layerCount).toDouble(), m_PrintSettings.StageType);
+            p_Stage.StageRelativeMove(-m_PrintScript.PumpHeightScriptList.at(m_PrintControls.layerCount).toDouble(), m_PrintSettings.StageType);
             ui->ProgramPrints->append("Pumping " + QString::number(m_PrintScript.PumpHeightScriptList.at(m_PrintControls.layerCount).toDouble()*1000) +" um");
         }
     }
     else{
-        Stage.StageRelativeMove(-m_PrintSettings.PumpingParameter, m_PrintSettings.StageType);
+        p_Stage.StageRelativeMove(-m_PrintSettings.PumpingParameter, m_PrintSettings.StageType);
         ui->ProgramPrints->append("Pumping " + QString::number(m_PrintSettings.PumpingParameter*1000) +" um");
     }
 }
@@ -399,7 +400,7 @@ void MainWindow::SetDarkTimer(int PrintScript, int DarkMotionMode)
     }
     else{
         if (m_PrintControls.inMotion == false){
-            Stage.StageAbsoluteMove(m_PrintControls.PrintEnd, m_PrintSettings.StageType);
+            p_Stage.StageAbsoluteMove(m_PrintControls.PrintEnd, m_PrintSettings.StageType);
         }
         PrintProcess();
     }
@@ -424,7 +425,7 @@ double MainWindow::CalcContinuousVelocity(PrintSettings m_PrintSettings)
 {
     double ContStageVelocity = (m_PrintSettings.StageVelocity)/(m_PrintSettings.ExposureTime/(1e6)); //Multiply Exposure time by 1e6 to convert from us to s to get to proper units
     ui->ProgramPrints->append("Continuous Stage Velocity set to " + QString::number(m_PrintSettings.StageVelocity) + "/" + QString::number(m_PrintSettings.ExposureTime) + " = " + QString::number(ContStageVelocity) + " mm/s");
-    Stage.SetStageVelocity(ContStageVelocity, m_PrintSettings.StageType);
+    p_Stage.SetStageVelocity(ContStageVelocity, m_PrintSettings.StageType);
 
     return ContStageVelocity;
 }
@@ -433,11 +434,11 @@ void MainWindow::StartPrint()
 {
     if (ValidateSettings() == true)
     {
-        Stage.initStageStart(m_PrintSettings);
+        p_Stage.initStageStart(m_PrintSettings);
         PrintToTerminal("Entering print procedure");
         p_DLP.SetLEDIntensity(m_PrintSettings, m_PrintScript);
         if (m_PrintSettings.MotionMode == CONTINUOUS){ //continuous motion mode
-            Stage.SetStageVelocity( CalcContinuousVelocity(m_PrintSettings), m_PrintSettings.StageType);
+            p_Stage.SetStageVelocity( CalcContinuousVelocity(m_PrintSettings), m_PrintSettings.StageType);
         }
 
         PrintStartTime = QTime::currentTime();
@@ -468,7 +469,7 @@ void MainWindow::PrintProcess2()
         if (m_PrintControls.remainingImages <= 0)
         {
             if(m_PrintSettings.MotionMode == CONTINUOUS){
-                Stage.StageStop(m_PrintSettings.StageType);
+                p_Stage.StageStop(m_PrintSettings.StageType);
             }
             QStringList ImageList = GetImageList(m_PrintControls, m_PrintSettings);
             m_PrintControls.remainingImages = p_DLP.PatternUpload(ImageList, m_PrintControls, m_PrintSettings, m_PrintScript);

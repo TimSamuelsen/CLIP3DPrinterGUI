@@ -1,9 +1,8 @@
-#ifndef PRINTELEMENTS_H
+    #ifndef PRINTELEMENTS_H
 #define PRINTELEMENTS_H
 
 #include <QStringList>
 #include <string.h>
-
 
 #define NormalTime
 #define QuickTime

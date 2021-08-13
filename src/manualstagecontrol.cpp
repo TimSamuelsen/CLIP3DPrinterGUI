@@ -1,21 +1,17 @@
 #include "manualstagecontrol.h"
 #include "ui_manualstagecontrol.h"
-#include "SMC100C.h"
-#include "mainwindow.h"
+#include "stagecommands.h"
 #include <QTimer>
 
 #define ON 1
 #define OFF 0
 
-//MainWindow Main;
+StageCommands& ms_Stage = StageCommands::Instance();
 
 static bool ConnectionFlag = false;
 static Stage_t StageType = STAGE_SMC; //Initialize stage type as SMC
 static bool EndStopState;
-static float FeedRate = 60;
-static bool StagePrep1 = false;
-static bool StagePrep2 = false;
-static PrintSettings s_PrintSettings;
+
 
 ManualStageControl::ManualStageControl(QWidget *parent) :
     QWidget(parent),
@@ -27,8 +23,7 @@ ManualStageControl::ManualStageControl(QWidget *parent) :
 
 ManualStageControl::~ManualStageControl()
 {
-    //SMC.SMC100CClose();
-    StageClose(StageType);
+    ms_Stage.StageClose(StageType);
     delete ui;
 }
 
@@ -58,7 +53,7 @@ void ManualStageControl::on_ConnectButton_clicked()
         QByteArray array = COMSelect.toLocal8Bit();
         char* COM = array.data();
         //bool connectTest = SMC.SMC100CInit(COM);
-        bool connectTest = StageInit(COM, StageType);
+        bool connectTest = ms_Stage.StageInit(COM, StageType);
         if (connectTest)
         {
             ui->TerminalOut->append("Stage Connected");
@@ -79,7 +74,7 @@ void ManualStageControl::on_ConnectButton_clicked()
     }
     else
     {
-        StageClose(StageType);
+        ms_Stage.StageClose(StageType);
         ui->TerminalOut->append("Stage Connection Closed");
         ui->ConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
         ui->ConnectionIndicator->setText("Disconnected");
@@ -90,10 +85,9 @@ void ManualStageControl::on_ConnectButton_clicked()
 
 void ManualStageControl::on_MoveRelative_clicked()
 {
-    MainWindow Main;
     double RelativeMoveDistance = (ui->RelativeMoveParam->value());
     //SMC.RelativeMove(RelativeMoveDistance);
-    StageRelativeMove(RelativeMoveDistance, StageType);
+    ms_Stage.StageRelativeMove(RelativeMoveDistance, StageType);
     QString RelativeMoveString = "Relative Move: " + QString::number(RelativeMoveDistance) + "mm";
     ui->TerminalOut->append(RelativeMoveString);
 }
@@ -101,8 +95,7 @@ void ManualStageControl::on_MoveRelative_clicked()
 void ManualStageControl::on_MoveAbsolute_clicked()
 {
     double AbsoluteMoveDistance = (ui->AbsoluteMoveParam->value());
-    //SMC.AbsoluteMove(AbsoluteMoveDistance);
-    StageAbsoluteMove(AbsoluteMoveDistance, StageType);
+    ms_Stage.StageAbsoluteMove(AbsoluteMoveDistance, StageType);
     QString AbsoluteMoveString = "Absolute Move: " + QString::number(AbsoluteMoveDistance) + "mm";
     ui->TerminalOut->append(AbsoluteMoveString);
 }
@@ -110,8 +103,7 @@ void ManualStageControl::on_MoveAbsolute_clicked()
 void ManualStageControl::on_SetMinEndOfRun_clicked()
 {
     double MinEndOfRun = (ui->NewMinEndOfRunParam->value());
-    //SMC.SetNegativeLimit(MinEndOfRun);
-    SetStageNegativeLimit(MinEndOfRun, StageType);
+    ms_Stage.SetStageNegativeLimit(MinEndOfRun, StageType);
     QString MinEndOfRunString =QString::number(MinEndOfRun);
     ui->TerminalOut->append("MinEndOfRun: " + MinEndOfRunString + "mm");
     ui->CurrentMinEndOfRun->setText(MinEndOfRunString);
@@ -120,8 +112,7 @@ void ManualStageControl::on_SetMinEndOfRun_clicked()
 void ManualStageControl::on_SetMaxEndOfRun_clicked()
 {
     double MaxEndOfRun = (ui->NewMaxEndOfRunParam->value());
-    //SMC.SetPositiveLimit(MaxEndOfRun);
-    SetStagePositiveLimit(MaxEndOfRun, StageType);
+    ms_Stage.SetStagePositiveLimit(MaxEndOfRun, StageType);
     QString MaxEndOfRunString = QString::number(MaxEndOfRun);
     ui->TerminalOut->append("MaxEndOfRun: " + MaxEndOfRunString + "mm");
     ui->CurrentMaxEndOfRun->setText(MaxEndOfRunString);
@@ -130,8 +121,7 @@ void ManualStageControl::on_SetMaxEndOfRun_clicked()
 void ManualStageControl::on_SetVelocity_clicked()
 {
     double StageVelocity = (ui->NewVelocityParam->value());
-    //SMC.SetVelocity(StageVelocity);
-    SetStageVelocity(StageVelocity, StageType);
+    ms_Stage.SetStageVelocity(StageVelocity, StageType);
     QString VelocityString = QString::number(StageVelocity);
     ui->TerminalOut->append("Set Velocity: " + VelocityString  + "mm/s");
     ui->CurrentVelocity->setText(VelocityString);
@@ -140,8 +130,7 @@ void ManualStageControl::on_SetVelocity_clicked()
 void ManualStageControl::on_SetAcceleration_clicked()
 {
     double StageAcceleration = (ui->NewAccelParam->value());
-    //SMC.SetAcceleration(StageAcceleration);
-    SetStageAcceleration(StageAcceleration, StageType);
+    ms_Stage.SetStageAcceleration(StageAcceleration, StageType);
     QString AccelerationString = QString::number(StageAcceleration);
     ui->TerminalOut->append("Set Acceleration: " + AccelerationString + "mm/s^2");
     ui->CurrentAcceleration->setText(AccelerationString);
@@ -149,7 +138,7 @@ void ManualStageControl::on_SetAcceleration_clicked()
 
 void ManualStageControl::on_GetMinEndOfRun_clicked()
 {
-    QString CurrentMinEndOfRun = SMC.GetNegativeLimit();
+    QString CurrentMinEndOfRun = ms_Stage.SMC.GetNegativeLimit();
     CurrentMinEndOfRun = CurrentMinEndOfRun.remove(0,3);
     ui->TerminalOut->append("Current Min End of Run: " + CurrentMinEndOfRun);
     ui->CurrentMinEndOfRun->setText(CurrentMinEndOfRun);
@@ -157,7 +146,7 @@ void ManualStageControl::on_GetMinEndOfRun_clicked()
 
 void ManualStageControl::on_GetMaxEndOfRun_clicked()
 {
-    QString CurrentMaxEndOfRun  = SMC.GetPositiveLimit();
+    QString CurrentMaxEndOfRun  = ms_Stage.SMC.GetPositiveLimit();
     CurrentMaxEndOfRun = CurrentMaxEndOfRun.remove(0,3);
     ui->TerminalOut->append("Current Max End of Run: " + CurrentMaxEndOfRun );
     ui->CurrentMaxEndOfRun->setText(CurrentMaxEndOfRun );
@@ -165,7 +154,7 @@ void ManualStageControl::on_GetMaxEndOfRun_clicked()
 
 void ManualStageControl::on_GetVelocity_clicked()
 {
-    QString CurrentVelocity  = SMC.GetVelocity();
+    QString CurrentVelocity  = ms_Stage.SMC.GetVelocity();
     CurrentVelocity = CurrentVelocity.remove(0,3);
     ui->TerminalOut->append("Current Velocity: " + CurrentVelocity);
     ui->CurrentVelocity->setText(CurrentVelocity);
@@ -173,7 +162,7 @@ void ManualStageControl::on_GetVelocity_clicked()
 
 void ManualStageControl::on_GetAcceleration_clicked()
 {
-    QString CurrentAcceleration  = SMC.GetAcceleration();
+    QString CurrentAcceleration  = ms_Stage.SMC.GetAcceleration();
     CurrentAcceleration = CurrentAcceleration.remove(0,3);
     ui->TerminalOut->append("Current Acceleration: " + CurrentAcceleration);
     ui->CurrentAcceleration->setText(CurrentAcceleration);
@@ -183,7 +172,7 @@ void ManualStageControl::on_GetPosition_clicked()
 {
     //QString CurrentPosition = SMC.GetPosition();
     //CurrentPosition = CurrentPosition.remove(0,3);
-    QString CurrentPosition = StageGetPosition(StageType);
+    QString CurrentPosition = ms_Stage.StageGetPosition(StageType);
     ui->TerminalOut->append("Stage is at: " + CurrentPosition);
     ui->CurrentPositionIndicator->setText(CurrentPosition);
 }
@@ -191,218 +180,15 @@ void ManualStageControl::on_GetPosition_clicked()
 void ManualStageControl::on_StopMotion_clicked()
 {
     //SMC.StopMotion();
-    StageStop(StageType);
+    ms_Stage.StageStop(StageType);
     ui->TerminalOut->append("Stopping Motion");
-}
-
-
-/*************************Expanded Stage Lib***********************/
-int ManualStageControl::StageInit(const char* COMPort, Stage_t StageType)
-{
-    int returnVal = 0;
-    if(StageType == STAGE_SMC){
-        SMC.SMC100CInit(COMPort);
-        returnVal = 1;
-    }
-    else if (StageType == STAGE_GCODE){
-        if(StageSerial.openDevice(COMPort,115200) == 1){ //If serial connection was succesful
-            returnVal = 1; //return 1 for succesful connection
-            Sleep(10); //Delay to avoid serial congestion
-
-            //Set stage programming to mm
-            QString UnitCommand = "\rG21\r\n";
-            int UnitReturn = StageSerial.writeString(UnitCommand.toLatin1().data());
-            if (UnitReturn < 0) //if command failed
-                returnVal = -1; //return -1 for failed command
-            Sleep(10); //Delay to avoid serial congestion
-
-            //Set stage to use incremental movements
-            QString IncrementCommand = "G91\r\n";
-            int IncrementReturn = StageSerial.writeString(IncrementCommand.toLatin1().data());
-            if (IncrementReturn < 0) //if command failed
-                returnVal = -1; //return -1 for failed command
-            Sleep(10); //Delay to avoid serial congestion
-
-            //Enable steppers
-            QString StepperCommand = "M17\r\n";
-            int StepperReturn = StageSerial.writeString(StepperCommand.toLatin1().data());
-            if (StepperReturn < 0) //if command failed
-                returnVal = -1; //return -1 for failed command
-            Sleep(500);
-            for (uint8_t i = 0; i < 25; i++){
-                static char receivedString[] = "ThisIsMyTest";
-                char finalChar = '\n';
-                uint maxNbBytes = 100;//make sure to validate this
-                int ReadStatus = StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
-                ui->TerminalOut->append(receivedString);
-                Sleep(10);
-            }
-        }
-        else{ //Serial connection failed
-            returnVal = -1;
-            printf("GCode stage connection failed");
-        }
-    }
-    return returnVal;
-}
-int ManualStageControl::StageClose(Stage_t StageType)
-{
-    int returnVal = 0;
-    if(StageType == STAGE_SMC){
-        SMC.SMC100CClose();
-    }
-    else if (StageType == STAGE_GCODE){
-        StageSerial.closeDevice();
-    }
-    return returnVal;
-}
-int ManualStageControl::StageHome(Stage_t StageType)
-{
-    int returnVal = 0;
-    if(StageType == STAGE_SMC){
-        returnVal = SMC.Home();
-    }
-    else if (StageType == STAGE_GCODE){
-        //Is there a use for a stage home command?
-        returnVal = 1;
-    }
-    return returnVal;
-}
-int ManualStageControl::StageStop(Stage_t StageType)
-{
-    int returnVal = 0; //default 0 is an error
-    if(StageType == STAGE_SMC){
-        SMC.StopMotion();
-    }
-    else if (StageType == STAGE_GCODE){
-        QString STOP = "M0\r";
-        int STOPreturn = StageSerial.writeString(STOP.toLatin1().data());
-        if (STOPreturn)
-            returnVal = -1;
-    }
-    return returnVal;
-}
-int ManualStageControl::SetStageVelocity(float VelocityToSet, Stage_t StageType)
-{
-    printf("This is a stage velocity test");
-    QString mystring = "velocity test";
-    emit StagePrintSignal(mystring);
-    emit StageError(mystring);
-    int returnVal = 0;
-    if(StageType == STAGE_SMC){
-        SMC.SetVelocity(VelocityToSet);
-    }
-    else if (StageType == STAGE_GCODE){
-        FeedRate = VelocityToSet * 60;
-    }
-    return returnVal;
-}
-int ManualStageControl::SetStageAcceleration(float AccelerationToSet, Stage_t StageType)
-{
-    int returnVal = 0;
-    if(StageType == STAGE_SMC){
-        SMC.SetAcceleration(AccelerationToSet);
-    }
-    else if (StageType == STAGE_GCODE){
-        /*QString AccelCommand = "M201 Z" + QString::number(AccelerationToSet) + "\r\n";
-        int AccelReturn = StageSerial.writeString(AccelCommand.toLatin1().data());
-        if (AccelReturn < 0)
-            returnVal = -1;*/
-    }
-    return returnVal;
-}
-int ManualStageControl::SetStagePositiveLimit(float PositiveLimit, Stage_t StageType)
-{
-    int returnVal = 0;
-    if(StageType == STAGE_SMC){
-        SMC.SetPositiveLimit(PositiveLimit);
-    }
-    else if (StageType == STAGE_GCODE){
-
-    }
-    return returnVal;
-}
-int ManualStageControl::SetStageNegativeLimit(float NegativeLimit, Stage_t StageType)
-{
-    int returnVal = 0;
-    if(StageType == STAGE_SMC){
-        SMC.SetNegativeLimit(NegativeLimit);
-    }
-    else if (StageType == STAGE_GCODE){
-
-    }
-    return returnVal;
-}
-int ManualStageControl::StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageType)
-{
-    int returnVal = 0;
-    if(StageType == STAGE_SMC){
-        SMC.AbsoluteMove(AbsoluteMovePosition);
-    }
-    else if (StageType == STAGE_GCODE){
-        //Set stage to do absolute move
-        QString AbsMoveCommand = "G92\r\nG1 Z" + QString::number(AbsoluteMovePosition) + " F" + QString::number(FeedRate) + "\r\n";
-        int AbsMoveReturn = StageSerial.writeString(AbsMoveCommand.toLatin1().data());
-        if (AbsMoveReturn < 0) //if command failed
-            returnVal = -1; //return -1 for failed command
-    }
-    return returnVal;
-}
-int ManualStageControl::StageRelativeMove(float RelativeMoveDistance, Stage_t StageType)
-{
-    int returnVal = 0;
-    if(StageType == STAGE_SMC){
-        SMC.RelativeMove(RelativeMoveDistance);
-    }
-    else if (StageType == STAGE_GCODE){
-        QString RelMoveCommand = "G91\r\nG1 Z" + QString::number(-RelativeMoveDistance) + " F" + QString::number(FeedRate) + "\r\n";
-        int RelMoveReturn = StageSerial.writeString(RelMoveCommand.toLatin1().data());
-        if (RelMoveReturn < 0)
-            returnVal = 1;
-    }
-    return returnVal;
-}
-
-QString ManualStageControl::StageGetPosition(Stage_t StageType)
-{
-    if(StageType == STAGE_SMC){
-        char* ReadPosition = SMC.GetPosition();
-        if (strnlen(ReadPosition,50) > 1){
-            QString CurrentPosition = QString::fromUtf8(ReadPosition);
-            CurrentPosition.remove(0,3); //Removes address and command
-            CurrentPosition.chop(2);
-            return CurrentPosition;
-        }
-    }
-    else if (StageType == STAGE_GCODE){
-
-        QString GetPositionCommand = "M114 R\r\n";
-        StageSerial.flushReceiver();
-        Sleep(5);
-        StageSerial.writeString(GetPositionCommand.toLatin1().data());
-        static char receivedString[] = "ThisIsMyTest";
-        char finalChar = '\n';
-        uint maxNbBytes = 100;//make sure to validate this
-        Sleep(10);
-        StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
-        printf(receivedString);
-        return receivedString;
-
-    }
-    return "NA";
-}
-
-void ManualStageControl::ClearRead()
-{
-    static char receivedString[] = "ThisIsMyTest";
-    char finalChar;
 }
 
 void ManualStageControl::on_SetPositionValue_clicked()
 {
     double PositionVal = ui->SetPositionParam->value();
     QString SetPositionCommand = "G92 Z" + QString::number(PositionVal) + "\r\n";
-    StageSerial.writeString(SetPositionCommand.toLatin1().data());
+    ms_Stage.StageSerial.writeString(SetPositionCommand.toLatin1().data());
     ui->TerminalOut->append("Set current position to: " + QString::number(PositionVal));
 }
 
@@ -410,7 +196,7 @@ void ManualStageControl::on_SendCustomCommand_clicked()
 {
     QString Command = ui->CustomCommandLine->text() + "\r";
     const char* CommandToSend = Command.toLatin1().data();
-    StageSerial.writeString(CommandToSend);
+    ms_Stage.StageSerial.writeString(CommandToSend);
     ui->TerminalOut->append("Custom Command: " + ui->CustomCommandLine->text());
 }
 
@@ -421,7 +207,7 @@ void ManualStageControl::on_EnableEndStopCheckbox_clicked()
         ui->DisableEndstopCheckbox->setChecked(false);
         EndStopState = ON;
         QString Command = "M121\r\n";
-        int returnVal = StageSerial.writeString(Command.toLatin1().data());
+        int returnVal = ms_Stage.StageSerial.writeString(Command.toLatin1().data());
         if (returnVal >= 0){
             ui->TerminalOut->append("Endstop enabled");
         }
@@ -438,7 +224,7 @@ void ManualStageControl::on_DisableEndstopCheckbox_clicked()
         ui->EnableEndStopCheckbox->setChecked(false);
         EndStopState = OFF;
         QString Command = "M120\r\n";
-        int returnVal = StageSerial.writeString(Command.toLatin1().data());
+        int returnVal = ms_Stage.StageSerial.writeString(Command.toLatin1().data());
         if (returnVal >= 0){
             ui->TerminalOut->append("Endstops disabled");
         }
@@ -446,85 +232,4 @@ void ManualStageControl::on_DisableEndstopCheckbox_clicked()
             ui->TerminalOut->append("Failed to send command");
         }
     }
-}
-
-/****************************Helper Functions****************************/
-void ManualStageControl::initStagePosition(PrintSettings si_PrintSettings)
-{
-    s_PrintSettings = si_PrintSettings;
-    initStageSlot();
-
-}
-
-void ManualStageControl::initStageSlot()
-{
-    printf("**************");
-    QString test = "this is my test";
-    emit StagePrintSignal(test);
-    emit StageError(test);
-    if (s_PrintSettings.StageType == STAGE_SMC){
-        double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
-        if (CurrentPosition < (s_PrintSettings.StartingPosition - 3.2)){
-            if (StagePrep1 == false){
-                SetStageVelocity(3, s_PrintSettings.StageType);
-                Sleep(20);
-                StageAbsoluteMove(s_PrintSettings.StartingPosition-3, s_PrintSettings.StageType);
-                Sleep(20);
-                StagePrep1 = true;
-                //Main.PrintToTerminal("Performing Rough Stage Movement");
-            }
-            QTimer::singleShot(1000, this, SLOT(initStageSlot()));
-        }
-        else{
-            fineMovement();
-        }
-    }
-    else{
-        //Main.PrintToTerminal("Auto stage initialization disabled for iCLIP, please move stage to endstop with manual controls");
-    }
-}
-
-void ManualStageControl::fineMovement()
-{
-    //MainWindow Main;
-    double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
-    if (CurrentPosition > s_PrintSettings.StartingPosition-0.01 && CurrentPosition < s_PrintSettings.StartingPosition+0.01){
-        verifyStageParams(s_PrintSettings);
-    }
-    else{
-        if (StagePrep2 == false){
-            Sleep(20);
-            SetStageVelocity(0.3, s_PrintSettings.StageType);
-            Sleep(20);
-            StageAbsoluteMove(s_PrintSettings.StartingPosition, s_PrintSettings.StageType);
-            //Main.PrintToTerminal("Fine Stage Movement");
-            StagePrep2 = true;
-        }
-        QTimer::singleShot(1000, this, SLOT(fineMovement(s_PrintSettings)));
-    }
-}
-
-void ManualStageControl::verifyStageParams(PrintSettings s_PrintSettings)
-{
-    //MainWindow Main;
-    //Main.PrintToTerminal("Verifying Stage Parameters");
-    Sleep(20);
-    SetStageAcceleration(s_PrintSettings.StageAcceleration, s_PrintSettings.StageType);
-    Sleep(20);
-    SetStageNegativeLimit(s_PrintSettings.MinEndOfRun, s_PrintSettings.StageType);
-    Sleep(20);
-    SetStagePositiveLimit(s_PrintSettings.MaxEndOfRun, s_PrintSettings.StageType);
-    Sleep(20);
-    SetStageVelocity(s_PrintSettings.StageVelocity, s_PrintSettings.StageType);
-}
-
-void ManualStageControl::initStageStart(PrintSettings si_PrintSettings)
-{
-    //MainWindow Main;
-
-    SetStageVelocity(si_PrintSettings.StageVelocity, si_PrintSettings.StageType);
-    Sleep(10);
-    emit(on_GetPosition_clicked());
-    Sleep(10);
-    emit(on_GetPosition_clicked());
 }

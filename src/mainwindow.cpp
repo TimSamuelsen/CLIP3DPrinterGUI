@@ -22,6 +22,7 @@
 #include "ui_mainwindow.h"
 #include "manualstagecontrol.h"
 #include "manualpumpcontrol.h"
+#include "stagecommands.h"
 #include "imagepopout.h"
 
 #include "serialib.h"
@@ -30,6 +31,7 @@
 #include <opencv2/opencv.hpp>
 
 DLP9000& DLP = DLP9000::Instance();
+StageCommands& Stage = StageCommands::Instance();
 
 //Auto parameter selection mode
 static double PrintSpeed;
@@ -43,8 +45,6 @@ QString LogFileDestination; //for storing log file destination in settings
 QString ImageFileDirectory; //For storing image file directory in settings
 QTime PrintStartTime; //Get start time for log
 //static double GetPosition; //Holds current position
-//static bool StagePrep1 = false; //For lowering stage
-//static bool StagePrep2 = false; //For lowering stage
 
 //For vp8bit workaround
 static int VP8Bit = OFF;
@@ -96,7 +96,6 @@ MainWindow::~MainWindow()
  */
 void MainWindow::on_ManualStage_clicked()
 {
-    //Create new manual stage control window
     ManualStageUI = new ManualStageControl();
     ManualStageUI->show();
 
