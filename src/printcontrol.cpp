@@ -1,9 +1,11 @@
 #include "printcontrol.h"
 #include "stagecommands.h"
+#include "pumpcommands.h"
 #include "dlp9000.h"
 
 DLP9000& pc_DLP = DLP9000::Instance();
 StageCommands& pc_Stage = StageCommands::Instance();
+PumpCommands& pc_Pump = PumpCommands::Instance();
 
 printcontrol::printcontrol()
 {
@@ -18,9 +20,16 @@ void printcontrol::InitializeSystem(QStringList ImageList, PrintSettings m_Print
     pPrintControls->PrintEnd = CalcPrintEnd(*pPrintControls, m_PrintSettings);
 }
 
+void printcontrol::AbortPrint(PrintSettings m_PrintSettings, PrintControls *pPrintControl)
+{
+    pc_DLP.PatternDisplay(OFF);
+    pc_Stage.StageStop(m_PrintSettings.StageType);
+    pc_Pump.Stop();
+    pPrintControl->layerCount = 0xFFFFFF;
 
+}
 
-
+/***************************************Helpers*********************************************/
 double printcontrol::CalcPrintEnd(PrintControls m_PrintControls, PrintSettings m_PrintSettings)
 {
     double PrintEnd = 0;

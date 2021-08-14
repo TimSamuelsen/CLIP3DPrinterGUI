@@ -65,6 +65,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(&DLP, SIGNAL(DLPPrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
     QObject::connect(&DLP, SIGNAL(DLPError(QString)), this, SLOT(showError(QString)));
+
+    QObject::connect(&Pump, SIGNAL(PumpPrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
+    QObject::connect(&Pump, SIGNAL(PumpError(QString)), this, SLOT(showError(QString)));
+
+    QObject::connect(&PrintControl, SIGNAL(ControlPrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
+    QObject::connect(&PrintControl, SIGNAL(ControlError(QString)), this, SLOT(showError(QString)));
+    QObject::connect(&PrintControl, SIGNAL(GetPositionSignal()), this, SLOT(on_GetPosition_clicked()));
+
     //Initialize features
     CurrentDateTime = QDateTime::currentDateTime(); //get current time for startup time
     loadSettings(); //load settings from settings file
@@ -81,8 +89,6 @@ MainWindow::~MainWindow()
     saveSettings(); //Save settings upon closing application main window
     delete ui;
 }
-
-
 
 /**
  * @brief MainWindow::on_ManualStage_clicked
@@ -1940,3 +1946,13 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
     }
 }
 
+/**
+ * @brief MainWindow::on_AbortPrint_clicked
+ * Aborts print and acts as e-stop. Stops light engine projection,
+ * stage movement and print process
+ */
+void MainWindow::on_AbortPrint_clicked()
+{
+    PrintControl.AbortPrint(m_PrintSettings, &m_PrintControls);
+    ui->ProgramPrints->append("PRINT ABORTED");
+}

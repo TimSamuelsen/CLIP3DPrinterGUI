@@ -25,6 +25,25 @@ typedef enum StageType{
     STAGE_GCODE,
 }Stage_t;
 
+typedef enum Parameter{
+    EXPOSURE_TIME,
+    LED_INTENSITY,
+    DARK_TIME,
+    LAYER_THICKNESS,
+    STAGE_VELOCITY,
+    STAGE_ACCELERATION,
+    PUMP_HEIGHT,
+    INJECTION_VOLUME,
+    INJECTION_RATE,
+    INITIAL_VOLUME,
+    MAX_IMAGE,
+    CONTINUOUS_INJECTION,
+    STARTING_POSITION,
+    MAX_END,
+    MIN_END,
+    INJECTION_DELAY,
+}Parameter_t;
+
 struct PrintScripts
 {
     int PrintScript = OFF; //Default print script is set to off

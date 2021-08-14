@@ -10,20 +10,6 @@ StageCommands& p_Stage = StageCommands::Instance();
 PumpCommands& p_Pump = PumpCommands::Instance();
 /***************************************Print Functionality*********************************************/
 /**
- * @brief MainWindow::on_AbortPrint_clicked
- * Aborts print and acts as e-stop. Stops light engine projection,
- * stage movement and print process
- */
-void MainWindow::on_AbortPrint_clicked()
-{
-    LCR_PatternDisplay(0); //Turn off light engine projection
-    p_Stage.StageStop(m_PrintSettings.StageType); //Stop stage movement
-    //Add pump stop here
-    m_PrintControls.layerCount = 0xFFFFFF; //Set layer count high to stop print process
-    ui->ProgramPrints->append("PRINT ABORTED");
-}
-
-/**
  * @brief MainWindow::on_StartPrint_clicked
  * Starts print process, set LED current calculates speed for continuous motion mode
  */

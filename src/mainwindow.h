@@ -10,26 +10,6 @@
 #include "PrintElements.h"
 #include "printcontrol.h"
 
-typedef enum Parameter{
-    EXPOSURE_TIME,
-    LED_INTENSITY,
-    DARK_TIME,
-    LAYER_THICKNESS,
-    STAGE_VELOCITY,
-    STAGE_ACCELERATION,
-    PUMP_HEIGHT,
-    INJECTION_VOLUME,
-    INJECTION_RATE,
-    INITIAL_VOLUME,
-    MAX_IMAGE,
-    CONTINUOUS_INJECTION,
-    STARTING_POSITION,
-    MAX_END,
-    MIN_END,
-    INJECTION_DELAY,
-}Parameter_t;
-
-
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE

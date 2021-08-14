@@ -40,6 +40,10 @@ public:
     QString GetInfuseRate();
     QString GetWithdrawRate();
 
+signals:
+    void PumpPrintSignal(QString StringToPrint);
+    void PumpError(QString ErrorString);
+
 private:
     char* SerialRead();
     void CommandBufferUpdate();
