@@ -44,6 +44,13 @@ typedef enum Parameter{
     INJECTION_DELAY,
 }Parameter_t;
 
+typedef enum ExposureType{
+    EXPOSURE_NORM,
+    EXPOSURE_PS,
+    EXPOSURE_PUMP,
+    EXPOSURE_PS_PUMP,
+}ExposureType_t;
+
 struct PrintScripts
 {
     int PrintScript = OFF; //Default print script is set to off
@@ -99,7 +106,7 @@ struct PrintControls
     uint layerCount = 0;
     int remainingImages = 0;
 
-
+    ExposureType_t ExposureType;
     double TotalPrintTime = 0;
     double RemainingPrintTime = 0;
 

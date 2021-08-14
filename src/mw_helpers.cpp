@@ -10,222 +10,6 @@ StageCommands& p_Stage = StageCommands::Instance();
 PumpCommands& p_Pump = PumpCommands::Instance();
 /***************************************Print Functionality*********************************************/
 /**
- * @brief MainWindow::on_StartPrint_clicked
- * Starts print process, set LED current calculates speed for continuous motion mode
- */
-void MainWindow::on_StartPrint_clicked()
-{
-    //If settings are validated successfully and Initialization has been completed
-    if (ValidateSettings() == true)
-    {
-        p_Stage.SetStageVelocity(m_PrintSettings.StageVelocity, m_PrintSettings.StageType); //Update stage velocity
-        Sleep(10); //Sleep to avoid spamming motor controller
-        emit(on_GetPosition_clicked()); //Get stage position to validate that stage connection is working
-        Sleep(10);
-        emit(on_GetPosition_clicked()); //Repeat get stage position
-        ui->ProgramPrints->append("Entering Printing Procedure");
-
-        //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
-        if (m_PrintScript.PrintScript == ON){ //If printscript is on
-            LCR_SetLedCurrents(0,0,(m_PrintScript.LEDScriptList.at(0).toInt())); //Set LED intensity to first value in printscript
-        }
-        else{ //if printscript is off
-            LCR_SetLedCurrents(0, 0, m_PrintSettings.UVIntensity); //set static LED intensity
-        }
-
-        if (m_PrintSettings.MotionMode == CONTINUOUS){ //continuous motion mode
-            double ContStageVelocity = (m_PrintSettings.StageVelocity)/(m_PrintSettings.ExposureTime/(1e6)); //Multiply Exposure time by 1e6 to convert from us to s to get to proper units
-            ui->ProgramPrints->append("Continuous Stage Velocity set to " + QString::number(m_PrintSettings.StageVelocity) + "/" + QString::number(m_PrintSettings.ExposureTime) + " = " + QString::number(ContStageVelocity) + " mm/s");
-            p_Stage.SetStageVelocity(ContStageVelocity, m_PrintSettings.StageType);
-        }
-
-        PrintStartTime = QTime::currentTime(); //Get print start time from current time
-        p_DLP.startPatSequence(); //Start projection
-
-        //Based on projection mode enter correct print process
-        if (m_PrintSettings.ProjectionMode == POTF){ //if in POTF mode
-            PrintProcess(); //Start print process
-            ui->ProgramPrints->append("Entering POTF print process");
-        }
-        else{ //else in Video Pattern Mode
-            p_DLP.clearElements();
-            PrintProcessVP(); //Start video pattern print process
-            ui->ProgramPrints->append("Entering Video Pattern print process");
-        }
-
-        //If continuous injection is on then start pump infusion
-        if (m_InjectionSettings.ContinuousInjection == ON){
-            p_Pump.StartInfusion();
-        }
-    }
-}
-
-/**
- * @brief MainWindow::PrintProcess
- * Print process, for detailed description see documentation
- */
-void MainWindow::PrintProcess(void)
-{
-    //If not at the end of the print
-    if (m_PrintControls.layerCount +1 <= m_PrintControls.nSlice)
-    {
-        //If there are no remaining images, reupload
-        if (m_PrintControls.remainingImages <= 0)
-        {
-            //If motion mode is set to continuous, pause stage movement during re-upload
-            if (m_PrintSettings.MotionMode == CONTINUOUS){
-                p_Stage.StageStop(m_PrintSettings.StageType);
-            }
-            LCR_PatternDisplay(0); //Stop projection
-
-            //Grab new images from the imageList starting at current layerCount, capped at max image upload
-            QListWidgetItem * item;
-            QStringList imageList;
-            uint count = 0;
-            int MaxImageReupload = m_PrintSettings.MaxImageUpload;
-            if (m_PrintSettings.MaxImageUpload > 390)
-            {
-                MaxImageReupload -= 5;
-            }
-            for(int i = (m_PrintControls.layerCount); (i < ui->FileList->count()); i++)
-            {
-                    item = ui->FileList->item(i);
-                    imageList << item->text();
-                    count++;
-                    if (i > m_PrintControls.layerCount + MaxImageReupload)
-                    {
-                        break;
-                    }
-            }
-
-            //Add patterns to local memory, upload to light engine, then clear local memory
-            p_DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
-            p_DLP.updateLUT(m_PrintSettings.ProjectionMode);
-            p_DLP.clearElements();
-
-            m_PrintControls.remainingImages = count - 1; //Set the remaining images to the # of images uploaded - 1
-            m_PrintControls.layerCount++; //Update layer count
-            Sleep(50); //Add delay to allow for light engine process to run
-            p_DLP.startPatSequence(); //Start projection
-            if(m_PrintSettings.PrinterType == ICLIP){ //delay is needed for iCLIP printer only
-                Sleep(500);
-            }
-            SetExposureTimer(0, m_PrintScript.PrintScript, m_PrintSettings.PumpingMode); //Set the exposure time
-
-            //if in continuous motion mode restart movement
-            if(m_PrintSettings.MotionMode == CONTINUOUS){
-                p_Stage.StageAbsoluteMove(m_PrintControls.PrintEnd, m_PrintSettings.StageType);
-                m_PrintControls.inMotion = true;
-            }
-            ui->ProgramPrints->append("Reupload succesful, current layer: " + QString::number(m_PrintControls.layerCount));
-            ui->ProgramPrints->append(QString::number(m_PrintControls.remainingImages + 1) + " images uploaded");
-        }
-        //If in intial exposure mode
-        else if (m_PrintControls.InitialExposureFlag == true)
-        {
-            SetExposureTimer(m_PrintControls.InitialExposureFlag, m_PrintScript.PrintScript, m_PrintSettings.PumpingMode); //Set exposure timer with InitialExposureFlag high
-            updatePlot();
-            m_PrintControls.InitialExposureFlag = false; //Set InitialExposureFlag low
-            m_PrintControls.inMotion = false; //Stage is currently not in motion, used for continuos stage movement
-            ui->ProgramPrints->append("POTF Exposing Initial Layer " + QString::number(m_PrintSettings.InitialExposure) + "s");
-        }
-        else
-        {
-            SetExposureTimer(0, m_PrintScript.PrintScript, m_PrintSettings.PumpingMode); //set exposure time
-            ui->ProgramPrints->append("Layer: " + QString::number(m_PrintControls.layerCount));
-
-            //Grab the current image file name and print to
-            QString filename =ui->FileList->item(m_PrintControls.layerCount)->text();
-            ui->ProgramPrints->append("Image File: " + filename);
-            m_PrintControls.layerCount++; //Update layerCount for new layer
-            m_PrintControls.remainingImages--; //Decrement remaining image counter
-            if(m_PrintSettings.MotionMode == STEPPED){
-                updatePlot();
-            }
-            else if (m_PrintSettings.MotionMode == CONTINUOUS){
-                if(m_PrintSettings.PrinterType == ICLIP){
-                    PrintInfuse();
-                    ui->ProgramPrints->append("Injecting " + QString::number(m_InjectionSettings.InfusionVolume) + "ul at " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s");
-                }
-            }
-            double OldPosition = GetPosition;
-            emit(on_GetPosition_clicked());
-            ui->ProgramPrints->append("Stage moved: " + QString::number(OldPosition - GetPosition));
-        }
-        return;
-    }
-    else
-    {
-        PrintComplete();
-    }
-}
-
-/**
- * @brief MainWindow::PrintProcessVP
- * Separate print process for Video Pattern mode
- */
-void MainWindow::PrintProcessVP()
-{
-    if (m_PrintControls.layerCount +1 <= m_PrintControls.nSlice)
-    {
-        if (m_PrintControls.ReSyncFlag == 1) //if resync
-        {
-            m_PrintControls.ReSyncFlag = 0;
-            if (LCR_PatternDisplay(0) < 0)
-                showError("Unable to stop pattern display");
-            Sleep(10);
-            QStringList imageList = GetImageList(m_PrintControls, m_PrintSettings);
-            //Add pattern data to buffer to prepare for pattern upload
-            if (m_PrintSettings.ProjectionMode == VIDEOPATTERN && m_PrintSettings.BitMode == 8){
-                //VP8bitWorkaround();
-                //ui->ProgramPrints->append("Using VP 8-bit workaround");
-                p_DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
-            }
-            else{
-                p_DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
-            }
-            p_DLP.updateLUT(m_PrintSettings.ProjectionMode); //update LUT on light engine to upload pattern data
-            p_DLP.clearElements(); //clear pattern data buffer
-            Sleep(50); //small delay to ensure that the new patterns are uploaded
-            PrintToTerminal("Resync succesful, frame: " + QString::number(m_PrintControls.FrameCount) + " layer: " + QString::number(m_PrintControls.layerCount) + "New Patterns: " + QString::number(imageList.count()));
-            p_DLP.startPatSequence();
-            Sleep(5);
-            SetExposureTimer(0, m_PrintScript.PrintScript, m_PrintSettings.PumpingMode);
-            m_PrintControls.layerCount++; //increment layer counter
-            m_PrintControls.remainingImages--; //decrement remaining images
-            m_PrintControls.BitLayer += m_PrintSettings.BitMode;
-        }
-        else if (m_PrintControls.InitialExposureFlag == true) //Initial Exposure
-        {
-            SetExposureTimer(m_PrintControls.InitialExposureFlag, m_PrintScript.PrintScript, m_PrintSettings.PumpingMode);
-            m_PrintControls.BitLayer = 1; //set to first bitlayer
-            m_PrintControls.ReSyncFlag = 1; //resync after intial exposure
-            ui->ProgramPrints->append("VP Exposing Initial Layer " + QString::number(m_PrintSettings.InitialExposure) + "s");
-            m_PrintControls.InitialExposureFlag = 0;
-        }
-        else //Normal print process
-        {
-            //Start exposuretime timers
-            SetExposureTimer(0, m_PrintScript.PrintScript, m_PrintSettings.PumpingMode);
-            //Print information to log
-            ui->ProgramPrints->append("VP Layer: " + QString::number(m_PrintControls.layerCount));
-            QString filename =ui->FileList->item(m_PrintControls.FrameCount)->text();
-            ui->ProgramPrints->append("Image File: " + filename);
-
-            m_PrintControls.layerCount++; //increment layer counter
-            m_PrintControls.remainingImages--; //decrement remaining images
-
-            //updatePlot();
-            m_PrintControls.BitLayer += m_PrintSettings.BitMode;
-        }
-    }
-    else //print complete
-    {
-        PrintComplete();
-    }
-}
-
-/**
  * @brief MainWindow::pumpingSlot
  * Pumping slot for when pumping is activated,
  * intermediary step between exposure time and dark time
@@ -252,7 +36,7 @@ void MainWindow::pumpingSlot(void)
 void MainWindow::ExposureTimeSlot(void)
 {
     //Set dark timer first for most accurate timing
-    SetDarkTimer(m_PrintScript.PrintScript, m_PrintSettings.MotionMode); //Set dark timer first for best timing
+    SetDarkTimer(); //Set dark timer first for best timing
     //Record current time in terminal
     ui->ProgramPrints->append(QTime::currentTime().toString("hh.mm.ss.zzz"));
     updatePlot(); //update plot early in dark time
@@ -330,52 +114,39 @@ void MainWindow::ExposureTimeSlot(void)
  */
 void MainWindow::DarkTimeSlot(void)
 {
-    if(m_PrintSettings.ProjectionMode == POTF){
-        PrintProcess();
-    }
-    else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
-        PrintProcessVP();
-    }
-    else{
-        showError("Incorrect Projection Mode");
-    }
+    PrintProcess();
 }
 
-void MainWindow::SetExposureTimer(int InitialExposureFlag, int PrintScript, int PumpingMode)
+void MainWindow::SetExposureTimer()
 {
-    if (InitialExposureFlag == 1)
-    {
+    if (m_PrintControls.InitialExposureFlag == 1){
         QTimer::singleShot(m_PrintSettings.InitialExposure*1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
     }
-    else
-    {
-        if (PrintScript == 1){
-            if (PumpingMode == 1){
-                QTimer::singleShot(m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(pumpingSlot()));
-            }
-            else{
-                QTimer::singleShot(m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-            }
-            ui->ProgramPrints->append("Exposing: " + QString::number(m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble()) + " ms");
-        }
-        else{
-            if (PumpingMode == 1){
-                QTimer::singleShot(m_PrintSettings.ExposureTime/1000, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
-            }
-            else{
+    else{
+        switch (m_PrintControls.ExposureType){
+            case EXPOSURE_NORM:
                 QTimer::singleShot(m_PrintSettings.ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-            }
-            ui->ProgramPrints->append("Exposing: " + QString::number(m_PrintSettings.ExposureTime/1000) + " ms");
+                break;
+            case EXPOSURE_PUMP:
+                QTimer::singleShot(m_PrintSettings.ExposureTime/1000, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
+                break;
+            case EXPOSURE_PS:
+                QTimer::singleShot(m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+                break;
+            case EXPOSURE_PS_PUMP:
+                QTimer::singleShot(m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(pumpingSlot()));
+                break;
+            default:
+                break;
         }
     }
 }
 
-void MainWindow::SetDarkTimer(int PrintScript, int DarkMotionMode)
+void MainWindow::SetDarkTimer()
 {
     double DarkTimeSelect = m_PrintSettings.DarkTime;
-    if (DarkMotionMode == STEPPED)
-    {
-        if (PrintScript == ON){
+    if (m_PrintSettings.MotionMode == STEPPED){
+        if (m_PrintScript.PrintScript == ON){
             if(m_PrintControls.layerCount < m_PrintScript.DarkTimeScriptList.size()){
                 DarkTimeSelect = m_PrintScript.DarkTimeScriptList.at(m_PrintControls.layerCount).toDouble();
             }
@@ -407,16 +178,7 @@ void MainWindow::PrintInfuse()
         ui->ProgramPrints->append("PrintInfuse");
     }
 }
-
-
-double MainWindow::CalcContinuousVelocity(PrintSettings m_PrintSettings)
-{
-    double ContStageVelocity = (m_PrintSettings.StageVelocity)/(m_PrintSettings.ExposureTime/(1e6)); //Multiply Exposure time by 1e6 to convert from us to s to get to proper units
-    ui->ProgramPrints->append("Continuous Stage Velocity set to " + QString::number(m_PrintSettings.StageVelocity) + "/" + QString::number(m_PrintSettings.ExposureTime) + " = " + QString::number(ContStageVelocity) + " mm/s");
-    p_Stage.SetStageVelocity(ContStageVelocity, m_PrintSettings.StageType);
-
-    return ContStageVelocity;
-}
+#if 0
 
 void MainWindow::StartPrint()
 {
@@ -426,7 +188,7 @@ void MainWindow::StartPrint()
         PrintToTerminal("Entering print procedure");
         p_DLP.SetLEDIntensity(m_PrintSettings, m_PrintScript);
         if (m_PrintSettings.MotionMode == CONTINUOUS){ //continuous motion mode
-            p_Stage.SetStageVelocity( CalcContinuousVelocity(m_PrintSettings), m_PrintSettings.StageType);
+            //p_Stage.SetStageVelocity( CalcContinuousVelocity(m_PrintSettings), m_PrintSettings.StageType);
         }
 
         PrintStartTime = QTime::currentTime();
@@ -464,14 +226,14 @@ void MainWindow::PrintProcess2()
         }
 
         if (m_PrintControls.InitialExposureFlag == true){
-            SetExposureTimer(m_PrintControls.InitialExposureFlag, m_PrintScript.PrintScript, m_PrintSettings.PumpingMode); //Set exposure timer with InitialExposureFlag high
+            SetExposureTimer(); //Set exposure timer with InitialExposureFlag high
             updatePlot();
             m_PrintControls.InitialExposureFlag = false; //Set InitialExposureFlag low
             m_PrintControls.inMotion = false; //Stage is currently not in motion, used for continuos stage movement
             ui->ProgramPrints->append("POTF Exposing Initial Layer " + QString::number(m_PrintSettings.InitialExposure) + "s");
         }
         else{
-            SetExposureTimer(0, m_PrintScript.PrintScript, m_PrintSettings.PumpingMode);
+            SetExposureTimer();
 
 
             m_PrintControls.layerCount++;
@@ -480,4 +242,170 @@ void MainWindow::PrintProcess2()
     }
 }
 
+
+/**
+ * @brief MainWindow::PrintProcess
+ * Print process, for detailed description see documentation
+ */
+void MainWindow::PrintProcess(void)
+{
+    //If not at the end of the print
+    if (m_PrintControls.layerCount +1 <= m_PrintControls.nSlice)
+    {
+        //If there are no remaining images, reupload
+        if (m_PrintControls.remainingImages <= 0)
+        {
+            //If motion mode is set to continuous, pause stage movement during re-upload
+            if (m_PrintSettings.MotionMode == CONTINUOUS){
+                p_Stage.StageStop(m_PrintSettings.StageType);
+            }
+            LCR_PatternDisplay(0); //Stop projection
+
+            //Grab new images from the imageList starting at current layerCount, capped at max image upload
+            QListWidgetItem * item;
+            QStringList imageList;
+            uint count = 0;
+            int MaxImageReupload = m_PrintSettings.MaxImageUpload;
+            if (m_PrintSettings.MaxImageUpload > 390)
+            {
+                MaxImageReupload -= 5;
+            }
+            for(int i = (m_PrintControls.layerCount); (i < ui->FileList->count()); i++)
+            {
+                    item = ui->FileList->item(i);
+                    imageList << item->text();
+                    count++;
+                    if (i > m_PrintControls.layerCount + MaxImageReupload)
+                    {
+                        break;
+                    }
+            }
+
+            //Add patterns to local memory, upload to light engine, then clear local memory
+            p_DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
+            p_DLP.updateLUT(m_PrintSettings.ProjectionMode);
+            p_DLP.clearElements();
+
+            m_PrintControls.remainingImages = count - 1; //Set the remaining images to the # of images uploaded - 1
+            m_PrintControls.layerCount++; //Update layer count
+            Sleep(50); //Add delay to allow for light engine process to run
+            p_DLP.startPatSequence(); //Start projection
+            if(m_PrintSettings.PrinterType == ICLIP){ //delay is needed for iCLIP printer only
+                Sleep(500);
+            }
+            SetExposureTimer(); //Set the exposure time
+
+            //if in continuous motion mode restart movement
+            if(m_PrintSettings.MotionMode == CONTINUOUS){
+                p_Stage.StageAbsoluteMove(m_PrintControls.PrintEnd, m_PrintSettings.StageType);
+                m_PrintControls.inMotion = true;
+            }
+            ui->ProgramPrints->append("Reupload succesful, current layer: " + QString::number(m_PrintControls.layerCount));
+            ui->ProgramPrints->append(QString::number(m_PrintControls.remainingImages + 1) + " images uploaded");
+        }
+        //If in intial exposure mode
+        else if (m_PrintControls.InitialExposureFlag == true)
+        {
+            SetExposureTimer(); //Set exposure timer with InitialExposureFlag high
+            updatePlot();
+            m_PrintControls.InitialExposureFlag = false; //Set InitialExposureFlag low
+            m_PrintControls.inMotion = false; //Stage is currently not in motion, used for continuos stage movement
+            ui->ProgramPrints->append("POTF Exposing Initial Layer " + QString::number(m_PrintSettings.InitialExposure) + "s");
+        }
+        else
+        {
+            SetExposureTimer(); //set exposure time
+            ui->ProgramPrints->append("Layer: " + QString::number(m_PrintControls.layerCount));
+
+            //Grab the current image file name and print to
+            QString filename =ui->FileList->item(m_PrintControls.layerCount)->text();
+            ui->ProgramPrints->append("Image File: " + filename);
+            m_PrintControls.layerCount++; //Update layerCount for new layer
+            m_PrintControls.remainingImages--; //Decrement remaining image counter
+            if(m_PrintSettings.MotionMode == STEPPED){
+                updatePlot();
+            }
+            else if (m_PrintSettings.MotionMode == CONTINUOUS){
+                if(m_PrintSettings.PrinterType == ICLIP){
+                    PrintInfuse();
+                    ui->ProgramPrints->append("Injecting " + QString::number(m_InjectionSettings.InfusionVolume) + "ul at " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s");
+                }
+            }
+            double OldPosition = GetPosition;
+            emit(on_GetPosition_clicked());
+            ui->ProgramPrints->append("Stage moved: " + QString::number(OldPosition - GetPosition));
+        }
+        return;
+    }
+    else
+    {
+        PrintComplete();
+    }
+}
+
+/**
+ * @brief MainWindow::PrintProcessVP
+ * Separate print process for Video Pattern mode
+ */
+void MainWindow::PrintProcessVP()
+{
+    if (m_PrintControls.layerCount +1 <= m_PrintControls.nSlice)
+    {
+        if (m_PrintControls.ReSyncFlag == 1) //if resync
+        {
+            m_PrintControls.ReSyncFlag = 0;
+            if (LCR_PatternDisplay(0) < 0)
+                showError("Unable to stop pattern display");
+            Sleep(10);
+            QStringList imageList = GetImageList(m_PrintControls, m_PrintSettings);
+            //Add pattern data to buffer to prepare for pattern upload
+            if (m_PrintSettings.ProjectionMode == VIDEOPATTERN && m_PrintSettings.BitMode == 8){
+                //VP8bitWorkaround();
+                //ui->ProgramPrints->append("Using VP 8-bit workaround");
+                p_DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
+            }
+            else{
+                p_DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
+            }
+            p_DLP.updateLUT(m_PrintSettings.ProjectionMode); //update LUT on light engine to upload pattern data
+            p_DLP.clearElements(); //clear pattern data buffer
+            Sleep(50); //small delay to ensure that the new patterns are uploaded
+            PrintToTerminal("Resync succesful, frame: " + QString::number(m_PrintControls.FrameCount) + " layer: " + QString::number(m_PrintControls.layerCount) + "New Patterns: " + QString::number(imageList.count()));
+            p_DLP.startPatSequence();
+            Sleep(5);
+            SetExposureTimer();
+            m_PrintControls.layerCount++; //increment layer counter
+            m_PrintControls.remainingImages--; //decrement remaining images
+            m_PrintControls.BitLayer += m_PrintSettings.BitMode;
+        }
+        else if (m_PrintControls.InitialExposureFlag == true) //Initial Exposure
+        {
+            SetExposureTimer();
+            m_PrintControls.BitLayer = 1; //set to first bitlayer
+            m_PrintControls.ReSyncFlag = 1; //resync after intial exposure
+            ui->ProgramPrints->append("VP Exposing Initial Layer " + QString::number(m_PrintSettings.InitialExposure) + "s");
+            m_PrintControls.InitialExposureFlag = 0;
+        }
+        else //Normal print process
+        {
+            //Start exposuretime timers
+            SetExposureTimer();
+            //Print information to log
+            ui->ProgramPrints->append("VP Layer: " + QString::number(m_PrintControls.layerCount));
+            QString filename =ui->FileList->item(m_PrintControls.FrameCount)->text();
+            ui->ProgramPrints->append("Image File: " + filename);
+
+            m_PrintControls.layerCount++; //increment layer counter
+            m_PrintControls.remainingImages--; //decrement remaining images
+
+            //updatePlot();
+            m_PrintControls.BitLayer += m_PrintSettings.BitMode;
+        }
+    }
+    else //print complete
+    {
+        PrintComplete();
+    }
+}
+#endif
 

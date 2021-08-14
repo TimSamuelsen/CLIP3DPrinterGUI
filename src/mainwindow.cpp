@@ -28,6 +28,7 @@ DLP9000& DLP = DLP9000::Instance();
 StageCommands& Stage = StageCommands::Instance();
 PumpCommands& Pump = PumpCommands::Instance();
 
+static QStringList ImageList;
 //Auto parameter selection mode
 static double PrintSpeed;
 static double PrintHeight;
@@ -72,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&PrintControl, SIGNAL(ControlPrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
     QObject::connect(&PrintControl, SIGNAL(ControlError(QString)), this, SLOT(showError(QString)));
     QObject::connect(&PrintControl, SIGNAL(GetPositionSignal()), this, SLOT(on_GetPosition_clicked()));
+    QObject::connect(&PrintControl, SIGNAL(UpdatePlotSignal()), this, SLOT(updatePlot()));
 
     //Initialize features
     CurrentDateTime = QDateTime::currentDateTime(); //get current time for startup time
@@ -1943,6 +1945,38 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         //If in continuous motion mode, calculates the print end position
         ui->StartPrint->setEnabled(true);
         printf("%f",m_PrintControls.PrintEnd);
+    }
+}
+
+/**
+ * @brief MainWindow::on_StartPrint_clicked
+ * Starts print process, set LED current calculates speed for continuous motion mode
+ */
+void MainWindow::on_StartPrint_clicked()
+{
+    //If settings are validated successfully and Initialization has been completed
+    if (ValidateSettings() == true){
+        PrintToTerminal("Entering Printing Procedure");
+        PrintStartTime = QTime::currentTime(); //Get print start time from current time
+        ImageList = GetImageList(m_PrintControls, m_PrintSettings);
+
+        PrintControl.StartPrint(m_PrintSettings, m_PrintScript, m_InjectionSettings);
+        PrintProcess();
+    }
+}
+
+void MainWindow::PrintProcess()
+{
+    if(m_PrintControls.layerCount + 1 <= m_PrintControls.nSlice){
+        if (m_PrintControls.remainingImages <= 0){
+            QStringList ImageList =  GetImageList(m_PrintControls, m_PrintSettings);
+            m_PrintControls.remainingImages = PrintControl.ReuploadHandler(ImageList, m_PrintControls, m_PrintSettings, m_PrintScript);
+        }
+        SetExposureTimer();
+        PrintControl.PrintProcessHandler(&m_PrintControls, m_PrintSettings);
+    }
+    else{
+        PrintComplete();
     }
 }
 

@@ -121,8 +121,6 @@ private slots:
 
     void on_DICLIPSelect_clicked();
 
-    void PrintProcessVP();
-
     void on_SetBitDepth_clicked();
 
     void on_SteppedMotion_clicked();
@@ -154,6 +152,8 @@ private slots:
 
     void StageMove();
 
+    void updatePlot();
+
 private:
     Ui::MainWindow *ui;
     PrintScripts m_PrintScript;
@@ -172,15 +172,13 @@ private:
     void saveSettings();
     void initSettings();
     void initPlot();
-    void updatePlot();
-    void addPlotData();
     QVector<double> qv_x, qv_y;
     void printParameters();
     bool initConfirmationScreen();
     void AutoMode();
     void initImagePopout();
-    void SetExposureTimer(int InitialExposureFlag, int PrintScript, int PumpingMode);
-    void SetDarkTimer(int PrintScript, int DarkMotionMode);
+    void SetExposureTimer();
+    void SetDarkTimer();
     void VP8bitWorkaround();
     bool PrintScriptApply(uint layerCount, QStringList Script, Parameter_t DynamicParam);
     void PrintComplete();

@@ -270,9 +270,14 @@ void StageCommands::verifyStageParams(PrintSettings s_PrintSettings)
 
 void StageCommands::initStageStart(PrintSettings si_PrintSettings)
 {
-    SetStageVelocity(si_PrintSettings.StageVelocity, si_PrintSettings.StageType);
+    if(si_PrintSettings.MotionMode == STEPPED){
+        SetStageVelocity(si_PrintSettings.StageVelocity, si_PrintSettings.StageType);
+    }
+    else if (si_PrintSettings.MotionMode == CONTINUOUS){
+        double ContStageVelocity = (si_PrintSettings.StageVelocity)/(si_PrintSettings.ExposureTime/(1e6)); //Multiply Exposure time by 1e6 to convert from us to s to get to proper units
+        emit StagePrintSignal("Continuous Stage Velocity set to " + QString::number(si_PrintSettings.StageVelocity) + "/" + QString::number(si_PrintSettings.ExposureTime) + " = " + QString::number(ContStageVelocity) + " mm/s");
+        SetStageVelocity(ContStageVelocity, si_PrintSettings.StageType);
+    }
     Sleep(10);
-    //emit(on_GetPosition_clicked());
-    Sleep(10);
-    //emit(on_GetPosition_clicked());
 }
+
