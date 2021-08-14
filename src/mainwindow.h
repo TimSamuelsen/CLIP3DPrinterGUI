@@ -148,10 +148,6 @@ private slots:
 
     void on_SetInjectionDelay_clicked();
 
-    void PrintInfuse();
-
-    void StageMove();
-
     void updatePlot();
 
 private:
@@ -186,6 +182,7 @@ private:
     double CalcPrintEnd(PrintControls m_PrintControls, PrintSettings m_PrintSettings);
     double CalcContinuousVelocity(PrintSettings m_PrintSettings);
     QStringList GetImageList(PrintControls m_PrintControls, PrintSettings m_PrintSettings);
+    void PrintScriptHandler(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript);
 
     void InitializeMW();
     void StartPrint();

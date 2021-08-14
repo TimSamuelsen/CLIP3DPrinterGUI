@@ -76,6 +76,64 @@ void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, PrintSetti
     }
 }
 
+bool printcontrol::VPFrameUpdate(PrintControls *pPrintControls, PrintSettings m_PrintSettings)
+{
+    bool returnVal = false;
+    if (pPrintControls->BitLayer > 24){
+        pPrintControls->FrameCount++;
+        emit ControlPrintSignal("New Frame: " + QString::number(pPrintControls->FrameCount));
+        pPrintControls->BitLayer = 1;
+        pPrintControls->ReSyncCount++;
+
+        //If 120 frames have been reached, prepare for resync
+        if(pPrintControls->ReSyncCount > (120 - 24)/(24/m_PrintSettings.BitMode)){
+            pPrintControls->ReSyncFlag = ON;
+            pPrintControls->ReSyncCount = 0;
+        }
+        returnVal = true;
+    }
+    return returnVal;
+}
+
+void printcontrol::DarkTimeHandler(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript, InjectionSettings m_InjectionSettings)
+{
+    if(m_PrintSettings.PrinterType == ICLIP){
+        if (m_InjectionSettings.InjectionDelayFlag == PRE){
+            PrintInfuse(m_InjectionSettings);
+            QTimer::singleShot(m_InjectionSettings.InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove(m_PrintControls, m_PrintSettings, m_PrintScript)));
+            emit ControlPrintSignal("Pre-Injection Delay: " + QString::number(m_InjectionSettings.InjectionDelayParam));
+        }
+        else if (m_InjectionSettings.InjectionDelayFlag == POST){
+            StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
+            QTimer::singleShot(m_InjectionSettings.InjectionDelayParam, Qt::PreciseTimer, this, SLOT(m_InjectionSettings));
+            emit ControlPrintSignal("Post-Injection Delay: " + QString::number(m_InjectionSettings.InjectionDelayParam));
+        }
+        else{
+            PrintInfuse(m_InjectionSettings);
+            StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
+            emit ControlPrintSignal("No injection delay");
+        }
+        emit ControlPrintSignal("Injecting " + QString::number(m_InjectionSettings.InfusionVolume) + "ul at " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s");
+    }
+    else{
+        StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
+        emit GetPositionSignal();
+    }
+}
+
+void printcontrol::StagePumpingHandler(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript)
+{
+    if(m_PrintScript.PrintScript == ON){
+        if (m_PrintControls.layerCount < m_PrintScript.PumpHeightScriptList.size()){
+            pc_Stage.StageRelativeMove(-m_PrintScript.PumpHeightScriptList.at(m_PrintControls.layerCount).toDouble(), m_PrintSettings.StageType);
+            emit ControlPrintSignal("Pumping " + QString::number(m_PrintScript.PumpHeightScriptList.at(m_PrintControls.layerCount).toDouble()*1000) +" um");
+        }
+    }
+    else{
+        pc_Stage.StageRelativeMove(-m_PrintSettings.PumpingParameter, m_PrintSettings.StageType);
+        emit ControlPrintSignal("Pumping " + QString::number(m_PrintSettings.PumpingParameter*1000) +" um");
+    }
+}
 /***************************************Helpers*********************************************/
 double printcontrol::CalcPrintEnd(PrintControls m_PrintControls, PrintSettings m_PrintSettings)
 {
@@ -112,4 +170,44 @@ ExposureType_t printcontrol::GetExposureType(PrintSettings m_PrintSettings, Prin
         }
     }
     return ExposureType;
+}
+
+void printcontrol::StageMove(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript)
+{
+    //If printscript is active, filter out layerCount = 0 and layerCount is greater than script length
+    if (m_PrintScript.PrintScript == ON){
+        if (m_PrintControls.layerCount > 0){
+            if (m_PrintControls.layerCount < m_PrintScript.LayerThicknessScriptList.size() && m_PrintControls.layerCount < m_PrintScript.StageAccelerationScriptList.size()){
+                double LayerThickness = m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()/1000; //grab layer thickness from script list
+                emit ControlPrintSignal("Moving Stage: " + QString::number(m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()) + " um");
+                pc_Stage.StageRelativeMove(-LayerThickness, m_PrintSettings.StageType); //Move stage 1 layer thickness
+
+                //If pumping mode is active, grab pump height from script and move stage Pump height - layer thickness
+                if (m_PrintSettings.PumpingMode == ON){
+                    double PumpParam = m_PrintScript.PumpHeightScriptList.at(m_PrintControls.layerCount).toDouble();
+                    pc_Stage.StageRelativeMove(PumpParam - LayerThickness, m_PrintSettings.StageType);
+                }
+            }
+        }
+    }
+    else{
+        if (m_PrintSettings.PumpingMode == ON){
+            pc_Stage.StageRelativeMove(m_PrintSettings.PumpingParameter - m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
+            emit ControlPrintSignal("Pumping active, moving stage: " + QString::number(m_PrintSettings.PumpingParameter - m_PrintSettings.LayerThickness) + " um");
+        }
+        else{
+            pc_Stage.StageRelativeMove(-m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
+            emit ControlPrintSignal("Moving stage: " + QString::number(m_PrintSettings.LayerThickness) + " um");
+        }
+    }
+}
+
+void printcontrol::PrintInfuse(InjectionSettings m_InjectionSettings)
+{
+    if (m_InjectionSettings.ContinuousInjection == OFF){
+        pc_Pump.ClearVolume();
+        Sleep(10);
+        pc_Pump.StartInfusion();
+        emit ControlPrintSignal("Injecting resin");
+    }
 }

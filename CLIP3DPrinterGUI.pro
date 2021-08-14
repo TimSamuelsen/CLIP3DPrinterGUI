@@ -23,7 +23,6 @@ SOURCES += \
     src/mainwindow.cpp \
     src/manualpumpcontrol.cpp \
     src/manualstagecontrol.cpp \
-    src/mw_helpers.cpp \
     src/prinstscriptdialog.cpp \
     src/printcontrol.cpp \
     src/pumpcommands.cpp \

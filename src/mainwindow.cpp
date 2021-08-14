@@ -1703,40 +1703,6 @@ bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter
 }
 
 /**
- * @brief MainWindow::StageMove
- *
- */
-void MainWindow::StageMove()
-{
-    //If printscript is active, filter out layerCount = 0 and layerCount is greater than script length
-    if (m_PrintScript.PrintScript == ON){
-        if (m_PrintControls.layerCount > 0){
-            if (m_PrintControls.layerCount < m_PrintScript.LayerThicknessScriptList.size() && m_PrintControls.layerCount < m_PrintScript.StageAccelerationScriptList.size()){
-                double LayerThickness = m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()/1000; //grab layer thickness from script list
-                PrintToTerminal("Moving Stage: " + QString::number(m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()) + " um");
-                Stage.StageRelativeMove(-LayerThickness, m_PrintSettings.StageType); //Move stage 1 layer thickness
-
-                //If pumping mode is active, grab pump height from script and move stage Pump height - layer thickness
-                if (m_PrintSettings.PumpingMode == ON){
-                    double PumpParam = m_PrintScript.PumpHeightScriptList.at(m_PrintControls.layerCount).toDouble();
-                    Stage.StageRelativeMove(PumpParam - LayerThickness, m_PrintSettings.StageType);
-                }
-            }
-        }
-    }
-    else{
-        if (m_PrintSettings.PumpingMode == ON){
-            Stage.StageRelativeMove(m_PrintSettings.PumpingParameter - m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
-            PrintToTerminal("Pumping active, moving stage: " + QString::number(m_PrintSettings.PumpingParameter - m_PrintSettings.LayerThickness) + " um");
-        }
-        else{
-            Stage.StageRelativeMove(-m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
-            PrintToTerminal("Moving stage: " + QString::number(m_PrintSettings.LayerThickness) + " um");
-        }
-    }
-}
-
-/**
  * @brief MainWindow::VP8bitWorkaround
  * Used as a workaround for the exposure clipping
  * seen in Video Pattern mode due to Bit Blanking
@@ -1799,6 +1765,22 @@ void MainWindow::VP8bitWorkaround()
 void MainWindow::PrintToTerminal(QString StringToPrint)
 {
     ui->ProgramPrints->append(StringToPrint);
+}
+
+void MainWindow::PrintScriptHandler(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript){
+    PrintScriptApply(m_PrintControls.layerCount, m_PrintScript.ExposureScriptList, EXPOSURE_TIME);
+    PrintScriptApply(m_PrintControls.layerCount, m_PrintScript.LEDScriptList, LED_INTENSITY);
+    PrintScriptApply(m_PrintControls.layerCount, m_PrintScript.DarkTimeScriptList, DARK_TIME);
+    PrintScriptApply(m_PrintControls.layerCount, m_PrintScript.LayerThicknessScriptList, LAYER_THICKNESS);
+    PrintScriptApply(m_PrintControls.layerCount, m_PrintScript.StageVelocityScriptList, STAGE_VELOCITY);
+    PrintScriptApply(m_PrintControls.layerCount, m_PrintScript.StageAccelerationScriptList, STAGE_ACCELERATION);
+    if (m_PrintSettings.PumpingMode == ON){
+        PrintScriptApply(m_PrintControls.layerCount, m_PrintScript.PumpHeightScriptList, PUMP_HEIGHT);
+    }
+    if (m_PrintSettings.PrinterType == ICLIP){
+        PrintScriptApply(m_PrintControls.layerCount, m_PrintScript.InjectionVolumeScriptList, INJECTION_VOLUME);
+        PrintScriptApply(m_PrintControls.layerCount, m_PrintScript.InjectionRateScriptList, INJECTION_RATE);
+    }
 }
 
 QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSettings m_PrintSettings)
@@ -1965,6 +1947,17 @@ void MainWindow::on_StartPrint_clicked()
     }
 }
 
+/**
+ * @brief MainWindow::on_AbortPrint_clicked
+ * Aborts print and acts as e-stop. Stops light engine projection,
+ * stage movement and print process
+ */
+void MainWindow::on_AbortPrint_clicked()
+{
+    PrintControl.AbortPrint(m_PrintSettings, &m_PrintControls);
+    ui->ProgramPrints->append("PRINT ABORTED");
+}
+
 void MainWindow::PrintProcess()
 {
     if(m_PrintControls.layerCount + 1 <= m_PrintControls.nSlice){
@@ -1981,12 +1974,100 @@ void MainWindow::PrintProcess()
 }
 
 /**
- * @brief MainWindow::on_AbortPrint_clicked
- * Aborts print and acts as e-stop. Stops light engine projection,
- * stage movement and print process
+ * @brief MainWindow::pumpingSlot
+ * Pumping slot for when pumping is activated,
+ * intermediary step between exposure time and dark time
  */
-void MainWindow::on_AbortPrint_clicked()
+void MainWindow::pumpingSlot(void)
 {
-    PrintControl.AbortPrint(m_PrintSettings, &m_PrintControls);
-    ui->ProgramPrints->append("PRINT ABORTED");
+    QTimer::singleShot(m_PrintSettings.DarkTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+    PrintControl.StagePumpingHandler(m_PrintControls, m_PrintSettings, m_PrintScript);
+}
+
+/**
+ * @brief MainWindow::ExposureTimeSlot
+ * Handles all dark time actions required
+ */
+void MainWindow::ExposureTimeSlot(void)
+{
+    //Set dark timer first for most accurate timing
+    SetDarkTimer(); //Set dark timer first for best timing
+    //Record current time in terminal
+    ui->ProgramPrints->append(QTime::currentTime().toString("hh.mm.ss.zzz"));
+    updatePlot(); //update plot early in dark time
+
+    //Video pattern mode handling
+    if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){ //If in video pattern mode
+        if (PrintControl.VPFrameUpdate(&m_PrintControls, m_PrintSettings) == true){
+            if (m_PrintControls.FrameCount < ui->FileList->count()){ //if not at end of file list
+                QPixmap img(ui->FileList->item(m_PrintControls.FrameCount)->text()); //select next image
+                ImagePopoutUI->showImage(img); //display next image
+            }
+        }
+    }
+
+    //Print Script handling
+    if(m_PrintScript.PrintScript == ON){
+        PrintScriptHandler(m_PrintControls, m_PrintSettings, m_PrintScript);
+    }
+
+    //Dark time handling
+    PrintControl.DarkTimeHandler(m_PrintControls, m_PrintSettings, m_PrintScript, m_InjectionSettings);
+}
+
+/**
+ * @brief MainWindow::DarkTimeSlot
+ * Dummy slot, may be removed
+ */
+void MainWindow::DarkTimeSlot(void)
+{
+    PrintProcess();
+}
+
+void MainWindow::SetExposureTimer()
+{
+    if (m_PrintControls.InitialExposureFlag == 1){
+        QTimer::singleShot(m_PrintSettings.InitialExposure*1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+    }
+    else{
+        switch (m_PrintControls.ExposureType){
+            case EXPOSURE_NORM:
+                QTimer::singleShot(m_PrintSettings.ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+                break;
+            case EXPOSURE_PUMP:
+                QTimer::singleShot(m_PrintSettings.ExposureTime/1000, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
+                break;
+            case EXPOSURE_PS:
+                QTimer::singleShot(m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
+                break;
+            case EXPOSURE_PS_PUMP:
+                QTimer::singleShot(m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble(), Qt::PreciseTimer, this, SLOT(pumpingSlot()));
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+void MainWindow::SetDarkTimer()
+{
+    double DarkTimeSelect = m_PrintSettings.DarkTime;
+    if (m_PrintSettings.MotionMode == STEPPED){
+        if (m_PrintScript.PrintScript == ON){
+            if(m_PrintControls.layerCount < m_PrintScript.DarkTimeScriptList.size()){
+                DarkTimeSelect = m_PrintScript.DarkTimeScriptList.at(m_PrintControls.layerCount).toDouble();
+            }
+            else{
+                DarkTimeSelect = m_PrintScript.DarkTimeScriptList.at(m_PrintControls.layerCount-2).toDouble();
+            }
+        }
+        QTimer::singleShot(DarkTimeSelect/1000,  Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        ui->ProgramPrints->append("Dark time: " + QString::number(DarkTimeSelect));
+    }
+    else{
+        if (m_PrintControls.inMotion == false){
+            Stage.StageAbsoluteMove(m_PrintControls.PrintEnd, m_PrintSettings.StageType);
+        }
+        PrintProcess();
+    }
 }
