@@ -14,6 +14,9 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+/*!
+ * \brief The MainWindow class handles front end ui
+ */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -93,7 +96,7 @@ private slots:
 
     void on_setPrintSpeed_clicked();
 
-    void on_pushButton_clicked();
+    void on_ManualPumpControl_clicked();
 
     void on_PumpConnectButton_clicked();
 

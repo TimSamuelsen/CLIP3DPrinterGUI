@@ -11,6 +11,11 @@
 #include <QTimer>
 #include <QProgressDialog>
 
+/*!
+ * \brief DLP9000::InitProjector
+ * Initializes connection to the projector.
+ * \return - Returns true if connection was successful, false otherwise
+ */
 bool DLP9000::InitProjector(void)
 {
     if (USB_Open() == 0)
@@ -25,8 +30,13 @@ bool DLP9000::InitProjector(void)
     }
 }
 
-/**
- * @brief DLP9000::on_addPatternsButton_clicked
+/*!
+ * \brief DLP9000::AddPatterns
+ * Prepares patterns and stores them in program memory prior to upload.
+ * \param fileNames - A list of file locations for images to be uploaded
+ * \param m_PrintSettings - Module print settings, using BitMode, ProjectionMode, ExposureTime, and DarkTime
+ * \param m_PrintScripts - Module print scripts, using ExposureTimeScript and DarkTimeScript
+ * \param m_PrintControls - Module print controls, using layerCount and InitialExposureFlag
  */
 void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, PrintScripts m_PrintScripts, PrintControls m_PrintControls)
 {
@@ -208,16 +218,14 @@ void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, 
 }
 /***************Helper Functions**************************/
 
-/**
- * @brief DLP9000::UpdatePatternMemory
- * Creates Splash images from all the Pattern elements
- * If it is Firmware update, adds the splash images to the firmware
- * If on the fly, converts the splash images to splash blocks and updates on teh fly
- * @param totalSplashImages - I - total number of Splash images to be updated in Firmware
- * @param firmware - I - boolean to determine if it is to update firmware or On the Fly mode
- * @return
+/*!
+ * \brief DLP9000::UpdatePatternMemory
+ * Creates Splash images from all the Pattern elements.
+ * Converts the splash images to splash blocks and uploads pattern images.
+ * \param totalSplashImages  - Total number of Splash images to be uploaded
+ * \return - Returns -1 for error and 0 for successful upload
  */
-int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware)
+int DLP9000::UpdatePatternMemory(int totalSplashImages)
 {
     for(int image = 0; image < totalSplashImages; image++)
     {
@@ -287,10 +295,10 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages, bool firmware)
 /**
  * @brief DLP9000::uploadPatternToEVM
  * Updates the Pattern images into the Splash block on the Firmware image in the EVM on the fly
- * @param master - I - boolean to indicate if it is madetr or slave
- * @param splashImageCount - I - the Index of the Splash Image to be updated
- * @param splash_size - I - size of the splash image that is being updated
- * @param splash_block - I - the updated splash block
+ * @param master boolean to indicate if it is madetr or slave
+ * @param splashImageCount - the Index of the Splash Image to be updated
+ * @param splash_size - size of the splash image that is being updated
+ * @param splash_block - the updated splash block
  * @return
  */
 int DLP9000::uploadPatternToEVM(bool master, int splashImageCount, int splash_size, uint08* splash_block)
@@ -351,17 +359,15 @@ int DLP9000::uploadPatternToEVM(bool master, int splashImageCount, int splash_si
 
 }
 
-
-
-
-/**
- * @brief DLP9000::on_updateLUT_Button_clicked
+/*!
+ * \brief DLP9000::updateLUT
+ * Handler function for uploading LUT data to light engine
+ * \param ProjectionMode Tells the function whether to format for POTF or video pattern mode
  */
 void DLP9000::updateLUT(int ProjectionMode)
 {
     int totalSplashImages = 0;
     int ret;
-    QTime waitEndTime;
     char errStr[255];
 
     if(m_elements.size() <= 0)
@@ -409,7 +415,7 @@ void DLP9000::updateLUT(int ProjectionMode)
 
     //if (ui->patternMemory_radioButton->isChecked() && m_patternImageChange)
     //{
-        if(UpdatePatternMemory(totalSplashImages, false) == 0)
+        if(UpdatePatternMemory(totalSplashImages) == 0)
         {
               printf("Total splash images: %d",totalSplashImages);
       //      m_patternImageChange = false;
@@ -421,22 +427,34 @@ void DLP9000::updateLUT(int ProjectionMode)
     //}
 }
 
-/**
- * @brief DLP9000::on_startPatSequence_Button_clicked
+/*!
+ * \brief DLP9000::startPatSequence
+ * Start pattern display on the light engine, emits an error
+ * if unable to start pattern display.
  */
 void DLP9000::startPatSequence(void)
 {
     if (LCR_PatternDisplay(2) < 0)
     {
-    }
         emit DLPError("Unable to start pattern display");
+    }
 }
 
+/*!
+ * \brief DLP9000::clearElements
+ * Simple function to clear local program pattern memory.
+ */
 void DLP9000::clearElements(void)
 {
     m_elements.clear();
 }
 
+/*!
+ * \brief DLP9000::setIT6535Mode
+ * Sets the mode of the IT6535 receiver, options include:
+ * Disabled, HDMI, and DisplayPort.
+ * \param Mode - The mode to set the IT6535 to
+ */
 void DLP9000::setIT6535Mode(int Mode)
 {
     unsigned int dataPort, pixelClock, dataEnable, syncSelect;
@@ -465,15 +483,16 @@ void DLP9000::setIT6535Mode(int Mode)
     LCR_SetIT6535PowerMode(ProjectMode);
 }
 
-/**
- * @brief DLP9000::calculateSplashImageDetails
- * for each of the pattern image on the pattern settings page, calculates the
+/*!
+ * \brief DLP9000::calculateSplashImageDetails
+ * For each of the pattern image on the pattern settings page, calculates the
  * total number of splash images of bit depth 24 based on the bit depth of each image
  * Also calculates the bitposition of each pattern element in the splash Image
- * and the index of the Splash image for each Pattern element
- * @param totalSplashImages - O - Total number of splash images to be created from
+ * and the index of the Splash image for each Pattern element.
+ * \param totalSplashImages - Total number of splash images to be created from
  *                                the available Pattern images
- * @return - 0 - success
+ * \param ProjectionMode - Determines whether to format for POTF or video pattern mode
+ * \return - 0 - success
  *          -1 - failure
  */
 int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware, int ProjectionMode)
@@ -566,17 +585,26 @@ int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware, 
     return 0;
 }
 
-void DLP9000::SetLEDIntensity(PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript)
+void DLP9000::SetLEDIntensity(int UVIntensity, int PrintScript, QStringList LEDScriptList)
 {
     //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
-    if (dlp_PrintScript.PrintScript == ON){ //If printscript is on
-        LCR_SetLedCurrents(0,0,(dlp_PrintScript.LEDScriptList.at(0).toInt())); //Set LED intensity to first value in printscript
+    if (PrintScript == ON){ //If printscript is on
+        LCR_SetLedCurrents(0,0,(LEDScriptList.at(0).toInt())); //Set LED intensity to first value in printscript
     }
     else{ //if printscript is off
-        LCR_SetLedCurrents(0, 0, dlp_PrintSettings.UVIntensity); //set static LED intensity
+        LCR_SetLedCurrents(0, 0, UVIntensity); //set static LED intensity
     }
 }
 
+/*!
+ * \brief DLP9000::PatternUpload
+ * Handler function for pattern uploads
+ * \param ImageList - List of image files to be uploaded
+ * \param dlp_PrintControls - Checks nSlice for sanity check, passed along to the AddPatterns function
+ * \param dlp_PrintSettings - Passed along to the AddPatterns function
+ * \param dlp_PrintScript - Passed along to the AddPatterns function
+ * \return
+ */
 int DLP9000::PatternUpload(QStringList ImageList, PrintControls dlp_PrintControls, PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript)
 {
     int nPatterns = ImageList.count();
@@ -590,6 +618,11 @@ int DLP9000::PatternUpload(QStringList ImageList, PrintControls dlp_PrintControl
     return nPatterns;
 }
 
+/*!
+ * \brief DLP9000::PatternDisplay
+ * Sets whether to start, stop, or pause pattern display
+ * \param DisplaySetting
+ */
 void DLP9000::PatternDisplay(int DisplaySetting)
 {
     LCR_PatternDisplay(DisplaySetting);

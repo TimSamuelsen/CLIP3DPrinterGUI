@@ -8,6 +8,9 @@
 #define PTN_WIDTH_WQXGA     2560
 #define PTN_HEIGHT_WQXGA    1600
 
+/*!
+ * \brief The DLP9000 class handles light engine operation
+ */
 class DLP9000: public QObject
 {
     Q_OBJECT
@@ -25,18 +28,26 @@ public:
 
     bool InitProjector(void);
     void AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, PrintScripts m_PrintScripts, PrintControls m_PrintControls);
-    int UpdatePatternMemory(int totalSplashImages, bool firmware);
+    int UpdatePatternMemory(int totalSplashImages);
     int uploadPatternToEVM(bool master, int splashImageCount, int splash_size, uint8_t* splash_block);
     void updateLUT(int ProjectionMode);
     void startPatSequence(void);
     void clearElements(void);
     void setIT6535Mode(int Mode);
-    void SetLEDIntensity(PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript);
+    void SetLEDIntensity(int UVIntensity, int PrintScript, QStringList LEDScriptList);
     int PatternUpload(QStringList ImageList, PrintControls dlp_PrintControls, PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript);
     void PatternDisplay(int DisplaySetting);
 
 signals:
+    /*!
+     * \brief DLPPrintSignal Light engine terminal printing  signal, connected to TerminalPrint function in Main Window.
+     * \param StringToPrint String to be printed
+     */
     void DLPPrintSignal(QString StringToPrint);
+    /*!
+     * \brief DLPError Light engine error signal, connected to showError function in Main Window.
+     * \param ErrorString Error string to be shown
+     */
     void DLPError(QString ErrorString);
 
 private:

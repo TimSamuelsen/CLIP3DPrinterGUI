@@ -2398,7 +2398,7 @@ p, li { white-space: pre-wrap; }
  Processing</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="ManualPumpControl">
      <property name="geometry">
       <rect>
        <x>130</x>

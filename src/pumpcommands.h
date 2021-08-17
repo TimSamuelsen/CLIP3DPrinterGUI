@@ -4,9 +4,13 @@
 #include <QObject>
 #include "serialib.h"
 
+/*!
+ * \brief The PumpCommands class handles injection pump operation
+ */
 class PumpCommands: public QObject
 {
     Q_OBJECT
+
 public:
     static PumpCommands& Instance() {
         static PumpCommands myInstance;
@@ -41,7 +45,17 @@ public:
     QString GetWithdrawRate();
 
 signals:
+    /*!
+     * \brief PumpPrintSignal Injection pump terminal printing  signal,
+     * connected to TerminalPrint function in Main Window.
+     * \param StringToPrint String to be printed
+     */
     void PumpPrintSignal(QString StringToPrint);
+    /*!
+     * \brief PumpError Light engine error signal,
+     * connected to showError function in Main Window.
+     * \param ErrorString Error string to be shown
+     */
     void PumpError(QString ErrorString);
 
 private:

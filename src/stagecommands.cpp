@@ -6,16 +6,23 @@ static bool StagePrep1 = false;
 static bool StagePrep2 = false;
 static PrintSettings s_PrintSettings;
 
+/*!
+ * \brief StageCommands::StageInit
+ * Initializes the stage serial port connection.
+ * \param COMPort - Select which COM port to connect to.
+ * \param StageType - Select stage type between STAGE_SMC or STAGE_GCODE
+ * \return - Returns 1 if successful connection, -1 if failed connection
+ */
 int StageCommands::StageInit(const char* COMPort, Stage_t StageType)
 {
     int returnVal = 0;
     if(StageType == STAGE_SMC){
-        SMC.SMC100CInit(COMPort);
-        returnVal = 1;
+        SMC.SMC100CInit(COMPort); //Call SMC init function to connect to stage
+        returnVal = 1; //Set returnVal to 1 for successful connection
     }
     else if (StageType == STAGE_GCODE){
-        if(StageSerial.openDevice(COMPort,115200) == 1){ //If serial connection was succesful
-            returnVal = 1; //return 1 for succesful connection
+        if(StageSerial.openDevice(COMPort,115200) == 1){ //If serial connection was successful
+            returnVal = 1; //return 1 for successful connection
             Sleep(10); //Delay to avoid serial congestion
 
             //Set stage programming to mm
@@ -54,6 +61,12 @@ int StageCommands::StageInit(const char* COMPort, Stage_t StageType)
     return returnVal;
 }
 
+/*!
+ * \brief StageCommands::StageClose
+ * Closes stage serial port connection.
+ * \param StageType - Select stage type between STAGE_SMC or STAGE_GCODE
+ * \return - Returns 1 if successful, -1 if failed
+ */
 int StageCommands::StageClose(Stage_t StageType)
 {
     int returnVal = 0;
@@ -66,6 +79,12 @@ int StageCommands::StageClose(Stage_t StageType)
     return returnVal;
 }
 
+/*!
+ * \brief StageCommands::StageHome
+ * Homes the stage to provide a reference point, only used for STAGE_SMC
+ * \param StageType - Select stage type between STAGE_SMC or STAGE_GCODE
+ * \return - Returns 1 if successful, -1 if failed
+ */
 int StageCommands::StageHome(Stage_t StageType)
 {
     int returnVal = 0;
@@ -73,12 +92,17 @@ int StageCommands::StageHome(Stage_t StageType)
         returnVal = SMC.Home();
     }
     else if (StageType == STAGE_GCODE){
-        //Is there a use for a stage home command?
+        //Is there a use for a stage home command for Gcode stage?
         returnVal = 1;
     }
     return returnVal;
 }
 
+/*!
+ * \brief StageCommands::StageStop
+ * \param StageType - Select stage type between STAGE_SMC or STAGE_GCODE
+ * \return - Returns 1 if successful, -1 if failed
+ */
 int StageCommands::StageStop(Stage_t StageType)
 {
     int returnVal = 0; //default 0 is an error
@@ -94,6 +118,12 @@ int StageCommands::StageStop(Stage_t StageType)
     return returnVal;
 }
 
+/*!
+ * \brief StageCommands::SetStageVelocity
+ * \param VelocityToSet - Velocity to be set in unit of mm/s
+ * \param StageType - Select stage type between STAGE_SMC or STAGE_GCODE
+ * \return - Returns 1 if successful, -1 if failed
+ */
 int StageCommands::SetStageVelocity(float VelocityToSet, Stage_t StageType)
 {
     int returnVal = 0;
@@ -101,11 +131,19 @@ int StageCommands::SetStageVelocity(float VelocityToSet, Stage_t StageType)
         SMC.SetVelocity(VelocityToSet);
     }
     else if (StageType == STAGE_GCODE){
+        /*For the Gcode stage the velocity is set along with the move command
+          so we need to set the static FeedRate variable*/
         FeedRate = VelocityToSet * 60;
     }
     return returnVal;
 }
 
+/*!
+ * \brief StageCommands::SetStageAcceleration
+ * \param AccelerationToSet - Acceleration to be in units of mm/s^2
+ * \param StageType - Select stage type between STAGE_SMC or STAGE_GCODE
+ * \return - Returns 1 if successful, -1 if failed
+ */
 int StageCommands::SetStageAcceleration(float AccelerationToSet, Stage_t StageType)
 {
     int returnVal = 0;
@@ -120,6 +158,13 @@ int StageCommands::SetStageAcceleration(float AccelerationToSet, Stage_t StageTy
     }
     return returnVal;
 }
+
+/*!
+ * \brief StageCommands::SetStagePositiveLimit
+ * \param PositiveLimit - Sets the positive stage endstop for SMC stage (mm)
+ * \param StageType - Select stage type between STAGE_SMC or STAGE_GCODE
+ * \return - Returns 1 if successful, -1 if failed
+ */
 int StageCommands::SetStagePositiveLimit(float PositiveLimit, Stage_t StageType)
 {
     int returnVal = 0;
@@ -132,6 +177,12 @@ int StageCommands::SetStagePositiveLimit(float PositiveLimit, Stage_t StageType)
     return returnVal;
 }
 
+/*!
+ * \brief StageCommands::SetStageNegativeLimit
+ * \param NegativeLimit - Sets the negative stage endstop for SMC stage (mm)
+ * \param StageType - Select stage type between STAGE_SMC or STAGE_GCODE
+ * \return - Returns 1 if successful, -1 if failed
+ */
 int StageCommands::SetStageNegativeLimit(float NegativeLimit, Stage_t StageType)
 {
     int returnVal = 0;
@@ -144,6 +195,12 @@ int StageCommands::SetStageNegativeLimit(float NegativeLimit, Stage_t StageType)
     return returnVal;
 }
 
+/*!
+ * \brief StageCommands::StageAbsoluteMove
+ * \param AbsoluteMovePosition
+ * \param StageType - Select stage type between STAGE_SMC or STAGE_GCODE
+ * \return - Returns 1 if successful, -1 if failed
+ */
 int StageCommands::StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageType)
 {
     int returnVal = 0;
@@ -160,6 +217,13 @@ int StageCommands::StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageTy
     return returnVal;
 }
 
+/*!
+ * \brief StageCommands::StageRelativeMove
+ * Moves the stage relative to it's current position.
+ * \param RelativeMoveDistance - Distance to move in units of (mm)
+ * \param StageType - Select stage type between STAGE_SMC or STAGE_GCODE
+ * \return - Returns 1 if successful, -1 if failed
+ */
 int StageCommands::StageRelativeMove(float RelativeMoveDistance, Stage_t StageType)
 {
     int returnVal = 0;
@@ -175,6 +239,12 @@ int StageCommands::StageRelativeMove(float RelativeMoveDistance, Stage_t StageTy
     return returnVal;
 }
 
+/*!
+ * \brief StageCommands::StageGetPosition
+ * Gets current stage position.
+ * \param StageType - Select stage type between STAGE_SMC or STAGE_GCODE
+ * \return - Returns QString containing the current stage position
+ */
 QString StageCommands::StageGetPosition(Stage_t StageType)
 {
     if(StageType == STAGE_SMC){
@@ -186,11 +256,10 @@ QString StageCommands::StageGetPosition(Stage_t StageType)
             return CurrentPosition;
         }
     }
-    else if (StageType == STAGE_GCODE){
-
+    else if (StageType == STAGE_GCODE){ //Test if
         QString GetPositionCommand = "M114 R\r\n";
-        StageSerial.flushReceiver();
-        Sleep(5);
+        StageSerial.flushReceiver(); //Flush receiver to get rid of readout we don't need
+        Sleep(5); //Delay for
         StageSerial.writeString(GetPositionCommand.toLatin1().data());
         static char receivedString[] = "ThisIsMyTest";
         char finalChar = '\n';
@@ -205,13 +274,25 @@ QString StageCommands::StageGetPosition(Stage_t StageType)
 }
 
 /****************************Helper Functions****************************/
+/*!
+ * \brief StageCommands::initStagePosition
+ * Saves the print settings to a module variable
+ * and calls initStageSlot
+ * \param si_PrintSettings - Print settings passed down from the Main Window
+ */
 void StageCommands::initStagePosition(PrintSettings si_PrintSettings)
 {
     s_PrintSettings = si_PrintSettings;
     initStageSlot();
-
 }
 
+/*!
+ * \brief StageCommands::initStageSlot
+ * Starts process of lowering stage down to it's starting position,
+ * tells stage to move to 3.2mm above the starting position then checks
+ * the stage position once per second and once it has reached the position
+ * 3.2mm above the starting position calls the fineMovement function
+ */
 void StageCommands::initStageSlot()
 {
     if (s_PrintSettings.StageType == STAGE_SMC){
@@ -236,9 +317,17 @@ void StageCommands::initStageSlot()
     }
 }
 
+/*!
+ * \brief StageCommands::fineMovement
+ * Sets the stage velocity to 0.3 mm/s and lowers the stage
+ * the final 3.2 mm down to the starting position, this is
+ * done to reduce the bubble created when the stage enters
+ * the resin
+ */
 void StageCommands::fineMovement()
 {
     double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
+    //If stage has not reached it's final starting position
     if (CurrentPosition > s_PrintSettings.StartingPosition-0.01 && CurrentPosition < s_PrintSettings.StartingPosition+0.01){
         verifyStageParams(s_PrintSettings);
     }
@@ -255,6 +344,14 @@ void StageCommands::fineMovement()
     }
 }
 
+/*!
+ * \brief StageCommands::verifyStageParams
+ * After the stage has reached it's final position
+ * and is ready to start the final stage printing parameters
+ * are sent to the stage.
+ * \param s_PrintSettings - Print settings passed down from MainWindow,
+ * uses StageType, StageVelocity, StageAcceleration, MinEndOfRun, and StageVelocity
+ */
 void StageCommands::verifyStageParams(PrintSettings s_PrintSettings)
 {
     emit StagePrintSignal("Verifying Stage Parameters");
@@ -268,6 +365,14 @@ void StageCommands::verifyStageParams(PrintSettings s_PrintSettings)
     SetStageVelocity(s_PrintSettings.StageVelocity, s_PrintSettings.StageType);
 }
 
+/*!
+ * \brief StageCommands::initStageStart
+ * Used to confirm that the stage velocity is set correctly,
+ * if in Continuous motion mode calculates the continuous stage
+ * velocity and sets it.
+ * \param si_PrintSettings Print settings passed down from MainWindow,
+ * uses StageType, MotionMode, StageVelocity, and ExposureTime
+ */
 void StageCommands::initStageStart(PrintSettings si_PrintSettings)
 {
     if(si_PrintSettings.MotionMode == STEPPED){

@@ -5,9 +5,15 @@
 #include "PrintElements.h"
 #include "SMC100C.h"
 
+/*!
+ * \brief The StageCommands class handles the vertical translation
+ * stage. It can handle both an SMC100CC motion controller and a
+ *  Gcode based stage. Uses serialib for serial communication.
+ */
 class StageCommands: public QObject
 {
     Q_OBJECT
+
 public:
     static StageCommands& Instance() {
         static StageCommands myInstance;
@@ -36,7 +42,17 @@ public:
     void initStageStart(PrintSettings si_PrintSettings);
 
 signals:
+    /*!
+     * \brief StagePrintSignal Stage terminal printing signal,
+     * connected to TerminalPrint function in mainwindow.
+     * \param StringToPrint - String to be printed
+     */
     void StagePrintSignal(QString StringToPrint);
+    /*!
+     * \brief StageError Stage error signal, connected to
+     * showError function in Main Window.
+     * \param ErrorString to be shown
+     */
     void StageError(QString ErrorString);
 
 private:
