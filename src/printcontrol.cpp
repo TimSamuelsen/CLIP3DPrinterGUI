@@ -83,12 +83,20 @@ void printcontrol::StartPrint(PrintSettings m_PrintSettings, PrintScripts m_Prin
  * \param m_PrintScript - From MainWindow, passed to PatternUpload
  * \return - Returns the number of patterns uploaded
  */
-int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript)
+int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript, bool ContinuousInjection)
 {
     if(m_PrintSettings.MotionMode == CONTINUOUS){
         pc_Stage.StageStop(m_PrintSettings.StageType);
     }
-    return pc_DLP.PatternUpload(ImageList, m_PrintControls, m_PrintSettings, m_PrintScript);
+    if(ContinuousInjection){
+        pc_Pump.Stop();
+    }
+    int UploadedImages = pc_DLP.PatternUpload(ImageList, m_PrintControls, m_PrintSettings, m_PrintScript);
+    if(ContinuousInjection){
+        pc_Pump.SetTargetVolume(0);
+        pc_Pump.StartInfusion();
+    }
+    return UploadedImages;
 }
 
 /*!
