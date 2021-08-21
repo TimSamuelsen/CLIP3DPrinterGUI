@@ -18,6 +18,13 @@ ManualStageControl::ManualStageControl(QWidget *parent) :
     ui(new Ui::ManualStageControl)
 {
     ui->setupUi(this);
+    if (ms_Stage.isConnected){
+        ui->TerminalOut->append("Stage Connected");
+        ui->ConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
+        ui->ConnectionIndicator->setText("Connected");
+        ui->ConnectButton->setText("Disconnect");
+        ConnectionFlag = true;
+    }
 }
 
 ManualStageControl::~ManualStageControl()

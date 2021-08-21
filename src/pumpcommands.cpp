@@ -1,6 +1,17 @@
 #include "pumpcommands.h"
 
 /******************************************Active Commands******************************************/
+bool PumpCommands::PumpInitConnection(const char* COMport)
+{
+    bool returnVal = false;
+    PumpSerial.closeDevice();   // Close any previous pump connections
+    if (PumpSerial.openDevice(COMport, 9600) == 1){
+        returnVal = true;
+        isConnected = true;
+    }
+    return returnVal;
+}
+
 /*!
  * \brief PumpCommands::StartInfusion
  * Starts pump infusion/injection

@@ -44,7 +44,7 @@ static bool initFlag;
 //May convert these to int or float eventually
 static char* MotionTime;
 static char* CurrentPosition;
-static serialib serial;
+serialib serial;
 
 //Many of these functions will likely not be needed and can be removed at a later date after testing
 //Command Libarary (Based on SMC100C User Manual p. 22-70)

@@ -58,6 +58,9 @@ int StageCommands::StageInit(const char* COMPort, Stage_t StageType)
             printf("GCode stage connection failed");
         }
     }
+    if (returnVal == 1){
+        isConnected = true;
+    }
     return returnVal;
 }
 

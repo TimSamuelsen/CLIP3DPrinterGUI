@@ -15,17 +15,20 @@ printcontrol::printcontrol()
 
 /*!
  * \brief printcontrol::InitializeSystem
- * Initializes system to be ready for print, moves stage to starting position, uploads patterns to light engine,
- * calculates and sets print end for continuous prints and exposure type.
- * \param ImageList - List of images to be uploaded
- * \param m_PrintSettings - Print settings from Main Window, passed to initStagePosition, PatternUpload, and CalcPrintEnd
- * \param pPrintControls - Print Controls pointer from Main Window, passed to PatternUpload and CalcPrintEnd, sets PrintEnd and ExposureType
- * \param m_PrintScript - Print script from Main Window, passed to PatternUpload and GetExposureType
+ * Initializes system to be ready for print, moves stage to starting position, uploads patterns to
+ * light engine, calculates and sets print end for continuous prints and exposure type.
+ * \param ImageList  List of images to be uploaded
+ * \param m_PrintSettings  Print settings from Main Window, passed to initStagePosition,
+ *                         PatternUpload, and CalcPrintEnd
+ * \param pPrintControls  Print Controls pointer from Main Window, passed to PatternUpload and
+ *                        CalcPrintEnd, sets PrintEnd and ExposureType
+ * \param m_PrintScript  Print script from Main Window, passed to PatternUpload and GetExposureType
  */
-void printcontrol::InitializeSystem(QStringList ImageList, PrintSettings m_PrintSettings, PrintControls *pPrintControls, PrintScripts m_PrintScript)
+void printcontrol::InitializeSystem(QStringList ImageList, PrintSettings m_PrintSettings,
+                                    PrintControls *pPrintControls, PrintScripts m_PrintScript)
 {
     pc_DLP.PatternDisplay(OFF);
-    pc_Stage.initStagePosition(m_PrintSettings);
+    pc_Stage.initStagePosition(m_PrintSettings);    // Move stage to starting position
     pc_DLP.PatternUpload(ImageList, *pPrintControls, m_PrintSettings, m_PrintScript);
 
     pPrintControls->PrintEnd = CalcPrintEnd(pPrintControls->nSlice, m_PrintSettings);
@@ -34,31 +37,36 @@ void printcontrol::InitializeSystem(QStringList ImageList, PrintSettings m_Print
 
 /*!
  * \brief printcontrol::AbortPrint
- * Aborts the print, stop projection, stops stage movement, stops pump, ends print process by setting layerCount to 0xFFFFFF
- * \param StageType - Select stage type between STAGE_SMC or STAGE_GCODE
- * \param pPrintControl - Pointer to PrintControls from MainWindow, sets layerCount
+ * Aborts the print, stop projection, stops stage movement, stops pump, ends print process
+ * by setting layerCount to 0xFFFFFF
+ * \param StageType  Select stage type between STAGE_SMC or STAGE_GCODE
+ * \param pPrintControl  Pointer to PrintControls from MainWindow, sets layerCount
  */
 void printcontrol::AbortPrint(Stage_t StageType, PrintControls *pPrintControl)
 {
-    pc_DLP.PatternDisplay(OFF);
-    pc_Stage.StageStop(StageType);
-    pc_Pump.Stop();
-    pPrintControl->layerCount = 0xFFFFFF;
+    pc_DLP.PatternDisplay(OFF);                 // Turn projection off
+    pc_Stage.StageStop(StageType);              // Stop stage movement
+    pc_Pump.Stop();                             // Stop injection
+    pPrintControl->layerCount = 0xFFFFFF;       // End print process loop
 }
 
 /*!
  * \brief printcontrol::StartPrint
  * Starts print, sets LEDIntensity, validates stage parameters, starts light engine pattern sequence
  * if in continuous injection mode starts infusion/injection
- * \param m_PrintSettings - Print settings from Main Window, passed to SetLEDIntensity and initStageStart, uses ProjectionMode
- * \param m_PrintScript - Print script from Main Window, passed to SetLEDIntensity using PrintScript and LEDScriptList
- * \param ContinuousInjection - bool to indicate whether system is in continuous injection mode
+ * \param m_PrintSettings   Print settings from Main Window, passed to SetLEDIntensity and
+ *                          initStageStart, uses ProjectionMode
+ * \param m_PrintScript     Print script from Main Window, passed to SetLEDIntensity
+ *                          using PrintScript and LEDScriptList
+ * \param ContinuousInjection   bool to indicate whether system is in continuous injection mode
  */
-void printcontrol::StartPrint(PrintSettings m_PrintSettings, PrintScripts m_PrintScript, bool ContinuousInjection)
+void printcontrol::StartPrint(PrintSettings m_PrintSettings, PrintScripts m_PrintScript,
+                              bool ContinuousInjection)
 {
-    pc_DLP.SetLEDIntensity(m_PrintSettings.UVIntensity, m_PrintScript.PrintScript, m_PrintScript.LEDScriptList);
-    pc_Stage.initStageStart(m_PrintSettings);
-    emit GetPositionSignal();
+    pc_DLP.SetLEDIntensity(m_PrintSettings.UVIntensity, m_PrintScript.PrintScript,
+                           m_PrintScript.LEDScriptList);
+    pc_Stage.initStageStart(m_PrintSettings);       // Validate correct stage parameters are set
+    emit GetPositionSignal();                       // Sanity check
     pc_DLP.startPatSequence();
 
     if (ContinuousInjection == ON){
@@ -77,22 +85,23 @@ void printcontrol::StartPrint(PrintSettings m_PrintSettings, PrintScripts m_Prin
 /*!
  * \brief printcontrol::ReuploadHandler
  * Handles the reupload, stops stage if in continuous print mode
- * \param ImageList - From MainWindow, passed to PatternUpload
- * \param m_PrintControls - From MainWindow, passed to PatternUpload
- * \param m_PrintSettings - From MainWindow, passed to PatternUpload, StageType passed to StageStop method
- * \param m_PrintScript - From MainWindow, passed to PatternUpload
- * \return - Returns the number of patterns uploaded
+ * \param ImageList  From MainWindow, passed to PatternUpload
+ * \param m_PrintControls  From MainWindow, passed to PatternUpload
+ * \param m_PrintSettings  From MainWindow, passed to PatternUpload, StageType passed to StageStop
+ * \param m_PrintScript    From MainWindow, passed to PatternUpload
+ * \return  Returns the number of patterns uploaded
  */
-int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript, bool ContinuousInjection)
+int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintControls, PrintSettings m_PrintSettings,
+                                  PrintScripts m_PrintScript, bool ContinuousInjection)
 {
-    if(m_PrintSettings.MotionMode == CONTINUOUS){
-        pc_Stage.StageStop(m_PrintSettings.StageType);
+    if(m_PrintSettings.MotionMode == CONTINUOUS){       // Continuous stage movement is stopped
+        pc_Stage.StageStop(m_PrintSettings.StageType);  // during reupload
     }
-    if(ContinuousInjection){
+    if(ContinuousInjection){        // Continuous Injection is stopped during reupload
         pc_Pump.Stop();
     }
     int UploadedImages = pc_DLP.PatternUpload(ImageList, m_PrintControls, m_PrintSettings, m_PrintScript);
-    if(ContinuousInjection){
+    if(ContinuousInjection){        // Restarting continous injection after reupload
         pc_Pump.SetTargetVolume(0);
         pc_Pump.StartInfusion();
     }
@@ -122,21 +131,21 @@ void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, uint Initi
 /*!
  * \brief printcontrol::VPFrameUpdate
  * Handles the frame update for Video Pattern mode.
- * \param pPrintControls - Pointer from MainWindow, uses BitLayer, sets FrameCount,
+ * \param pPrintControls  Pointer from MainWindow, uses BitLayer, sets FrameCount,
  * BitLayer, ReSyncCount, ReSyncFlag
- * \param BitMode - Bit depth of the images for this print
- * \return - Returns false if no frame update is needed, true if frame update is needed
+ * \param BitMode  Bit depth of the images for this print
+ * \return  Returns false if no frame update is needed, true if frame update is needed
  */
 bool printcontrol::VPFrameUpdate(PrintControls *pPrintControls, int BitMode)
 {
     bool returnVal = false;
-    if (pPrintControls->BitLayer > 24){
+    if (pPrintControls->BitLayer > 24){     // If exceeded max bit layers for 1 image
         pPrintControls->FrameCount++;
         emit ControlPrintSignal("New Frame: " + QString::number(pPrintControls->FrameCount));
-        pPrintControls->BitLayer = 1;
+        pPrintControls->BitLayer = 1;       // reset BitLayer counter to 0
         pPrintControls->ReSyncCount++;
 
-        //If 120 frames have been reached, prepare for resync
+        // If 120 frames have been reached, prepare for resync
         if(pPrintControls->ReSyncCount > (120 - 24)/(24/BitMode)){
             pPrintControls->ReSyncFlag = ON;
             pPrintControls->ReSyncCount = 0;
@@ -148,32 +157,39 @@ bool printcontrol::VPFrameUpdate(PrintControls *pPrintControls, int BitMode)
 
 /*!
  * \brief printcontrol::DarkTimeHandler
- * Sets the appropriate dark time, handles injection delays for iCLIP and moves stage
- * \param m_PrintControls - Print controls from MainWindow, passed to StageMove
- * \param m_PrintSettings - Print settings from MainWindow, passed to StageMove, using PrinterType
- * \param m_PrintScript - Print script from MainWindow, passed to StageMove
- * \param m_InjectionSettings - Injection settings from MainWindow, using InjectionDelayFlag, ContinuousInjection, InjectionDelayParam
+ * Sets the appropriate dark time, handles pre and post injection delays for iCLIP and moves stage
+ * \param m_PrintControls  Print controls from MainWindow, passed to StageMove
+ * \param m_PrintSettings  Print settings from MainWindow, passed to StageMove, using PrinterType
+ * \param m_PrintScript  Print script from MainWindow, passed to StageMove
+ * \param m_InjectionSettings  Injection settings from MainWindow, using InjectionDelayFlag,
+ *                              ContinuousInjection, InjectionDelayParam
  */
-void printcontrol::DarkTimeHandler(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript, InjectionSettings m_InjectionSettings)
+void printcontrol::DarkTimeHandler(PrintControls m_PrintControls, PrintSettings m_PrintSettings,
+                                   PrintScripts m_PrintScript, InjectionSettings m_InjectionSettings)
 {
     if(m_PrintSettings.PrinterType == ICLIP){
+        // For pre injection delay, injection is handled first and stage movement second
         if (m_InjectionSettings.InjectionDelayFlag == PRE){
             PrintInfuse(m_InjectionSettings.ContinuousInjection);
             QTimer::singleShot(m_InjectionSettings.InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove(m_PrintControls, m_PrintSettings, m_PrintScript)));
             emit ControlPrintSignal("Pre-Injection Delay: " + QString::number(m_InjectionSettings.InjectionDelayParam));
         }
+        // For post injection delay, stage movement is handled first and injection second
         else if (m_InjectionSettings.InjectionDelayFlag == POST){
             StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
             QTimer::singleShot(m_InjectionSettings.InjectionDelayParam, Qt::PreciseTimer, this, SLOT(m_InjectionSettings));
             emit ControlPrintSignal("Post-Injection Delay: " + QString::number(m_InjectionSettings.InjectionDelayParam));
         }
+        // If no injection delay is set, injection and movement are handled at the same time
         else{
             PrintInfuse(m_InjectionSettings.ContinuousInjection);
             StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
             emit ControlPrintSignal("No injection delay");
         }
-        emit ControlPrintSignal("Injecting " + QString::number(m_InjectionSettings.InfusionVolume) + "ul at " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s");
+        emit ControlPrintSignal("Injecting " + QString::number(m_InjectionSettings.InfusionVolume)
+                                + "ul at " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s");
     }
+    // If not in iCLIP mode, stage movement is performed directly
     else{
         StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
         emit GetPositionSignal();
@@ -190,12 +206,16 @@ void printcontrol::DarkTimeHandler(PrintControls m_PrintControls, PrintSettings 
  */
 void printcontrol::StagePumpingHandler(uint layerCount, PrintSettings m_PrintSettings, PrintScripts m_PrintScript)
 {
+    // If in printscript mode grab pump height from PumpHeightScriptList
     if(m_PrintScript.PrintScript == ON){
+        // This if statement is a guard on segmentation faults
         if (layerCount < m_PrintScript.PumpHeightScriptList.size()){
-            pc_Stage.StageRelativeMove(-m_PrintScript.PumpHeightScriptList.at(layerCount).toDouble(), m_PrintSettings.StageType);
-            emit ControlPrintSignal("Pumping " + QString::number(m_PrintScript.PumpHeightScriptList.at(layerCount).toDouble()*1000) +" um");
+            double PumpHeight = m_PrintScript.PumpHeightScriptList.at(layerCount).toDouble();
+            pc_Stage.StageRelativeMove(-PumpHeight, m_PrintSettings.StageType);
+            emit ControlPrintSignal("Pumping " + QString::number(PumpHeight*1000) +" um");
         }
     }
+    // If not in print script mode use static pumping parameter
     else{
         pc_Stage.StageRelativeMove(-m_PrintSettings.PumpingParameter, m_PrintSettings.StageType);
         emit ControlPrintSignal("Pumping " + QString::number(m_PrintSettings.PumpingParameter*1000) +" um");
@@ -209,7 +229,7 @@ void printcontrol::StagePumpingHandler(uint layerCount, PrintSettings m_PrintSet
  * \param nSlice - Number of slices in the print
  * \param m_PrintSettings - Print settings from MainWindow, using MotionMode,
  *        PrinterType, StartingPosition and LayerThickness
- * \return
+ * \return  Returns the calculated print ending position
  */
 double printcontrol::CalcPrintEnd(uint nSlice, PrintSettings m_PrintSettings)
 {
@@ -221,7 +241,8 @@ double printcontrol::CalcPrintEnd(uint nSlice, PrintSettings m_PrintSettings)
         else if (m_PrintSettings.PrinterType == ICLIP){
             PrintEnd = nSlice*m_PrintSettings.LayerThickness;
         }
-        //PrintToTerminal("Print end for continuous motion print set to: " + QString::number(m_PrintControls.PrintEnd));
+        emit ControlPrintSignal("Print end for continuous motion print set to: " +
+                                QString::number(PrintEnd));
     }
     return PrintEnd;
 }

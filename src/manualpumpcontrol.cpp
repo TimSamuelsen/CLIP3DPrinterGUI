@@ -18,6 +18,12 @@ manualpumpcontrol::manualpumpcontrol(QWidget *parent) :
     ui(new Ui::manualpumpcontrol)
 {
     ui->setupUi(this);
+    if(mp_Pump.isConnected){
+        ui->TerminalOut->append("Serial Port Connected");
+        ui->ConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
+        ui->ConnectionIndicator->setText("Connected");
+        ConnectionFlag = true;
+    }
 }
 
 manualpumpcontrol::~manualpumpcontrol()
@@ -32,22 +38,16 @@ void manualpumpcontrol::on_ConnectButton_clicked()
     QString COMSelect = ui->COMSelect->currentText();
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
-    if (mp_Pump.PumpSerial.openDevice(COM,9600) == 1)
-    {
+    if (mp_Pump.PumpInitConnection(COM)){
         ui->TerminalOut->append("Serial Port Connected");
-
         ui->ConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
         ui->ConnectionIndicator->setText("Connected");
-
         ConnectionFlag = true;
     }
-    else
-    {
+    else{
         ui->TerminalOut->append("Serial Port Connection Failed");
-
         ui->ConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
         ui->ConnectionIndicator->setText("Disconnected");
-
         ConnectionFlag = false;
     }
 }

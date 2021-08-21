@@ -24,6 +24,7 @@ public:
     StageCommands& operator=(StageCommands const&) = delete;    //Copy assign
     StageCommands& operator=(StageCommands &&) = delete;        //Move assign
 
+    bool isConnected;
     SMC100C SMC;
     serialib StageSerial;
 
@@ -54,6 +55,11 @@ signals:
      * \param ErrorString to be shown
      */
     void StageError(QString ErrorString);
+    /*!
+     * \brief StageConnected
+     * Signals to main window that a connection to the stage was initiated from
+     */
+    void StageConnected();
 
 private:
     void GetValues();

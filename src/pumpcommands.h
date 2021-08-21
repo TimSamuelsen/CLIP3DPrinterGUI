@@ -22,6 +22,9 @@ public:
     PumpCommands& operator=(PumpCommands &&) = delete;        //Move assign
 
     serialib PumpSerial;
+    bool isConnected;
+
+    bool PumpInitConnection(const char* COMport);
 
     int StartInfusion();
     int StartWithdraw();
@@ -57,6 +60,11 @@ signals:
      * \param ErrorString Error string to be shown
      */
     void PumpError(QString ErrorString);
+    /*!
+     * \brief StageConnected
+     * Signals to main window that a connection to the pump was initiated
+     */
+    void PumpConnected();
 
 private:
     char* SerialRead();
