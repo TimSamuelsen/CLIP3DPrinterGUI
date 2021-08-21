@@ -179,7 +179,7 @@ void imageprocessing::bitEncode24()
 
     merge(channel,3,ImageOut);
     QPixmap newImage = QPixmap::fromImage(QImage((unsigned char*) ImageOut.data, ImageOut.cols, ImageOut.rows, QImage::Format_BGR888));
-    ui->ImageDisplay->setPixmap(newImage.scaled(853,533));
+    ui->ImageDisplay->setPixmap(newImage.scaled(671,411));
 
     QString ImageName = TargetDestination + "/" + QString::number(encode24Count) + ".tiff";
     imwrite(ImageName.toUtf8().constData(), ImageOut);

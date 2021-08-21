@@ -843,16 +843,14 @@ void MainWindow::on_StageConnectButton_clicked()
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
     if (Stage.StageInit(COM, m_PrintSettings.StageType) == true
-        && Stage.StageHome(m_PrintSettings.StageType) == true)
-    {
+        && Stage.StageHome(m_PrintSettings.StageType) == true){
         PrintToTerminal("Stage Connected");
         ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0);border: 1px solid black;");
         ui->StageConnectionIndicator->setText("Connected");
         Sleep(10);
         emit(on_GetPosition_clicked());
     }
-    else
-    {
+    else {
         PrintToTerminal("Stage Connection Failed");
         ui->StageConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0);border: 1px solid black;");
         ui->StageConnectionIndicator->setText("Disconnected");
@@ -1287,8 +1285,14 @@ bool MainWindow::initConfirmationScreen()
     QMessageBox confScreen;
     QPushButton *cancelButton = confScreen.addButton(QMessageBox::Cancel);
     QPushButton *okButton = confScreen.addButton(QMessageBox::Ok);
-    confScreen.setStyleSheet("QLabel{min-width:300 px; font-size: 24px; text-align:center;} QPushButton{ width:150px; font-size: 18px; } QTextEdit{min-height:150px; font-size: 16px;}");
-    confScreen.setText("Please Confirm Print Parameters");
+    /*confScreen.setStyleSheet("QLabel{min-width:300 px; font-size: 24px; text-align:center;} "
+                             "QPushButton{ width:150px; } "
+                             "QTextEdit{min-height:150px; font-size: 16px;}");*/
+    confScreen.setStyleSheet("QPushButton{ width: 85px; } "
+                             "QLabel{font-size: 20px;}"
+                             "QTextEdit{font-size: 16px;}"
+                             "QScrollArea{ height: 400px");
+    confScreen.setText("Please Confirm Print Parameters "); //nospaces
 
     QString DetailedText;
     if(m_PrintSettings.PrinterType == CLIP30UM){
@@ -1358,34 +1362,30 @@ bool MainWindow::initConfirmationScreen()
     }
     else if (m_PrintSettings.PrinterType == ICLIP){
         if(m_InjectionSettings.ContinuousInjection == ON){
-            DetailedText += "Continuous injection enabled";
+            DetailedText += "Continuous injection enabled\n";
         }
         else{
-            DetailedText += "Continuous injection disabled";
+            DetailedText += "Continuous injection disabled\n";
         }
         DetailedText += "Infusion volume per layer: " + QString::number(m_InjectionSettings.InfusionVolume) + "ul\n";
         DetailedText += "Infusion rate per layer: " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s";
     }
-    DetailedText += " \r\n \r\n";
     confScreen.setDetailedText(DetailedText);
 
     confScreen.exec();
 
-    if (confScreen.clickedButton() == cancelButton)
-    {
+    if (confScreen.clickedButton() == cancelButton){
         PrintToTerminal("Print Parameters Not Confirmed");
         PrintToTerminal("Cancelling Print");
     }
-    else if (confScreen.clickedButton() == okButton)
-    {
+    else if (confScreen.clickedButton() == okButton){
         PrintToTerminal("Print Parameters Confirmed");
         PrintToTerminal(DetailedText);
         PrintToTerminal("Proceding to Stage Movement and Image Upload");
         retVal = true;
     }
-    else
-    {
-        PrintToTerminal("ConfScreen Error");
+    else{
+        showError("Confirmation Screen Error");
     }
     return retVal;
 }
@@ -1397,8 +1397,7 @@ bool MainWindow::initConfirmationScreen()
  */
 bool MainWindow::ValidateSettings(void)
 {
-    if (m_PrintSettings.InitialExposure < 0 || m_PrintSettings.InitialExposure > 400)
-    {
+    if (m_PrintSettings.InitialExposure < 0 || m_PrintSettings.InitialExposure > 400){
         showError("Invalid initial exposure time");
         PrintToTerminal("InvalidSliceThickness");
     }
@@ -1428,7 +1427,9 @@ bool MainWindow::ValidateSettings(void)
         return false;
     }
     //Validate StageMinEndOfRun
-    else if (m_PrintSettings.MinEndOfRun < -5 || m_PrintSettings.MinEndOfRun > 65 || m_PrintSettings.MinEndOfRun >= m_PrintSettings.MaxEndOfRun){
+    else if (m_PrintSettings.MinEndOfRun < -5
+             || m_PrintSettings.MinEndOfRun > 65
+             || m_PrintSettings.MinEndOfRun >= m_PrintSettings.MaxEndOfRun){
         showError("Invalid Min End Of Run");
         PrintToTerminal("Invalid Min End Of Run");
         return false;
