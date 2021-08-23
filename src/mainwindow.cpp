@@ -233,6 +233,7 @@ void MainWindow::PrintProcess()
                                                               m_InjectionSettings.ContinuousInjection);
             m_PrintControls.remainingImages = imagesUploaded;
         }
+
         SetExposureTimer();
         PrintControl.PrintProcessHandler(&m_PrintControls, m_PrintSettings.InitialExposure);
     }
@@ -262,7 +263,7 @@ void MainWindow::ExposureTimeSlot(void)
     //Set dark timer first for most accurate timing
     SetDarkTimer();
     //Record current time in terminal
-    ui->ProgramPrints->append(QTime::currentTime().toString("hh.mm.ss.zzz"));
+    PrintToTerminal("Exp. end: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
     updatePlot(); //update plot early in dark time
 
     //Video pattern mode handling
@@ -291,6 +292,7 @@ void MainWindow::ExposureTimeSlot(void)
 void MainWindow::DarkTimeSlot(void)
 {
     PrintProcess();
+    ui->ProgramPrints->append(QTime::currentTime().toString("hh.mm.ss.zzz"));
 }
 
 /*!
@@ -349,7 +351,7 @@ void MainWindow::SetDarkTimer()
             }
         }
         QTimer::singleShot(DarkTimeSelect/1000,  Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
-        ui->ProgramPrints->append("Dark time: " + QString::number(DarkTimeSelect));
+        PrintToTerminal("Dark time: " + QString::number(DarkTimeSelect/1000) + " ms");
     }
     else{
         if (m_PrintControls.inMotion == false){
@@ -1952,7 +1954,7 @@ void MainWindow::VP8bitWorkaround()
         }
         //update nSlice
     }
-    DLP.AddPatterns(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
+    DLP.AddPatterns2(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
     PrintToTerminal("Etime: " + QString::number(ExposureTimeList.count()) + ", Dtime: " + QString::number(DarkTimeList.count()) + ", LEDlist: " + QString::number(LEDlist.count()) + ", Images: " + QString::number(imageList.count()));
 }
 
@@ -1987,12 +1989,13 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
 {
     QStringList ImageList;
     QListWidgetItem * item;
-    static uint InitialExposureCount = m_PrintSettings.InitialExposure;
+    int InitialExposureCount = m_PrintSettings.InitialExposure;
     if (m_PrintControls.InitialExposureFlag == ON){ //If in initial POTF upload
         m_PrintControls.nSlice = ui->FileList->count();
-            item = ui->FileList->item(0);
-        for (uint i = 1; i < (m_PrintSettings.InitialExposure); i++){
+        item = ui->FileList->item(0);
+        while (InitialExposureCount > 0){
             ImageList << item->text();
+            InitialExposureCount -= 5;
         }
         if (m_PrintSettings.ProjectionMode == POTF){
             for (int i = 1; i < ui->FileList->count(); i++){
@@ -2031,6 +2034,9 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
             }
             ui->ProgramPrints->append(QString::number(j) + " patterns uploaded");
         }
+    }
+    for (uint i = 0; i < ImageList.count(); i++){
+        PrintToTerminal(ImageList.at(i));
     }
     return ImageList;
 }

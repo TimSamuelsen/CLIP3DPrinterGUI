@@ -94,17 +94,24 @@ void printcontrol::StartPrint(PrintSettings m_PrintSettings, PrintScripts m_Prin
 int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintControls, PrintSettings m_PrintSettings,
                                   PrintScripts m_PrintScript, bool ContinuousInjection)
 {
+    emit ControlPrintSignal("Entering Reupload");
     if(m_PrintSettings.MotionMode == CONTINUOUS){       // Continuous stage movement is stopped
         pc_Stage.StageStop(m_PrintSettings.StageType);  // during reupload
+        emit ControlPrintSignal("Pausing Continuous Stage Movement");
     }
     if(ContinuousInjection){        // Continuous Injection is stopped during reupload
         pc_Pump.Stop();
+        emit ControlPrintSignal("Pausing Continuous Injection");
     }
     int UploadedImages = pc_DLP.PatternUpload(ImageList, m_PrintControls, m_PrintSettings, m_PrintScript);
+    emit ControlPrintSignal(QString::number(UploadedImages) + " images uploaded");
     if(ContinuousInjection){        // Restarting continous injection after reupload
         pc_Pump.SetTargetVolume(0);
         pc_Pump.StartInfusion();
     }
+
+    pc_DLP.startPatSequence();      // Restart projection after reupload
+
     return UploadedImages;
 }
 

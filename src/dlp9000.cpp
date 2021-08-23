@@ -43,6 +43,10 @@ void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, 
     if(m_PrintSettings.BitMode == 0){
         m_PrintSettings.BitMode = 1; //Default bitmode to 1 if it somehow gets passed in undefined
     }
+    int InitialExposureCount = 0;
+    if(m_PrintControls.InitialExposureFlag && m_PrintSettings.ProjectionMode == POTF){
+        InitialExposureCount = m_PrintSettings.InitialExposure;
+    }
     uint CurrentImage = m_PrintControls.layerCount;
     int i;
     int BitPos = 0;
@@ -144,15 +148,16 @@ void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, 
             {
                 pattern.bits = m_PrintSettings.BitMode;
                 pattern.color = PatternElement::BLUE;
-                if (m_PrintScripts.PrintScript == ON)
-                {
+                if (InitialExposureCount > 0){
+
+                }
+                else if (m_PrintScripts.PrintScript == ON){
                     pattern.exposure = m_PrintScripts.ExposureScriptList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
                     pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(CurrentImage).toInt() * 1000;
-                    printf("%d, %d \r\n", pattern.exposure, pattern.darkPeriod);
+                    printf("exp: %d, dt: %d \r\n", pattern.exposure, pattern.darkPeriod);
                     CurrentImage++; //Should this be done before?
                 }
-                else
-                {
+                else{
                     pattern.exposure = m_PrintSettings.ExposureTime;
                     pattern.darkPeriod = m_PrintSettings.DarkTime;
                 }
@@ -197,23 +202,6 @@ void DLP9000::AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, 
             //m_patternImageChange = true;
         }
     }
-#if 0
-    if (m_elements.size() > 0)
-    {
-        waveWindow->updatePatternList(m_elements);
-        waveWindow->draw();
-        ui->zoomSlider->setEnabled(true);
-        ui->selectAllButton->setEnabled(true);
-        ui->ptnSetting_groupBox->setEnabled(true);
-        ui->clearPattern_checkbox->setEnabled(true);
-        ui->removePatternsButton->setEnabled(true);
-        on_patternSelect(m_elements.size()-1,m_elements);
-        isPatternLoaded = TRUE;
-        ui->editLUT_Button->setEnabled(TRUE);
-    }
-#endif
-
-    //updatePtnCheckbox();
     return;
 }
 /***************Helper Functions**************************/
@@ -611,7 +599,7 @@ int DLP9000::PatternUpload(QStringList ImageList, PrintControls dlp_PrintControl
     LCR_PatternDisplay(0);
     if (dlp_PrintControls.nSlice > 0)
     {
-        AddPatterns(ImageList, dlp_PrintSettings, dlp_PrintScript, dlp_PrintControls);
+        AddPatterns2(ImageList, dlp_PrintSettings, dlp_PrintScript, dlp_PrintControls);
         updateLUT(dlp_PrintSettings.ProjectionMode);
         clearElements();
     }
@@ -627,6 +615,116 @@ void DLP9000::PatternDisplay(int DisplaySetting)
 {
     LCR_PatternDisplay(DisplaySetting);
 }
+
+
+void DLP9000::AddPatterns2(QStringList fileNames, PrintSettings m_PrintSettings, PrintScripts m_PrintScripts, PrintControls m_PrintControls)
+{
+    if(m_PrintSettings.BitMode == 0){
+        m_PrintSettings.BitMode = 1; //Default bitmode to 1 if it somehow gets passed in undefined
+    }
+    int InitialExposureCount = 0;
+    if(m_PrintControls.InitialExposureFlag){
+        InitialExposureCount = m_PrintSettings.InitialExposure;
+    }
+    uint CurrentImage = m_PrintControls.layerCount;
+    int i;
+    int BitPos = 0;
+    int numPatAdded = 0;
+
+    if(fileNames.isEmpty())
+    {
+        emit DLPError("No image files found");
+        return;
+    }
+    QDir dir = QFileInfo(QFile(fileNames.at(0))).absoluteDir();     //TODO: Make sure this doesn't interfere
+    m_ptnImagePath = dir.absolutePath();                            //      with Video Pattern mode
+
+    for(i = 0; i < fileNames.size(); i++){
+        PatternElement pattern;
+
+        pattern.bits = m_PrintSettings.BitMode;
+        pattern.color = PatternElement::BLUE;
+        if(InitialExposureCount > 0){
+            if (InitialExposureCount > 5){
+                pattern.exposure = 5*1000*1000;     // 5s = 5 000 000 us, don't want to go above 5s!
+                InitialExposureCount -= 5;
+            }
+            else{
+                pattern.exposure = InitialExposureCount*1000*1000;
+                InitialExposureCount = 0;
+            }
+            pattern.darkPeriod = 0;
+            printf("iexp: %d, dt: %d", pattern.exposure, pattern.darkPeriod);
+
+        }
+        else if (m_PrintScripts.PrintScript == ON){
+            pattern.exposure = m_PrintScripts.ExposureScriptList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
+            pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(CurrentImage).toInt() * 1000;
+            printf("exp: %d, dt: %d \r\n", pattern.exposure, pattern.darkPeriod);
+            CurrentImage++; //Should this be done before?
+        }
+        else{
+            pattern.exposure = m_PrintSettings.ExposureTime;
+            pattern.darkPeriod = m_PrintSettings.DarkTime;
+        }
+        pattern.trigIn = false;
+        pattern.trigOut2 = true;
+        pattern.clear = true;
+
+        if(m_PrintSettings.ProjectionMode == POTF){
+            if (m_elements.size() != 0){
+                pattern.splashImageIndex = m_elements[m_elements.size()-1].splashImageIndex;
+                pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos;
+            }
+            pattern.name = fileNames.at(i);
+            printf(pattern.name.toLatin1());
+            printf("\r\n");
+        }
+        else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
+            pattern.splashImageIndex = 0;
+            if (m_elements.size() == 0){
+                BitPos += m_PrintSettings.BitMode;
+                pattern.splashImageBitPos = 0;
+            }
+            else{
+                if(m_PrintControls.InitialExposureFlag){
+                    pattern.splashImageBitPos = 0;
+                }
+                else{
+                    pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos
+                                                + m_elements[m_elements.size()-1].bits;
+                    if (BitPos > 23){
+                        BitPos = 0;
+                    }
+                    printf(",BP: %d,", BitPos);
+                    pattern.splashImageBitPos = BitPos;
+                    BitPos += m_PrintSettings.BitMode;
+                    printf("BitPos: %d \r\n", pattern.splashImageBitPos);
+                }
+            }
+
+        }
+        pattern.selected = true;
+        m_elements.append(pattern);
+        numPatAdded++;
+
+    }
+    printf("%d Patterns Added",numPatAdded);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
