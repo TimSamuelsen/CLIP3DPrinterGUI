@@ -1,6 +1,13 @@
+.wy-nav-content {
+    max-width: 900px;
+}
 
 .wy-menu-vertical header, .wy-menu-vertical p.caption {
-	color: #eee6cb;
+	color: #ddcf99;
+}
+
+.wy-side-nav-search, .wy-nav-top {
+      background: #8c1515;
 }
 
 .wy-menu-vertical a {
@@ -15,3 +22,4 @@
 
 .wy-side-nav-search input[type=text] {
 	border-color: rgba(7, 78, 104, 0.83);
+}

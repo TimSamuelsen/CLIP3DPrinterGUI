@@ -1,0 +1,1811 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.1" xml:lang="en-US">
+  <compounddef id="class_main_window" kind="class" language="C++" prot="public">
+    <compoundname>MainWindow</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">QMainWindow</basecompoundref>
+      <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="class_main_window_1a26672bbdddb9a42b606d5d83d0cef2ed" prot="public" static="no" mutable="no">
+        <type><ref refid="classimagepopout" kindref="compound">imagepopout</ref></type>
+        <definition>imagepopout MainWindow::popout</definition>
+        <argsstring></argsstring>
+        <name>popout</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="24" column="17" bodyfile="mainwindow.h" bodystart="24" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1a3444912e6f49106298f37a2989e2422d" prot="public" static="no" mutable="no">
+        <type><ref refid="classprintcontrol" kindref="compound">printcontrol</ref></type>
+        <definition>printcontrol MainWindow::PrintControl</definition>
+        <argsstring></argsstring>
+        <name>PrintControl</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="25" column="18" bodyfile="mainwindow.h" bodystart="25" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_main_window_1a35466a70ed47252a0191168126a352a5" prot="private" static="no" mutable="no">
+        <type>Ui::MainWindow *</type>
+        <definition>Ui::MainWindow* MainWindow::ui</definition>
+        <argsstring></argsstring>
+        <name>ui</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="154" column="20" bodyfile="mainwindow.h" bodystart="154" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1ac0dc2155daa28877de41b0f3420ded65" prot="private" static="no" mutable="no">
+        <type><ref refid="struct_print_scripts" kindref="compound">PrintScripts</ref></type>
+        <definition>PrintScripts MainWindow::m_PrintScript</definition>
+        <argsstring></argsstring>
+        <name>m_PrintScript</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="155" column="18" bodyfile="mainwindow.h" bodystart="155" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1ac6c1955058cd99f2bdebf5aaa36988c3" prot="private" static="no" mutable="no">
+        <type><ref refid="struct_print_settings" kindref="compound">PrintSettings</ref></type>
+        <definition>PrintSettings MainWindow::m_PrintSettings</definition>
+        <argsstring></argsstring>
+        <name>m_PrintSettings</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="156" column="19" bodyfile="mainwindow.h" bodystart="156" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1aabd5fd95fd204f30e54c2af032fb2543" prot="private" static="no" mutable="no">
+        <type><ref refid="struct_print_controls" kindref="compound">PrintControls</ref></type>
+        <definition>PrintControls MainWindow::m_PrintControls</definition>
+        <argsstring></argsstring>
+        <name>m_PrintControls</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="157" column="19" bodyfile="mainwindow.h" bodystart="157" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1a919944619dba5c0ce9516c5c5c07df99" prot="private" static="no" mutable="no">
+        <type><ref refid="struct_injection_settings" kindref="compound">InjectionSettings</ref></type>
+        <definition>InjectionSettings MainWindow::m_InjectionSettings</definition>
+        <argsstring></argsstring>
+        <name>m_InjectionSettings</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="158" column="23" bodyfile="mainwindow.h" bodystart="158" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1ac515ae1dba9e52d251ffc5c618154b21" prot="private" static="no" mutable="no">
+        <type><ref refid="class_manual_stage_control" kindref="compound">ManualStageControl</ref> *</type>
+        <definition>ManualStageControl* MainWindow::ManualStageUI</definition>
+        <argsstring></argsstring>
+        <name>ManualStageUI</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="159" column="24" bodyfile="mainwindow.h" bodystart="159" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1a622e5763bbf8d5912c91df500a29ff66" prot="private" static="no" mutable="no">
+        <type><ref refid="classmanualpumpcontrol" kindref="compound">manualpumpcontrol</ref> *</type>
+        <definition>manualpumpcontrol* MainWindow::ManualPumpUI</definition>
+        <argsstring></argsstring>
+        <name>ManualPumpUI</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="160" column="23" bodyfile="mainwindow.h" bodystart="160" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1acab65b11d730852e7014e50229131df1" prot="private" static="no" mutable="no">
+        <type><ref refid="classimageprocessing" kindref="compound">imageprocessing</ref> *</type>
+        <definition>imageprocessing* MainWindow::ImageProcessUI</definition>
+        <argsstring></argsstring>
+        <name>ImageProcessUI</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="161" column="21" bodyfile="mainwindow.h" bodystart="161" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1a3f55fd4952af654c217c943f5a17fd2e" prot="private" static="no" mutable="no">
+        <type><ref refid="classimagepopout" kindref="compound">imagepopout</ref> *</type>
+        <definition>imagepopout* MainWindow::ImagePopoutUI</definition>
+        <argsstring></argsstring>
+        <name>ImagePopoutUI</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="162" column="17" bodyfile="mainwindow.h" bodystart="162" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1a70198cb08d2b91b5a30a4c3b95559262" prot="private" static="no" mutable="no">
+        <type>QTime</type>
+        <definition>QTime MainWindow::PrintStartTime</definition>
+        <argsstring></argsstring>
+        <name>PrintStartTime</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="163" column="11" bodyfile="mainwindow.h" bodystart="163" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1afc9cc6f217d538495fbe77173f1e9b7c" prot="private" static="no" mutable="no">
+        <type>double</type>
+        <definition>double MainWindow::GetPosition</definition>
+        <argsstring></argsstring>
+        <name>GetPosition</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="164" column="12" bodyfile="mainwindow.h" bodystart="164" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1a0db7bf6852ae93300e637480ab1e290a" prot="private" static="no" mutable="no">
+        <type>QVector&lt; double &gt;</type>
+        <definition>QVector&lt;double&gt; MainWindow::qv_x</definition>
+        <argsstring></argsstring>
+        <name>qv_x</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="171" column="13" bodyfile="mainwindow.h" bodystart="171" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_main_window_1a5d8813f1ebdab64b1840881b7efbc9f3" prot="private" static="no" mutable="no">
+        <type>QVector&lt; double &gt;</type>
+        <definition>QVector&lt;double&gt; MainWindow::qv_y</definition>
+        <argsstring></argsstring>
+        <name>qv_y</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="171" column="18" bodyfile="mainwindow.h" bodystart="171" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_main_window_1a996c5a2b6f77944776856f08ec30858d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>MainWindow::MainWindow</definition>
+        <argsstring>(QWidget *parent=nullptr)</argsstring>
+        <name>MainWindow</name>
+        <param>
+          <type>QWidget *</type>
+          <declname>parent</declname>
+          <defval>nullptr</defval>
+        </param>
+        <briefdescription>
+<para><ref refid="class_main_window_1a996c5a2b6f77944776856f08ec30858d" kindref="member">MainWindow::MainWindow</ref>. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>parent</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Creates the mainwindow, gets current time for print log, loads and initializes saved settings and initializes plot </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="22" column="5" bodyfile="mainwindow.cpp" bodystart="55" bodyend="83"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1ae98d00a93bc118200eeef9f9bba1dba7" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type></type>
+        <definition>MainWindow::~MainWindow</definition>
+        <argsstring>()</argsstring>
+        <name>~MainWindow</name>
+        <briefdescription>
+<para><ref refid="class_main_window_1ae98d00a93bc118200eeef9f9bba1dba7" kindref="member">MainWindow::~MainWindow</ref> Called when the main window is closed. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="23" column="5" bodyfile="mainwindow.cpp" bodystart="89" bodyend="93"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-slot">
+      <memberdef kind="slot" id="class_main_window_1ae8639d864d9411e3c252e170a848643a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::showError</definition>
+        <argsstring>(QString errMsg)</argsstring>
+        <name>showError</name>
+        <param>
+          <type>QString</type>
+          <declname>errMsg</declname>
+        </param>
+        <briefdescription>
+<para><ref refid="class_main_window_1ae8639d864d9411e3c252e170a848643a" kindref="member">MainWindow::showError</ref> helper function to show the appropriate API Error message. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>errMsg</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>- I - error messgae to be shown </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="28" column="10" bodyfile="mainwindow.cpp" bodystart="1016" bodyend="1028"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1aa2ff71ea8af4bec75a490343dab56c37" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::PrintToTerminal</definition>
+        <argsstring>(QString StringToPrint)</argsstring>
+        <name>PrintToTerminal</name>
+        <param>
+          <type>QString</type>
+          <declname>StringToPrint</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="29" column="10" bodyfile="mainwindow.cpp" bodystart="1765" bodyend="1768"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-slot">
+      <memberdef kind="slot" id="class_main_window_1a6cfab4cd70c7489f597d2278da93bf8e" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_ManualStage_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_ManualStage_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_ManualStage_clicked Open the manual stage control window, sends home command to stage and closes mainwindow connection. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="32" column="10" bodyfile="mainwindow.cpp" bodystart="100" bodyend="115"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a3513f77e543f1b077d893f9d47399983" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetSliceThickness_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetSliceThickness_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetSliceThickness_clicked Sets m_PrintSettings.LayerThickness variable from the value inputted by the user. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="34" column="10" bodyfile="mainwindow.cpp" bodystart="847" bodyend="851"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a1d8af3ff2a6182241b71f70f491a3940" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetStageVelocity_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetStageVelocity_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetStageVelocity_clicked Sets StageVelocity variable from the value inputted by the user, also directly sends command to stage to set velocity. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="36" column="10" bodyfile="mainwindow.cpp" bodystart="858" bodyend="863"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a5d60939509656c9bbfcd56fe4ce537be" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetStageAcceleration_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetStageAcceleration_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetStageAcceleration_clicked Sets StageAcceleration variable from the value inputted by the user, also directly sends command to stage to set acceleration. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="38" column="10" bodyfile="mainwindow.cpp" bodystart="870" bodyend="875"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a4e61bc357ff0a51ecee88f1c04cfe9b6" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetMaxEndOfRun_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetMaxEndOfRun_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetMaxEndOfRun_clicked Sets MaxEndOfRun variable from the value inputted by the user, also directly sends command to stage to set max end of run. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="40" column="10" bodyfile="mainwindow.cpp" bodystart="882" bodyend="887"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a2f771e90f834d84717b7abfd16160eeb" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetMinEndOfRun_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetMinEndOfRun_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetMinEndOfRun_clicked Sets MinEndOfRun variable from the value inputted by the user, also directly sends command to stage to set min end of run. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="42" column="10" bodyfile="mainwindow.cpp" bodystart="894" bodyend="899"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1af1d4099bf6ba12186186a52e747d172c" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetExposureTime_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetExposureTime_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetExposureTime_clicked Sets ExposureTime variable from the value selected by the user. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="44" column="10" bodyfile="mainwindow.cpp" bodystart="916" bodyend="920"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a4c81a110505ade6caf7fa75359cc038f" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetUVIntensity_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetUVIntensity_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetUVIntensity_clicked Sets UVIntensity from the value selected by the user. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="46" column="10" bodyfile="mainwindow.cpp" bodystart="926" bodyend="930"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a0c53bfcf210857f3933ddd9bb0bf15b7" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetDarkTime_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetDarkTime_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetDarkTime_clicked Sets DarkTime variable from the value selected by the user. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="48" column="10" bodyfile="mainwindow.cpp" bodystart="906" bodyend="910"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a86e11bd17bb5cbdd16bdc1d0f9799783" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_LiveValueList1_activated</definition>
+        <argsstring>(const QString &amp;arg1)</argsstring>
+        <name>on_LiveValueList1_activated</name>
+        <param>
+          <type>const QString &amp;</type>
+          <declname>arg1</declname>
+        </param>
+        <briefdescription>
+<para>MainWindow::on_LiveValueList1_activated. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>arg1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Currently Not In Use </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="50" column="10" bodyfile="mainwindow.cpp" bodystart="1843" bodyend="1846"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a2acec2bae55c6ec7f0a30890402e7372" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_LiveValueList2_activated</definition>
+        <argsstring>(const QString &amp;arg1)</argsstring>
+        <name>on_LiveValueList2_activated</name>
+        <param>
+          <type>const QString &amp;</type>
+          <declname>arg1</declname>
+        </param>
+        <briefdescription>
+<para>MainWindow::on_LiveValueList2_activated. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>arg1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Currently Not In Use </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="52" column="10" bodyfile="mainwindow.cpp" bodystart="1853" bodyend="1856"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a00190e0fb4195c192444e4713967012f" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_LiveValueList3_activated</definition>
+        <argsstring>(const QString &amp;arg1)</argsstring>
+        <name>on_LiveValueList3_activated</name>
+        <param>
+          <type>const QString &amp;</type>
+          <declname>arg1</declname>
+        </param>
+        <briefdescription>
+<para>MainWindow::on_LiveValueList3_activated. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>arg1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Currently Not In Use </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="54" column="10" bodyfile="mainwindow.cpp" bodystart="1863" bodyend="1866"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1ae12b8ae605480e2f4c685bdb4e873e10" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_LiveValueList4_activated</definition>
+        <argsstring>(const QString &amp;arg1)</argsstring>
+        <name>on_LiveValueList4_activated</name>
+        <param>
+          <type>const QString &amp;</type>
+          <declname>arg1</declname>
+        </param>
+        <briefdescription>
+<para>MainWindow::on_LiveValueList4_activated. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>arg1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Currently Not In Use </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="56" column="10" bodyfile="mainwindow.cpp" bodystart="1873" bodyend="1876"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a5e9ce7dfbdb1f4729ba8370581538c66" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_LiveValueList5_activated</definition>
+        <argsstring>(const QString &amp;arg1)</argsstring>
+        <name>on_LiveValueList5_activated</name>
+        <param>
+          <type>const QString &amp;</type>
+          <declname>arg1</declname>
+        </param>
+        <briefdescription>
+<para>MainWindow::on_LiveValueList5_activated. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>arg1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Currently Not In Use </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="58" column="10" bodyfile="mainwindow.cpp" bodystart="1883" bodyend="1886"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a7658a943ae58d539e5fefa9569501036" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_LiveValueList6_activated</definition>
+        <argsstring>(const QString &amp;arg1)</argsstring>
+        <name>on_LiveValueList6_activated</name>
+        <param>
+          <type>const QString &amp;</type>
+          <declname>arg1</declname>
+        </param>
+        <briefdescription>
+<para>MainWindow::on_LiveValueList6_activated. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>arg1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Currently Not In Use </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="60" column="10" bodyfile="mainwindow.cpp" bodystart="1893" bodyend="1896"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a73cd41c533723618e1f93cc82a0051bd" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_ResinSelect_activated</definition>
+        <argsstring>(const QString &amp;arg1)</argsstring>
+        <name>on_ResinSelect_activated</name>
+        <param>
+          <type>const QString &amp;</type>
+          <declname>arg1</declname>
+        </param>
+        <briefdescription>
+<para>MainWindow::on_ResinSelect_activated. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>arg1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The resin selected Prints the resin selected to the terminal </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="62" column="10" bodyfile="mainwindow.cpp" bodystart="700" bodyend="703"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a46211fd911aeb1f16ef2224a0675168d" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_InitializeAndSynchronize_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_InitializeAndSynchronize_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_InitializeAndSynchronize_clicked Prepares the system for printing, moves stage to starting position inits plot, uploads images to the light engine. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="64" column="10" bodyfile="mainwindow.cpp" bodystart="1906" bodyend="1931"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1acc26f664fa0012540d6a6b276c132af7" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_StartPrint_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_StartPrint_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_StartPrint_clicked Starts print process, set LED current calculates speed for continuous motion mode. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="66" column="10" bodyfile="mainwindow.cpp" bodystart="1937" bodyend="1948"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1aafec2d28f86caff512561dc15a2987d5" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_StageConnectButton_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_StageConnectButton_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_StageConnectButton_clicked Connects to stage, if succesful gets position, sends home commands and gets position. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="68" column="10" bodyfile="mainwindow.cpp" bodystart="648" bodyend="668"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a1b781d7ee27a5e7a2aa6251d2b0497a5" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_LightEngineConnectButton_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_LightEngineConnectButton_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_LightEngineConnectButton_clicked Connect to light engine, gets last error code to validate that no errors have occured and connection is working. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="70" column="10" bodyfile="mainwindow.cpp" bodystart="617" bodyend="641"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a828ce6ce5d3f18a016fd710027e0b664" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SelectFile_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SelectFile_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SelectFile_clicked Select all object image files to project. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="72" column="10" bodyfile="mainwindow.cpp" bodystart="447" bodyend="466"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a0c98942097d997b23d207807e696a7f0" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_ClearImageFiles_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_ClearImageFiles_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_ClearImageFiles_clicked Clear image files selected. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="74" column="10" bodyfile="mainwindow.cpp" bodystart="482" bodyend="485"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1ab3acc7248fa6a4d4bd11aeb4f488d349" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::ExposureTimeSlot</definition>
+        <argsstring>()</argsstring>
+        <name>ExposureTimeSlot</name>
+        <briefdescription>
+<para>MainWindow::ExposureTimeSlot Handles all dark time actions required. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="76" column="10" bodyfile="mainwindow.cpp" bodystart="1991" bodyend="2016"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1ac5aa9824bee6acab5cf080d48953b3c2" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::DarkTimeSlot</definition>
+        <argsstring>()</argsstring>
+        <name>DarkTimeSlot</name>
+        <briefdescription>
+<para>MainWindow::DarkTimeSlot Dummy slot, may be removed. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="78" column="10" bodyfile="mainwindow.cpp" bodystart="2022" bodyend="2025"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a5efa79f28cfc5e18c8f05de92ea24d88" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::PrintProcess</definition>
+        <argsstring>()</argsstring>
+        <name>PrintProcess</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="80" column="10" bodyfile="mainwindow.cpp" bodystart="1961" bodyend="1974"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a413ca68deb2659c88e588eb44d82e1b9" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::saveText</definition>
+        <argsstring>()</argsstring>
+        <name>saveText</name>
+        <briefdescription>
+<para>MainWindow::saveText Saves Terminal Window printout to .txt log upon print completion or abort. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="82" column="10" bodyfile="mainwindow.cpp" bodystart="1035" bodyend="1050"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a57a6d3de9e6b7feec3fb9d84953d8e05" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_LogFileBrowse_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_LogFileBrowse_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_LogFileBrowse_clicked Select directory to store log files. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="84" column="10" bodyfile="mainwindow.cpp" bodystart="472" bodyend="476"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1ae0a0ace622166c749319adebf7ffdfba" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetStartingPosButton_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetStartingPosButton_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetStartingPosButton_clicked Sets Starting Position variable from the value inputted by the user (also doubles as debug tool for GetPosition(), will be removed) </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="86" column="10" bodyfile="mainwindow.cpp" bodystart="833" bodyend="841"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a0189e2c8cdb07e297dec85e9195aab0f" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_AbortPrint_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_AbortPrint_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_AbortPrint_clicked Aborts print and acts as e-stop. Stops light engine projection, stage movement and print process. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="88" column="10" bodyfile="mainwindow.cpp" bodystart="1955" bodyend="1959"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1aa1448a570793fc6986f5a902bea6b338" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetIntialAdhesionTimeButton_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetIntialAdhesionTimeButton_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetIntialAdhesionTimeButton_clicked Sets InitialExposure variable from the value inputted by the user. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="90" column="10" bodyfile="mainwindow.cpp" bodystart="822" bodyend="826"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a112d899733205b7793eb4e085d33ace8" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_AutoCheckBox_stateChanged</definition>
+        <argsstring>(int arg1)</argsstring>
+        <name>on_AutoCheckBox_stateChanged</name>
+        <param>
+          <type>int</type>
+          <declname>arg1</declname>
+        </param>
+        <briefdescription>
+<para>MainWindow::on_AutoCheckBox_stateChanged. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>arg1</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The state of the AutoCheckBox If AutoCheckBox is set, go into auto mode </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="92" column="10" bodyfile="mainwindow.cpp" bodystart="710" bodyend="756"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a33ef77e731cfefab6adb3bcc40a175a6" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_setPrintSpeed_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_setPrintSpeed_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_setPrintSpeed_clicked Sets PrintSpeed variable from value inputted by user, also triggers automode. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="94" column="10" bodyfile="mainwindow.cpp" bodystart="800" bodyend="805"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a4de79c63c7fa0b8d7c468ac71f20be81" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_pushButton_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_pushButton_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_pushButton_clicked Opens the Manual Pump Control window and closes the mainwindow pump connection. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="96" column="10" bodyfile="mainwindow.cpp" bodystart="122" bodyend="130"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a2f7f1749fc6e7d100c281b21902c1017" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_PumpConnectButton_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_PumpConnectButton_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_PumpConnectButton_clicked Connects to pump. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="98" column="10" bodyfile="mainwindow.cpp" bodystart="674" bodyend="692"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a63b09df5175258487d67c8eb60ecea97" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_GetPosition_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_GetPosition_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_GetPosition_clicked Gets position, saves it in module level variable GetPosition, updates slider and prints to terminal window. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="100" column="10" bodyfile="mainwindow.cpp" bodystart="149" bodyend="170"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1af82d7e114605ded00c7dae0acae21f8c" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetMaxImageUpload_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetMaxImageUpload_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetMaxImageUpload_clicked Sets the max image upload, used to avoid large error buildup or large wait times due to large uploads. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="102" column="10" bodyfile="mainwindow.cpp" bodystart="775" bodyend="793"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a29b3c6380c2121abc85238d2fbf411a6" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetPrintHeight_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetPrintHeight_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetPrintHeight_clicked Sets PrintHeight variable from value inputted by user, also triggers automode. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="104" column="10" bodyfile="mainwindow.cpp" bodystart="811" bodyend="816"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a2d7ead38298eb0b737d143eeb84dd2d4" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_AutoCheckBox_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_AutoCheckBox_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_AutoCheckBox_clicked Guard on edge case that sets the checkbox while it&apos;s actual state is unchecked. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="106" column="10" bodyfile="mainwindow.cpp" bodystart="762" bodyend="768"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a2ec1b267ccab653ed4ce5b776b5a2924" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_UsePrintScript_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_UsePrintScript_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_UsePrintScript_clicked Used to select whether to use set print variables or print script. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="108" column="10" bodyfile="mainwindow.cpp" bodystart="491" bodyend="527"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a78643099dcb1648fe416955ba005e792" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SelectPrintScript_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SelectPrintScript_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SelectPrintScript_clicked User selects print script from file, the print script is parsed and the exposure time and LED intensity is stored in module level QStringLists: ExposureScriptList and LEDScriptList. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="110" column="10" bodyfile="mainwindow.cpp" bodystart="535" bodyend="601"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a20c58318df05b38a8da83cb1dafd94f0" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_ClearPrintScript_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_ClearPrintScript_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_ClearPrintScript_clicked Clears selected print list. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="112" column="10" bodyfile="mainwindow.cpp" bodystart="607" bodyend="610"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a377d7e34b4fdab406624b799e5e8c37d" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_ImageProcess_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_ImageProcess_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_ImageProcess_clicked Opens the image processing window. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="114" column="10" bodyfile="mainwindow.cpp" bodystart="136" bodyend="142"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a19fa025bd65c7a5b52f232181c132d29" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_POTFcheckbox_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_POTFcheckbox_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_POTFcheckbox_clicked Sets projection mode to POTF. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="116" column="10" bodyfile="mainwindow.cpp" bodystart="177" bodyend="188"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1afd171478e098f4fc24bab78db5de3561" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_VP_HDMIcheckbox_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_VP_HDMIcheckbox_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_VP_HDMIcheckbox_clicked Sets projection mode to Video Pattern. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="118" column="10" bodyfile="mainwindow.cpp" bodystart="194" bodyend="216"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a854a427a4f2cdac8a05df8b617453c2b" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::Check4VideoLock</definition>
+        <argsstring>()</argsstring>
+        <name>Check4VideoLock</name>
+        <briefdescription>
+<para>MainWindow::Check4VideoLock Validates that the video source is locked, this is needed for Video Pattern Mode. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="120" column="10" bodyfile="mainwindow.cpp" bodystart="222" bodyend="280"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1aa4794d023fe7810a74e4cc1bf011ca04" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_DICLIPSelect_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_DICLIPSelect_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_DICLIPSelect_clicked Preps the system for use with iCLIP printer. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="122" column="10" bodyfile="mainwindow.cpp" bodystart="308" bodyend="326"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1ad7936c57b591ebd5464146598b639219" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetBitDepth_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetBitDepth_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetBitDepth_clicked Sets the module variable BitMode which is used to determine the bit depth the user wishes to print with. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="124" column="10" bodyfile="mainwindow.cpp" bodystart="358" bodyend="362"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a777e4e52014d26129984afa15e6935ee" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SteppedMotion_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SteppedMotion_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SteppedMotion_clicked Sets motion mode to stepped, this is the default. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="126" column="10" bodyfile="mainwindow.cpp" bodystart="368" bodyend="378"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1acd00d9be200d244c3213ff347568267b" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_ContinuousMotion_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_ContinuousMotion_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_ContinuousMotion_clicked Sets motion mode to continuous. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="128" column="10" bodyfile="mainwindow.cpp" bodystart="384" bodyend="398"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a25299444f0d6ccf0078cf50e59a6da68" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_pumpingCheckBox_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_pumpingCheckBox_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_pumpingCheckBox_clicked Enables pumping mode in which the stage movement is exaggerated to avoid the part sticking to the window. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="130" column="10" bodyfile="mainwindow.cpp" bodystart="405" bodyend="422"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a257119f0aa015b322a5a0deca024f3a8" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_setPumping_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_setPumping_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_setPumping_clicked Sets the pumping depth parameter. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="132" column="10" bodyfile="mainwindow.cpp" bodystart="428" bodyend="438"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1abb420ac3e655e47bf29accf110d78374" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::pumpingSlot</definition>
+        <argsstring>()</argsstring>
+        <name>pumpingSlot</name>
+        <briefdescription>
+<para>MainWindow::pumpingSlot Pumping slot for when pumping is activated, intermediary step between exposure time and dark time. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="134" column="10" bodyfile="mainwindow.cpp" bodystart="1981" bodyend="1985"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a12f4d6eca0fcf4dd1c0fc32121eb1d89" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_CLIPSelect_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_CLIPSelect_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_CLIPSelect_clicked Preps the system for use with the 30 um printer. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="135" column="10" bodyfile="mainwindow.cpp" bodystart="332" bodyend="350"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a9c963d95cb16951b8a9a7be80a906d6f" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetInfuseRate_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetInfuseRate_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetInfuseRate_clicked. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="137" column="10" bodyfile="mainwindow.cpp" bodystart="951" bodyend="956"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a1f1990324db3bdd40126d4614c03aeaf" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetVolPerLayer_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetVolPerLayer_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_SetVolPerLayer_clicked. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="139" column="10" bodyfile="mainwindow.cpp" bodystart="961" bodyend="966"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a2787711affec0b16250221050daf0eba" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_ContinuousInjection_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_ContinuousInjection_clicked</name>
+        <briefdescription>
+<para>MainWindow::on_ContinuousInjection_clicked. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="141" column="10" bodyfile="mainwindow.cpp" bodystart="935" bodyend="946"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1ae96bf26efe87e60b2640ca42fc91b96e" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetInitialVolume_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetInitialVolume_clicked</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="143" column="10" bodyfile="mainwindow.cpp" bodystart="968" bodyend="972"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1ac93222ccfd696e323f5bdb186c32a976" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_PreMovementCheckbox_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_PreMovementCheckbox_clicked</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="145" column="10" bodyfile="mainwindow.cpp" bodystart="974" bodyend="987"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1a03591d3916eb41d91a766704f72ae86d" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_PostMovementCheckbox_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_PostMovementCheckbox_clicked</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="147" column="10" bodyfile="mainwindow.cpp" bodystart="989" bodyend="1002"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1aaf3753010bf9f046739beacaf03769df" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::on_SetInjectionDelay_clicked</definition>
+        <argsstring>()</argsstring>
+        <name>on_SetInjectionDelay_clicked</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="149" column="10" bodyfile="mainwindow.cpp" bodystart="1004" bodyend="1008"/>
+      </memberdef>
+      <memberdef kind="slot" id="class_main_window_1afaec5d8234aad98fdc49858012ea2cb9" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::updatePlot</definition>
+        <argsstring>()</argsstring>
+        <name>updatePlot</name>
+        <briefdescription>
+<para>MainWindow::updatePlot Updates current plot with new stage position. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="151" column="10" bodyfile="mainwindow.cpp" bodystart="1460" bodyend="1507"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-func">
+      <memberdef kind="function" id="class_main_window_1a1bbb9f3ef34f6b256957e63711182061" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool MainWindow::ValidateSettings</definition>
+        <argsstring>(void)</argsstring>
+        <name>ValidateSettings</name>
+        <param>
+          <type>void</type>
+        </param>
+        <briefdescription>
+<para>MainWindow::ValidateSettings. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>bool: true if settings are valid, false otherwise </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="166" column="10" bodyfile="mainwindow.cpp" bodystart="1205" bodyend="1263"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1a9bb1f3b7f6b5360abfd2dc01fc1c8930" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::loadSettings</definition>
+        <argsstring>()</argsstring>
+        <name>loadSettings</name>
+        <briefdescription>
+<para>MainWindow::loadSettings Loads the settings from file to module variables. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="167" column="10" bodyfile="mainwindow.cpp" bodystart="1314" bodyend="1355"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1abb30531afee763d0586ee6323fd332e2" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::saveSettings</definition>
+        <argsstring>()</argsstring>
+        <name>saveSettings</name>
+        <briefdescription>
+<para>MainWindow::saveSettings Saves settings so that they are initialized upon startup. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="168" column="10" bodyfile="mainwindow.cpp" bodystart="1270" bodyend="1308"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1abc629dd51e3495a13850573a308cddf7" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::initSettings</definition>
+        <argsstring>()</argsstring>
+        <name>initSettings</name>
+        <briefdescription>
+<para>MainWindow::initSettings Updates the UI to reflect the settings. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="169" column="10" bodyfile="mainwindow.cpp" bodystart="1361" bodyend="1420"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1a8d56ee932b0e4f531555b18a1708ef82" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::initPlot</definition>
+        <argsstring>()</argsstring>
+        <name>initPlot</name>
+        <briefdescription>
+<para>MainWindow::initPlot Initializes live plotting of stage position. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="170" column="10" bodyfile="mainwindow.cpp" bodystart="1427" bodyend="1454"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1af044c03b15b39c7a980760d0040f7509" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::printParameters</definition>
+        <argsstring>()</argsstring>
+        <name>printParameters</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="172" column="10"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1a0aeb12a1845ffe09871c916af481a9f3" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool MainWindow::initConfirmationScreen</definition>
+        <argsstring>()</argsstring>
+        <name>initConfirmationScreen</name>
+        <briefdescription>
+<para>MainWindow::initConfirmationScreen. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>bool: true if user has confirmed, false otherwise Initializes the confirmation screen so that the user can confirm whether the input parameters are correct </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="173" column="10" bodyfile="mainwindow.cpp" bodystart="1091" bodyend="1198"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1ab2e9e99c957872404fccb50c6ad785dd" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::AutoMode</definition>
+        <argsstring>()</argsstring>
+        <name>AutoMode</name>
+        <briefdescription>
+<para>MainWindow::AutoMode Calculates exposure time and slice thickness based on input print height and print speed. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="174" column="10" bodyfile="mainwindow.cpp" bodystart="1057" bodyend="1083"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1a47e64fffe7dffeb894cb01ad6fb24285" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::initImagePopout</definition>
+        <argsstring>()</argsstring>
+        <name>initImagePopout</name>
+        <briefdescription>
+<para>MainWindow::initImagePopout Initializes the image popout window that is used for video pattern mode. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="175" column="10" bodyfile="mainwindow.cpp" bodystart="286" bodyend="302"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1ae0383188be69c4e07c44d01a6765da75" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::SetExposureTimer</definition>
+        <argsstring>()</argsstring>
+        <name>SetExposureTimer</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="176" column="10" bodyfile="mainwindow.cpp" bodystart="2027" bodyend="2050"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1a754f434a087248c52da952779484c056" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::SetDarkTimer</definition>
+        <argsstring>()</argsstring>
+        <name>SetDarkTimer</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="177" column="10" bodyfile="mainwindow.cpp" bodystart="2052" bodyend="2073"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1acf11ac6457a3c956f854e2a27b697090" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::VP8bitWorkaround</definition>
+        <argsstring>()</argsstring>
+        <name>VP8bitWorkaround</name>
+        <briefdescription>
+<para>MainWindow::VP8bitWorkaround Used as a workaround for the exposure clipping seen in Video Pattern mode due to Bit Blanking. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="178" column="10" bodyfile="mainwindow.cpp" bodystart="1710" bodyend="1763"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1a8fbb94e3f37f7ba986e8a9e3950bb259" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool MainWindow::PrintScriptApply</definition>
+        <argsstring>(uint layerCount, QStringList Script, Parameter_t DynamicParam)</argsstring>
+        <name>PrintScriptApply</name>
+        <param>
+          <type>uint</type>
+          <declname>layerCount</declname>
+        </param>
+        <param>
+          <type>QStringList</type>
+          <declname>Script</declname>
+        </param>
+        <param>
+          <type>Parameter_t</type>
+          <declname>DynamicParam</declname>
+          <defname>DynamicVar</defname>
+        </param>
+        <briefdescription>
+<para>MainWindow::PrintScriptValidate. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>layerCount</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>Script</parametername>
+</parameternamelist>
+<parameterdescription>
+<para></para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Validating printscript to avoid segmentation faults </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="179" column="10" bodyfile="mainwindow.cpp" bodystart="1632" bodyend="1703"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1a20fc353ebd6e0896681fa01122cfb54d" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::PrintComplete</definition>
+        <argsstring>()</argsstring>
+        <name>PrintComplete</name>
+        <briefdescription>
+<para>MainWindow::PrintEnd. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="180" column="10" bodyfile="mainwindow.cpp" bodystart="1601" bodyend="1623"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1a8a7cc1fae92e3ef6af70478b400a5f81" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::EnableParameter</definition>
+        <argsstring>(Parameter_t Parameter, bool State)</argsstring>
+        <name>EnableParameter</name>
+        <param>
+          <type>Parameter_t</type>
+          <declname>Parameter</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>State</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="181" column="10" bodyfile="mainwindow.cpp" bodystart="1512" bodyend="1596"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1a44a0df1eb3e2922c6262d8fb08d81c47" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double MainWindow::CalcPrintEnd</definition>
+        <argsstring>(PrintControls m_PrintControls, PrintSettings m_PrintSettings)</argsstring>
+        <name>CalcPrintEnd</name>
+        <param>
+          <type><ref refid="struct_print_controls" kindref="compound">PrintControls</ref></type>
+          <declname>m_PrintControls</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_print_settings" kindref="compound">PrintSettings</ref></type>
+          <declname>m_PrintSettings</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="182" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1ad1009681ae0d3d8ee236e23b10b3741d" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double MainWindow::CalcContinuousVelocity</definition>
+        <argsstring>(PrintSettings m_PrintSettings)</argsstring>
+        <name>CalcContinuousVelocity</name>
+        <param>
+          <type><ref refid="struct_print_settings" kindref="compound">PrintSettings</ref></type>
+          <declname>m_PrintSettings</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="183" column="12"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1aa3c6e3842860865e6b42e5d00f959c39" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>QStringList</type>
+        <definition>QStringList MainWindow::GetImageList</definition>
+        <argsstring>(PrintControls m_PrintControls, PrintSettings m_PrintSettings)</argsstring>
+        <name>GetImageList</name>
+        <param>
+          <type><ref refid="struct_print_controls" kindref="compound">PrintControls</ref></type>
+          <declname>m_PrintControls</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_print_settings" kindref="compound">PrintSettings</ref></type>
+          <declname>m_PrintSettings</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="184" column="17" bodyfile="mainwindow.cpp" bodystart="1786" bodyend="1836"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1acf6ff52524fec7b3e5bc3666c9a2106a" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::PrintScriptHandler</definition>
+        <argsstring>(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript)</argsstring>
+        <name>PrintScriptHandler</name>
+        <param>
+          <type><ref refid="struct_print_controls" kindref="compound">PrintControls</ref></type>
+          <declname>m_PrintControls</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_print_settings" kindref="compound">PrintSettings</ref></type>
+          <declname>m_PrintSettings</declname>
+        </param>
+        <param>
+          <type><ref refid="struct_print_scripts" kindref="compound">PrintScripts</ref></type>
+          <declname>m_PrintScript</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="185" column="10" bodyfile="mainwindow.cpp" bodystart="1770" bodyend="1784"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1a47c0c2bba84d528c6539f08a5c916f10" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::InitializeMW</definition>
+        <argsstring>()</argsstring>
+        <name>InitializeMW</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="187" column="10"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1afb93e1302493a91775c63f623d0020f5" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::StartPrint</definition>
+        <argsstring>()</argsstring>
+        <name>StartPrint</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="188" column="10"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1a9146d15fe6f750f865b778d27127a8a2" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::PrintProcess2</definition>
+        <argsstring>()</argsstring>
+        <name>PrintProcess2</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="189" column="10"/>
+      </memberdef>
+      <memberdef kind="function" id="class_main_window_1aecba599b372d9fdf89dfbc1f4a060019" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void MainWindow::initConnections</definition>
+        <argsstring>()</argsstring>
+        <name>initConnections</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="mainwindow.h" line="190" column="10"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>QMainWindow</label>
+      </node>
+      <node id="1">
+        <label>MainWindow</label>
+        <link refid="class_main_window"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="3">
+        <label>printcontrol</label>
+        <link refid="classprintcontrol"/>
+        <childnode refid="4" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>QObject</label>
+      </node>
+      <node id="2">
+        <label>QMainWindow</label>
+      </node>
+      <node id="1">
+        <label>MainWindow</label>
+        <link refid="class_main_window"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+        <childnode refid="3" relation="usage">
+          <edgelabel>PrintControl</edgelabel>
+        </childnode>
+        <childnode refid="5" relation="usage">
+          <edgelabel>popout</edgelabel>
+        </childnode>
+      </node>
+      <node id="5">
+        <label>imagepopout</label>
+        <link refid="classimagepopout"/>
+        <childnode refid="6" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>QWidget</label>
+      </node>
+    </collaborationgraph>
+    <location file="mainwindow.h" line="17" column="1" bodyfile="mainwindow.h" bodystart="18" bodyend="191"/>
+    <listofallmembers>
+      <member refid="class_main_window_1ab2e9e99c957872404fccb50c6ad785dd" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>AutoMode</name></member>
+      <member refid="class_main_window_1ad1009681ae0d3d8ee236e23b10b3741d" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>CalcContinuousVelocity</name></member>
+      <member refid="class_main_window_1a44a0df1eb3e2922c6262d8fb08d81c47" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>CalcPrintEnd</name></member>
+      <member refid="class_main_window_1a854a427a4f2cdac8a05df8b617453c2b" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>Check4VideoLock</name></member>
+      <member refid="class_main_window_1ac5aa9824bee6acab5cf080d48953b3c2" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>DarkTimeSlot</name></member>
+      <member refid="class_main_window_1a8a7cc1fae92e3ef6af70478b400a5f81" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>EnableParameter</name></member>
+      <member refid="class_main_window_1ab3acc7248fa6a4d4bd11aeb4f488d349" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>ExposureTimeSlot</name></member>
+      <member refid="class_main_window_1aa3c6e3842860865e6b42e5d00f959c39" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>GetImageList</name></member>
+      <member refid="class_main_window_1afc9cc6f217d538495fbe77173f1e9b7c" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>GetPosition</name></member>
+      <member refid="class_main_window_1a3f55fd4952af654c217c943f5a17fd2e" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>ImagePopoutUI</name></member>
+      <member refid="class_main_window_1acab65b11d730852e7014e50229131df1" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>ImageProcessUI</name></member>
+      <member refid="class_main_window_1a0aeb12a1845ffe09871c916af481a9f3" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>initConfirmationScreen</name></member>
+      <member refid="class_main_window_1aecba599b372d9fdf89dfbc1f4a060019" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>initConnections</name></member>
+      <member refid="class_main_window_1a47c0c2bba84d528c6539f08a5c916f10" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>InitializeMW</name></member>
+      <member refid="class_main_window_1a47e64fffe7dffeb894cb01ad6fb24285" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>initImagePopout</name></member>
+      <member refid="class_main_window_1a8d56ee932b0e4f531555b18a1708ef82" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>initPlot</name></member>
+      <member refid="class_main_window_1abc629dd51e3495a13850573a308cddf7" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>initSettings</name></member>
+      <member refid="class_main_window_1a9bb1f3b7f6b5360abfd2dc01fc1c8930" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>loadSettings</name></member>
+      <member refid="class_main_window_1a919944619dba5c0ce9516c5c5c07df99" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>m_InjectionSettings</name></member>
+      <member refid="class_main_window_1aabd5fd95fd204f30e54c2af032fb2543" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>m_PrintControls</name></member>
+      <member refid="class_main_window_1ac0dc2155daa28877de41b0f3420ded65" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>m_PrintScript</name></member>
+      <member refid="class_main_window_1ac6c1955058cd99f2bdebf5aaa36988c3" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>m_PrintSettings</name></member>
+      <member refid="class_main_window_1a996c5a2b6f77944776856f08ec30858d" prot="public" virt="non-virtual"><scope>MainWindow</scope><name>MainWindow</name></member>
+      <member refid="class_main_window_1a622e5763bbf8d5912c91df500a29ff66" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>ManualPumpUI</name></member>
+      <member refid="class_main_window_1ac515ae1dba9e52d251ffc5c618154b21" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>ManualStageUI</name></member>
+      <member refid="class_main_window_1a0189e2c8cdb07e297dec85e9195aab0f" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_AbortPrint_clicked</name></member>
+      <member refid="class_main_window_1a2d7ead38298eb0b737d143eeb84dd2d4" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_AutoCheckBox_clicked</name></member>
+      <member refid="class_main_window_1a112d899733205b7793eb4e085d33ace8" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_AutoCheckBox_stateChanged</name></member>
+      <member refid="class_main_window_1a0c98942097d997b23d207807e696a7f0" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_ClearImageFiles_clicked</name></member>
+      <member refid="class_main_window_1a20c58318df05b38a8da83cb1dafd94f0" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_ClearPrintScript_clicked</name></member>
+      <member refid="class_main_window_1a12f4d6eca0fcf4dd1c0fc32121eb1d89" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_CLIPSelect_clicked</name></member>
+      <member refid="class_main_window_1a2787711affec0b16250221050daf0eba" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_ContinuousInjection_clicked</name></member>
+      <member refid="class_main_window_1acd00d9be200d244c3213ff347568267b" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_ContinuousMotion_clicked</name></member>
+      <member refid="class_main_window_1aa4794d023fe7810a74e4cc1bf011ca04" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_DICLIPSelect_clicked</name></member>
+      <member refid="class_main_window_1a63b09df5175258487d67c8eb60ecea97" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_GetPosition_clicked</name></member>
+      <member refid="class_main_window_1a377d7e34b4fdab406624b799e5e8c37d" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_ImageProcess_clicked</name></member>
+      <member refid="class_main_window_1a46211fd911aeb1f16ef2224a0675168d" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_InitializeAndSynchronize_clicked</name></member>
+      <member refid="class_main_window_1a1b781d7ee27a5e7a2aa6251d2b0497a5" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_LightEngineConnectButton_clicked</name></member>
+      <member refid="class_main_window_1a86e11bd17bb5cbdd16bdc1d0f9799783" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_LiveValueList1_activated</name></member>
+      <member refid="class_main_window_1a2acec2bae55c6ec7f0a30890402e7372" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_LiveValueList2_activated</name></member>
+      <member refid="class_main_window_1a00190e0fb4195c192444e4713967012f" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_LiveValueList3_activated</name></member>
+      <member refid="class_main_window_1ae12b8ae605480e2f4c685bdb4e873e10" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_LiveValueList4_activated</name></member>
+      <member refid="class_main_window_1a5e9ce7dfbdb1f4729ba8370581538c66" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_LiveValueList5_activated</name></member>
+      <member refid="class_main_window_1a7658a943ae58d539e5fefa9569501036" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_LiveValueList6_activated</name></member>
+      <member refid="class_main_window_1a57a6d3de9e6b7feec3fb9d84953d8e05" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_LogFileBrowse_clicked</name></member>
+      <member refid="class_main_window_1a6cfab4cd70c7489f597d2278da93bf8e" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_ManualStage_clicked</name></member>
+      <member refid="class_main_window_1a03591d3916eb41d91a766704f72ae86d" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_PostMovementCheckbox_clicked</name></member>
+      <member refid="class_main_window_1a19fa025bd65c7a5b52f232181c132d29" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_POTFcheckbox_clicked</name></member>
+      <member refid="class_main_window_1ac93222ccfd696e323f5bdb186c32a976" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_PreMovementCheckbox_clicked</name></member>
+      <member refid="class_main_window_1a2f7f1749fc6e7d100c281b21902c1017" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_PumpConnectButton_clicked</name></member>
+      <member refid="class_main_window_1a25299444f0d6ccf0078cf50e59a6da68" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_pumpingCheckBox_clicked</name></member>
+      <member refid="class_main_window_1a4de79c63c7fa0b8d7c468ac71f20be81" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_pushButton_clicked</name></member>
+      <member refid="class_main_window_1a73cd41c533723618e1f93cc82a0051bd" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_ResinSelect_activated</name></member>
+      <member refid="class_main_window_1a828ce6ce5d3f18a016fd710027e0b664" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SelectFile_clicked</name></member>
+      <member refid="class_main_window_1a78643099dcb1648fe416955ba005e792" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SelectPrintScript_clicked</name></member>
+      <member refid="class_main_window_1ad7936c57b591ebd5464146598b639219" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetBitDepth_clicked</name></member>
+      <member refid="class_main_window_1a0c53bfcf210857f3933ddd9bb0bf15b7" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetDarkTime_clicked</name></member>
+      <member refid="class_main_window_1af1d4099bf6ba12186186a52e747d172c" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetExposureTime_clicked</name></member>
+      <member refid="class_main_window_1a9c963d95cb16951b8a9a7be80a906d6f" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetInfuseRate_clicked</name></member>
+      <member refid="class_main_window_1ae96bf26efe87e60b2640ca42fc91b96e" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetInitialVolume_clicked</name></member>
+      <member refid="class_main_window_1aaf3753010bf9f046739beacaf03769df" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetInjectionDelay_clicked</name></member>
+      <member refid="class_main_window_1aa1448a570793fc6986f5a902bea6b338" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetIntialAdhesionTimeButton_clicked</name></member>
+      <member refid="class_main_window_1a4e61bc357ff0a51ecee88f1c04cfe9b6" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetMaxEndOfRun_clicked</name></member>
+      <member refid="class_main_window_1af82d7e114605ded00c7dae0acae21f8c" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetMaxImageUpload_clicked</name></member>
+      <member refid="class_main_window_1a2f771e90f834d84717b7abfd16160eeb" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetMinEndOfRun_clicked</name></member>
+      <member refid="class_main_window_1a29b3c6380c2121abc85238d2fbf411a6" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetPrintHeight_clicked</name></member>
+      <member refid="class_main_window_1a33ef77e731cfefab6adb3bcc40a175a6" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_setPrintSpeed_clicked</name></member>
+      <member refid="class_main_window_1a257119f0aa015b322a5a0deca024f3a8" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_setPumping_clicked</name></member>
+      <member refid="class_main_window_1a3513f77e543f1b077d893f9d47399983" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetSliceThickness_clicked</name></member>
+      <member refid="class_main_window_1a5d60939509656c9bbfcd56fe4ce537be" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetStageAcceleration_clicked</name></member>
+      <member refid="class_main_window_1a1d8af3ff2a6182241b71f70f491a3940" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetStageVelocity_clicked</name></member>
+      <member refid="class_main_window_1ae0a0ace622166c749319adebf7ffdfba" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetStartingPosButton_clicked</name></member>
+      <member refid="class_main_window_1a4c81a110505ade6caf7fa75359cc038f" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetUVIntensity_clicked</name></member>
+      <member refid="class_main_window_1a1f1990324db3bdd40126d4614c03aeaf" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SetVolPerLayer_clicked</name></member>
+      <member refid="class_main_window_1aafec2d28f86caff512561dc15a2987d5" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_StageConnectButton_clicked</name></member>
+      <member refid="class_main_window_1acc26f664fa0012540d6a6b276c132af7" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_StartPrint_clicked</name></member>
+      <member refid="class_main_window_1a777e4e52014d26129984afa15e6935ee" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_SteppedMotion_clicked</name></member>
+      <member refid="class_main_window_1a2ec1b267ccab653ed4ce5b776b5a2924" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_UsePrintScript_clicked</name></member>
+      <member refid="class_main_window_1afd171478e098f4fc24bab78db5de3561" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>on_VP_HDMIcheckbox_clicked</name></member>
+      <member refid="class_main_window_1a26672bbdddb9a42b606d5d83d0cef2ed" prot="public" virt="non-virtual"><scope>MainWindow</scope><name>popout</name></member>
+      <member refid="class_main_window_1a20fc353ebd6e0896681fa01122cfb54d" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>PrintComplete</name></member>
+      <member refid="class_main_window_1a3444912e6f49106298f37a2989e2422d" prot="public" virt="non-virtual"><scope>MainWindow</scope><name>PrintControl</name></member>
+      <member refid="class_main_window_1af044c03b15b39c7a980760d0040f7509" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>printParameters</name></member>
+      <member refid="class_main_window_1a5efa79f28cfc5e18c8f05de92ea24d88" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>PrintProcess</name></member>
+      <member refid="class_main_window_1a9146d15fe6f750f865b778d27127a8a2" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>PrintProcess2</name></member>
+      <member refid="class_main_window_1a8fbb94e3f37f7ba986e8a9e3950bb259" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>PrintScriptApply</name></member>
+      <member refid="class_main_window_1acf6ff52524fec7b3e5bc3666c9a2106a" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>PrintScriptHandler</name></member>
+      <member refid="class_main_window_1a70198cb08d2b91b5a30a4c3b95559262" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>PrintStartTime</name></member>
+      <member refid="class_main_window_1aa2ff71ea8af4bec75a490343dab56c37" prot="public" virt="non-virtual"><scope>MainWindow</scope><name>PrintToTerminal</name></member>
+      <member refid="class_main_window_1abb420ac3e655e47bf29accf110d78374" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>pumpingSlot</name></member>
+      <member refid="class_main_window_1a0db7bf6852ae93300e637480ab1e290a" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>qv_x</name></member>
+      <member refid="class_main_window_1a5d8813f1ebdab64b1840881b7efbc9f3" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>qv_y</name></member>
+      <member refid="class_main_window_1abb30531afee763d0586ee6323fd332e2" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>saveSettings</name></member>
+      <member refid="class_main_window_1a413ca68deb2659c88e588eb44d82e1b9" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>saveText</name></member>
+      <member refid="class_main_window_1a754f434a087248c52da952779484c056" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>SetDarkTimer</name></member>
+      <member refid="class_main_window_1ae0383188be69c4e07c44d01a6765da75" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>SetExposureTimer</name></member>
+      <member refid="class_main_window_1ae8639d864d9411e3c252e170a848643a" prot="public" virt="non-virtual"><scope>MainWindow</scope><name>showError</name></member>
+      <member refid="class_main_window_1afb93e1302493a91775c63f623d0020f5" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>StartPrint</name></member>
+      <member refid="class_main_window_1a35466a70ed47252a0191168126a352a5" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>ui</name></member>
+      <member refid="class_main_window_1afaec5d8234aad98fdc49858012ea2cb9" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>updatePlot</name></member>
+      <member refid="class_main_window_1a1bbb9f3ef34f6b256957e63711182061" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>ValidateSettings</name></member>
+      <member refid="class_main_window_1acf11ac6457a3c956f854e2a27b697090" prot="private" virt="non-virtual"><scope>MainWindow</scope><name>VP8bitWorkaround</name></member>
+      <member refid="class_main_window_1ae98d00a93bc118200eeef9f9bba1dba7" prot="public" virt="non-virtual"><scope>MainWindow</scope><name>~MainWindow</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
