@@ -59,7 +59,7 @@ signals:
      * \brief StageConnected
      * Signals to main window that a connection to the stage was initiated from
      */
-    void StageConnected();
+    void StageConnect();
 
 private:
     void GetValues();

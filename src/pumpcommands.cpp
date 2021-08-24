@@ -8,6 +8,7 @@ bool PumpCommands::PumpInitConnection(const char* COMport)
     if (PumpSerial.openDevice(COMport, 9600) == 1){
         returnVal = true;
         isConnected = true;
+        emit PumpConnect();
     }
     return returnVal;
 }

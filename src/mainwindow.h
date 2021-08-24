@@ -153,6 +153,10 @@ private slots:
 
     void updatePlot();
 
+    void StageConnected();
+
+    void PumpConnected();
+
 private:
     Ui::MainWindow *ui;
     PrintScripts m_PrintScript;

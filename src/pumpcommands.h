@@ -64,7 +64,7 @@ signals:
      * \brief StageConnected
      * Signals to main window that a connection to the pump was initiated
      */
-    void PumpConnected();
+    void PumpConnect();
 
 private:
     char* SerialRead();

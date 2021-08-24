@@ -60,6 +60,7 @@ int StageCommands::StageInit(const char* COMPort, Stage_t StageType)
     }
     if (returnVal == 1){
         isConnected = true;
+        emit StageConnect();
     }
     return returnVal;
 }

@@ -28,17 +28,17 @@ DLP9000& DLP = DLP9000::Instance();
 StageCommands& Stage = StageCommands::Instance();
 PumpCommands& Pump = PumpCommands::Instance();
 
-//  Auto parameter selection mode
+// Auto parameter selection mode
 static double PrintSpeed;
 static double PrintHeight;
-static bool AutoModeFlag = false;       //true when automode is on, false otherwise
+static bool AutoModeFlag = false;       // true when automode is on, false otherwise
 
-//  Settings and log variables
-static bool loadSettingsFlag = false;   //For ensuring the settings are only loaded once
-QDateTime CurrentDateTime;              //Current time
-QString LogFileDestination;             //for storing log file destination in settings
-QString ImageFileDirectory;             //For storing image file directory in settings
-QTime PrintStartTime;                   //Get start time for log
+// Settings and log variables
+static bool loadSettingsFlag = false;   // For ensuring the settings are only loaded once
+QDateTime CurrentDateTime;              // Current time
+QString LogFileDestination;             // for storing log file destination in settings
+QString ImageFileDirectory;             // For storing image file directory in settings
+QTime PrintStartTime;                   // Get start time for log
 
 //For vp8bit workaround
 static int VP8Bit = OFF;
@@ -59,12 +59,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(&Stage, SIGNAL(StagePrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
     QObject::connect(&Stage, SIGNAL(StageError(QString)), this, SLOT(showError(QString)));
+    QObject::connect(&Stage, SIGNAL(StageConnect()), this, SLOT(StageConnected()));
 
     QObject::connect(&DLP, SIGNAL(DLPPrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
     QObject::connect(&DLP, SIGNAL(DLPError(QString)), this, SLOT(showError(QString)));
 
     QObject::connect(&Pump, SIGNAL(PumpPrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
     QObject::connect(&Pump, SIGNAL(PumpError(QString)), this, SLOT(showError(QString)));
+    QObject::connect(&Pump, SIGNAL(PumpConnect()), this, SLOT(PumpConnected()));
 
     QObject::connect(&PrintControl, SIGNAL(ControlPrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
     QObject::connect(&PrintControl, SIGNAL(ControlError(QString)), this, SLOT(showError(QString)));
@@ -846,7 +848,6 @@ void MainWindow::on_StageConnectButton_clicked()
     char* COM = array.data();
     if (Stage.StageInit(COM, m_PrintSettings.StageType) == true
         && Stage.StageHome(m_PrintSettings.StageType) == true){
-        PrintToTerminal("Stage Connected");
         ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0);border: 1px solid black;");
         ui->StageConnectionIndicator->setText("Connected");
         Sleep(10);
@@ -859,6 +860,15 @@ void MainWindow::on_StageConnectButton_clicked()
     }
 }
 
+void MainWindow::StageConnected()
+{
+    PrintToTerminal("Stage Connected");
+    ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0);"
+                                                "border: 1px solid black;");
+    ui->StageConnectionIndicator->setText("Connected");
+    emit(on_GetPosition_clicked());
+}
+
 /*!
  * \brief MainWindow::on_PumpConnectButton_clicked
  * Connects to pump
@@ -869,7 +879,6 @@ void MainWindow::on_PumpConnectButton_clicked()
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
     if (Pump.PumpInitConnection(COM)){
-        PrintToTerminal("Pump Connected");
         ui->PumpConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0);"
                                                    "border: 1px solid black;");
         ui->PumpConnectionIndicator->setText("Connected");
@@ -882,6 +891,13 @@ void MainWindow::on_PumpConnectButton_clicked()
     }
 }
 
+void MainWindow::PumpConnected()
+{
+    PrintToTerminal("Pump Connected");
+    ui->PumpConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0);"
+                                               "border: 1px solid black;");
+    ui->PumpConnectionIndicator->setText("Connected");
+}
 /*********************************************Print Parameters*********************************************/
 /*!
  * \brief MainWindow::on_ResinSelect_activated
