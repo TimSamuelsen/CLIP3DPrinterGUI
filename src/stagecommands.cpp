@@ -288,6 +288,7 @@ void StageCommands::initStagePosition(PrintSettings si_PrintSettings)
 {
     s_PrintSettings = si_PrintSettings;
     initStageSlot();
+    SMC.serial.flushReceiver();
 }
 
 /*!
@@ -301,6 +302,7 @@ void StageCommands::initStageSlot()
 {
     if (s_PrintSettings.StageType == STAGE_SMC){
         double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
+        emit StageGetPositionSignal(QString::number(CurrentPosition));
         if (CurrentPosition < (s_PrintSettings.StartingPosition - 3.2)){
             if (StagePrep1 == false){
                 SetStageVelocity(3, s_PrintSettings.StageType);
@@ -308,6 +310,7 @@ void StageCommands::initStageSlot()
                 StageAbsoluteMove(s_PrintSettings.StartingPosition-3, s_PrintSettings.StageType);
                 Sleep(20);
                 StagePrep1 = true;
+                emit StagePrintSignal("Performing Rough Stage Move to: " + QString::number(s_PrintSettings.StartingPosition-3));
                 //Main.PrintToTerminal("Performing Rough Stage Movement");
             }
             QTimer::singleShot(1000, this, SLOT(initStageSlot()));
@@ -317,7 +320,7 @@ void StageCommands::initStageSlot()
         }
     }
     else{
-        //Main.PrintToTerminal("Auto stage initialization disabled for iCLIP, please move stage to endstop with manual controls");
+        emit StagePrintSignal("Auto stage initialization disabled for iCLIP, please move stage to endstop with manual controls");
     }
 }
 
@@ -331,6 +334,7 @@ void StageCommands::initStageSlot()
 void StageCommands::fineMovement()
 {
     double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
+    emit StageGetPositionSignal(QString::number(CurrentPosition));
     //If stage has not reached it's final starting position
     if (CurrentPosition > s_PrintSettings.StartingPosition-0.01 && CurrentPosition < s_PrintSettings.StartingPosition+0.01){
         verifyStageParams(s_PrintSettings);
@@ -341,10 +345,10 @@ void StageCommands::fineMovement()
             SetStageVelocity(0.3, s_PrintSettings.StageType);
             Sleep(20);
             StageAbsoluteMove(s_PrintSettings.StartingPosition, s_PrintSettings.StageType);
-            emit StagePrintSignal("Fine Stage Movement");
+            emit StagePrintSignal("Fine Stage Movement to: " + QString::number(s_PrintSettings.StartingPosition));
             StagePrep2 = true;
         }
-        QTimer::singleShot(1000, this, SLOT(fineMovement(s_PrintSettings)));
+        QTimer::singleShot(1000, this, SLOT(fineMovement()));
     }
 }
 

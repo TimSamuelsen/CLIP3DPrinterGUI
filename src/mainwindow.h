@@ -153,6 +153,8 @@ private slots:
 
     void updatePlot();
 
+    void updatePosition(QString CurrentPosition);
+
     void StageConnected();
 
     void PumpConnected();

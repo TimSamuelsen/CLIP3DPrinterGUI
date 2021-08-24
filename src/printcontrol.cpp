@@ -128,6 +128,7 @@ void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, uint Initi
         pPrintControls->inMotion = false;
         emit ControlPrintSignal("Exposing Initial Layer " + QString::number(InitialExposure) + "s");
         emit UpdatePlotSignal();
+        emit GetPositionSignal();
     }
     else{
         pPrintControls->layerCount++;

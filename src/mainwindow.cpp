@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&Stage, SIGNAL(StagePrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
     QObject::connect(&Stage, SIGNAL(StageError(QString)), this, SLOT(showError(QString)));
     QObject::connect(&Stage, SIGNAL(StageConnect()), this, SLOT(StageConnected()));
+    QObject::connect(&Stage, SIGNAL(StageGetPositionSignal(QString)), this, SLOT(updatePosition(QString)));
 
     QObject::connect(&DLP, SIGNAL(DLPPrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
     QObject::connect(&DLP, SIGNAL(DLPError(QString)), this, SLOT(showError(QString)));
@@ -139,14 +140,16 @@ void MainWindow::on_ImageProcess_clicked()
 void MainWindow::on_GetPosition_clicked()
 {
     QString CurrentPosition = Stage.StageGetPosition(m_PrintSettings.StageType);
+    updatePosition(CurrentPosition);
 
     if (m_PrintSettings.PrinterType == CLIP30UM){
-        CurrentPosition.remove(0,3);    //Removes address and command code
-        CurrentPosition.chop(2);        //To be removed...
     }
     else if(m_PrintSettings.PrinterType == ICLIP){
-
     }
+}
+
+void MainWindow::updatePosition(QString CurrentPosition)
+{
     ui->CurrentPositionIndicator->setText(CurrentPosition);
     PrintToTerminal("Stage is currently at: " + CurrentPosition + " mm");
     ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
@@ -342,7 +345,7 @@ void MainWindow::SetExposureTimer()
  */
 void MainWindow::SetDarkTimer()
 {
-    double DarkTimeSelect = m_PrintSettings.DarkTime;
+    double DarkTimeSelect = m_PrintSettings.DarkTime/1000;
     if (m_PrintSettings.MotionMode == STEPPED){
         if (m_PrintScript.PrintScript == ON){
             if(m_PrintControls.layerCount < m_PrintScript.DarkTimeScriptList.size()){
@@ -352,8 +355,8 @@ void MainWindow::SetDarkTimer()
                 DarkTimeSelect = m_PrintScript.DarkTimeScriptList.at(m_PrintControls.layerCount-2).toDouble();
             }
         }
-        QTimer::singleShot(DarkTimeSelect/1000,  Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
-        PrintToTerminal("Dark time: " + QString::number(DarkTimeSelect/1000) + " ms");
+        QTimer::singleShot(DarkTimeSelect,  Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        PrintToTerminal("Dark time: " + QString::number(DarkTimeSelect) + " ms");
     }
     else{
         if (m_PrintControls.inMotion == false){
