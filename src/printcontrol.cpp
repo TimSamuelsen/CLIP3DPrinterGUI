@@ -133,6 +133,7 @@ void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, uint Initi
     else{
         pPrintControls->layerCount++;
         pPrintControls->remainingImages--;
+        pPrintControls->BitLayer++;
     }
 }
 

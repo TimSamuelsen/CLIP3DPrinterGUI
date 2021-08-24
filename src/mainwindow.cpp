@@ -179,6 +179,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             // n slices = (n bit layers in an image (24) / selected bit depth) * n images
             // i.e. for a 24 bit layer image with a selected bit depth of 4 the
             m_PrintControls.nSlice = (24/m_PrintSettings.BitMode)*ui->FileList->count();
+
             // Grab first image and display in image popout
             QString filename = ui->FileList->item(m_PrintControls.layerCount)->text();
             QPixmap img(filename);
@@ -402,11 +403,11 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
         //Set video display off
         if (LCR_SetMode(PTN_MODE_DISABLE) < 0)
         {
-            showError("Unable to switch to video mode");
-            ui->VP_HDMIcheckbox->setChecked(false);
-            ui->POTFcheckbox->setChecked(true);
-            emit(on_POTFcheckbox_clicked());
-            return;
+            //showError("Unable to switch to video mode");
+            //ui->VP_HDMIcheckbox->setChecked(false);
+            //ui->POTFcheckbox->setChecked(true);
+            //emit(on_POTFcheckbox_clicked());
+            //return;
         }
         DLP.setIT6535Mode(1); //Set IT6535 reciever to HDMI input
         Check4VideoLock();
