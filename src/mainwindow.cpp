@@ -232,7 +232,8 @@ void MainWindow::on_AbortPrint_clicked()
 void MainWindow::PrintProcess()
 {
     if(m_PrintControls.layerCount + 1 <= m_PrintControls.nSlice){   // if not at print end
-        if (m_PrintControls.remainingImages <= 0){                  // Reupload if no more images
+        // Reupload if no more images and not in initial exposure
+        if (m_PrintControls.remainingImages <= 0 && m_PrintControls.InitialExposureFlag == false){
             QStringList ImageList =  GetImageList(m_PrintControls, m_PrintSettings);
             int imagesUploaded = PrintControl.ReuploadHandler(ImageList, m_PrintControls,
                                                               m_PrintSettings, m_PrintScript,
@@ -286,6 +287,7 @@ void MainWindow::ExposureTimeSlot(void)
     if(m_PrintScript.PrintScript == ON){
         PrintScriptHandler(m_PrintControls, m_PrintSettings, m_PrintScript);
     }
+
 
     //Dark time handling
     PrintControl.DarkTimeHandler(m_PrintControls, m_PrintSettings, m_PrintScript, m_InjectionSettings);

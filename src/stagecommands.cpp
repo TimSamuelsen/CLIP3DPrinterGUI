@@ -300,6 +300,7 @@ void StageCommands::initStagePosition(PrintSettings si_PrintSettings)
  */
 void StageCommands::initStageSlot()
 {
+    static int MovementAttempts = 0;
     if (s_PrintSettings.StageType == STAGE_SMC){
         double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
         emit StageGetPositionSignal(QString::number(CurrentPosition));
@@ -313,7 +314,13 @@ void StageCommands::initStageSlot()
                 emit StagePrintSignal("Performing Rough Stage Move to: " + QString::number(s_PrintSettings.StartingPosition-3));
                 //Main.PrintToTerminal("Performing Rough Stage Movement");
             }
-            QTimer::singleShot(1000, this, SLOT(initStageSlot()));
+            if(MovementAttempts < 30){
+                QTimer::singleShot(1000, this, SLOT(initStageSlot()));
+                MovementAttempts++;
+            }
+            else{
+                emit StagePrintSignal("Could not move stage to starting position");
+            }
         }
         else{
             fineMovement();
