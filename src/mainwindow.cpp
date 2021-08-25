@@ -239,6 +239,7 @@ void MainWindow::PrintProcess()
                                                               m_PrintSettings, m_PrintScript,
                                                               m_InjectionSettings.ContinuousInjection);
             m_PrintControls.remainingImages = imagesUploaded;
+            PrintToTerminal("Exiting Reupload: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
         }
 
         SetExposureTimer();
@@ -300,7 +301,7 @@ void MainWindow::ExposureTimeSlot(void)
 void MainWindow::DarkTimeSlot(void)
 {
     PrintProcess();
-    ui->ProgramPrints->append(QTime::currentTime().toString("hh.mm.ss.zzz"));
+    ui->ProgramPrints->append("Dark end: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
 }
 
 /*!
@@ -327,12 +328,22 @@ void MainWindow::SetExposureTimer()
         PrintToTerminal("Exposure: " + QString::number(ExposureTime/1000) + "ms, preparing for pumping");
         break;
       case EXPOSURE_PS:
-        ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble();
+        if (m_PrintControls.layerCount < m_PrintScript.ExposureScriptList.count()){
+            ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble();
+        }
+        else{
+            ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintScript.ExposureScriptList.count()-1).toDouble();
+        }
         QTimer::singleShot(ExposureTime, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
         PrintToTerminal("Exposure PS: " + QString::number(ExposureTime) + "ms");
         break;
       case EXPOSURE_PS_PUMP:
-        ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble();
+        if (m_PrintControls.layerCount < m_PrintScript.ExposureScriptList.count()){
+            ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble();
+        }
+        else{
+            ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintScript.ExposureScriptList.count()-1).toDouble();
+        }
         QTimer::singleShot(ExposureTime, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
         PrintToTerminal("Exposure PS: " + QString::number(ExposureTime) + "ms, preparing for pumping");
         break;
@@ -355,7 +366,7 @@ void MainWindow::SetDarkTimer()
                 DarkTimeSelect = m_PrintScript.DarkTimeScriptList.at(m_PrintControls.layerCount).toDouble();
             }
             else{
-                DarkTimeSelect = m_PrintScript.DarkTimeScriptList.at(m_PrintControls.layerCount-2).toDouble();
+                DarkTimeSelect = m_PrintScript.DarkTimeScriptList.at(m_PrintScript.DarkTimeScriptList.count()-2).toDouble();
             }
         }
         QTimer::singleShot(DarkTimeSelect,  Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
@@ -405,11 +416,11 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
         //Set video display off
         if (LCR_SetMode(PTN_MODE_DISABLE) < 0)
         {
-            //showError("Unable to switch to video mode");
-            //ui->VP_HDMIcheckbox->setChecked(false);
-            //ui->POTFcheckbox->setChecked(true);
-            //emit(on_POTFcheckbox_clicked());
-            //return;
+            PrintToTerminal("Unable to switch to video mode");
+            ui->VP_HDMIcheckbox->setChecked(false);
+            ui->POTFcheckbox->setChecked(true);
+            emit(on_POTFcheckbox_clicked());
+            return;
         }
         DLP.setIT6535Mode(1); //Set IT6535 reciever to HDMI input
         Check4VideoLock();
@@ -641,8 +652,6 @@ void MainWindow::on_setPumping_clicked()
         PrintToTerminal("Please enable pumping before setting pumping parameter");
     }
 }
-
-
 
 /*********************************************File Handling*********************************************/
 /*!
@@ -1231,6 +1240,7 @@ void MainWindow::on_SetInjectionDelay_clicked()
 void MainWindow::showError(QString errMsg)
 {
     PrintToTerminal("ERROR: " + errMsg);
+
     QMessageBox errMsgBox;
     char errStr[128];
 
@@ -1309,13 +1319,9 @@ bool MainWindow::initConfirmationScreen()
     QMessageBox confScreen;
     QPushButton *cancelButton = confScreen.addButton(QMessageBox::Cancel);
     QPushButton *okButton = confScreen.addButton(QMessageBox::Ok);
-    /*confScreen.setStyleSheet("QLabel{min-width:300 px; font-size: 24px; text-align:center;} "
-                             "QPushButton{ width:150px; } "
-                             "QTextEdit{min-height:150px; font-size: 16px;}");*/
     confScreen.setStyleSheet("QPushButton{ width: 85px; } "
                              "QLabel{font-size: 20px;}"
-                             "QTextEdit{font-size: 16px;}"
-                             "QScrollArea{ height: 400px");
+                             "QTextEdit{font-size: 16px;}");
     confScreen.setText("Please Confirm Print Parameters "); //nospaces
 
     QString DetailedText;
@@ -1703,7 +1709,7 @@ void MainWindow::updatePlot()
     QString RemainingTime;
     if (m_PrintScript.PrintScript == 1)
     {
-        if (m_PrintControls.layerCount > 0)
+        if (m_PrintControls.layerCount > 0 && m_PrintControls.layerCount < m_PrintScript.ExposureScriptList.count())
         {
             m_PrintControls.RemainingPrintTime -= m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount - 1).toDouble()/1000;
         }
@@ -2014,18 +2020,20 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
     int InitialExposureCount = m_PrintSettings.InitialExposure;
     if (m_PrintControls.InitialExposureFlag == ON){ //If in initial POTF upload
         m_PrintControls.nSlice = ui->FileList->count();
-        item = ui->FileList->item(0);
-        while (InitialExposureCount > 0){
-            ImageList << item->text();
-            InitialExposureCount -= 5;
-        }
-        if (m_PrintSettings.ProjectionMode == POTF){
-            for (int i = 1; i < ui->FileList->count(); i++){
-                item = ui->FileList->item(i);
+        if (m_PrintControls.nSlice){
+            item = ui->FileList->item(0);
+            while (InitialExposureCount > 0){
                 ImageList << item->text();
-                if ((i + m_PrintSettings.InitialExposure) > m_PrintSettings.MaxImageUpload){
-                        break;
-                    }
+                InitialExposureCount -= 5;
+            }
+            if (m_PrintSettings.ProjectionMode == POTF){
+                for (int i = 1; i < ui->FileList->count(); i++){
+                    item = ui->FileList->item(i);
+                    ImageList << item->text();
+                    if ((i + m_PrintSettings.InitialExposure) > m_PrintSettings.MaxImageUpload){
+                            break;
+                        }
+                }
             }
         }
     }
@@ -2041,7 +2049,7 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
     }
     else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
         int j = 0;
-        for(int i = m_PrintControls.FrameCount; i < m_PrintControls.FrameCount + (5*m_PrintSettings.BitMode); i++)
+        for(int i = m_PrintControls.FrameCount; i < m_PrintControls.FrameCount + (1*m_PrintSettings.BitMode); i++)
         {
             for (j = 0; j < (24/m_PrintSettings.BitMode); j++)
             {

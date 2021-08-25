@@ -3,6 +3,7 @@
 #include "pumpcommands.h"
 #include "dlp9000.h"
 #include <QTimer>
+#include <QTime>
 
 DLP9000& pc_DLP = DLP9000::Instance();
 StageCommands& pc_Stage = StageCommands::Instance();
@@ -94,7 +95,7 @@ void printcontrol::StartPrint(PrintSettings m_PrintSettings, PrintScripts m_Prin
 int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintControls, PrintSettings m_PrintSettings,
                                   PrintScripts m_PrintScript, bool ContinuousInjection)
 {
-    emit ControlPrintSignal("Entering Reupload");
+    emit ControlPrintSignal("Entering Reupload: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
     if(m_PrintSettings.MotionMode == CONTINUOUS){       // Continuous stage movement is stopped
         pc_Stage.StageStop(m_PrintSettings.StageType);  // during reupload
         emit ControlPrintSignal("Pausing Continuous Stage Movement");
@@ -109,7 +110,7 @@ int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintCo
         pc_Pump.SetTargetVolume(0);
         pc_Pump.StartInfusion();
     }
-
+    Sleep(625);
     pc_DLP.startPatSequence();      // Restart projection after reupload
 
     return UploadedImages;
@@ -134,6 +135,7 @@ void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, uint Initi
         pPrintControls->layerCount++;
         pPrintControls->remainingImages--;
         pPrintControls->BitLayer++;
+        emit ControlPrintSignal("Layer " + QString::number(pPrintControls->layerCount));
     }
 }
 
@@ -155,7 +157,7 @@ bool printcontrol::VPFrameUpdate(PrintControls *pPrintControls, int BitMode)
         pPrintControls->ReSyncCount++;
 
         // If 120 frames have been reached, prepare for resync
-        if(pPrintControls->ReSyncCount > (120 - 24)/(24/BitMode)){
+        if(pPrintControls->ReSyncCount > (24 - 24)/(24/BitMode)){
             pPrintControls->ReSyncFlag = ON;
             pPrintControls->ReSyncCount = 0;
         }

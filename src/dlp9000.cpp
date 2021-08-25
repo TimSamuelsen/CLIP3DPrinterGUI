@@ -79,8 +79,15 @@ void DLP9000::AddPatterns2(QStringList fileNames, PrintSettings m_PrintSettings,
 
         }
         else if (m_PrintScripts.PrintScript == ON){
-            pattern.exposure = m_PrintScripts.ExposureScriptList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
-            pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(CurrentImage).toInt() * 1000;
+            if (CurrentImage < m_PrintScripts.ExposureScriptList.count()){
+                pattern.exposure = m_PrintScripts.ExposureScriptList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
+                pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(CurrentImage).toInt() * 1000;
+            }
+            else{
+                int LastEntry = m_PrintScripts.ExposureScriptList.count()-1;
+                pattern.exposure = m_PrintScripts.ExposureScriptList.at(LastEntry).toInt() * 1000; //*1000 to get from ms to us
+                pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(LastEntry).toInt() * 1000;
+            }
             printf("exp: %d, dt: %d \r\n", pattern.exposure, pattern.darkPeriod);
             CurrentImage++; //Should this be done before?
         }
