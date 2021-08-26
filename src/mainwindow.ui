@@ -987,6 +987,16 @@ parameters</string>
        <string>COM6</string>
       </property>
      </item>
+     <item>
+      <property name="text">
+       <string>COM7</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>COM8</string>
+      </property>
+     </item>
     </widget>
     <widget class="QPushButton" name="LightEngineConnectButton">
      <property name="geometry">
@@ -1083,6 +1093,16 @@ parameters</string>
      <item>
       <property name="text">
        <string>COM6</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>COM7</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>COM8</string>
       </property>
      </item>
     </widget>
