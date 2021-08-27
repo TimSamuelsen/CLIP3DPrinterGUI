@@ -90,7 +90,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Connect to Pump</string>
+    <string>Pump Connection</string>
    </property>
    <widget class="QComboBox" name="COMSelect">
     <property name="geometry">

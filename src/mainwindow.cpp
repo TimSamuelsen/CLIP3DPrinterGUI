@@ -1673,7 +1673,16 @@ void MainWindow::initPlot()
     {
         ui->LivePlot->xAxis->setRange(0, m_PrintSettings.InitialExposure+5+0.1*m_PrintControls.nSlice+(1.5*(m_PrintControls.nSlice*(m_PrintSettings.ExposureTime+m_PrintSettings.DarkTime))/(1000*1000)));
     }
-    ui->LivePlot->yAxis->setRange(0.9*(m_PrintSettings.StartingPosition - m_PrintControls.nSlice*m_PrintSettings.LayerThickness),1.1*m_PrintSettings.StartingPosition);
+    if (m_PrintSettings.PrinterType == CLIP30UM){
+        double upper = 0.9*(m_PrintSettings.StartingPosition - m_PrintControls.nSlice*m_PrintSettings.LayerThickness);
+        double lower = 1.1*m_PrintSettings.StartingPosition;
+        ui->LivePlot->yAxis->setRange(lower,upper);
+    }
+    else if (m_PrintSettings.PrinterType == ICLIP){
+        double upper = 1.1*(m_PrintControls.nSlice*m_PrintSettings.LayerThickness);
+        double lower = 0;
+        ui->LivePlot->yAxis->setRange(lower, upper);
+    }
     ui->LivePlot->replot();
 }
 

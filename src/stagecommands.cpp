@@ -263,7 +263,7 @@ QString StageCommands::StageGetPosition(Stage_t StageType)
     else if (StageType == STAGE_GCODE){ //Test if
         QString GetPositionCommand = "M114 R\r\n";
         StageSerial.flushReceiver(); //Flush receiver to get rid of readout we don't need
-        Sleep(5); //Delay for
+        //Sleep(5); // Testing removal of delay
         StageSerial.writeString(GetPositionCommand.toLatin1().data());
         static char receivedString[] = "ThisIsMyTest";
         char finalChar = '\n';
@@ -271,7 +271,11 @@ QString StageCommands::StageGetPosition(Stage_t StageType)
         Sleep(10);
         StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
         printf(receivedString);
-        return receivedString;
+        QString CurrentPosition = QString::fromUtf8(receivedString);
+        QString returnVal = CurrentPosition.mid(CurrentPosition.indexOf("Z"),
+                                                CurrentPosition.indexOf("E"));
+
+        return returnVal;
 
     }
     return "NA";
