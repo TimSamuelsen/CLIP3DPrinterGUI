@@ -243,6 +243,9 @@ void MainWindow::PrintProcess()
         }
 
         SetExposureTimer();
+        if (m_PrintSettings.PrinterType == ICLIP){
+            emit on_GetPosition_clicked();
+        }
         PrintControl.PrintProcessHandler(&m_PrintControls, m_PrintSettings.InitialExposure);
     }
     else{

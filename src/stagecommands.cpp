@@ -265,15 +265,17 @@ QString StageCommands::StageGetPosition(Stage_t StageType)
         StageSerial.flushReceiver(); //Flush receiver to get rid of readout we don't need
         //Sleep(5); // Testing removal of delay
         StageSerial.writeString(GetPositionCommand.toLatin1().data());
-        static char receivedString[] = "ThisIsMyTest";
+        static char receivedString[] = "ThisIsMyPositionTest";
         char finalChar = '\n';
         uint maxNbBytes = 100;//make sure to validate this
-        Sleep(10);
+        //Sleep(10);
         StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
         printf(receivedString);
         QString CurrentPosition = QString::fromUtf8(receivedString);
         QString returnVal = CurrentPosition.mid(CurrentPosition.indexOf("Z"),
                                                 CurrentPosition.indexOf("E"));
+        returnVal.remove(0,2);
+        returnVal.chop(3);
 
         return returnVal;
 
