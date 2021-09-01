@@ -16,6 +16,7 @@
 #include <QInputDialog>
 #include <QDesktopServices>
 #include <QSettings>
+#include <QHeaderView>
 
 #include "API.h"
 #include "mainwindow.h"
@@ -39,6 +40,7 @@ QDateTime CurrentDateTime;              // Current time
 QString LogFileDestination;             // for storing log file destination in settings
 QString ImageFileDirectory;             // For storing image file directory in settings
 QTime PrintStartTime;                   // Get start time for log
+bool PSTableInitFlag = false;
 
 //For vp8bit workaround
 static int VP8Bit = OFF;
@@ -814,6 +816,7 @@ void MainWindow::on_SelectPrintScript_clicked()
             }
         }
     }
+    initPrintScriptTable();
 }
 
 /*!
@@ -1739,6 +1742,16 @@ void MainWindow::updatePlot()
     textLabel2->setFont(QFont(font().family(), 12)); // make font a bit larger
     textLabel2->setPen(QPen(Qt::black)); // show black border around text
 
+    if(m_PrintControls.InitialExposureFlag == OFF && m_PrintControls.layerCount == 0){
+        QCPItemText *textLabel3 = new QCPItemText(ui->LivePlot);
+        textLabel3->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
+        textLabel3->position->setType(QCPItemPosition::ptAxisRectRatio);
+        textLabel3->position->setCoords(0.98, 0.14); // place position at center/top of axis rect
+        textLabel3->setText(" Initial Exposure Active");
+        textLabel3->setFont(QFont(font().family(), 12)); // make font a bit larger
+        textLabel3->setPen(QPen(Qt::black)); // show black border around tex
+    }
+
     ui->LivePlot->replot(QCustomPlot::rpQueuedReplot);
 }
 /*************************************************************
@@ -2082,6 +2095,121 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
     }
     return ImageList;
 }
+
+void MainWindow::initPrintScriptTable()
+{
+    //Config Header
+    ui->PrintScriptTable->setRowCount(m_PrintScript.ExposureScriptList.count());
+    ui->PrintScriptTable->setColumnCount(7);
+    QStringList Labels = {"Exp Time(ms)", "LED Int","Dark Time(ms)",
+                          "Layer(um)","Velocity(mm/s)",
+                          "Accel(mm/s^2)", "Pump Height(um)",};
+    if (m_PrintSettings.PrinterType == ICLIP){
+        ui->PrintScriptTable->setColumnCount(9);
+        Labels += {"Inj Volume(ul)" , "Inj Rate(ul/s)" };
+    }
+    ui->PrintScriptTable->setHorizontalHeaderLabels(Labels);
+
+    updatePrintScriptTable();
+    PSTableInitFlag = true;
+}
+
+void MainWindow::updatePrintScriptTable()
+{
+    PrintScriptTableEntry(m_PrintScript.ExposureScriptList, 0);
+    PrintScriptTableEntry(m_PrintScript.LEDScriptList, 1);
+    PrintScriptTableEntry(m_PrintScript.DarkTimeScriptList, 2);
+    PrintScriptTableEntry(m_PrintScript.LayerThicknessScriptList, 3);
+    PrintScriptTableEntry(m_PrintScript.StageVelocityScriptList, 4);
+    PrintScriptTableEntry(m_PrintScript.StageAccelerationScriptList, 5);
+    PrintScriptTableEntry(m_PrintScript.PumpHeightScriptList, 6);
+    if (m_PrintSettings.PrinterType == ICLIP){
+        PrintScriptTableEntry(m_PrintScript.InjectionVolumeScriptList, 7);
+        PrintScriptTableEntry(m_PrintScript.InjectionRateScriptList, 8);
+    }
+}
+
+void MainWindow::PrintScriptTableEntry(QStringList Script, uint ColNum)
+{
+    for (int i = 0; i < Script.count(); i++){
+        QTableWidgetItem *pCell = ui->PrintScriptTable->item(i,ColNum);
+        if(!pCell){
+            pCell = new QTableWidgetItem;
+            ui->PrintScriptTable->setItem(i, ColNum, pCell);
+        }
+        pCell->setText(Script.at(i));
+    }
+}
+
+void MainWindow::on_PrintScriptTable_cellChanged(int row, int column)
+{
+    if(PSTableInitFlag){ //Only activate after print script table is init
+        QString CurrentCell = ui->PrintScriptTable->item(row, column)->text();
+        QString ScriptType;
+        switch (column)
+        {
+            case 0:
+                m_PrintScript.ExposureScriptList[row] = CurrentCell;
+                ScriptType = "Exposure layer ";
+                break;
+            case 1:
+                m_PrintScript.LEDScriptList[row] = CurrentCell;
+                ScriptType = "LED Intensity layer ";
+                break;
+            case 2:
+                m_PrintScript.DarkTimeScriptList[row] = CurrentCell;
+                ScriptType = "Dark Time layer ";
+                break;
+            case 3:
+                m_PrintScript.LayerThicknessScriptList[row] = CurrentCell;
+                ScriptType = "Layer Thickness layer ";
+                break;
+            case 4:
+                m_PrintScript.StageVelocityScriptList[row] = CurrentCell;
+                ScriptType = "Velocity layer ";
+                break;
+            case 5:
+                m_PrintScript.StageAccelerationScriptList[row] = CurrentCell;
+                ScriptType = "Acceleration layer ";
+                break;
+            case 6:
+                m_PrintScript.PumpHeightScriptList[row] = CurrentCell;
+                ScriptType = "Pump Height layer ";
+                break;
+            case 7:
+                m_PrintScript.InjectionVolumeScriptList[row] = CurrentCell;
+                ScriptType = "Injection Volume layer ";
+                break;
+            case 8:
+                m_PrintScript.InjectionRateScriptList[row] = CurrentCell;
+                ScriptType = "Injection Rate layer ";
+                break;
+            default:
+                break;
+        }
+        PrintToTerminal(ScriptType + QString::number(row+1) + " set to " + CurrentCell);
+    }
+}
+
+static bool EditsActive = true;
+void MainWindow::on_PrintScriptTable_cellPressed(int row, int column)
+{
+    if(EditsActive){
+        QMessageBox confScreen;
+        confScreen.setText("Are you sure you want to manually edit the print script?");
+        QPushButton *YesButton = confScreen.addButton(QMessageBox::Yes);
+        QPushButton *AbortButton = confScreen.addButton(QMessageBox::Abort);
+        confScreen.exec();
+        if (confScreen.clickedButton() == YesButton){
+            EditsActive = false;
+        }
+        else{
+            ui->PrintScriptTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+            //EditsActive = false;
+        }
+    }
+}
+
 /*******************************************Live Value Monitoring********************************************/
 /**
  * @brief MainWindow::on_LiveValueList1_activated

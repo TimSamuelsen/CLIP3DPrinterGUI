@@ -39,7 +39,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -60,13 +60,13 @@
      <attribute name="title">
       <string>PrintScriptTable</string>
      </attribute>
-     <widget class="QTableView" name="tableView_2">
+     <widget class="QTableWidget" name="PrintScriptTable">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>831</width>
-        <height>471</height>
+        <width>841</width>
+        <height>461</height>
        </rect>
       </property>
      </widget>

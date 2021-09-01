@@ -159,6 +159,10 @@ private slots:
 
     void PumpConnected();
 
+    void on_PrintScriptTable_cellChanged(int row, int column);
+
+    void on_PrintScriptTable_cellPressed(int row, int column);
+
 private:
     Ui::MainWindow *ui;
     PrintScripts m_PrintScript;
@@ -197,5 +201,8 @@ private:
     void StartPrint();
     void PrintProcess2();
     void initConnections();
+    void initPrintScriptTable();
+    void PrintScriptTableEntry(QStringList Script, uint ColNum);
+    void updatePrintScriptTable();
 };
 #endif // MAINWINDOW_H
