@@ -311,6 +311,9 @@ void MainWindow::ExposureTimeSlot(void)
  */
 void MainWindow::DarkTimeSlot(void)
 {
+    if (m_PrintScript.PrintScript == ON && m_PrintControls.layerCount == 0){
+        PrintScriptHandler(m_PrintControls, m_PrintSettings, m_PrintScript);
+    }
     PrintProcess();
     ui->ProgramPrints->append("Dark end: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
 }
