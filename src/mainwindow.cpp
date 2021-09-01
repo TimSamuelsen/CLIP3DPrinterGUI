@@ -213,9 +213,6 @@ void MainWindow::on_StartPrint_clicked()
         if(m_PrintScript.PrintScript){
             LCR_SetLedCurrents(0, 0, m_PrintSettings.InitialIntensity);
         }
-        else{
-            LCR_SetLedCurrents(0, 0, m_PrintSettings.UVIntensity);
-        }
         PrintControl.StartPrint(m_PrintSettings, m_PrintScript,
                                 m_InjectionSettings.ContinuousInjection);
         PrintProcess();
@@ -310,8 +307,13 @@ void MainWindow::ExposureTimeSlot(void)
  */
 void MainWindow::DarkTimeSlot(void)
 {
-    if (m_PrintControls.layerCount == 0 && m_PrintScript.PrintScript == ON){
-        PrintScriptHandler(m_PrintControls, m_PrintSettings, m_PrintScript);
+    if (m_PrintControls.layerCount == 0){
+        if (m_PrintScript.PrintScript == ON){
+            PrintScriptHandler(m_PrintControls, m_PrintSettings, m_PrintScript);
+        }
+        else{
+            LCR_SetLedCurrents(0, 0, m_PrintSettings.UVIntensity);
+        }
     }
     PrintProcess();
     ui->ProgramPrints->append("Dark end: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
@@ -738,7 +740,6 @@ void MainWindow::on_UsePrintScript_clicked()
         EnableParameter(PUMP_HEIGHT, OFF);
         EnableParameter(INJECTION_VOLUME, OFF);
         EnableParameter(INJECTION_RATE, OFF);
-        EnableParameter(INITIAL_INTENSITY, ON);
     }
     else //printscript is not checked
     {
@@ -756,7 +757,6 @@ void MainWindow::on_UsePrintScript_clicked()
         EnableParameter(PUMP_HEIGHT, ON);
         EnableParameter(INJECTION_VOLUME, ON);
         EnableParameter(INJECTION_RATE, ON);
-        EnableParameter(INITIAL_INTENSITY, OFF);
     }
 }
 
@@ -1704,7 +1704,6 @@ void MainWindow::initSettings()
     }
 
     EnableParameter(VP_RESYNC, OFF); //Always starts in POTF so ResyncVP is disabled from start
-    EnableParameter(INITIAL_INTENSITY, OFF); //Always starts off, print script is disabled at start
 
     ui->pumpingParameter->setValue(m_PrintSettings.PumpingParameter);
     ui->BitDepthParam->setValue(m_PrintSettings.BitMode);
