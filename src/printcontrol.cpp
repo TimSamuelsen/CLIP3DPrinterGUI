@@ -64,8 +64,9 @@ void printcontrol::AbortPrint(Stage_t StageType, PrintControls *pPrintControl)
 void printcontrol::StartPrint(PrintSettings m_PrintSettings, PrintScripts m_PrintScript,
                               bool ContinuousInjection)
 {
-    pc_DLP.SetLEDIntensity(m_PrintSettings.UVIntensity, m_PrintScript.PrintScript,
-                           m_PrintScript.LEDScriptList);
+    //pc_DLP.SetLEDIntensity(m_PrintSettings.UVIntensity, m_PrintScript.PrintScript,
+                          // m_PrintScript.LEDScriptList);
+
     pc_Stage.initStageStart(m_PrintSettings);       // Validate correct stage parameters are set
     emit GetPositionSignal();                       // Sanity check
     pc_DLP.startPatSequence();

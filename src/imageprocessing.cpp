@@ -310,6 +310,15 @@ int imageprocessing::hexSelect(int imageNum)
     return returnVal;
 }
 
+QStringList imageprocessing::ExposedPixelCount(QStringList ImageList)
+{
+    QStringList ExposedPixelList;
+    for (int i = 0; i < ImageList.size(); i++){
+        QString fileName = ImageList[i];
+        Mat imageRead = imread(samples::findFile(fileName.toUtf8().constData()), IMREAD_GRAYSCALE);
+    }
+    return ExposedPixelList;
+}
 #if 0
 void imageprocessing::on_DisplayImage_clicked()
 {

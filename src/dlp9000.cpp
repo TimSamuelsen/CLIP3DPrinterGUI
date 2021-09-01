@@ -509,7 +509,8 @@ int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware, 
     return 0;
 }
 
-void DLP9000::SetLEDIntensity(int UVIntensity, int PrintScript, QStringList LEDScriptList)
+/*
+void DLP9000::SetLEDIntensity(int InitialIntensity)
 {
     //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
     if (PrintScript == ON){ //If printscript is on
@@ -519,6 +520,7 @@ void DLP9000::SetLEDIntensity(int UVIntensity, int PrintScript, QStringList LEDS
         LCR_SetLedCurrents(0, 0, UVIntensity); //set static LED intensity
     }
 }
+*/
 
 /*!
  * \brief DLP9000::PatternUpload

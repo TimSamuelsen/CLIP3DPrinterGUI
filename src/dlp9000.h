@@ -34,7 +34,7 @@ public:
     void startPatSequence(void);
     void clearElements(void);
     void setIT6535Mode(int Mode);
-    void SetLEDIntensity(int UVIntensity, int PrintScript, QStringList LEDScriptList);
+    void SetLEDIntensity(int InitialIntensity);
     int PatternUpload(QStringList ImageList, PrintControls dlp_PrintControls, PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript);
     void PatternDisplay(int DisplaySetting);
     void AddPatterns2(QStringList fileNames, PrintSettings m_PrintSettings, PrintScripts m_PrintScripts, PrintControls m_PrintControls);

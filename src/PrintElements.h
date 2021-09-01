@@ -89,6 +89,7 @@ struct PrintSettings
     double ExposureTime = 0;
     double DarkTime = 0;
     uint InitialExposure = 0;
+    uint InitialIntensity = 0;
     int UVIntensity = 0;
     int MaxImageUpload = 20;
 

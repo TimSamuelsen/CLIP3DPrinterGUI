@@ -163,6 +163,8 @@ private slots:
 
     void on_PrintScriptTable_cellPressed(int row, int column);
 
+    void on_SetInitalExposureIntensity_clicked();
+
 private:
     Ui::MainWindow *ui;
     PrintScripts m_PrintScript;

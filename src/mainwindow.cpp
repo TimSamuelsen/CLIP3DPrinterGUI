@@ -210,6 +210,12 @@ void MainWindow::on_StartPrint_clicked()
         PrintToTerminal("Entering Printing Procedure");
         PrintStartTime = QTime::currentTime();      // Grabs the current time and saves it
 
+        if(m_PrintScript.PrintScript){
+            LCR_SetLedCurrents(0, 0, m_PrintSettings.InitialIntensity);
+        }
+        else{
+            LCR_SetLedCurrents(0, 0, m_PrintSettings.UVIntensity);
+        }
         PrintControl.StartPrint(m_PrintSettings, m_PrintScript,
                                 m_InjectionSettings.ContinuousInjection);
         PrintProcess();
@@ -1128,6 +1134,17 @@ void MainWindow::on_SetMinEndOfRun_clicked()
 
 /******************************************Light Engine Parameters********************************************/
 /*!
+ * \brief MainWindow::on_SetInitalExposureIntensity_clicked
+ * Sets the initial exposure intensity
+ */
+void MainWindow::on_SetInitalExposureIntensity_clicked()
+{
+    m_PrintSettings.InitialIntensity = ui->InitialExposureIntensityParam->value();
+    PrintToTerminal("Set Initial Exposure Intensity to: " +
+                    QString::number(m_PrintSettings.InitialIntensity));
+}
+
+/*!
  * \brief MainWindow::on_SetDarkTime_clicked
  * Sets DarkTime variable from the value selected by the user
  */
@@ -1512,6 +1529,8 @@ void MainWindow::saveSettings()
     settings.setValue("m_PrintSettings.LayerThickness", m_PrintSettings.LayerThickness);
     settings.setValue("StartingPosition", m_PrintSettings.StartingPosition);
     settings.setValue("InitialExposure", m_PrintSettings.InitialExposure);
+    settings.setValue("InitialIntensity", m_PrintSettings.InitialIntensity);
+
     settings.setValue("PrintSpeed", PrintSpeed);
     settings.setValue("PrintHeight", PrintHeight);
 
@@ -1557,7 +1576,8 @@ void MainWindow::loadSettings()
 
 
         m_PrintSettings.StartingPosition = settings.value("StartingPosition", 5).toDouble();
-        m_PrintSettings.InitialExposure = settings.value("InitialExposure", 10).toDouble();
+        m_PrintSettings.InitialExposure = settings.value("InitialExposure", 10).toInt();
+        m_PrintSettings.InitialIntensity = settings.value("InitialIntensity", 10).toInt();
         m_PrintSettings.LayerThickness = settings.value("m_PrintSettings.LayerThickness", 200).toDouble();
         PrintSpeed = settings.value("PrintSpeed", 40).toDouble();
         PrintHeight = settings.value("PrintHeight", 5000).toDouble();
@@ -1602,6 +1622,7 @@ void MainWindow::initSettings()
     ui->SliceThicknessParam->setValue(m_PrintSettings.LayerThickness*1000);
     ui->StartingPositionParam->setValue(m_PrintSettings.StartingPosition);
     ui->InitialAdhesionParameter->setValue(m_PrintSettings.InitialExposure);
+    ui->InitialExposureIntensityParam->setValue(m_PrintSettings.InitialIntensity);
     ui->PrintSpeedParam->setValue(PrintSpeed);
     ui->PrintHeightParam->setValue(PrintHeight);
 

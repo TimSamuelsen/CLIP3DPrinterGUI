@@ -16,6 +16,7 @@ class imageprocessing : public QWidget
 public:
     explicit imageprocessing(QWidget *parent = nullptr);
     ~imageprocessing();
+    QStringList ExposedPixelCount(QStringList ImageList);
 
 
 private slots:
