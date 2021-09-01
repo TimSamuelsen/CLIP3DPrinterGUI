@@ -131,7 +131,7 @@ void imageprocessing::on_GreyscaleEncode_clicked()
         QPixmap newImage = QPixmap::fromImage(QImage((unsigned char*) ImageOut.data, ImageOut.cols, ImageOut.rows, QImage::Format_BGR888));
         ui->ImageDisplay->setPixmap(newImage.scaled(853,533));
 
-        QString ImageName = TargetDestination + "/" + QString::number(grayEncodeCount) + ".tiff";
+        QString ImageName = TargetDestination + "/" + QString::number(grayEncodeCount) + ".png";
         imwrite(ImageName.toUtf8().constData(), ImageOut);
         ui->OutputImageList->addItem(ImageName);
         //imshow("Test", ImageOut);
@@ -181,7 +181,7 @@ void imageprocessing::bitEncode24()
     QPixmap newImage = QPixmap::fromImage(QImage((unsigned char*) ImageOut.data, ImageOut.cols, ImageOut.rows, QImage::Format_BGR888));
     ui->ImageDisplay->setPixmap(newImage.scaled(671,411));
 
-    QString ImageName = TargetDestination + "/" + QString::number(encode24Count) + ".tiff";
+    QString ImageName = TargetDestination + "/" + QString::number(encode24Count) + ".png";
     imwrite(ImageName.toUtf8().constData(), ImageOut);
     ui->OutputImageList->addItem(ImageName);
     encode24Count++;
