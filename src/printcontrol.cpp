@@ -148,7 +148,7 @@ void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, uint Initi
  * \param BitMode  Bit depth of the images for this print
  * \return  Returns false if no frame update is needed, true if frame update is needed
  */
-bool printcontrol::VPFrameUpdate(PrintControls *pPrintControls, int BitMode)
+bool printcontrol::VPFrameUpdate(PrintControls *pPrintControls, int BitMode, int ReSyncRate)
 {
     bool returnVal = false;
     if (pPrintControls->BitLayer > 24){     // If exceeded max bit layers for 1 image
@@ -158,7 +158,7 @@ bool printcontrol::VPFrameUpdate(PrintControls *pPrintControls, int BitMode)
         pPrintControls->ReSyncCount++;
 
         // If 120 frames have been reached, prepare for resync
-        if(pPrintControls->ReSyncCount > (24 - 24)/(24/BitMode)){
+        if(pPrintControls->ReSyncCount > (ReSyncRate - 24)/(24/BitMode)){
             pPrintControls->ReSyncFlag = ON;
             pPrintControls->ReSyncCount = 0;
         }

@@ -287,7 +287,7 @@ void MainWindow::ExposureTimeSlot(void)
 
     //Video pattern mode handling
     if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){ //If in video pattern mode
-        if (PrintControl.VPFrameUpdate(&m_PrintControls, m_PrintSettings.BitMode) == true){
+        if (PrintControl.VPFrameUpdate(&m_PrintControls, m_PrintSettings.BitMode, m_PrintSettings.ResyncVP) == true){
             if (m_PrintControls.FrameCount < ui->FileList->count()){ //if not at end of file list
                 QPixmap img(ui->FileList->item(m_PrintControls.FrameCount)->text()); //select next image
                 ImagePopoutUI->showImage(img); //display next image
@@ -300,7 +300,6 @@ void MainWindow::ExposureTimeSlot(void)
         PrintScriptHandler(m_PrintControls, m_PrintSettings, m_PrintScript);
     }
 
-
     //Dark time handling
     PrintControl.DarkTimeHandler(m_PrintControls, m_PrintSettings, m_PrintScript, m_InjectionSettings);
 }
@@ -311,7 +310,7 @@ void MainWindow::ExposureTimeSlot(void)
  */
 void MainWindow::DarkTimeSlot(void)
 {
-    if (m_PrintScript.PrintScript == ON && m_PrintControls.layerCount == 0){
+    if (m_PrintControls.layerCount == 0 && m_PrintScript.PrintScript == ON){
         PrintScriptHandler(m_PrintControls, m_PrintSettings, m_PrintScript);
     }
     PrintProcess();
@@ -327,7 +326,8 @@ void MainWindow::DarkTimeSlot(void)
 void MainWindow::SetExposureTimer()
 {
   if (m_PrintControls.InitialExposureFlag == 1){
-      QTimer::singleShot(m_PrintSettings.InitialExposure*1000, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+      int InitialExpMs = (m_PrintSettings.InitialExposure + m_PrintSettings.InitialDelay)*1000;
+      QTimer::singleShot(InitialExpMs, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
   }
   else{
     float ExposureTime = 0;
@@ -407,6 +407,7 @@ void MainWindow::on_POTFcheckbox_clicked()
     {
         ui->VP_HDMIcheckbox->setChecked(false);     //Uncheck the Video Pattern checkbox
         EnableParameter(MAX_IMAGE, ON);             //Enable the max image upload parameter
+        EnableParameter(VP_RESYNC, OFF);
         m_PrintSettings.ProjectionMode = POTF;      //Set projection mode to POTF
         DLP.setIT6535Mode(0);                       //Turn off HDMI connection
         LCR_SetMode(PTN_MODE_OTF);                  //Set light engine to POTF mode
@@ -424,17 +425,18 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
     {
         ui->POTFcheckbox->setChecked(false); //Uncheck the Video Pattern checkbox
         EnableParameter(MAX_IMAGE, OFF);
+        EnableParameter(VP_RESYNC, ON);
         initImagePopout(); //Open projection window
         m_PrintSettings.ProjectionMode = VIDEOPATTERN; //Set projection mode to video pattern
 
         //Set video display off
         if (LCR_SetMode(PTN_MODE_DISABLE) < 0)
         {
-            PrintToTerminal("Unable to switch to video mode");
+            /*PrintToTerminal("Unable to switch to video mode");
             ui->VP_HDMIcheckbox->setChecked(false);
             ui->POTFcheckbox->setChecked(true);
             emit(on_POTFcheckbox_clicked());
-            return;
+            return;*/
         }
         DLP.setIT6535Mode(1); //Set IT6535 reciever to HDMI input
         Check4VideoLock();
@@ -736,6 +738,7 @@ void MainWindow::on_UsePrintScript_clicked()
         EnableParameter(PUMP_HEIGHT, OFF);
         EnableParameter(INJECTION_VOLUME, OFF);
         EnableParameter(INJECTION_RATE, OFF);
+        EnableParameter(INITIAL_INTENSITY, ON);
     }
     else //printscript is not checked
     {
@@ -753,6 +756,7 @@ void MainWindow::on_UsePrintScript_clicked()
         EnableParameter(PUMP_HEIGHT, ON);
         EnableParameter(INJECTION_VOLUME, ON);
         EnableParameter(INJECTION_RATE, ON);
+        EnableParameter(INITIAL_INTENSITY, OFF);
     }
 }
 
@@ -1029,6 +1033,12 @@ void MainWindow::on_SetMaxImageUpload_clicked()
     PrintToTerminal(MaxImageUploadString);
 }
 
+void MainWindow::on_SetResyncRate_clicked()
+{
+    m_PrintSettings.ResyncVP = ui->ResyncRateList->currentText().toInt();
+    PrintToTerminal("VP Resync rate set to: " + QString::number(m_PrintSettings.ResyncVP));
+}
+
 
 /*!
  * \brief MainWindow::on_setPrintSpeed_clicked
@@ -1136,6 +1146,18 @@ void MainWindow::on_SetMinEndOfRun_clicked()
 }
 
 /******************************************Light Engine Parameters********************************************/
+/*!
+ * \brief MainWindow::on_SetInitialDelay_clicked
+ * Sets the post initial exposure delay time, this is used ensure that oxygen has more time to
+ * diffuse after the initial prolonged exposure
+ */
+void MainWindow::on_SetInitialDelay_clicked()
+{
+    m_PrintSettings.InitialDelay = ui->InitialDelayParam->value();
+    PrintToTerminal("Set Initial Exposure Delay to: " +
+                    QString::number(m_PrintSettings.InitialDelay) + "s");
+}
+
 /*!
  * \brief MainWindow::on_SetInitalExposureIntensity_clicked
  * Sets the initial exposure intensity
@@ -1379,9 +1401,17 @@ bool MainWindow::initConfirmationScreen()
         DetailedText += "Pumping Enabled\n";
     }
 
-    DetailedText += "Max Image Upload: " + QString::number(m_PrintSettings.MaxImageUpload) + "images\n";
+    if (m_PrintSettings.ProjectionMode == POTF){
+        DetailedText += "Max Image Upload: " + QString::number(m_PrintSettings.MaxImageUpload) + "images\n";
+    }
+    else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
+        DetailedText += "Resync rate: " + QString::number(m_PrintSettings.ResyncVP) + "\n";
+    }
+
     DetailedText += "Bit Depth set to: " + QString::number(m_PrintSettings.BitMode) + "\n";
     DetailedText += "Initial Exposure Time: " + QString::number(m_PrintSettings.InitialExposure) + "s\n";
+    DetailedText += "Initial Exposure Delay: " + QString::number(m_PrintSettings.InitialDelay) + "s\n";
+    DetailedText += "Initial Exposure Intensity " + QString::number(m_PrintSettings.InitialIntensity) + "\n";
     if (m_PrintSettings.PrinterType == CLIP30UM){
         DetailedText += "Starting Position: " + QString::number(m_PrintSettings.StartingPosition) + " mm\n";
     }
@@ -1529,15 +1559,17 @@ void MainWindow::saveSettings()
     settings.setValue("MaxEndOfRun", m_PrintSettings.MaxEndOfRun);
     settings.setValue("MinEndOfRun", m_PrintSettings.MinEndOfRun);
 
-    settings.setValue("m_PrintSettings.LayerThickness", m_PrintSettings.LayerThickness);
+    settings.setValue("LayerThickness", m_PrintSettings.LayerThickness);
     settings.setValue("StartingPosition", m_PrintSettings.StartingPosition);
     settings.setValue("InitialExposure", m_PrintSettings.InitialExposure);
+    settings.setValue("InitialDelay", m_PrintSettings.InitialDelay);
     settings.setValue("InitialIntensity", m_PrintSettings.InitialIntensity);
 
     settings.setValue("PrintSpeed", PrintSpeed);
     settings.setValue("PrintHeight", PrintHeight);
 
-    settings.setValue("m_PrintSettings.MaxImageUpload", m_PrintSettings.MaxImageUpload);
+    settings.setValue("MaxImageUpload", m_PrintSettings.MaxImageUpload);
+    settings.setValue("ResyncVP", m_PrintSettings.ResyncVP);
 
     settings.setValue("LogFileDestination", LogFileDestination);
     settings.setValue("ImageFileDirectory", ImageFileDirectory);
@@ -1580,12 +1612,14 @@ void MainWindow::loadSettings()
 
         m_PrintSettings.StartingPosition = settings.value("StartingPosition", 5).toDouble();
         m_PrintSettings.InitialExposure = settings.value("InitialExposure", 10).toInt();
+        m_PrintSettings.InitialDelay = settings.value("InitialDelay", 0).toInt();
         m_PrintSettings.InitialIntensity = settings.value("InitialIntensity", 10).toInt();
-        m_PrintSettings.LayerThickness = settings.value("m_PrintSettings.LayerThickness", 200).toDouble();
+        m_PrintSettings.LayerThickness = settings.value("LayerThickness", 1).toDouble();
         PrintSpeed = settings.value("PrintSpeed", 40).toDouble();
         PrintHeight = settings.value("PrintHeight", 5000).toDouble();
 
         m_PrintSettings.MaxImageUpload = settings.value("MaxImageUpload", 50).toDouble();
+        m_PrintSettings.ResyncVP = settings.value("ResyncVP", 24).toDouble();
 
         LogFileDestination = settings.value("LogFileDestination", "C://").toString();
         ImageFileDirectory = settings.value("ImageFileDirectory", "C://").toString();
@@ -1625,11 +1659,13 @@ void MainWindow::initSettings()
     ui->SliceThicknessParam->setValue(m_PrintSettings.LayerThickness*1000);
     ui->StartingPositionParam->setValue(m_PrintSettings.StartingPosition);
     ui->InitialAdhesionParameter->setValue(m_PrintSettings.InitialExposure);
+    ui->InitialDelayParam->setValue(m_PrintSettings.InitialDelay);
     ui->InitialExposureIntensityParam->setValue(m_PrintSettings.InitialIntensity);
     ui->PrintSpeedParam->setValue(PrintSpeed);
     ui->PrintHeightParam->setValue(PrintHeight);
 
     ui->MaxImageUpload->setValue(m_PrintSettings.MaxImageUpload);
+    ui->ResyncRateList->setCurrentIndex((m_PrintSettings.ResyncVP/24)-1);
 
     ui->LogFileLocation->setText(LogFileDestination);
 
@@ -1666,6 +1702,9 @@ void MainWindow::initSettings()
     else if(m_PrintSettings.PumpingMode == OFF){
         ui->pumpingCheckBox->setChecked(false);
     }
+
+    EnableParameter(VP_RESYNC, OFF); //Always starts in POTF so ResyncVP is disabled from start
+    EnableParameter(INITIAL_INTENSITY, OFF); //Always starts off, print script is disabled at start
 
     ui->pumpingParameter->setValue(m_PrintSettings.PumpingParameter);
     ui->BitDepthParam->setValue(m_PrintSettings.BitMode);
@@ -1835,11 +1874,20 @@ void MainWindow::EnableParameter(Parameter_t Parameter, bool State)
             ui->SetMaxImageUpload->setEnabled(State);
             ui->MaxImageUploadBox->setEnabled(State);
             break;
+        case VP_RESYNC:
+            ui->ResyncRateList->setEnabled(State);
+            ui->SetResyncRate->setEnabled(State);
+            ui->ResyncRateBox->setEnabled(State);
+            break;
         case INITIAL_VOLUME:
             ui->InitialVolumeParam->setEnabled(State);
             ui->SetInitialVolume->setEnabled(State);
             ui->InitialVolumeBox->setEnabled(State);
             break;
+        case INITIAL_INTENSITY:
+            ui->InitialExposureIntensityParam->setEnabled(State);
+            ui->SetInitalExposureIntensity->setEnabled(State);
+            ui->InitialIntensityBox->setEnabled(State);
         case CONTINUOUS_INJECTION:
             ui->ContinuousInjection->setEnabled(State);
             break;
@@ -2103,7 +2151,8 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
     }
     else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
         int j = 0;
-        for(int i = m_PrintControls.FrameCount; i < m_PrintControls.FrameCount + (1*m_PrintSettings.BitMode); i++)
+        int nUploadFrames = (m_PrintSettings.ResyncVP/24)*m_PrintSettings.BitMode;
+        for(int i = m_PrintControls.FrameCount; i < m_PrintControls.FrameCount + nUploadFrames; i++)
         {
             for (j = 0; j < (24/m_PrintSettings.BitMode); j++)
             {
@@ -2299,4 +2348,3 @@ void MainWindow::on_LiveValueList6_activated(const QString &arg1)
 {
     PrintToTerminal("LV6: " + arg1);
 }
-

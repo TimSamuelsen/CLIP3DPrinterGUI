@@ -36,7 +36,9 @@ typedef enum Parameter{
     INJECTION_VOLUME,
     INJECTION_RATE,
     INITIAL_VOLUME,
+    INITIAL_INTENSITY,
     MAX_IMAGE,
+    VP_RESYNC,
     CONTINUOUS_INJECTION,
     STARTING_POSITION,
     MAX_END,
@@ -88,10 +90,12 @@ struct PrintSettings
     double MinEndOfRun = 0;
     double ExposureTime = 0;
     double DarkTime = 0;
-    uint InitialExposure = 0;
-    uint InitialIntensity = 0;
+    int InitialExposure = 0;
+    int InitialDelay = 0;
+    int InitialIntensity = 0;
     int UVIntensity = 0;
     int MaxImageUpload = 20;
+    int ResyncVP = 24;
 
     double PumpingParameter = 0;
 };

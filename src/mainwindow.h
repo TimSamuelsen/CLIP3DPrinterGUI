@@ -165,6 +165,10 @@ private slots:
 
     void on_SetInitalExposureIntensity_clicked();
 
+    void on_SetInitialDelay_clicked();
+
+    void on_SetResyncRate_clicked();
+
 private:
     Ui::MainWindow *ui;
     PrintScripts m_PrintScript;

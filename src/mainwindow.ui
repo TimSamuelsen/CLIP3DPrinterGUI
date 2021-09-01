@@ -22,7 +22,7 @@
   <property name="maximumSize">
    <size>
     <width>1266</width>
-    <height>748</height>
+    <height>900</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -1424,114 +1424,7 @@ parameters</string>
          </property>
         </widget>
        </widget>
-       <widget class="QGroupBox" name="PrintScriptBox">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>150</y>
-          <width>331</width>
-          <height>91</height>
-         </rect>
-        </property>
-        <property name="title">
-         <string>Print Script</string>
-        </property>
-        <widget class="QPushButton" name="ClearPrintScript">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>250</x>
-           <y>20</y>
-           <width>71</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <family>MS Shell Dlg 2</family>
-           <pointsize>8</pointsize>
-           <weight>50</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Clear</string>
-         </property>
-        </widget>
-        <widget class="QLineEdit" name="PrintScriptFile">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>51</y>
-           <width>311</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="SelectPrintScript">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>160</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <family>MS Shell Dlg 2</family>
-           <pointsize>8</pointsize>
-           <weight>50</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Select File</string>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="UsePrintScript">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>141</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <family>MS Shell Dlg 2</family>
-           <pointsize>8</pointsize>
-           <weight>50</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Enable Print Script</string>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QGroupBox" name="ResyncRateVP">
+       <widget class="QGroupBox" name="ResyncRateBox">
         <property name="geometry">
          <rect>
           <x>9</x>
@@ -1543,7 +1436,7 @@ parameters</string>
         <property name="title">
          <string>Resync Rate VP</string>
         </property>
-        <widget class="QComboBox" name="comboBox">
+        <widget class="QComboBox" name="ResyncRateList">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -1578,7 +1471,7 @@ parameters</string>
           </property>
          </item>
         </widget>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="SetResyncRate">
          <property name="geometry">
           <rect>
            <x>100</x>
@@ -1589,6 +1482,48 @@ parameters</string>
          </property>
          <property name="text">
           <string>Set</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="BitDepthBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>150</y>
+          <width>161</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Bit Depth</string>
+        </property>
+        <widget class="QPushButton" name="SetBitDepth">
+         <property name="geometry">
+          <rect>
+           <x>100</x>
+           <y>20</y>
+           <width>51</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Set</string>
+         </property>
+        </widget>
+        <widget class="QSpinBox" name="BitDepthParam">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>81</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>8</number>
          </property>
         </widget>
        </widget>
@@ -1609,7 +1544,7 @@ parameters</string>
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>80</y>
+          <y>150</y>
           <width>161</width>
           <height>61</height>
          </rect>
@@ -1651,7 +1586,7 @@ parameters</string>
         <property name="geometry">
          <rect>
           <x>180</x>
-          <y>80</y>
+          <y>150</y>
           <width>161</width>
           <height>61</height>
          </rect>
@@ -1693,7 +1628,7 @@ parameters</string>
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>150</y>
+          <y>80</y>
           <width>161</width>
           <height>61</height>
          </rect>
@@ -1737,48 +1672,6 @@ parameters</string>
          </property>
         </widget>
        </widget>
-       <widget class="QGroupBox" name="BitDepthBox">
-        <property name="geometry">
-         <rect>
-          <x>180</x>
-          <y>150</y>
-          <width>161</width>
-          <height>61</height>
-         </rect>
-        </property>
-        <property name="title">
-         <string>Bit Depth</string>
-        </property>
-        <widget class="QPushButton" name="SetBitDepth">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
-        <widget class="QSpinBox" name="BitDepthParam">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>81</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>8</number>
-         </property>
-        </widget>
-       </widget>
        <widget class="QGroupBox" name="InitialExposureBox">
         <property name="geometry">
          <rect>
@@ -1818,11 +1711,11 @@ parameters</string>
          </property>
         </widget>
        </widget>
-       <widget class="QGroupBox" name="InitialExposureBox_2">
+       <widget class="QGroupBox" name="InitialIntensityBox">
         <property name="geometry">
          <rect>
           <x>180</x>
-          <y>10</y>
+          <y>80</y>
           <width>161</width>
           <height>61</height>
          </rect>
@@ -1854,6 +1747,42 @@ parameters</string>
          </property>
          <property name="text">
           <string>Set</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="InitialDelayBox">
+        <property name="geometry">
+         <rect>
+          <x>180</x>
+          <y>10</y>
+          <width>161</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Initial Exp Delay (s)</string>
+        </property>
+        <widget class="QPushButton" name="SetInitialDelay">
+         <property name="geometry">
+          <rect>
+           <x>100</x>
+           <y>20</y>
+           <width>51</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Set</string>
+         </property>
+        </widget>
+        <widget class="QSpinBox" name="InitialDelayParam">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>21</y>
+           <width>81</width>
+           <height>31</height>
+          </rect>
          </property>
         </widget>
        </widget>
@@ -2397,9 +2326,124 @@ Injection</string>
        </widget>
       </widget>
       <widget class="QWidget" name="page_6">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>349</width>
+         <height>241</height>
+        </rect>
+       </property>
        <attribute name="label">
-        <string>                      Image Slice Analysis</string>
+        <string>                     Dynamic Print Mode</string>
        </attribute>
+       <widget class="QGroupBox" name="PrintScriptBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>331</width>
+          <height>91</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Print Script</string>
+        </property>
+        <widget class="QPushButton" name="ClearPrintScript">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>250</x>
+           <y>20</y>
+           <width>71</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>MS Shell Dlg 2</family>
+           <pointsize>8</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Clear</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="PrintScriptFile">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>51</y>
+           <width>311</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="SelectPrintScript">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="geometry">
+          <rect>
+           <x>160</x>
+           <y>20</y>
+           <width>91</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>MS Shell Dlg 2</family>
+           <pointsize>8</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Select File</string>
+         </property>
+        </widget>
+        <widget class="QCheckBox" name="UsePrintScript">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>141</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="font">
+          <font>
+           <family>MS Shell Dlg 2</family>
+           <pointsize>8</pointsize>
+           <weight>50</weight>
+           <italic>false</italic>
+           <bold>false</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Enable Print Script</string>
+         </property>
+        </widget>
+       </widget>
       </widget>
       <widget class="QWidget" name="page_5">
        <property name="geometry">

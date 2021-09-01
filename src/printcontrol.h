@@ -18,7 +18,7 @@ public:
     void StartPrint(PrintSettings m_PrintSettings, PrintScripts m_PrintScript, bool ContinuousInjection);
     void PrintProcessHandler(PrintControls *pPrintControls, uint InitialExposure);
     int ReuploadHandler(QStringList ImageList, PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript, bool ContinuousInjection);
-    bool VPFrameUpdate(PrintControls *pPrintControls, int BitMode);
+    bool VPFrameUpdate(PrintControls *pPrintControls, int BitMode, int ReSyncRate);
     void DarkTimeHandler(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript, InjectionSettings m_InjectionSettings);
     void StagePumpingHandler(uint layerCount, PrintSettings m_PrintSettings, PrintScripts m_PrintScript);
 signals:
