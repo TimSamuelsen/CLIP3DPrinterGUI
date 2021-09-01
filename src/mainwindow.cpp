@@ -1906,6 +1906,9 @@ bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter
         if (layerCount < Script.size()){
             if (Script.at(layerCount).toDouble() == Script.at(layerCount - 1).toDouble()){
                 //do nothing to avoid spamming
+                if (layerCount == 1 && DynamicVar == LED_INTENSITY){
+                    LCR_SetLedCurrents(0, 0, Script.at(0).toInt());
+                }
             }
             else{
                 returnVal = true;

@@ -1828,7 +1828,7 @@ parameters</string>
          </rect>
         </property>
         <property name="title">
-         <string>Initial Exposure Intensity (0-255)</string>
+         <string>Initial Exp Intensity (0-255)</string>
         </property>
         <widget class="QSpinBox" name="InitialExposureIntensityParam">
          <property name="geometry">
