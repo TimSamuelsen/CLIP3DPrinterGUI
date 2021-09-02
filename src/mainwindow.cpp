@@ -439,11 +439,11 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
         //Set video display off
         if (LCR_SetMode(PTN_MODE_DISABLE) < 0)
         {
-            /*PrintToTerminal("Unable to switch to video mode");
+            PrintToTerminal("Unable to switch to video mode");
             ui->VP_HDMIcheckbox->setChecked(false);
             ui->POTFcheckbox->setChecked(true);
             emit(on_POTFcheckbox_clicked());
-            return;*/
+            return;
         }
         DLP.setIT6535Mode(1); //Set IT6535 reciever to HDMI input
         Check4VideoLock();
@@ -1419,35 +1419,6 @@ bool MainWindow::initConfirmationScreen()
     DetailedText += "Initial Exposure Intensity " + QString::number(m_PrintSettings.InitialIntensity) + "\n";
     if (m_PrintSettings.PrinterType == CLIP30UM){
         DetailedText += "Starting Position: " + QString::number(m_PrintSettings.StartingPosition) + " mm\n";
-    }
-    DetailedText += "Slice Thickness: " + QString::number(m_PrintSettings.LayerThickness*1000) + " μm\n";
-
-    if (AutoModeFlag)
-    {
-        DetailedText += "Auto Mode Active \n";
-        DetailedText += "Print Speed: " + QString::number(PrintSpeed) + " μm/s\n";
-        DetailedText += "Print Height: " + QString::number(PrintHeight) + " μm\n";
-    }
-    else
-    {
-        DetailedText += "Auto Mode Not Active\n";
-    }
-    if (m_PrintScript.PrintScript == 1)
-    {
-        DetailedText += "Exposure Time controlled by print script\n";
-        DetailedText += "UV Intensity controlled by print script\n";
-        DetailedText += "Dark Time controlled by print script\n";
-    }
-    else
-    {
-        DetailedText += "Exposure Time: " + QString::number(m_PrintSettings.ExposureTime/1000) + " ms\n";
-        DetailedText += "UV Intensity: " + QString::number(m_PrintSettings.UVIntensity) + "\n";
-        DetailedText += "Dark Time " + QString::number(m_PrintSettings.DarkTime/1000) + " ms\n";
-    }
-
-    DetailedText += "Stage Velocity: " + QString::number(m_PrintSettings.StageVelocity) + " mm/s\n";
-    if (m_PrintSettings.PrinterType == CLIP30UM){
-        DetailedText += "Stage Acceleration: " + QString::number(m_PrintSettings.StageAcceleration) + " mm/s^2\n";
         DetailedText += "Max End Of Run: " + QString::number(m_PrintSettings.MaxEndOfRun) + " mm\n";
         DetailedText += "Min End Of Run: " + QString::number(m_PrintSettings.MinEndOfRun) + " mm\n";
     }
@@ -1458,9 +1429,54 @@ bool MainWindow::initConfirmationScreen()
         else{
             DetailedText += "Continuous injection disabled\n";
         }
-        DetailedText += "Infusion volume per layer: " + QString::number(m_InjectionSettings.InfusionVolume) + "ul\n";
-        DetailedText += "Infusion rate per layer: " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s";
     }
+
+    if (AutoModeFlag){
+        DetailedText += "Auto Mode Active \n";
+        DetailedText += "Print Speed: " + QString::number(PrintSpeed) + " μm/s\n";
+        DetailedText += "Print Height: " + QString::number(PrintHeight) + " μm\n";
+    }
+    else{
+        DetailedText += "Auto Mode Not Active\n";
+    }
+    if (m_PrintScript.PrintScript == 1)
+    {
+        DetailedText += "Exposure Time controlled by print script\n";
+        DetailedText += "UV Intensity controlled by print script\n";
+        DetailedText += "Dark Time controlled by print script\n";
+        DetailedText += "Layer Thickness controlled by print script\n";
+        DetailedText += "Stage Velocity controlled by print script\n";
+        DetailedText += "Stage Acceleration controlled by print script\n";
+        if (m_PrintSettings.PrinterType == CLIP30UM){
+            DetailedText += "Stage Acceleration controlled by print script\n";
+        }
+        if (m_PrintSettings.PumpingMode == ON){
+            DetailedText += "Pump Height controlled by print script\n";
+        }
+        if(m_PrintSettings.PrinterType == ICLIP){
+            DetailedText += "Injection Volume controlled by print script\n";
+            DetailedText += "Injection Rate controlled by print script\n";
+        }
+    }
+    else
+    {
+        DetailedText += "Exposure Time: " + QString::number(m_PrintSettings.ExposureTime/1000) + " ms\n";
+        DetailedText += "UV Intensity: " + QString::number(m_PrintSettings.UVIntensity) + "\n";
+        DetailedText += "Dark Time " + QString::number(m_PrintSettings.DarkTime/1000) + " ms\n";
+        DetailedText += "Layer Thickness: " + QString::number(m_PrintSettings.LayerThickness*1000) + " μm\n";
+        DetailedText += "Stage Velocity: " + QString::number(m_PrintSettings.StageVelocity) + " mm/s\n";
+        if (m_PrintSettings.PrinterType == CLIP30UM){
+            DetailedText += "Stage Acceleration: " + QString::number(m_PrintSettings.StageAcceleration) + " mm/s^2\n";
+        }
+        if (m_PrintSettings.PumpingMode == ON){
+            DetailedText += "Pump Height set to: " + QString::number(m_PrintSettings.PumpingParameter);
+        }
+        if(m_PrintSettings.PrinterType == ICLIP){
+            DetailedText += "Infusion volume per layer: " + QString::number(m_InjectionSettings.InfusionVolume) + "ul\n";
+            DetailedText += "Infusion rate per layer: " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s";
+        }
+    }
+
     confScreen.setDetailedText(DetailedText);
 
     confScreen.exec();
