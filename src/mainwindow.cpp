@@ -328,7 +328,10 @@ void MainWindow::DarkTimeSlot(void)
 void MainWindow::SetExposureTimer()
 {
   if (m_PrintControls.InitialExposureFlag == 1){
-      int InitialExpMs = (m_PrintSettings.InitialExposure + m_PrintSettings.InitialDelay)*1000;
+      int InitialExpMs = m_PrintSettings.InitialExposure*1000;
+      if(m_PrintSettings.ProjectionMode == ON){
+        InitialExpMs += (m_PrintSettings.InitialDelay)*1000;
+      }
       QTimer::singleShot(InitialExpMs, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
   }
   else{
@@ -410,6 +413,7 @@ void MainWindow::on_POTFcheckbox_clicked()
         ui->VP_HDMIcheckbox->setChecked(false);     //Uncheck the Video Pattern checkbox
         EnableParameter(MAX_IMAGE, ON);             //Enable the max image upload parameter
         EnableParameter(VP_RESYNC, OFF);
+        EnableParameter(INITIAL_DELAY, OFF);
         m_PrintSettings.ProjectionMode = POTF;      //Set projection mode to POTF
         DLP.setIT6535Mode(0);                       //Turn off HDMI connection
         LCR_SetMode(PTN_MODE_OTF);                  //Set light engine to POTF mode
@@ -428,6 +432,7 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
         ui->POTFcheckbox->setChecked(false); //Uncheck the Video Pattern checkbox
         EnableParameter(MAX_IMAGE, OFF);
         EnableParameter(VP_RESYNC, ON);
+        EnableParameter(INITIAL_DELAY, ON);
         initImagePopout(); //Open projection window
         m_PrintSettings.ProjectionMode = VIDEOPATTERN; //Set projection mode to video pattern
 
@@ -1703,7 +1708,8 @@ void MainWindow::initSettings()
         ui->pumpingCheckBox->setChecked(false);
     }
 
-    EnableParameter(VP_RESYNC, OFF); //Always starts in POTF so ResyncVP is disabled from start
+    EnableParameter(VP_RESYNC, OFF); // Always starts in POTF so ResyncVP is disabled from start
+    EnableParameter(INITIAL_DELAY, OFF); // Always starts in POTF so Initial delay is disabled
 
     ui->pumpingParameter->setValue(m_PrintSettings.PumpingParameter);
     ui->BitDepthParam->setValue(m_PrintSettings.BitMode);
@@ -1887,6 +1893,11 @@ void MainWindow::EnableParameter(Parameter_t Parameter, bool State)
             ui->InitialExposureIntensityParam->setEnabled(State);
             ui->SetInitalExposureIntensity->setEnabled(State);
             ui->InitialIntensityBox->setEnabled(State);
+            break;
+        case INITIAL_DELAY:
+            ui->InitialDelayParam->setEnabled(State);
+            ui->SetInitialDelay->setEnabled(State);
+            ui->InitialDelayBox->setEnabled(State);
         case CONTINUOUS_INJECTION:
             ui->ContinuousInjection->setEnabled(State);
             break;
