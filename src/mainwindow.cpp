@@ -168,8 +168,10 @@ void MainWindow::updatePosition(QString CurrentPosition)
 void MainWindow::on_InitializeAndSynchronize_clicked()
 {
   // If the confirmation screen was approved by user
-  if (initConfirmationScreen())
+  if(ui->FileList->count() > 0)
   {
+    if (initConfirmationScreen())
+    {
     if(m_PrintSettings.ProjectionMode == POTF){
         // n slices = n images
         m_PrintControls.nSlice = ui->FileList->count();
@@ -197,6 +199,10 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         updatePlot();
         ui->StartPrint->setEnabled(true);
     }
+  }
+  else{
+      showError("No image files selected");
+  }
 }
 
 /**
