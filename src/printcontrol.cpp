@@ -26,10 +26,12 @@ printcontrol::printcontrol()
  * \param m_PrintScript  Print script from Main Window, passed to PatternUpload and GetExposureType
  */
 void printcontrol::InitializeSystem(QStringList ImageList, PrintSettings m_PrintSettings,
-                                    PrintControls *pPrintControls, PrintScripts m_PrintScript)
+                                    PrintControls *pPrintControls, PrintScripts m_PrintScript,
+                                    InjectionSettings m_InjectionSettings)
 {
     pc_DLP.PatternDisplay(OFF);
     pc_Stage.initStagePosition(m_PrintSettings);    // Move stage to starting position
+    pc_Pump.initPumpParams(m_InjectionSettings);
     pc_DLP.PatternUpload(ImageList, *pPrintControls, m_PrintSettings, m_PrintScript);
 
     pPrintControls->PrintEnd = CalcPrintEnd(pPrintControls->nSlice, m_PrintSettings);
@@ -110,6 +112,7 @@ int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintCo
     if(ContinuousInjection){        // Restarting continous injection after reupload
         pc_Pump.SetTargetVolume(0);
         pc_Pump.StartInfusion();
+        emit ControlPrintSignal("Resuming Continuous Injection");
     }
     Sleep(625);
     pc_DLP.startPatSequence();      // Restart projection after reupload
@@ -123,7 +126,8 @@ int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintCo
  * \param pPrintControls - From MainWindow, uses InitialExposureFlag, sets inMotion, layerCount, and remainingImages
  * \param InitialExposure - Initial exposure duration in units of seconds
  */
-void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, uint InitialExposure)
+void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, uint InitialExposure,
+                                       InjectionSettings m_InjectionSettings)
 {
     if(pPrintControls->InitialExposureFlag == true){
         pPrintControls->InitialExposureFlag = false;
@@ -131,8 +135,14 @@ void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, uint Initi
         emit ControlPrintSignal("Exposing Initial Layer " + QString::number(InitialExposure) + "s");
         emit UpdatePlotSignal();
         emit GetPositionSignal();
+        pc_Pump.SetTargetVolume(m_InjectionSettings.InfusionVolume);
     }
     else{
+        if(m_InjectionSettings.SteppedContinuousInjection){
+            pc_Pump.SetInfuseRate(m_InjectionSettings.BaseInjectionRate);
+            emit ControlPrintSignal("Injection rate set to: " +
+                                    QString::number(m_InjectionSettings.BaseInjectionRate));
+        }
         pPrintControls->layerCount++;
         pPrintControls->remainingImages--;
         pPrintControls->BitLayer++;
@@ -182,24 +192,27 @@ void printcontrol::DarkTimeHandler(PrintControls m_PrintControls, PrintSettings 
     if(m_PrintSettings.PrinterType == ICLIP){
         // For pre injection delay, injection is handled first and stage movement second
         if (m_InjectionSettings.InjectionDelayFlag == PRE){
-            PrintInfuse(m_InjectionSettings.ContinuousInjection);
+            PrintInfuse(m_InjectionSettings);
             QTimer::singleShot(m_InjectionSettings.InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove(m_PrintControls, m_PrintSettings, m_PrintScript)));
             emit ControlPrintSignal("Pre-Injection Delay: " + QString::number(m_InjectionSettings.InjectionDelayParam));
         }
         // For post injection delay, stage movement is handled first and injection second
         else if (m_InjectionSettings.InjectionDelayFlag == POST){
             StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
-            QTimer::singleShot(m_InjectionSettings.InjectionDelayParam, Qt::PreciseTimer, this, SLOT(m_InjectionSettings));
+            QTimer::singleShot(m_InjectionSettings.InjectionDelayParam, Qt::PreciseTimer, this, SLOT(PrintInfuse(m_InjectionSettings)));
             emit ControlPrintSignal("Post-Injection Delay: " + QString::number(m_InjectionSettings.InjectionDelayParam));
         }
         // If no injection delay is set, injection and movement are handled at the same time
         else{
-            PrintInfuse(m_InjectionSettings.ContinuousInjection);
+            PrintInfuse(m_InjectionSettings);
             StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
             emit ControlPrintSignal("No injection delay");
         }
-        emit ControlPrintSignal("Injecting " + QString::number(m_InjectionSettings.InfusionVolume)
-                                + "ul at " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s");
+
+        if (m_InjectionSettings.ContinuousInjection == OFF){
+            emit ControlPrintSignal("Injecting " + QString::number(m_InjectionSettings.InfusionVolume)
+                                    + "ul at " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s");
+        }
     }
     // If not in iCLIP mode, stage movement is performed directly
     else{
@@ -299,7 +312,7 @@ void printcontrol::StageMove(PrintControls m_PrintControls, PrintSettings m_Prin
         if (m_PrintControls.layerCount > 0){
             if (m_PrintControls.layerCount < m_PrintScript.LayerThicknessScriptList.size()){
                 double LayerThickness = m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()/1000; //grab layer thickness from script list
-                emit ControlPrintSignal("Moving Stage: " + QString::number(m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()) + " um");
+                emit ControlPrintSignal("Moving Stage: " + QString::number(m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()*1000) + " um");
                 pc_Stage.StageRelativeMove(-LayerThickness, m_PrintSettings.StageType); //Move stage 1 layer thickness
 
                 //If pumping mode is active, grab pump height from script and move stage Pump height - layer thickness
@@ -328,12 +341,18 @@ void printcontrol::StageMove(PrintControls m_PrintControls, PrintSettings m_Prin
  * clears volume and starts new infusion
  * \param ContinuousInjection - boolean, true if ContinuousInjection is active, false otherwise
  */
-void printcontrol::PrintInfuse(bool ContinuousInjection)
+void printcontrol::PrintInfuse(InjectionSettings m_InjectionSettings)
 {
-    if (ContinuousInjection == OFF){
+    if (m_InjectionSettings.ContinuousInjection == OFF){
         pc_Pump.ClearVolume();
         Sleep(10);
         pc_Pump.StartInfusion();
         emit ControlPrintSignal("Injecting resin");
+    }
+    else if (m_InjectionSettings.SteppedContinuousInjection == ON){
+        pc_Pump.SetInfuseRate(m_InjectionSettings.InfusionRate);
+        emit ControlPrintSignal("Injection rate set to: " +
+                                            QString::number(m_InjectionSettings.InfusionRate));
+
     }
 }

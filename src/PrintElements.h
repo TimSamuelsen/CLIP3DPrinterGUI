@@ -35,12 +35,14 @@ typedef enum Parameter{
     PUMP_HEIGHT,
     INJECTION_VOLUME,
     INJECTION_RATE,
+    BASE_INJECTION,
     INITIAL_VOLUME,
     INITIAL_DELAY,
     INITIAL_INTENSITY,
     MAX_IMAGE,
     VP_RESYNC,
     CONTINUOUS_INJECTION,
+    STEPPED_CONT_INJECTION,
     STARTING_POSITION,
     MAX_END,
     MIN_END,
@@ -132,10 +134,12 @@ struct InjectionSettings
     double InfusionRate = 0;
     double InfusionVolume = 0;
     double InitialVolume = 0;
+    double BaseInjectionRate = 0;
+    double InjectionDelayParam = 0;
 
     bool ContinuousInjection = false;
+    bool SteppedContinuousInjection = false;
     int InjectionDelayFlag = 0;
-    double InjectionDelayParam = 0;
 };
 
 #endif // PRINTELEMENTS_H

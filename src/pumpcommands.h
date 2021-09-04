@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "serialib.h"
+#include "PrintElements.h"
 
 /*!
  * \brief The PumpCommands class handles injection pump operation
@@ -25,6 +26,7 @@ public:
     bool isConnected;
 
     bool PumpInitConnection(const char* COMport);
+    void initPumpParams(InjectionSettings m_InjectionSettings);
 
     int StartInfusion();
     int StartWithdraw();

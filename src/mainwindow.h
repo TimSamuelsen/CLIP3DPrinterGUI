@@ -169,6 +169,10 @@ private slots:
 
     void on_SetResyncRate_clicked();
 
+    void on_SetBaseInfusion_clicked();
+
+    void on_SteppedContInjection_clicked();
+
 private:
     Ui::MainWindow *ui;
     PrintScripts m_PrintScript;

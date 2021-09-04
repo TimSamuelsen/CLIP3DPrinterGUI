@@ -1,4 +1,5 @@
 #include "pumpcommands.h"
+#include "PrintElements.h"
 
 /******************************************Active Commands******************************************/
 bool PumpCommands::PumpInitConnection(const char* COMport)
@@ -332,4 +333,20 @@ char* PumpCommands::SerialRead()
         return  receivedString;
     }
    return receivedString;
+}
+
+void PumpCommands::initPumpParams(InjectionSettings m_InjectionSettings)
+{
+    if (m_InjectionSettings.ContinuousInjection || m_InjectionSettings.SteppedContinuousInjection){
+        SetInfuseRate(m_InjectionSettings.BaseInjectionRate);
+        Sleep(10);
+        SetTargetTime(0); // Settings target time to 0 results in a indefinite injection
+    }
+    else{
+        SetInfuseRate(m_InjectionSettings.InfusionRate);
+        Sleep(10);
+        SetTargetVolume(m_InjectionSettings.InitialVolume);
+
+    }
+
 }

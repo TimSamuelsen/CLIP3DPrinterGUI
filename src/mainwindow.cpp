@@ -192,8 +192,8 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         // Get ordered list of images
         QStringList ImageList = GetImageList(m_PrintControls, m_PrintSettings);
         // Initialize system hardware
-        PrintControl.InitializeSystem(ImageList, m_PrintSettings, &m_PrintControls, m_PrintScript);
-
+        PrintControl.InitializeSystem(ImageList, m_PrintSettings, &m_PrintControls,
+                                      m_PrintScript, m_InjectionSettings);
         emit(on_GetPosition_clicked());     //Sanity check for stage starting position
         initPlot();
         updatePlot();
@@ -255,9 +255,9 @@ void MainWindow::PrintProcess()
 
         SetExposureTimer();
         if (m_PrintSettings.PrinterType == ICLIP){
-            emit on_GetPosition_clicked();
+            on_GetPosition_clicked();
         }
-        PrintControl.PrintProcessHandler(&m_PrintControls, m_PrintSettings.InitialExposure);
+        PrintControl.PrintProcessHandler(&m_PrintControls, m_PrintSettings.InitialExposure, m_InjectionSettings);
     }
     else{
         PrintComplete();
@@ -449,6 +449,7 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
             ui->VP_HDMIcheckbox->setChecked(false);
             ui->POTFcheckbox->setChecked(true);
             emit(on_POTFcheckbox_clicked());
+            // add a close image popout
             return;
         }
         DLP.setIT6535Mode(1); //Set IT6535 reciever to HDMI input
@@ -1217,15 +1218,42 @@ void MainWindow::on_SetUVIntensity_clicked()
 void MainWindow::on_ContinuousInjection_clicked()
 {
     if (ui->ContinuousInjection->isChecked() == true){
+        ui->SteppedContInjection->setChecked(false);
         Pump.SetTargetVolume(0);
         m_InjectionSettings.ContinuousInjection = true;
         PrintToTerminal("Continuous Injection Selected");
+        EnableParameter(BASE_INJECTION, ON);
     }
     else{
         m_InjectionSettings.ContinuousInjection = false;
         PrintToTerminal("Continuous Injection Disabled");
     }
 }
+
+void MainWindow::on_SteppedContInjection_clicked()
+{
+    if (ui->SteppedContInjection->isChecked() == true){
+        ui->ContinuousInjection->setChecked(false);
+        Pump.SetTargetVolume(0);
+        m_InjectionSettings.SteppedContinuousInjection = true;
+        PrintToTerminal("Stepped continuous injection enabled");
+        EnableParameter(BASE_INJECTION, ON);
+
+    }
+    else{
+        m_InjectionSettings.SteppedContinuousInjection = false;
+        ui->ContinuousInjection->setChecked(false);
+        PrintToTerminal("Stepped continuous injection disabled");
+    }
+}
+
+void MainWindow::on_SetBaseInfusion_clicked()
+{
+    m_InjectionSettings.BaseInjectionRate = ui->BaseInfusionParam->value();
+    PrintToTerminal("Set Base injection to: " +
+                    QString::number(m_InjectionSettings.BaseInjectionRate) + " ul/s");
+}
+
 
 /*!
  * \brief MainWindow::on_SetInfuseRate_clicked
@@ -1385,101 +1413,118 @@ bool MainWindow::initConfirmationScreen()
 
     QString DetailedText;
     if(m_PrintSettings.PrinterType == CLIP30UM){
-        DetailedText += "Printer set to CLIP 30um\n";
+        DetailedText += "Printer Type: CLIP 30um\n";
     }
     else if(m_PrintSettings.PrinterType == ICLIP){
-        DetailedText += "Printer set to iCLIP\n";
+        DetailedText += "Printer Type: iCLIP\n";
     }
 
     if(m_PrintSettings.ProjectionMode == POTF){
-        DetailedText += "POTF projection mode selected\n";
+        DetailedText += "Projection Mode: POTF\n";
     }
     else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
-        DetailedText += "Video Pattern projection mode selected\n";
+        DetailedText += "Projection Mode: Video Pattern\n";
     }
 
     if(m_PrintSettings.MotionMode == STEPPED){
-        DetailedText += "Motion mode set to stepped\n";
+        DetailedText += "Motion Mode: stepped\n";
     }
     else if(m_PrintSettings.MotionMode == CONTINUOUS){
-        DetailedText += "Motion mode set to continuous\n";
+        DetailedText += "Motion Mode: continuous\n";
     }
 
     if(m_PrintSettings.PumpingMode == OFF){
-        DetailedText += "Pumping disabled\n";
+        DetailedText += "Pumping: disabled\n";
     }
     else if(m_PrintSettings.PumpingMode == ON){
-        DetailedText += "Pumping Enabled\n";
+        DetailedText += "Pumping: enabled\n";
     }
 
     if (m_PrintSettings.ProjectionMode == POTF){
-        DetailedText += "Max Image Upload: " + QString::number(m_PrintSettings.MaxImageUpload) + "images\n";
+        DetailedText += "Max Image Upload: " + QString::number(m_PrintSettings.MaxImageUpload) + "\n";
     }
     else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
-        DetailedText += "Resync rate: " + QString::number(m_PrintSettings.ResyncVP) + "\n";
+        DetailedText += "Resync Rate: " + QString::number(m_PrintSettings.ResyncVP) + "\n";
+        DetailedText += "Initial Exposure Delay: " + QString::number(m_PrintSettings.InitialDelay) + " s\n";
     }
 
-    DetailedText += "Bit Depth set to: " + QString::number(m_PrintSettings.BitMode) + "\n";
-    DetailedText += "Initial Exposure Time: " + QString::number(m_PrintSettings.InitialExposure) + "s\n";
-    DetailedText += "Initial Exposure Delay: " + QString::number(m_PrintSettings.InitialDelay) + "s\n";
-    DetailedText += "Initial Exposure Intensity " + QString::number(m_PrintSettings.InitialIntensity) + "\n";
+    DetailedText += "Bit Depth: " + QString::number(m_PrintSettings.BitMode) + "\n";
+    DetailedText += "Initial Exposure Time: " + QString::number(m_PrintSettings.InitialExposure) + " s\n";
+    DetailedText += "Initial Exposure Intensity: " + QString::number(m_PrintSettings.InitialIntensity) + "\n";
     if (m_PrintSettings.PrinterType == CLIP30UM){
         DetailedText += "Starting Position: " + QString::number(m_PrintSettings.StartingPosition) + " mm\n";
-        DetailedText += "Max End Of Run: " + QString::number(m_PrintSettings.MaxEndOfRun) + " mm\n";
-        DetailedText += "Min End Of Run: " + QString::number(m_PrintSettings.MinEndOfRun) + " mm\n";
+        DetailedText += "Max End of Run: " + QString::number(m_PrintSettings.MaxEndOfRun) + " mm\n";
+        DetailedText += "Min End of Run: " + QString::number(m_PrintSettings.MinEndOfRun) + " mm\n";
     }
     else if (m_PrintSettings.PrinterType == ICLIP){
+        if(m_InjectionSettings.InjectionDelayFlag == PRE){
+            DetailedText += "Pre-Injection Delay: "
+                            + QString::number(m_InjectionSettings.InjectionDelayParam) + " ms\n";
+        }
+        else if(m_InjectionSettings.InjectionDelayFlag == POST){
+            DetailedText += "Post-Injection Delay: "
+                            + QString::number(m_InjectionSettings.InjectionDelayParam) + " ms\n";
+        }
+
         if(m_InjectionSettings.ContinuousInjection == ON){
-            DetailedText += "Continuous injection enabled\n";
+            DetailedText += "Continuous Injection: enabled\n";
+            DetailedText += "Base Injection Rate: " + QString::number(m_InjectionSettings.BaseInjectionRate) + " ul/s\n";
+        }
+        else if (m_InjectionSettings.SteppedContinuousInjection){
+            DetailedText += "Continuous Injection: stepped\n";
+            DetailedText += "Base Injection Rate: " + QString::number(m_InjectionSettings.BaseInjectionRate) + " ul/s\n";
         }
         else{
-            DetailedText += "Continuous injection disabled\n";
+            DetailedText += "Continuous Injection: disabled\n";
         }
+
+        DetailedText += "Initial Injection Volume: " + QString::number(m_InjectionSettings.InfusionVolume) + " ul\n";
     }
 
     if (AutoModeFlag){
-        DetailedText += "Auto Mode Active \n";
-        DetailedText += "Print Speed: " + QString::number(PrintSpeed) + " μm/s\n";
-        DetailedText += "Print Height: " + QString::number(PrintHeight) + " μm\n";
+        DetailedText += "Auto Mode Active\n";
+        DetailedText += "Print Speed: " + QString::number(PrintSpeed) + " um/s\n";
+        DetailedText += "Print Height: " + QString::number(PrintHeight) + " um\n";
     }
     else{
         DetailedText += "Auto Mode Not Active\n";
     }
     if (m_PrintScript.PrintScript == 1)
     {
-        DetailedText += "Exposure Time controlled by print script\n";
-        DetailedText += "UV Intensity controlled by print script\n";
-        DetailedText += "Dark Time controlled by print script\n";
-        DetailedText += "Layer Thickness controlled by print script\n";
-        DetailedText += "Stage Velocity controlled by print script\n";
-        DetailedText += "Stage Acceleration controlled by print script\n";
+        DetailedText += "Print Script: enabled\n";
+        DetailedText += "Exposure Time: print script\n";
+        DetailedText += "UV Intensity: print script\n";
+        DetailedText += "Dark Time: print script\n";
+        DetailedText += "Layer Thickness: print script\n";
+        DetailedText += "Stage Velocity: print script\n";
         if (m_PrintSettings.PrinterType == CLIP30UM){
-            DetailedText += "Stage Acceleration controlled by print script\n";
+            DetailedText += "Stage Acceleration: print script\n";
         }
         if (m_PrintSettings.PumpingMode == ON){
-            DetailedText += "Pump Height controlled by print script\n";
+            DetailedText += "Pump Height: print script\n";
         }
         if(m_PrintSettings.PrinterType == ICLIP){
-            DetailedText += "Injection Volume controlled by print script\n";
-            DetailedText += "Injection Rate controlled by print script\n";
+            DetailedText += "Injection Volume: print script\n";
+            DetailedText += "Injection Rate: print script\n";
         }
     }
     else
     {
+        DetailedText += "Print Script: disabled\n";
         DetailedText += "Exposure Time: " + QString::number(m_PrintSettings.ExposureTime/1000) + " ms\n";
         DetailedText += "UV Intensity: " + QString::number(m_PrintSettings.UVIntensity) + "\n";
-        DetailedText += "Dark Time " + QString::number(m_PrintSettings.DarkTime/1000) + " ms\n";
-        DetailedText += "Layer Thickness: " + QString::number(m_PrintSettings.LayerThickness*1000) + " μm\n";
+        DetailedText += "Dark Time: " + QString::number(m_PrintSettings.DarkTime/1000) + " ms\n";
+        DetailedText += "Layer Thickness: " + QString::number(m_PrintSettings.LayerThickness*1000) + " um\n";
         DetailedText += "Stage Velocity: " + QString::number(m_PrintSettings.StageVelocity) + " mm/s\n";
         if (m_PrintSettings.PrinterType == CLIP30UM){
             DetailedText += "Stage Acceleration: " + QString::number(m_PrintSettings.StageAcceleration) + " mm/s^2\n";
         }
         if (m_PrintSettings.PumpingMode == ON){
-            DetailedText += "Pump Height set to: " + QString::number(m_PrintSettings.PumpingParameter);
+            DetailedText += "Pump Height: " + QString::number(m_PrintSettings.PumpingParameter*1000) + " um\n";
         }
         if(m_PrintSettings.PrinterType == ICLIP){
-            DetailedText += "Infusion volume per layer: " + QString::number(m_InjectionSettings.InfusionVolume) + "ul\n";
-            DetailedText += "Infusion rate per layer: " + QString::number(m_InjectionSettings.InfusionRate) + "ul/s";
+            DetailedText += "Injection Volume: " + QString::number(m_InjectionSettings.InfusionVolume) + " ul\n";
+            DetailedText += "Injection Rate: " + QString::number(m_InjectionSettings.InfusionRate) + " ul/s";
         }
     }
 
@@ -1609,10 +1654,11 @@ void MainWindow::saveSettings()
     settings.setValue("PumpingParameter", m_PrintSettings.PumpingParameter);
     settings.setValue("BitMode", m_PrintSettings.BitMode);
 
-    settings.setValue("ContinuousInjection", ui->ContinuousInjection->isChecked());
     settings.setValue("InfusionRate", m_InjectionSettings.InfusionRate);
     settings.setValue("InfusionVolume", m_InjectionSettings.InfusionVolume);
-
+    settings.setValue("InitialVolume", m_InjectionSettings.InfusionVolume);
+    settings.setValue("BaseInjectionRate", m_InjectionSettings.BaseInjectionRate);
+    settings.setValue("InjectionDelay", m_InjectionSettings.InjectionDelayParam);
 
     settings.setValue("StageCOM", ui->COMPortSelect->currentIndex());
     settings.setValue("PumpCOM", ui->COMPortSelectPump->currentIndex());
@@ -1657,14 +1703,16 @@ void MainWindow::loadSettings()
         m_PrintSettings.PumpingMode = settings.value("PumpingMode", 0).toDouble();
         m_PrintSettings.PumpingParameter = settings.value("PumpingParameter", 0).toDouble();
         m_PrintSettings.BitMode = settings.value("BitMode", 1).toDouble();
+
         m_InjectionSettings.InfusionRate = settings.value("InfusionRate", 5).toDouble();
         m_InjectionSettings.InfusionVolume = settings.value("InfusionVolume", 5).toDouble();
-
-        m_InjectionSettings.ContinuousInjection = settings.value("ContinuousInjection", OFF).toInt();
-        loadSettingsFlag = true;
+        m_InjectionSettings.InitialVolume = settings.value("InitialVolume", 0).toDouble();
+        m_InjectionSettings.BaseInjectionRate = settings.value("BaseInjectionRate", 0).toDouble();
+        m_InjectionSettings.InjectionDelayParam = settings.value("InjectionDelay", 0).toDouble();
 
         ui->COMPortSelect->setCurrentIndex(settings.value("StageCOM", 0).toInt());
         ui->COMPortSelectPump->setCurrentIndex(settings.value("PumpCOM", 0).toInt());
+        loadSettingsFlag = true;
     }
 }
 
@@ -1704,11 +1752,7 @@ void MainWindow::initSettings()
     else if(m_PrintSettings.PrinterType == ICLIP){
         ui->DICLIPSelect->setChecked(true);
         ui->CLIPSelect->setChecked(false);
-        emit(on_DICLIPSelect_clicked());
-        if(m_InjectionSettings.ContinuousInjection == ON){
-            ui->ContinuousInjection->setChecked(true);
-            emit(on_ContinuousInjection_clicked());
-        }
+        on_DICLIPSelect_clicked();
     }
 
     if(m_PrintSettings.MotionMode == STEPPED){
@@ -1735,8 +1779,12 @@ void MainWindow::initSettings()
 
     ui->pumpingParameter->setValue(m_PrintSettings.PumpingParameter);
     ui->BitDepthParam->setValue(m_PrintSettings.BitMode);
+
     ui->InfuseRateParam->setValue(m_InjectionSettings.InfusionRate);
     ui->VolPerLayerParam->setValue(m_InjectionSettings.InfusionVolume);
+    ui->InitialVolumeParam->setValue(m_InjectionSettings.InfusionVolume);
+    ui->BaseInfusionParam->setValue(m_InjectionSettings.BaseInjectionRate);
+    ui->InjectionDelayParam->setValue(m_InjectionSettings.InjectionDelayParam);
 }
 
 /*******************************************Plot Functions*********************************************/
@@ -1896,6 +1944,11 @@ void MainWindow::EnableParameter(Parameter_t Parameter, bool State)
             ui->SetInfuseRate->setEnabled(State);
             ui->InfusionRateBox->setEnabled(State);
             break;
+        case BASE_INJECTION:
+            ui->BaseInfusionParam->setEnabled(State);
+            ui->BaseInfusionRateTitle->setEnabled(State);
+            ui->SetBaseInfusion->setEnabled(State);
+            break;
         case MAX_IMAGE:
             ui->MaxImageUpload->setEnabled(State);
             ui->SetMaxImageUpload->setEnabled(State);
@@ -1920,8 +1973,11 @@ void MainWindow::EnableParameter(Parameter_t Parameter, bool State)
             ui->InitialDelayParam->setEnabled(State);
             ui->SetInitialDelay->setEnabled(State);
             ui->InitialDelayBox->setEnabled(State);
+            break;
         case CONTINUOUS_INJECTION:
             ui->ContinuousInjection->setEnabled(State);
+            ui->SteppedContInjection->setEnabled(State);
+            ui->ContInjectionBox->setEnabled(State);
             break;
         case STARTING_POSITION:
             ui->StartingPositionParam->setEnabled(State);
@@ -2027,14 +2083,21 @@ bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter
                         //currently handled by StageMove function
                         break;
                     case INJECTION_VOLUME:
-                        Pump.SetTargetVolume(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble());
-                        ui->LiveValue4->setText(QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
-                        PrintToTerminal("Injection Volume set to : " + QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
+                        if (m_InjectionSettings.ContinuousInjection == OFF && m_InjectionSettings.SteppedContinuousInjection == OFF){
+                            Pump.SetTargetVolume(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble());
+                            ui->LiveValue4->setText(QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
+                            PrintToTerminal("Injection Volume set to : " + QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
+                        }
                         break;
                     case INJECTION_RATE:
-                        Pump.SetInfuseRate(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble());
+                        if (m_InjectionSettings.SteppedContinuousInjection == ON || m_InjectionSettings.ContinuousInjection){
+                            m_InjectionSettings.InfusionRate = m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble();
+                        }
+                        else{
+                            Pump.SetInfuseRate(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble());
+                            PrintToTerminal("Injection Rate set to: " + QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
+                        }
                         ui->LiveValue5->setText(QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
-                        PrintToTerminal("Injection Rate set to: " + QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
                         break;
                     default:
                         break;
