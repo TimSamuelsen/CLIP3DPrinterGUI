@@ -345,12 +345,13 @@ void MainWindow::SetExposureTimer()
     switch (m_PrintControls.ExposureType){
       case EXPOSURE_NORM:
         QTimer::singleShot(m_PrintSettings.ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-        PrintToTerminal("Exposure: " + QString::number(m_PrintSettings.ExposureTime/1000) + "ms");
+        PrintToTerminal("Exposure: " + QString::number(m_PrintSettings.ExposureTime/1000) + "ms ");
         break;
       case EXPOSURE_PUMP:
         ExposureTime = m_PrintSettings.ExposureTime/1000;   //Convert from us to ms
         QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
-        PrintToTerminal("Exposure: " + QString::number(ExposureTime/1000) + "ms, preparing for pumping");
+        PrintToTerminal("Exposure: " + QString::number(ExposureTime/1000) + " ms");
+        PrintToTerminal("Preparing for pumping");
         break;
       case EXPOSURE_PS:
         if (m_PrintControls.layerCount < m_PrintScript.ExposureScriptList.count()){
@@ -395,7 +396,7 @@ void MainWindow::SetDarkTimer()
             }
         }
         QTimer::singleShot(DarkTimeSelect,  Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
-        PrintToTerminal("Dark time: " + QString::number(DarkTimeSelect) + " ms");
+        PrintToTerminal("Dark Time: " + QString::number(DarkTimeSelect) + " ms");
     }
     else{
         if (m_PrintControls.inMotion == false){
