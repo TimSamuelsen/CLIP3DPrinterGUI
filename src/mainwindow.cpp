@@ -361,7 +361,7 @@ void MainWindow::SetExposureTimer()
             ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintScript.ExposureScriptList.count()-1).toDouble();
         }
         QTimer::singleShot(ExposureTime, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-        PrintToTerminal("Exposure PS: " + QString::number(ExposureTime) + "ms");
+        PrintToTerminal("Exposure: " + QString::number(ExposureTime) + "ms");
         break;
       case EXPOSURE_PS_PUMP:
         if (m_PrintControls.layerCount < m_PrintScript.ExposureScriptList.count()){
@@ -371,7 +371,7 @@ void MainWindow::SetExposureTimer()
             ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintScript.ExposureScriptList.count()-1).toDouble();
         }
         QTimer::singleShot(ExposureTime, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
-        PrintToTerminal("Exposure PS: " + QString::number(ExposureTime) + "ms, preparing for pumping");
+        PrintToTerminal("Exposure: " + QString::number(ExposureTime) + "ms, preparing for pumping");
         break;
       default:
         break;
@@ -1685,7 +1685,7 @@ void MainWindow::loadSettings()
 
 
         m_PrintSettings.StartingPosition = settings.value("StartingPosition", 5).toDouble();
-        m_PrintSettings.InitialExposure = settings.value("InitialExposure", 10).toInt();
+        m_PrintSettings.InitialExposure = settings.value("InitialExposure", 10).toDouble();
         m_PrintSettings.InitialDelay = settings.value("InitialDelay", 0).toInt();
         m_PrintSettings.InitialIntensity = settings.value("InitialIntensity", 10).toInt();
         m_PrintSettings.LayerThickness = settings.value("LayerThickness", 1).toDouble();
@@ -2215,7 +2215,7 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
 {
     QStringList ImageList;
     QListWidgetItem * item;
-    int InitialExposureCount = m_PrintSettings.InitialExposure;
+    double InitialExposureCount = m_PrintSettings.InitialExposure;
     if (m_PrintControls.InitialExposureFlag == ON){ //If in initial POTF upload
         m_PrintControls.nSlice = ui->FileList->count();
         if (m_PrintControls.nSlice){

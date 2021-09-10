@@ -1293,7 +1293,7 @@ parameters</string>
        <number>0</number>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_4">
        <property name="geometry">
@@ -1706,8 +1706,8 @@ parameters</string>
            <height>31</height>
           </rect>
          </property>
-         <property name="decimals">
-          <number>0</number>
+         <property name="maximum">
+          <double>999.990000000000009</double>
          </property>
         </widget>
        </widget>

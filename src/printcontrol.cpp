@@ -312,7 +312,7 @@ void printcontrol::StageMove(PrintControls m_PrintControls, PrintSettings m_Prin
         if (m_PrintControls.layerCount > 0){
             if (m_PrintControls.layerCount < m_PrintScript.LayerThicknessScriptList.size()){
                 double LayerThickness = m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()/1000; //grab layer thickness from script list
-                emit ControlPrintSignal("Moving Stage: " + QString::number(m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()*1000) + " um");
+                emit ControlPrintSignal("Moving Stage: " + QString::number(m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()) + " um");
                 pc_Stage.StageRelativeMove(-LayerThickness, m_PrintSettings.StageType); //Move stage 1 layer thickness
 
                 //If pumping mode is active, grab pump height from script and move stage Pump height - layer thickness
@@ -326,11 +326,11 @@ void printcontrol::StageMove(PrintControls m_PrintControls, PrintSettings m_Prin
     else{
         if (m_PrintSettings.PumpingMode == ON){
             pc_Stage.StageRelativeMove(m_PrintSettings.PumpingParameter - m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
-            emit ControlPrintSignal("Pumping active, moving stage: " + QString::number(m_PrintSettings.PumpingParameter - m_PrintSettings.LayerThickness) + " um");
+            emit ControlPrintSignal("Pumping active, moving stage: " + QString::number(1000*(m_PrintSettings.PumpingParameter - m_PrintSettings.LayerThickness)) + " um");
         }
         else{
             pc_Stage.StageRelativeMove(-m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
-            emit ControlPrintSignal("Moving stage: " + QString::number(m_PrintSettings.LayerThickness) + " um");
+            emit ControlPrintSignal("Moving stage: " + QString::number(m_PrintSettings.LayerThickness*1000) + " um");
         }
     }
 }

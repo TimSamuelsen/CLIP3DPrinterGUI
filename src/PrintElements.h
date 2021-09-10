@@ -93,7 +93,7 @@ struct PrintSettings
     double MinEndOfRun = 0;
     double ExposureTime = 0;
     double DarkTime = 0;
-    int InitialExposure = 0;
+    double InitialExposure = 0;
     int InitialDelay = 0;
     int InitialIntensity = 0;
     int UVIntensity = 0;

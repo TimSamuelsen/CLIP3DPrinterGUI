@@ -43,7 +43,7 @@ void DLP9000::AddPatterns2(QStringList fileNames, PrintSettings m_PrintSettings,
     if(m_PrintSettings.BitMode == 0){
         m_PrintSettings.BitMode = 1; //Default bitmode to 1 if it somehow gets passed in undefined
     }
-    int InitialExposureCount = 0;
+    double InitialExposureCount = 0;
     if(m_PrintControls.InitialExposureFlag){
         InitialExposureCount = m_PrintSettings.InitialExposure;
     }
