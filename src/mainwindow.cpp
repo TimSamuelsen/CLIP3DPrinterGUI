@@ -2111,6 +2111,7 @@ bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter
         {
             case LED_INTENSITY:
                 LCR_SetLedCurrents(0, 0, Script.at(0).toInt());
+                break;
             case INJECTION_VOLUME:
                 Pump.SetInfuseRate(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble());
                 break;
