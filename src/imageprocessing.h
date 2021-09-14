@@ -17,6 +17,8 @@ public:
     explicit imageprocessing(QWidget *parent = nullptr);
     ~imageprocessing();
     QStringList ExposedPixelCount(QStringList ImageList);
+    QStringList ExposedPixelCountVP(QStringList ImageList);
+    QStringList GetDeepestPixels(QStringList ImageList);
 
 
 private slots:

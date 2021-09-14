@@ -191,6 +191,9 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         }
         // Get ordered list of images
         QStringList ImageList = GetImageList(m_PrintControls, m_PrintSettings);
+        //imageprocessing ImageTest;
+        //ImageTest.ExposedPixelCount(ImageList);
+        //ImageTest.GetDeepestPixels(ImageList);
         // Initialize system hardware
         PrintControl.InitializeSystem(ImageList, m_PrintSettings, &m_PrintControls,
                                       m_PrintScript, m_InjectionSettings);
@@ -1606,7 +1609,7 @@ bool MainWindow::ValidateSettings(void)
         return false;
     }
     //Validate UVIntensity
-    else if (m_PrintSettings.UVIntensity < 1 || m_PrintSettings.UVIntensity > 255){
+    else if (m_PrintSettings.UVIntensity < 0 || m_PrintSettings.UVIntensity > 255){
         showError("Invalid UV Intensity");
         PrintToTerminal("Invalid UVIntensity");
         return false;

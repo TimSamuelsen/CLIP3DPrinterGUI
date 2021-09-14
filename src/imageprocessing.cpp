@@ -315,10 +315,67 @@ QStringList imageprocessing::ExposedPixelCount(QStringList ImageList)
     QStringList ExposedPixelList;
     for (int i = 0; i < ImageList.size(); i++){
         QString fileName = ImageList[i];
+        int PixelCount = 0;
         Mat imageRead = imread(samples::findFile(fileName.toUtf8().constData()), IMREAD_GRAYSCALE);
+        Mat imageBinary;
+        threshold(imageRead, imageBinary, 10, 255, 0); //threshold image to binary
+        for (int row = 0; row < imageBinary.rows; row++)
+        {
+           for (int col = 0; col < imageBinary.cols; col++)
+           {
+               if (imageBinary.at<uchar>(row,col) > 0)
+               {
+                   PixelCount++;
+               }
+           }
+        }
+        printf("%d\r\n",PixelCount);
+        ExposedPixelList << QString::number(PixelCount);
     }
     return ExposedPixelList;
 }
+
+QStringList imageprocessing::ExposedPixelCountVP(QStringList ImageList)
+{
+    QStringList ExposedPixelList;
+    return ExposedPixelList;
+}
+
+QStringList imageprocessing::GetDeepestPixels(QStringList ImageList)
+{
+    QStringList DeepestPixelList;
+    for (int i = 0; i < ImageList.size(); i++){
+        QString fileName = ImageList[i];
+        Mat imageRead = imread(samples::findFile(fileName.toUtf8().constData()), IMREAD_GRAYSCALE);
+        Mat imageBinary;
+        threshold(imageRead, imageBinary, 10, 255, 0);
+        Mat dist;
+        distanceTransform(imageBinary, dist, DIST_L2, 5);
+
+        double minVal;
+        double maxVal;
+        Point minLoc;
+        Point maxLoc;
+        minMaxLoc(dist, &minVal, &maxVal, &minLoc, &maxLoc );
+
+        printf("MaxVal: %f, Loc: %d, %d", maxVal, maxLoc.x, maxLoc.y);
+        normalize(dist, dist, 0, 1.0, NORM_MINMAX);
+
+        Mat grayBGR;
+        cvtColor(dist, grayBGR, COLOR_GRAY2BGR);
+        circle(grayBGR, maxLoc, 7, Scalar(0, 255, 0),2);
+        char buffer [50];
+        sprintf(buffer, "%.1f", maxVal);
+        String InputString = buffer;
+        putText(grayBGR,InputString, Point(maxLoc.x +10, maxLoc.y+10),cv::FONT_HERSHEY_DUPLEX,1,
+                Scalar(0, 255, 0));
+
+
+        imshow("TEST", grayBGR);
+    }
+    return DeepestPixelList;
+}
+
 #if 0
 void imageprocessing::on_DisplayImage_clicked()
 {
