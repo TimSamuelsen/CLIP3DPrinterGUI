@@ -99,6 +99,7 @@ struct PrintSettings
     int UVIntensity = 0;
     int MaxImageUpload = 20;
     int ResyncVP = 24;
+    QString Resin = "No resin selected";
 
     double PumpingParameter = 0;
 };

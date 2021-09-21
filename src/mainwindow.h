@@ -62,8 +62,6 @@ private slots:
 
     void on_LiveValueList6_activated(const QString &arg1);
 
-    void on_ResinSelect_activated(const QString &arg1);
-
     void on_InitializeAndSynchronize_clicked();
 
     void on_StartPrint_clicked();
@@ -172,6 +170,10 @@ private slots:
     void on_SetBaseInfusion_clicked();
 
     void on_SteppedContInjection_clicked();
+
+    void on_resinSelect_activated(const QString &arg1);
+
+    void on_LogName_textChanged();
 
 private:
     Ui::MainWindow *ui;

@@ -39,6 +39,7 @@ static bool loadSettingsFlag = false;   // For ensuring the settings are only lo
 QDateTime CurrentDateTime;              // Current time
 QString LogFileDestination;             // for storing log file destination in settings
 QString ImageFileDirectory;             // For storing image file directory in settings
+QString LogName = "CLIPGUITEST";        // For storing the log file nam
 QTime PrintStartTime;                   // Get start time for log
 bool PSTableInitFlag = false;
 
@@ -55,7 +56,7 @@ QStringList FrameList;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    //Create new window
+    // Create new window
     ui = (new Ui::MainWindow);
     ui->setupUi(this);
 
@@ -326,6 +327,9 @@ void MainWindow::DarkTimeSlot(void)
     }
     PrintProcess();
     ui->ProgramPrints->append("Dark end: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
+    if (m_PrintSettings.PrinterType == ICLIP){
+        on_GetPosition_clicked();
+    }
 }
 
 /*!
@@ -948,15 +952,11 @@ void MainWindow::PumpConnected()
                                                "border: 1px solid black;");
     ui->PumpConnectionIndicator->setText("Connected");
 }
-/*********************************************Print Parameters*********************************************/
-/*!
- * \brief MainWindow::on_ResinSelect_activated
- * @param arg1: The resin selected
- * Prints the resin selected to the terminal
- */
-void MainWindow::on_ResinSelect_activated(const QString &arg1)
+/************************************Print Parameters**********************************************/
+void MainWindow::on_resinSelect_activated(const QString &arg1)
 {
-    PrintToTerminal(arg1 + " Selected");
+    PrintToTerminal("Resin set to: " + arg1);
+    m_PrintSettings.Resin = arg1;
 }
 
 /*!
@@ -1353,7 +1353,8 @@ void MainWindow::saveText()
      QString Log = ui->ProgramPrints->toPlainText();
      QString LogDate = CurrentDateTime.toString("yyyy-MM-dd");
      QString LogTime = CurrentDateTime.toString("hh.mm.ss");
-     QString LogTitle = LogFileDestination + "/CLIPGUITEST_" + LogDate + "_" + LogTime + ".txt";
+     QString LogTitle = LogFileDestination + "/" + LogName + "_" + LogDate + "_"
+                        + LogTime + ".txt";
      PrintToTerminal(LogTitle);
      QFile file(LogTitle);
      if (file.open(QIODevice::WriteOnly | QFile::Text))
@@ -1416,12 +1417,16 @@ bool MainWindow::initConfirmationScreen()
     confScreen.setText("Please Confirm Print Parameters "); //nospaces
 
     QString DetailedText;
+    DetailedText += LogName + "\n";
     if(m_PrintSettings.PrinterType == CLIP30UM){
         DetailedText += "Printer Type: CLIP 30um\n";
     }
     else if(m_PrintSettings.PrinterType == ICLIP){
         DetailedText += "Printer Type: iCLIP\n";
     }
+
+    m_PrintSettings.Resin = ui->resinSelect->currentText();
+    DetailedText += "Resin: " + m_PrintSettings.Resin;
 
     if(m_PrintSettings.ProjectionMode == POTF){
         DetailedText += "Projection Mode: POTF\n";
@@ -1649,7 +1654,9 @@ void MainWindow::saveSettings()
 
     settings.setValue("LogFileDestination", LogFileDestination);
     settings.setValue("ImageFileDirectory", ImageFileDirectory);
+    settings.setValue("LogName", LogName);
 
+    settings.setValue("Resin", m_PrintSettings.Resin);
     settings.setValue("PrinterType", m_PrintSettings.PrinterType);
     settings.setValue("StageType", m_PrintSettings.StageType);
 
@@ -1700,8 +1707,10 @@ void MainWindow::loadSettings()
 
         LogFileDestination = settings.value("LogFileDestination", "C://").toString();
         ImageFileDirectory = settings.value("ImageFileDirectory", "C://").toString();
+        LogName = settings.value("LogName", "CLIPGUITEST").toString();
 
         m_PrintSettings.PrinterType = settings.value("PrinterType", CLIP30UM).toDouble();
+        m_PrintSettings.Resin = settings.value("Resin", "No resin selected").toString();
 
         m_PrintSettings.MotionMode = settings.value("MotionMode", STEPPED).toDouble();
         m_PrintSettings.PumpingMode = settings.value("PumpingMode", 0).toDouble();
@@ -1746,7 +1755,21 @@ void MainWindow::initSettings()
     ui->MaxImageUpload->setValue(m_PrintSettings.MaxImageUpload);
     ui->ResyncRateList->setCurrentIndex((m_PrintSettings.ResyncVP/24)-1);
 
+    bool FoundMatch = false;
+    QStringList itemsInComboBox;
+    for (int index = 0; index < ui->resinSelect->count(); index++){
+        if (m_PrintSettings.Resin == ui->resinSelect->itemText(index)){
+            ui->resinSelect->setCurrentIndex(index);
+            FoundMatch = true;
+            break;
+        }
+    }
+    if(FoundMatch == false){
+        ui->resinSelect->addItem(m_PrintSettings.Resin);
+        ui->resinSelect->setCurrentIndex(ui->resinSelect->count()-1);
+    }
     ui->LogFileLocation->setText(LogFileDestination);
+    ui->LogName->setText(LogName);
 
     if(m_PrintSettings.PrinterType == CLIP30UM){
         ui->CLIPSelect->setChecked(true);
@@ -2110,16 +2133,53 @@ bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter
         }
     }
     else{ //If layercount = 0, or first layer
-        switch(DynamicVar)
+        switch(DynamicVar) // TO DO: Fix this mess
         {
+            case EXPOSURE_TIME:
+                //don't need to account for this atm
+                ui->LiveValue1->setText(QString::number(m_PrintScript.ExposureScriptList.at(layerCount).toInt()));
+                break;
             case LED_INTENSITY:
-                LCR_SetLedCurrents(0, 0, Script.at(0).toInt());
+                LCR_SetLedCurrents(0, 0, (Script.at(layerCount).toInt()));
+                ui->LiveValue2->setText(QString::number(Script.at(layerCount).toInt()));
+                PrintToTerminal("LED Intensity set to: " + QString::number(Script.at(layerCount).toInt()));
+                break;
+            case DARK_TIME:
+                PrintToTerminal("Dark Time set to: " + QString::number(Script.at(layerCount).toDouble()));
+                ui->LiveValue3->setText(QString::number(Script.at(layerCount).toInt()));
+                break;
+            case LAYER_THICKNESS:
+                //Currently handled by StageMove() function
+                break;
+            case STAGE_VELOCITY:
+                Stage.SetStageVelocity(Script.at(layerCount).toDouble(), m_PrintSettings.StageType);
+                PrintToTerminal("New stage velocity set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
+                Sleep(10); //delay for stage com
+                break;
+            case STAGE_ACCELERATION:
+                Stage.SetStageAcceleration(Script.at(layerCount).toDouble(), m_PrintSettings.StageType);
+                PrintToTerminal("New stage acceleration set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
+                Sleep(10); //delay for stage com
+                break;
+            case PUMP_HEIGHT:
+                //currently handled by StageMove function
                 break;
             case INJECTION_VOLUME:
-                Pump.SetInfuseRate(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble());
+                if (m_InjectionSettings.ContinuousInjection == OFF && m_InjectionSettings.SteppedContinuousInjection == OFF){
+                    Pump.SetTargetVolume(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble());
+                    ui->LiveValue4->setText(QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
+                    PrintToTerminal("Injection Volume set to : " + QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
+                }
                 break;
             case INJECTION_RATE:
-                Pump.SetTargetVolume(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble());
+                if (m_InjectionSettings.SteppedContinuousInjection == ON || m_InjectionSettings.ContinuousInjection){
+                    m_InjectionSettings.InfusionRate = m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble();
+                }
+                else{
+                    Pump.SetInfuseRate(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble());
+                    PrintToTerminal("Injection Rate set to: " + QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
+                }
+                ui->LiveValue5->setText(QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
                 break;
             default:
                 break;
@@ -2447,4 +2507,9 @@ void MainWindow::on_LiveValueList5_activated(const QString &arg1)
 void MainWindow::on_LiveValueList6_activated(const QString &arg1)
 {
     PrintToTerminal("LV6: " + arg1);
+}
+
+void MainWindow::on_LogName_textChanged()
+{
+    LogName = ui->LogName->toPlainText();
 }

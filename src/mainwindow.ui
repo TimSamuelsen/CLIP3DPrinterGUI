@@ -39,7 +39,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -75,44 +75,6 @@
      <attribute name="title">
       <string>Model Slicer</string>
      </attribute>
-     <widget class="QLabel" name="SelectResinLabel">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>90</y>
-        <width>111</width>
-        <height>20</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Select Resin&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="ResinSelect">
-      <property name="geometry">
-       <rect>
-        <x>40</x>
-        <y>120</y>
-        <width>101</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <item>
-       <property name="text">
-        <string>Resin A</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Resin B</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Resin C</string>
-       </property>
-      </item>
-     </widget>
      <widget class="QCheckBox" name="AutoCheckBox">
       <property name="geometry">
        <rect>
@@ -1238,13 +1200,13 @@ parameters</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>140</y>
+      <y>150</y>
       <width>381</width>
       <height>491</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -1293,7 +1255,7 @@ parameters</string>
        <number>0</number>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_4">
        <property name="geometry">
@@ -1311,7 +1273,7 @@ parameters</string>
         <property name="geometry">
          <rect>
           <x>180</x>
-          <y>10</y>
+          <y>80</y>
           <width>161</width>
           <height>61</height>
          </rect>
@@ -1347,7 +1309,7 @@ parameters</string>
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>10</y>
+          <y>80</y>
           <width>161</width>
           <height>61</height>
          </rect>
@@ -1386,7 +1348,7 @@ parameters</string>
         <property name="geometry">
          <rect>
           <x>180</x>
-          <y>80</y>
+          <y>150</y>
           <width>161</width>
           <height>61</height>
          </rect>
@@ -1428,7 +1390,7 @@ parameters</string>
         <property name="geometry">
          <rect>
           <x>9</x>
-          <y>80</y>
+          <y>150</y>
           <width>161</width>
           <height>61</height>
          </rect>
@@ -1488,8 +1450,8 @@ parameters</string>
        <widget class="QGroupBox" name="BitDepthBox">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>150</y>
+          <x>180</x>
+          <y>10</y>
           <width>161</width>
           <height>61</height>
          </rect>
@@ -1525,6 +1487,42 @@ parameters</string>
          <property name="maximum">
           <number>8</number>
          </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="resinSelectBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>161</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>Select Resin</string>
+        </property>
+        <widget class="QComboBox" name="resinSelect">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>141</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="editable">
+          <bool>true</bool>
+         </property>
+         <item>
+          <property name="text">
+           <string>Resin A</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Resin B</string>
+          </property>
+         </item>
         </widget>
        </widget>
       </widget>
@@ -2627,9 +2625,9 @@ parameters</string>
       <property name="geometry">
        <rect>
         <x>30</x>
-        <y>90</y>
+        <y>150</y>
         <width>301</width>
-        <height>321</height>
+        <height>261</height>
        </rect>
       </property>
       <property name="widgetResizable">
@@ -2641,60 +2639,18 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>299</width>
-         <height>319</height>
+         <height>259</height>
         </rect>
        </property>
       </widget>
-     </widget>
-     <widget class="QPushButton" name="LogFileBrowse">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>40</y>
-        <width>71</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Browse</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="LogFileLocation">
-      <property name="geometry">
-       <rect>
-        <x>11</x>
-        <y>41</y>
-        <width>271</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background:white; border: 1px solid black;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="LogFileTitle">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>351</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Set Log File Destination&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
      </widget>
      <widget class="QTextBrowser" name="ProgramPrints">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>90</y>
+        <y>150</y>
         <width>351</width>
-        <height>351</height>
+        <height>291</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -2707,6 +2663,74 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
+     </widget>
+     <widget class="QGroupBox" name="LogDestinationBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>351</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Set Log File Destination</string>
+      </property>
+      <widget class="QLabel" name="LogFileLocation">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>261</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background:white; border: 1px solid black;</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="LogFileBrowse">
+       <property name="geometry">
+        <rect>
+         <x>280</x>
+         <y>20</y>
+         <width>61</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Browse</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>80</y>
+        <width>351</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Edit Log Title</string>
+      </property>
+      <widget class="QTextEdit" name="LogName">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>331</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">background:white; border: 1px solid black;</string>
+       </property>
+      </widget>
      </widget>
     </widget>
    </widget>
