@@ -1426,7 +1426,7 @@ bool MainWindow::initConfirmationScreen()
     }
 
     m_PrintSettings.Resin = ui->resinSelect->currentText();
-    DetailedText += "Resin: " + m_PrintSettings.Resin;
+    DetailedText += "Resin: " + m_PrintSettings.Resin + "\n";
 
     if(m_PrintSettings.ProjectionMode == POTF){
         DetailedText += "Projection Mode: POTF\n";
