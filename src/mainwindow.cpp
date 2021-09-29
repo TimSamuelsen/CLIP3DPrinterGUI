@@ -95,6 +95,14 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::initPollTimer()
+{
+    QTimer *timer = new QTimer(this);
+    timer->setInterval(100);
+    connect(timer, SIGNAL(timeout()), this, SLOT(on_GetPosition_clicked()));
+    timer->start();
+}
+
 /*!
  * \brief MainWindow::on_ManualStage_clicked
  * Open the manual stage control window, sends home
@@ -155,6 +163,7 @@ void MainWindow::updatePosition(QString CurrentPosition)
 {
     ui->CurrentPositionIndicator->setText(CurrentPosition);
     PrintToTerminal("Stage is currently at: " + CurrentPosition + " mm");
+    PrintToTerminal("GTest: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
     ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
     GetPosition = CurrentPosition.toDouble();
 }
@@ -225,6 +234,7 @@ void MainWindow::on_StartPrint_clicked()
         }
         PrintControl.StartPrint(m_PrintSettings, m_PrintScript,
                                 m_InjectionSettings.ContinuousInjection);
+        initPollTimer();
         PrintProcess();
     }
 }
@@ -256,7 +266,6 @@ void MainWindow::PrintProcess()
             m_PrintControls.remainingImages = imagesUploaded;
             PrintToTerminal("Exiting Reupload: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
         }
-
         SetExposureTimer();
         if (m_PrintSettings.PrinterType == ICLIP){
             on_GetPosition_clicked();
@@ -352,7 +361,7 @@ void MainWindow::SetExposureTimer()
     switch (m_PrintControls.ExposureType){
       case EXPOSURE_NORM:
         QTimer::singleShot(m_PrintSettings.ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-        PrintToTerminal("Exposure: " + QString::number(m_PrintSettings.ExposureTime/1000) + "ms ");
+        PrintToTerminal("Exposure: " + QString::number(m_PrintSettings.ExposureTime/1000) + " ms");
         break;
       case EXPOSURE_PUMP:
         ExposureTime = m_PrintSettings.ExposureTime/1000;   //Convert from us to ms
@@ -368,7 +377,7 @@ void MainWindow::SetExposureTimer()
             ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintScript.ExposureScriptList.count()-1).toDouble();
         }
         QTimer::singleShot(ExposureTime, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-        PrintToTerminal("Exposure: " + QString::number(ExposureTime) + "ms");
+        PrintToTerminal("Exposure: " + QString::number(ExposureTime) + " ms");
         break;
       case EXPOSURE_PS_PUMP:
         if (m_PrintControls.layerCount < m_PrintScript.ExposureScriptList.count()){
@@ -378,7 +387,7 @@ void MainWindow::SetExposureTimer()
             ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintScript.ExposureScriptList.count()-1).toDouble();
         }
         QTimer::singleShot(ExposureTime, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
-        PrintToTerminal("Exposure: " + QString::number(ExposureTime) + "ms, preparing for pumping");
+        PrintToTerminal("Exposure: " + QString::number(ExposureTime) + " ms, preparing for pumping");
         break;
       default:
         break;
@@ -428,9 +437,9 @@ void MainWindow::on_POTFcheckbox_clicked()
         EnableParameter(MAX_IMAGE, ON);             //Enable the max image upload parameter
         EnableParameter(VP_RESYNC, OFF);
         EnableParameter(INITIAL_DELAY, OFF);
-        m_PrintSettings.ProjectionMode = POTF;      //Set projection mode to POTF
-        DLP.setIT6535Mode(0);                       //Turn off HDMI connection
-        LCR_SetMode(PTN_MODE_OTF);                  //Set light engine to POTF mode
+        m_PrintSettings.ProjectionMode = POTF;      // Set projection mode to POTF
+        DLP.setIT6535Mode(0);                       // Turn off HDMI connection
+        LCR_SetMode(PTN_MODE_OTF);                  // Set light engine to POTF mode
     }
 }
 
@@ -440,14 +449,14 @@ void MainWindow::on_POTFcheckbox_clicked()
  */
 void MainWindow::on_VP_HDMIcheckbox_clicked()
 {
-    //Make sure that the checkbox is checked before proceeding
+    // Make sure that the checkbox is checked before proceeding
     if (ui->VP_HDMIcheckbox->isChecked())
     {
-        ui->POTFcheckbox->setChecked(false); //Uncheck the Video Pattern checkbox
+        ui->POTFcheckbox->setChecked(false); // Uncheck the Video Pattern checkbox
         EnableParameter(MAX_IMAGE, OFF);
         EnableParameter(VP_RESYNC, ON);
         EnableParameter(INITIAL_DELAY, ON);
-        initImagePopout(); //Open projection window
+        initImagePopout(); // Open projection window
         m_PrintSettings.ProjectionMode = VIDEOPATTERN; //Set projection mode to video pattern
 
         //Set video display off

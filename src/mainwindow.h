@@ -133,6 +133,7 @@ private slots:
     void on_setPumping_clicked();
 
     void pumpingSlot();
+
     void on_CLIPSelect_clicked();
 
     void on_SetInfuseRate_clicked();
@@ -216,5 +217,7 @@ private:
     void initPrintScriptTable();
     void PrintScriptTableEntry(QStringList Script, uint ColNum);
     void updatePrintScriptTable();
+
+    void initPollTimer();
 };
 #endif // MAINWINDOW_H

@@ -39,7 +39,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -275,7 +275,7 @@ parameters</string>
       <x>230</x>
       <y>50</y>
       <width>161</width>
-      <height>80</height>
+      <height>81</height>
      </rect>
     </property>
     <property name="autoFillBackground">
@@ -1200,13 +1200,13 @@ parameters</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>150</y>
+      <y>140</y>
       <width>381</width>
       <height>491</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_4">
      <attribute name="title">
@@ -1263,7 +1263,7 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1532,7 +1532,7 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1791,7 +1791,7 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2093,7 +2093,7 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2422,7 +2422,7 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2542,7 +2542,7 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">

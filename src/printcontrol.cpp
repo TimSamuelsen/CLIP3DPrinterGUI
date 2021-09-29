@@ -147,6 +147,7 @@ void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, uint Initi
         pPrintControls->remainingImages--;
         pPrintControls->BitLayer++;
         emit ControlPrintSignal("Layer " + QString::number(pPrintControls->layerCount));
+        emit GetPositionSignal();
     }
 }
 
@@ -330,7 +331,7 @@ void printcontrol::StageMove(PrintControls m_PrintControls, PrintSettings m_Prin
         }
         else{
             pc_Stage.StageRelativeMove(-m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
-            emit ControlPrintSignal("Moving stage: " + QString::number(m_PrintSettings.LayerThickness*1000) + " um");
+            emit ControlPrintSignal("Moving Stage: " + QString::number(m_PrintSettings.LayerThickness*1000) + " um");
         }
     }
 }
