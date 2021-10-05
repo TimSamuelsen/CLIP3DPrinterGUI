@@ -214,7 +214,7 @@ parameters</string>
      <rect>
       <x>10</x>
       <y>50</y>
-      <width>221</width>
+      <width>241</width>
       <height>81</height>
      </rect>
     </property>
@@ -230,31 +230,9 @@ parameters</string>
     <widget class="QCheckBox" name="POTFcheckbox">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>30</y>
-       <width>161</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::RightToLeft</enum>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
-     </property>
-     <property name="text">
-      <string>    POTF Mode    </string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QCheckBox" name="VP_HDMIcheckbox">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>50</y>
-       <width>161</width>
+       <x>10</x>
+       <y>20</y>
+       <width>81</width>
        <height>20</height>
       </rect>
      </property>
@@ -265,16 +243,101 @@ parameters</string>
       <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
      </property>
      <property name="text">
-      <string>Video Pattern HDMI</string>
+      <string>    POTF  </string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="VP_HDMIcheckbox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>81</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
+     </property>
+     <property name="text">
+      <string>VP</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="VideoCheckbox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>81</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Video</string>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="DisplayCableBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>20</y>
+       <width>111</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>Display Cable</string>
+     </property>
+     <widget class="QComboBox" name="DisplayCableList">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>None</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>HDMI</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>DisplayPort</string>
+       </property>
+      </item>
+     </widget>
     </widget>
    </widget>
    <widget class="QGroupBox" name="PrinterSelectBox">
     <property name="geometry">
      <rect>
-      <x>230</x>
+      <x>250</x>
       <y>50</y>
-      <width>161</width>
+      <width>141</width>
       <height>81</height>
      </rect>
     </property>
@@ -287,9 +350,9 @@ parameters</string>
     <widget class="QRadioButton" name="CLIPSelect">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>30</x>
        <y>20</y>
-       <width>91</width>
+       <width>71</width>
        <height>31</height>
       </rect>
      </property>
@@ -315,9 +378,9 @@ parameters</string>
     <widget class="QRadioButton" name="DICLIPSelect">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>30</x>
        <y>50</y>
-       <width>91</width>
+       <width>71</width>
        <height>21</height>
       </rect>
      </property>

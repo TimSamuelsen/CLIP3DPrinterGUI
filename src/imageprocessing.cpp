@@ -310,6 +310,7 @@ int imageprocessing::hexSelect(int imageNum)
     return returnVal;
 }
 
+/*
 QStringList imageprocessing::ExposedPixelCount(QStringList ImageList)
 {
     QStringList ExposedPixelList;
@@ -375,6 +376,7 @@ QStringList imageprocessing::GetDeepestPixels(QStringList ImageList)
     }
     return DeepestPixelList;
 }
+*/
 
 #if 0
 void imageprocessing::on_DisplayImage_clicked()

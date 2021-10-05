@@ -176,6 +176,8 @@ private slots:
 
     void on_LogName_textChanged();
 
+    void on_VideoCheckbox_clicked();
+
 private:
     Ui::MainWindow *ui;
     PrintScripts m_PrintScript;

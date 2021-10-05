@@ -12,6 +12,7 @@
 #define CONTINUOUS  1
 #define STEPPED     0
 //For selecting projection mode
+#define VIDEO 2
 #define VIDEOPATTERN 1
 #define POTF 0
 //For selecting printer
@@ -47,6 +48,7 @@ typedef enum Parameter{
     MAX_END,
     MIN_END,
     INJECTION_DELAY,
+    DISPLAY_CABLE,
 }Parameter_t;
 
 typedef enum ExposureType{

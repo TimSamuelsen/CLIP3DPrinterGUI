@@ -32,7 +32,9 @@ void printcontrol::InitializeSystem(QStringList ImageList, PrintSettings m_Print
     pc_DLP.PatternDisplay(OFF);
     pc_Stage.initStagePosition(m_PrintSettings);    // Move stage to starting position
     pc_Pump.initPumpParams(m_InjectionSettings);
-    pc_DLP.PatternUpload(ImageList, *pPrintControls, m_PrintSettings, m_PrintScript);
+    if(m_PrintSettings.ProjectionMode != VIDEO){
+       pc_DLP.PatternUpload(ImageList, *pPrintControls, m_PrintSettings, m_PrintScript);
+    }
 
     pPrintControls->PrintEnd = CalcPrintEnd(pPrintControls->nSlice, m_PrintSettings);
     pPrintControls->ExposureType = GetExposureType(m_PrintScript.PrintScript, m_PrintSettings.PumpingMode);

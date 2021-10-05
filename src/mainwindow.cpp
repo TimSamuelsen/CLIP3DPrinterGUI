@@ -97,10 +97,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::initPollTimer()
 {
-    QTimer *timer = new QTimer(this);
-    timer->setInterval(100);
-    connect(timer, SIGNAL(timeout()), this, SLOT(on_GetPosition_clicked()));
-    timer->start();
+    //QTimer *timer = new QTimer(this);
+    //timer->setInterval(100);
+    //connect(timer, SIGNAL(timeout()), this, SLOT(on_GetPosition_clicked()));
+    //timer->start();
 }
 
 /*!
@@ -163,12 +163,11 @@ void MainWindow::updatePosition(QString CurrentPosition)
 {
     ui->CurrentPositionIndicator->setText(CurrentPosition);
     PrintToTerminal("Stage is currently at: " + CurrentPosition + " mm");
-    PrintToTerminal("GTest: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
+    //PrintToTerminal("GTest: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
     ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
     GetPosition = CurrentPosition.toDouble();
 }
 /**********************************Print Process Handling******************************************/
-
 /**
  * @brief MainWindow::on_InitializeAndSynchronize_clicked
  * Prepares the system for printing, moves stage to starting position
@@ -182,13 +181,14 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
   {
     if (initConfirmationScreen())
     {
-    if(m_PrintSettings.ProjectionMode == POTF){
-        // n slices = n images
-        m_PrintControls.nSlice = ui->FileList->count();
-        // remaining number of images is max n images - n images used for initial exposure
-        m_PrintControls.remainingImages = m_PrintSettings.MaxImageUpload
-                                          - m_PrintSettings.InitialExposure;
-        }
+        if(m_PrintSettings.ProjectionMode == POTF){
+            // n slices = n images
+            m_PrintControls.nSlice = ui->FileList->count();
+            // remaining number of images is max n images - n images used for initial exposure
+            m_PrintControls.remainingImages = m_PrintSettings.MaxImageUpload
+                                              - m_PrintSettings.InitialExposure;
+            QStringList ImageList = GetImageList(m_PrintControls, m_PrintSettings);
+            }
         else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
             // n slices = (n bit layers in an image (24) / selected bit depth) * n images
             // i.e. for a 24 bit layer image with a selected bit depth of 4 the
@@ -199,11 +199,11 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             QPixmap img(filename);
             ImagePopoutUI->showImage(img);
         }
-        // Get ordered list of images
+        else if (m_PrintSettings.ProjectionMode == VIDEO){
+            m_PrintControls.nSlice = ui->FileList->count(); // n slices = n images
+        }
         QStringList ImageList = GetImageList(m_PrintControls, m_PrintSettings);
-        //imageprocessing ImageTest;
-        //ImageTest.ExposedPixelCount(ImageList);
-        //ImageTest.GetDeepestPixels(ImageList);
+
         // Initialize system hardware
         PrintControl.InitializeSystem(ImageList, m_PrintSettings, &m_PrintControls,
                                       m_PrintScript, m_InjectionSettings);
@@ -234,7 +234,7 @@ void MainWindow::on_StartPrint_clicked()
         }
         PrintControl.StartPrint(m_PrintSettings, m_PrintScript,
                                 m_InjectionSettings.ContinuousInjection);
-        initPollTimer();
+        //initPollTimer();
         PrintProcess();
     }
 }
@@ -258,13 +258,23 @@ void MainWindow::PrintProcess()
 {
     if(m_PrintControls.layerCount + 1 <= m_PrintControls.nSlice){   // if not at print end
         // Reupload if no more images and not in initial exposure
-        if (m_PrintControls.remainingImages <= 0 && m_PrintControls.InitialExposureFlag == false){
+        if (m_PrintControls.remainingImages <= 0
+            && m_PrintControls.InitialExposureFlag == false
+            && m_PrintSettings.ProjectionMode != VIDEO){
             QStringList ImageList =  GetImageList(m_PrintControls, m_PrintSettings);
             int imagesUploaded = PrintControl.ReuploadHandler(ImageList, m_PrintControls,
                                                               m_PrintSettings, m_PrintScript,
                                                               m_InjectionSettings.ContinuousInjection);
-            m_PrintControls.remainingImages = imagesUploaded;
+                m_PrintControls.remainingImages = imagesUploaded;
             PrintToTerminal("Exiting Reupload: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
+        }
+        if(m_PrintSettings.ProjectionMode == VIDEO){
+            if(m_PrintControls.layerCount < ui->FileList->count()){
+                PrintToTerminal("LoadTimeImStart: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
+                QPixmap img(ui->FileList->item(m_PrintControls.layerCount)->text());
+                ImagePopoutUI->showImage(img);
+                PrintToTerminal("LoadTimeImEnd: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
+            }
         }
         SetExposureTimer();
         if (m_PrintSettings.PrinterType == ICLIP){
@@ -295,6 +305,14 @@ void MainWindow::pumpingSlot(void)
  */
 void MainWindow::ExposureTimeSlot(void)
 {
+    if (m_PrintSettings.ProjectionMode == VIDEO
+        && m_PrintControls.FrameCount < ui->FileList->count())
+    {
+        PrintToTerminal("LoadTimeImStart: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
+        QPixmap img(ui->FileList->item(m_PrintControls.FrameCount)->text());
+        ImagePopoutUI->showImage(img);
+        PrintToTerminal("LoadTimeImEnd: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
+    }
     //Set dark timer first for most accurate timing
     SetDarkTimer();
     //Record current time in terminal
@@ -308,6 +326,14 @@ void MainWindow::ExposureTimeSlot(void)
                 QPixmap img(ui->FileList->item(m_PrintControls.FrameCount)->text()); //select next image
                 ImagePopoutUI->showImage(img); //display next image
             }
+        }
+    }
+    else if(m_PrintSettings.ProjectionMode == VIDEO){
+        if(m_PrintControls.FrameCount < ui->FileList->count()){
+            PrintToTerminal("LoadTimeImStart: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
+            QPixmap img;
+            ImagePopoutUI->showImage(img);
+            PrintToTerminal("LoadTimeImEnd: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
         }
     }
 
@@ -351,7 +377,7 @@ void MainWindow::SetExposureTimer()
 {
   if (m_PrintControls.InitialExposureFlag == 1){
       int InitialExpMs = m_PrintSettings.InitialExposure*1000;
-      if(m_PrintSettings.ProjectionMode == ON){
+      if(m_PrintSettings.ProjectionMode == ON){ // TODO: why is this like this??
         InitialExpMs += (m_PrintSettings.InitialDelay)*1000;
       }
       QTimer::singleShot(InitialExpMs, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
@@ -434,12 +460,37 @@ void MainWindow::on_POTFcheckbox_clicked()
     if (ui->POTFcheckbox->isChecked())
     {
         ui->VP_HDMIcheckbox->setChecked(false);     //Uncheck the Video Pattern checkbox
+        ui->VideoCheckbox->setChecked(false);
+
         EnableParameter(MAX_IMAGE, ON);             //Enable the max image upload parameter
         EnableParameter(VP_RESYNC, OFF);
         EnableParameter(INITIAL_DELAY, OFF);
+        //EnableParameter(DISPLAY_CABLE, OFF);
         m_PrintSettings.ProjectionMode = POTF;      // Set projection mode to POTF
         DLP.setIT6535Mode(0);                       // Turn off HDMI connection
         LCR_SetMode(PTN_MODE_OTF);                  // Set light engine to POTF mode
+    }
+}
+
+void MainWindow::on_VideoCheckbox_clicked()
+{
+    if (ui->VideoCheckbox->isChecked()){
+        ui->POTFcheckbox->setChecked(false);
+        ui->VP_HDMIcheckbox->setChecked(false);
+        EnableParameter(MAX_IMAGE, OFF);
+        EnableParameter(VP_RESYNC, OFF);
+        //EnableParameter(DISPLAY_CABLE, ON);
+        m_PrintSettings.ProjectionMode = VIDEO;
+        //if(LCR_SetMode(PTN_MODE_DISABLE) < 0){
+        //    PrintToTerminal("Unable to switch to video mode");
+        //    ui->POTFcheckbox->setChecked(true);
+         //   on_POTFcheckbox_clicked();
+        //}
+        //else{
+            int DisplayCable = ui->DisplayCableList->currentIndex();
+            initImagePopout(); // Open projection window
+            DLP.setIT6535Mode(DisplayCable); //Set IT6535 reciever to correct display cable
+        //}
     }
 }
 
@@ -450,27 +501,27 @@ void MainWindow::on_POTFcheckbox_clicked()
 void MainWindow::on_VP_HDMIcheckbox_clicked()
 {
     // Make sure that the checkbox is checked before proceeding
-    if (ui->VP_HDMIcheckbox->isChecked())
-    {
+    if (ui->VP_HDMIcheckbox->isChecked()){
+        ui->VideoCheckbox->setChecked(false);
         ui->POTFcheckbox->setChecked(false); // Uncheck the Video Pattern checkbox
         EnableParameter(MAX_IMAGE, OFF);
         EnableParameter(VP_RESYNC, ON);
         EnableParameter(INITIAL_DELAY, ON);
-        initImagePopout(); // Open projection window
+        //EnableParameter(DISPLAY_CABLE, ON);
         m_PrintSettings.ProjectionMode = VIDEOPATTERN; //Set projection mode to video pattern
 
         //Set video display off
-        if (LCR_SetMode(PTN_MODE_DISABLE) < 0)
-        {
+        if (LCR_SetMode(PTN_MODE_DISABLE) < 0){
             PrintToTerminal("Unable to switch to video mode");
-            ui->VP_HDMIcheckbox->setChecked(false);
             ui->POTFcheckbox->setChecked(true);
-            emit(on_POTFcheckbox_clicked());
+            on_POTFcheckbox_clicked();
             // add a close image popout
-            return;
         }
-        DLP.setIT6535Mode(1); //Set IT6535 reciever to HDMI input
-        Check4VideoLock();
+        else{
+            initImagePopout(); // Open projection window
+            DLP.setIT6535Mode(1); //Set IT6535 reciever to HDMI input
+            Check4VideoLock();
+        }
     }
 }
 
@@ -1443,6 +1494,9 @@ bool MainWindow::initConfirmationScreen()
     else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
         DetailedText += "Projection Mode: Video Pattern\n";
     }
+    else if(m_PrintSettings.ProjectionMode == VIDEO){
+        DetailedText += "Projection Mode: Video\n";
+    }
 
     if(m_PrintSettings.MotionMode == STEPPED){
         DetailedText += "Motion Mode: stepped\n";
@@ -1464,6 +1518,9 @@ bool MainWindow::initConfirmationScreen()
     else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
         DetailedText += "Resync Rate: " + QString::number(m_PrintSettings.ResyncVP) + "\n";
         DetailedText += "Initial Exposure Delay: " + QString::number(m_PrintSettings.InitialDelay) + " s\n";
+    }
+    else if (m_PrintSettings.ProjectionMode == VIDEO){
+
     }
 
     DetailedText += "Bit Depth: " + QString::number(m_PrintSettings.BitMode) + "\n";
@@ -1660,6 +1717,7 @@ void MainWindow::saveSettings()
 
     settings.setValue("MaxImageUpload", m_PrintSettings.MaxImageUpload);
     settings.setValue("ResyncVP", m_PrintSettings.ResyncVP);
+    settings.setValue("DisplayCableIndex", ui->DisplayCableList->currentIndex());
 
     settings.setValue("LogFileDestination", LogFileDestination);
     settings.setValue("ImageFileDirectory", ImageFileDirectory);
@@ -1713,6 +1771,7 @@ void MainWindow::loadSettings()
 
         m_PrintSettings.MaxImageUpload = settings.value("MaxImageUpload", 50).toDouble();
         m_PrintSettings.ResyncVP = settings.value("ResyncVP", 24).toDouble();
+        ui->DisplayCableList->setCurrentIndex(settings.value("DisplayCableIndex").toInt());
 
         LogFileDestination = settings.value("LogFileDestination", "C://").toString();
         ImageFileDirectory = settings.value("ImageFileDirectory", "C://").toString();
@@ -2035,6 +2094,10 @@ void MainWindow::EnableParameter(Parameter_t Parameter, bool State)
             ui->SetInjectionDelay->setEnabled(State);
             ui->InjectionDelayBox->setEnabled(State);
             break;
+        case DISPLAY_CABLE:
+            ui->DisplayCableBox->setEnabled(State);
+            ui->DisplayCableList->setEnabled(State);
+            break;
         default:
             break;
     }
@@ -2289,7 +2352,8 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
     QStringList ImageList;
     QListWidgetItem * item;
     double InitialExposureCount = m_PrintSettings.InitialExposure;
-    if (m_PrintControls.InitialExposureFlag == ON){ //If in initial POTF upload
+    if (m_PrintControls.InitialExposureFlag == ON
+        && m_PrintSettings.ProjectionMode != VIDEO){ //If in initial POTF upload
         m_PrintControls.nSlice = ui->FileList->count();
         if (m_PrintControls.nSlice){
             item = ui->FileList->item(0);
