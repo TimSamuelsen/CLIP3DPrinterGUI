@@ -8,8 +8,8 @@ CONFIG += c++11
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 INCLUDEPATH += "src"
-INCLUDEPATH += "src/serialib"
-INCLUDEPATH += "src/qcustomplot"
+INCLUDEPATH += "src/3rdparty/serialib"
+INCLUDEPATH += "src/3rdparty/qcustomplot"
 
 
 RC_ICONS = DeSimoneLogo.ico
@@ -19,6 +19,7 @@ SOURCES += \
     src/dlp9000.cpp \
     src/imagepopout.cpp \
     src/imageprocessing.cpp \
+    src/liveplot.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/manualpumpcontrol.cpp \
@@ -26,17 +27,19 @@ SOURCES += \
     src/prinstscriptdialog.cpp \
     src/printcontrol.cpp \
     src/pumpcommands.cpp \
-    src/qcustomplot/qcustomplot.cpp \
-    src/serialib/serialib.cpp \
+    src/3rdparty/qcustomplot/qcustomplot.cpp \
+    src/3rdparty/serialib/serialib.cpp \
+    src/settings.cpp \
     src/stagecommands.cpp
 
 HEADERS += \
     src/PrintElements.h \
-    src/PtnImage.h \
+    src/3rdparty/PtnImage.h \
     src/SMC100C.h \
     src/dlp9000.h \
     src/imagepopout.h \
     src/imageprocessing.h \
+    src/liveplot.h \
     src/mainwindow.h \
     src/manualpumpcontrol.h \
     src/manualstagecontrol.h \
@@ -44,55 +47,57 @@ HEADERS += \
     src/prinstscriptdialog.h \
     src/printcontrol.h \
     src/pumpcommands.h \
-    src/qcustomplot/qcustomplot.h \
-    src/serialib/serialib.h \
+    src/3rdparty/qcustomplot/qcustomplot.h \
+    src/3rdparty/serialib/serialib.h \
+    src/settings.h \
     src/stagecommands.h
 
 FORMS += \
     src/imagepopout.ui \
     src/imageprocessing.ui \
+    src/liveplot.ui \
     src/mainwindow.ui \
     src/manualpumpcontrol.ui \
     src/manualstagecontrol.ui \
     src/prinstscriptdialog.ui
 
 #For Lightcrafter API"
-INCLUDEPATH += "src\\HiresLib"
-INCLUDEPATH += "src\\hidapi-master\\hidapi"
-INCLUDEPATH += "src\\hidapi-master\\windows\\Release"
-INCLUDEPATH += $$PWD/src/HiresLib
-DEPENDPATH += $$PWD/src/HiresLib
+INCLUDEPATH += "src\\3rdparty\\HiresLib"
+INCLUDEPATH += "src\\3rdparty\\hidapi-master\\hidapi"
+INCLUDEPATH += "src\\3rdparty\\hidapi-master\\windows\\Release"
+INCLUDEPATH += $$PWD/src/3rdparty/HiresLib
+DEPENDPATH += $$PWD/src/3rdpartyHiresLib
 
 HEADERS += \
-    src/HiresLib/API.h \
-    src/HiresLib/BMPParser.h \
-    src/HiresLib/Error.h \
-    src/HiresLib/batchfile.h \
-    src/HiresLib/common.h \
-    src/HiresLib/compress.h \
-    src/HiresLib/firmware.h \
-    src/HiresLib/flashimage.h \
-    src/HiresLib/flashloader.h \
-    src/HiresLib/pattern.h \
-    src/HiresLib/splash.h \
-    src/HiresLib/usb.h
+    src/3rdparty/HiresLib/API.h \
+    src/3rdparty/HiresLib/BMPParser.h \
+    src/3rdparty/HiresLib/Error.h \
+    src/3rdparty/HiresLib/batchfile.h \
+    src/3rdparty/HiresLib/common.h \
+    src/3rdparty/HiresLib/compress.h \
+    src/3rdparty/HiresLib/firmware.h \
+    src/3rdparty/HiresLib/flashimage.h \
+    src/3rdparty/HiresLib/flashloader.h \
+    src/3rdparty/HiresLib/pattern.h \
+    src/3rdparty/HiresLib/splash.h \
+    src/3rdparty/HiresLib/usb.h
 
 SOURCES += \
-    src/HiresLib/API.c \
-    src/HiresLib/BMPParser.c \
-    src/HiresLib/Error.c \
-    src/HiresLib/batchfile.c \
-    src/HiresLib/compress.c \
-    src/HiresLib/firmware.c \
-    src/HiresLib/flashimage.c \
-    src/HiresLib/flashloader.c \
-    src/HiresLib/pattern.c \
-    src/HiresLib/splash.c \
-    src/HiresLib/usb.c
+    src/3rdparty/HiresLib/API.c \
+    src/3rdparty/HiresLib/BMPParser.c \
+    src/3rdparty/HiresLib/Error.c \
+    src/3rdparty/HiresLib/batchfile.c \
+    src/3rdparty/HiresLib/compress.c \
+    src/3rdparty/HiresLib/firmware.c \
+    src/3rdparty/HiresLib/flashimage.c \
+    src/3rdparty/HiresLib/flashloader.c \
+    src/3rdparty/HiresLib/pattern.c \
+    src/3rdparty/HiresLib/splash.c \
+    src/3rdparty/HiresLib/usb.c
 
-INCLUDEPATH += $$PWD/hidapi-master/lib4QT
-DEPENDPATH += $$PWD/hidapi-master/lib4QT
-win32: LIBS += -L$$PWD/src/hidapi-master/lib4QT/ -lhidapi
+INCLUDEPATH += $$PWD/3rdparty/hidapi-master/lib4QT
+DEPENDPATH += $$PWD/3rdparty/hidapi-master/lib4QT
+win32: LIBS += -L$$PWD/src/3rdparty/hidapi-master/lib4QT/ -lhidapi
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -105,10 +110,10 @@ RESOURCES += \
 
 win32: LIBS += -lSetupAPI
 #OpenCV libs
-INCLUDEPATH += $$PWD/src/OpenCV/install/include
-DEPENDPATH += $$PWD/src/OpenCV/install/include
+INCLUDEPATH += $$PWD/src/3rdparty/OpenCV/install/include
+DEPENDPATH += $$PWD/src/3rdparty/OpenCV/install/include
 
-win32: LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_core401.dll
-win32: LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_imgcodecs401.dll
-win32: LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_imgproc401.dll
-win32: LIBS += -L$$PWD/src/OpenCV/install/x64/mingw/lib/ -llibopencv_highgui401.dll
+win32: LIBS += -L$$PWD/src/3rdparty/OpenCV/install/x64/mingw/lib/ -llibopencv_core401.dll
+win32: LIBS += -L$$PWD/src/3rdparty/OpenCV/install/x64/mingw/lib/ -llibopencv_imgcodecs401.dll
+win32: LIBS += -L$$PWD/src/3rdparty/OpenCV/install/x64/mingw/lib/ -llibopencv_imgproc401.dll
+win32: LIBS += -L$$PWD/src/3rdparty/OpenCV/install/x64/mingw/lib/ -llibopencv_highgui401.dll

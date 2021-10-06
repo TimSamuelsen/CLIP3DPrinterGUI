@@ -61,7 +61,7 @@ serialib serial;
 const SMC100C::CommandStruct SMC100C::CommandLibrary[] =
 {
     {CommandType::None,"  ",CommandParameterType::None,CommandGetSetType::None},
-	{CommandType::Acceleration,"AC",CommandParameterType::Float,CommandGetSetType::GetSet},
+    {CommandType::Acceleration,"AC",CommandParameterType::Float,CommandGetSetType::GetSet},
     {CommandType::BacklashComp,"BA",CommandParameterType::Float,CommandGetSetType::GetSet},
     {CommandType::HysterisisComp,"BH",CommandParameterType::Float,CommandGetSetType::GetSet},
     {CommandType::DriverVoltage,"DV",CommandParameterType::Float,CommandGetSetType::GetSet},

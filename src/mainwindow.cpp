@@ -41,6 +41,7 @@ QString LogFileDestination;             // for storing log file destination in s
 QString ImageFileDirectory;             // For storing image file directory in settings
 QString LogName = "CLIPGUITEST";        // For storing the log file nam
 QTime PrintStartTime;                   // Get start time for log
+int LastUploadTime = 0;
 bool PSTableInitFlag = false;
 
 //For vp8bit workaround
@@ -270,10 +271,11 @@ void MainWindow::PrintProcess()
         }
         if(m_PrintSettings.ProjectionMode == VIDEO){
             if(m_PrintControls.layerCount < ui->FileList->count()){
-                PrintToTerminal("LoadTimeImStart: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
+                QTime StartTime = QTime::currentTime();
                 QPixmap img(ui->FileList->item(m_PrintControls.layerCount)->text());
                 ImagePopoutUI->showImage(img);
-                PrintToTerminal("LoadTimeImEnd: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
+                LastUploadTime = StartTime.msecsTo(QTime::currentTime());
+                PrintToTerminal("Upload: " + QString::number(LastUploadTime) + " ms");
             }
         }
         SetExposureTimer();
@@ -330,10 +332,8 @@ void MainWindow::ExposureTimeSlot(void)
     }
     else if(m_PrintSettings.ProjectionMode == VIDEO){
         if(m_PrintControls.FrameCount < ui->FileList->count()){
-            PrintToTerminal("LoadTimeImStart: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
             QPixmap img;
             ImagePopoutUI->showImage(img);
-            PrintToTerminal("LoadTimeImEnd: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
         }
     }
 
@@ -437,8 +437,14 @@ void MainWindow::SetDarkTimer()
                 DarkTimeSelect = m_PrintScript.DarkTimeScriptList.at(m_PrintScript.DarkTimeScriptList.count()-2).toDouble();
             }
         }
-        QTimer::singleShot(DarkTimeSelect,  Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        if(m_PrintSettings.ProjectionMode == VIDEO && DarkTimeSelect > 0.5 * LastUploadTime){
+            QTimer::singleShot(DarkTimeSelect-LastUploadTime, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        }
+        else{
+            QTimer::singleShot(DarkTimeSelect,  Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        }
         PrintToTerminal("Dark Time: " + QString::number(DarkTimeSelect) + " ms");
+
     }
     else{
         if (m_PrintControls.inMotion == false){

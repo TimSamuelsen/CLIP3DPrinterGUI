@@ -24,5 +24,5 @@ void imagepopout::showImage(QPixmap imagename)
 {
     //QPixmap img(imagename);
     ui->Image->setPixmap(imagename);
-    printf("ShowingImage");
+    //printf("ShowingImage");
 }
