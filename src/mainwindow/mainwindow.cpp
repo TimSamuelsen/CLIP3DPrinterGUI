@@ -17,6 +17,7 @@
 #include <QDesktopServices>
 #include <QSettings>
 #include <QHeaderView>
+#include <QWindow>
 
 #include "API.h"
 #include "mainwindow.h"
@@ -76,13 +77,11 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&PrintControl, SIGNAL(ControlPrintSignal(QString)), this, SLOT(PrintToTerminal(QString)));
     QObject::connect(&PrintControl, SIGNAL(ControlError(QString)), this, SLOT(showError(QString)));
     QObject::connect(&PrintControl, SIGNAL(GetPositionSignal()), this, SLOT(on_GetPosition_clicked()));
-    QObject::connect(&PrintControl, SIGNAL(UpdatePlotSignal()), this, SLOT(updatePlot()));
 
     //Initialize features
     CurrentDateTime = QDateTime::currentDateTime(); //get current time for startup time
     loadSettings(); //load settings from settings file
     initSettings(); //initialize settings by updating ui
-    initPlot(); //initiallize the plot window
     ui->graphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
 }
 
@@ -210,8 +209,6 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         PrintControl.InitializeSystem(ImageList, m_PrintSettings, &m_PrintControls,
                                       m_PrintScript, m_InjectionSettings);
         emit(on_GetPosition_clicked());     //Sanity check for stage starting position
-        initPlot();
-        updatePlot();
         ui->graphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
         ui->graphicWindow->updatePlot(m_PrintControls, m_PrintSettings, m_PrintScript);
         ui->StartPrint->setEnabled(true);
@@ -322,7 +319,6 @@ void MainWindow::ExposureTimeSlot(void)
     SetDarkTimer();
     //Record current time in terminal
     PrintToTerminal("Exp. end: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
-    updatePlot(); //update plot early in dark time
     ui->graphicWindow->updatePlot(m_PrintControls, m_PrintSettings, m_PrintScript);
 
     //Video pattern mode handling
@@ -861,7 +857,7 @@ void MainWindow::on_SelectPrintScript_clicked()
     ui->PrintScriptFile->setText(file_name);
     QFile file(file_name);
     if (!file.open(QIODevice::ReadOnly)){
-        qDebug() << file.errorString();
+        //qDebug() << file.errorString();
     }
     QStringList wordList;
     while (!file.atEnd()){   // Runs until the end of the file
@@ -919,7 +915,9 @@ void MainWindow::on_SelectPrintScript_clicked()
             }
         }
     }
-    initPrintScriptTable();
+    //initPrintScriptTable();
+    ui->graphicWindow->initPrintScriptTable(m_PrintSettings, &m_PrintScript);
+
 }
 
 /*!
@@ -1029,70 +1027,7 @@ void MainWindow::on_resinSelect_activated(const QString &arg1)
     m_PrintSettings.Resin = arg1;
 }
 
-/*!
- * \brief MainWindow::on_AutoCheckBox_stateChanged
- * @param arg1: The state of the AutoCheckBox
- * If AutoCheckBox is set, go into auto mode
- */
-void MainWindow::on_AutoCheckBox_stateChanged(int arg1)
-{
-    if (arg1 == 2) //If automode is checked
-    {
-        int SliceCount = ui->FileList->count(); //# of images = # of slices
-        if (SliceCount > 0)  //If there are images selected
-        {
-            ui->SetExposureTime->setEnabled(false);
-            ui->ExposureTimeParam->setEnabled(false);
 
-            ui->SetSliceThickness->setEnabled(false);
-            ui->SliceThicknessParam->setEnabled(false);
-
-            ui->PrintSpeedParam->setEnabled(true);
-            ui->setPrintSpeed->setEnabled(true);
-
-            ui->PrintHeightParam->setEnabled(true);
-            ui->SetPrintHeight->setEnabled(true);
-
-            AutoModeFlag = true;
-            AutoMode();
-        }
-        else //With no images selected auto mode does not worked and the program reverts to normal operation
-        {
-            ui->AutoCheckBox->setChecked(false);
-            PrintToTerminal("No Object Image Files Detected, Please Select Image Files First");
-        }
-    }
-    else //Automode is not checked, revert to normal operation
-    {
-        ui->SetExposureTime->setEnabled(true);
-        ui->ExposureTimeParam->setEnabled(true);
-
-        ui->SetSliceThickness->setEnabled(true);
-        ui->SliceThicknessParam->setEnabled(true);
-
-        ui->PrintSpeedParam->setEnabled(false);
-        ui->setPrintSpeed->setEnabled(false);
-
-        ui->PrintHeightParam->setEnabled(false);
-        ui->SetPrintHeight->setEnabled(false);
-
-        ui->AutoCheckBox->setChecked(false);
-
-        AutoModeFlag = false;
-    }
-}
-
-/*!
- * \brief MainWindow::on_AutoCheckBox_clicked
- * Guard on edge case that sets the checkbox while it's actual state is unchecked
- */
-void MainWindow::on_AutoCheckBox_clicked()
-{
-    int SliceCount = ui->FileList->count();
-    if (SliceCount < 1){
-        ui->AutoCheckBox->setChecked(false);
-    }
-}
 
 /*!
  * \brief MainWindow::on_SetMaxImageUpload_clicked
@@ -1123,29 +1058,6 @@ void MainWindow::on_SetResyncRate_clicked()
 {
     m_PrintSettings.ResyncVP = ui->ResyncRateList->currentText().toInt();
     PrintToTerminal("VP Resync rate set to: " + QString::number(m_PrintSettings.ResyncVP));
-}
-
-
-/*!
- * \brief MainWindow::on_setPrintSpeed_clicked
- * Sets PrintSpeed variable from value inputted by user, also triggers automode
- */
-void MainWindow::on_setPrintSpeed_clicked()
-{
-    PrintSpeed = (ui->PrintSpeedParam->value());
-    PrintToTerminal("Set Print Speed to: " + QString::number(PrintSpeed) + " um/s");
-    AutoMode();
-}
-
-/*!
- * \brief MainWindow::on_SetPrintHeight_clicked
- * Sets PrintHeight variable from value inputted by user, also triggers automode
- */
-void MainWindow::on_SetPrintHeight_clicked()
-{
-    PrintHeight = (ui->PrintHeightParam->value());
-    PrintToTerminal("Set Print Speed to: " + QString::number(PrintHeight) + "");
-    AutoMode();
 }
 
 /*!
@@ -1434,39 +1346,6 @@ void MainWindow::saveText()
          file.flush();
          file.close();
      }
-}
-
-/**
- * @brief MainWindow::AutoMode
- * Calculates exposure time and slice thickness based on input
- * print height and print speed
- */
-void MainWindow::AutoMode()
-{
-    if (AutoModeFlag)
-    {
-        int SliceCount = ui->FileList->count();
-        if (SliceCount > 0)
-        {
-            PrintToTerminal("WARNING: Auto Mode is not accurate if you have not selected all your object image files");
-            int TotalPrintTime = PrintHeight / PrintSpeed;  //  um/(um/s) = s
-            //PrintToTerminal("PrintHeight: " + QString::number(PrintHeight) + " PrintSpeed: " + QString::number(PrintSpeed) + "  TotalPrintTime: " + QString::number(TotalPrintTime));
-            m_PrintSettings.ExposureTime = (TotalPrintTime*1000) / SliceCount;
-            //PrintToTerminal("Total Print Time: " + QString::number(TotalPrintTime) + " Slice Count" + QString::number(SliceCount) + "  ExposureTime: " + QString::number(ExposureTime));
-            ui->ExposureTimeParam->setValue(m_PrintSettings.ExposureTime);
-            PrintToTerminal("Calculated Exposure Time: " + QString::number(m_PrintSettings.ExposureTime) + " ms");
-
-            m_PrintSettings.LayerThickness = PrintHeight / SliceCount;
-            ui->SliceThicknessParam->setValue(m_PrintSettings.LayerThickness);
-            PrintToTerminal("Calculated Slice Thickness: " + QString::number(m_PrintSettings.LayerThickness) + " um");
-        }
-        else
-        {
-            PrintToTerminal("No Object Image Files Detected, Please Select Image Files First");
-            ui->AutoCheckBox->setChecked(false);
-            emit(on_AutoCheckBox_stateChanged(1));
-        }
-    }
 }
 
 /**
@@ -1827,8 +1706,6 @@ void MainWindow::initSettings()
     ui->InitialAdhesionParameter->setValue(m_PrintSettings.InitialExposure);
     ui->InitialDelayParam->setValue(m_PrintSettings.InitialDelay);
     ui->InitialExposureIntensityParam->setValue(m_PrintSettings.InitialIntensity);
-    ui->PrintSpeedParam->setValue(PrintSpeed);
-    ui->PrintHeightParam->setValue(PrintHeight);
 
     ui->MaxImageUpload->setValue(m_PrintSettings.MaxImageUpload);
     ui->ResyncRateList->setCurrentIndex((m_PrintSettings.ResyncVP/24)-1);
@@ -1893,110 +1770,7 @@ void MainWindow::initSettings()
 }
 
 /*******************************************Plot Functions*********************************************/
-/**
- * @brief MainWindow::initPlot
- * Initializes live plotting of stage position
- */
-void MainWindow::initPlot()
-{
-    ui->LivePlot->addGraph();
-    ui->LivePlot->graph(0)->setName("Print Progress");
-    ui->LivePlot->xAxis->setLabel("Time (s)");
-    ui->LivePlot->yAxis->setLabel("Position (mm)");
-    if (m_PrintScript.PrintScript ==1)
-    {
-        m_PrintControls.TotalPrintTime = 0;
-        for (int i= 0; i < m_PrintScript.ExposureScriptList.size(); i++)
-            {
-                //PrintToTerminal("Exp. Time: " + QString::number(ExposureScriptList.at(i).toDouble()/1000));
-                m_PrintControls.TotalPrintTime += m_PrintScript.ExposureScriptList.at(i).toDouble()/1000;
-                //PrintToTerminal("Current Total :" + QString::number(TotalPrintTimeS));
-            }
-        m_PrintControls.TotalPrintTime += m_PrintControls.nSlice * (m_PrintSettings.DarkTime/(1000*1000));
-        m_PrintControls.TotalPrintTime += m_PrintSettings.InitialExposure + 5;
-        m_PrintControls.TotalPrintTime += m_PrintControls.nSlice * 0.1;
-        m_PrintControls.RemainingPrintTime = m_PrintControls.TotalPrintTime;
-        ui->LivePlot->xAxis->setRange(0, m_PrintControls.TotalPrintTime*1.1);
-    }
-    else
-    {
-        ui->LivePlot->xAxis->setRange(0, m_PrintSettings.InitialExposure+5+0.1*m_PrintControls.nSlice+(1.5*(m_PrintControls.nSlice*(m_PrintSettings.ExposureTime+m_PrintSettings.DarkTime))/(1000*1000)));
-    }
-    if (m_PrintSettings.PrinterType == CLIP30UM){
-        double upper = 0.9*(m_PrintSettings.StartingPosition - m_PrintControls.nSlice*m_PrintSettings.LayerThickness);
-        double lower = 1.1*m_PrintSettings.StartingPosition;
-        ui->LivePlot->yAxis->setRange(lower,upper);
-    }
-    else if (m_PrintSettings.PrinterType == ICLIP){
-        double upper = 1.1*(m_PrintControls.nSlice*m_PrintSettings.LayerThickness);
-        double lower = 0;
-        ui->LivePlot->yAxis->setRange(lower, upper);
-    }
-    ui->LivePlot->replot();
-}
 
-/**
- * @brief MainWindow::updatePlot
- * Updates current plot with new stage position
- */
-void MainWindow::updatePlot()
-{
-    QTime updateTime = QTime::currentTime();
-    int TimeElapsed = m_PrintControls.PrintStartTime.secsTo(updateTime);
-
-    double CurrentPos = m_PrintControls.StagePosition;//StartingPosition - (layerCount*m_PrintSettings.LayerThickness);
-
-    qv_x.append(TimeElapsed);
-    qv_y.append(CurrentPos);
-
-    ui->LivePlot->graph(0)->setData(qv_x,qv_y);
-    ui->LivePlot->clearItems();
-
-    //Update Layer label
-    QString Layer = " Layer: " + QString::number(m_PrintControls.layerCount) + "/" + QString::number(m_PrintControls.nSlice);
-    QCPItemText *textLabel1 = new QCPItemText(ui->LivePlot);
-    textLabel1->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
-    textLabel1->position->setType(QCPItemPosition::ptAxisRectRatio);
-    textLabel1->position->setCoords(0.98, 0.07); // place position at center/top of axis rect
-    textLabel1->setText(Layer);
-    textLabel1->setFont(QFont(font().family(), 12)); // make font a bit larger
-    textLabel1->setPen(QPen(Qt::black)); // show black border around text
-
-
-    //Update Remaining Time Label
-    QString RemainingTime;
-    if (m_PrintScript.PrintScript == 1)
-    {
-        if (m_PrintControls.layerCount > 0 && m_PrintControls.layerCount < m_PrintScript.ExposureScriptList.count())
-        {
-            m_PrintControls.RemainingPrintTime -= m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount - 1).toDouble()/1000;
-        }
-        RemainingTime = "Est. Remaining Time: " + QString::number(m_PrintControls.RemainingPrintTime) + "s";
-    }
-    else
-    {
-        RemainingTime = "Est. Remaining Time: " + QString::number(((m_PrintSettings.ExposureTime+m_PrintSettings.DarkTime)/(1000*1000))*(m_PrintControls.nSlice-m_PrintControls.layerCount)+m_PrintSettings.InitialExposure) + "s";
-    }
-    QCPItemText *textLabel2 = new QCPItemText(ui->LivePlot);
-    textLabel2->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
-    textLabel2->position->setType(QCPItemPosition::ptAxisRectRatio);
-    textLabel2->position->setCoords(0.98, 0.0); // place position at center/top of axis rect
-    textLabel2->setText(RemainingTime);
-    textLabel2->setFont(QFont(font().family(), 12)); // make font a bit larger
-    textLabel2->setPen(QPen(Qt::black)); // show black border around text
-
-    if(m_PrintControls.InitialExposureFlag == OFF && m_PrintControls.layerCount == 0){
-        QCPItemText *textLabel3 = new QCPItemText(ui->LivePlot);
-        textLabel3->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
-        textLabel3->position->setType(QCPItemPosition::ptAxisRectRatio);
-        textLabel3->position->setCoords(0.98, 0.14); // place position at center/top of axis rect
-        textLabel3->setText(" Initial Exposure Active");
-        textLabel3->setFont(QFont(font().family(), 12)); // make font a bit larger
-        textLabel3->setPen(QPen(Qt::black)); // show black border around tex
-    }
-
-    ui->LivePlot->replot(QCustomPlot::rpQueuedReplot);
-}
 /*************************************************************
  * ********************Development***************************
  * ***********************************************************/
@@ -2415,120 +2189,6 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
         PrintToTerminal(ImageList.at(i));
     }
     return ImageList;
-}
-
-void MainWindow::initPrintScriptTable()
-{
-    //Config Header
-    ui->PrintScriptTable->setRowCount(m_PrintScript.ExposureScriptList.count());
-    ui->PrintScriptTable->setColumnCount(7);
-    QStringList Labels = {"Exp Time(ms)", "LED Int","Dark Time(ms)",
-                          "Layer(um)","Velocity(mm/s)",
-                          "Accel(mm/s^2)", "Pump Height(um)",};
-    if (m_PrintSettings.PrinterType == ICLIP){
-        ui->PrintScriptTable->setColumnCount(9);
-        Labels += {"Inj Volume(ul)" , "Inj Rate(ul/s)" };
-    }
-    ui->PrintScriptTable->setHorizontalHeaderLabels(Labels);
-
-    updatePrintScriptTable();
-    PSTableInitFlag = true;
-}
-
-void MainWindow::updatePrintScriptTable()
-{
-    PrintScriptTableEntry(m_PrintScript.ExposureScriptList, 0);
-    PrintScriptTableEntry(m_PrintScript.LEDScriptList, 1);
-    PrintScriptTableEntry(m_PrintScript.DarkTimeScriptList, 2);
-    PrintScriptTableEntry(m_PrintScript.LayerThicknessScriptList, 3);
-    PrintScriptTableEntry(m_PrintScript.StageVelocityScriptList, 4);
-    PrintScriptTableEntry(m_PrintScript.StageAccelerationScriptList, 5);
-    PrintScriptTableEntry(m_PrintScript.PumpHeightScriptList, 6);
-    if (m_PrintSettings.PrinterType == ICLIP){
-        PrintScriptTableEntry(m_PrintScript.InjectionVolumeScriptList, 7);
-        PrintScriptTableEntry(m_PrintScript.InjectionRateScriptList, 8);
-    }
-}
-
-void MainWindow::PrintScriptTableEntry(QStringList Script, uint ColNum)
-{
-    for (int i = 0; i < Script.count(); i++){
-        QTableWidgetItem *pCell = ui->PrintScriptTable->item(i,ColNum);
-        if(!pCell){
-            pCell = new QTableWidgetItem;
-            ui->PrintScriptTable->setItem(i, ColNum, pCell);
-        }
-        pCell->setText(Script.at(i));
-    }
-}
-
-void MainWindow::on_PrintScriptTable_cellChanged(int row, int column)
-{
-    if(PSTableInitFlag){ //Only activate after print script table is init
-        QString CurrentCell = ui->PrintScriptTable->item(row, column)->text();
-        QString ScriptType;
-        switch (column)
-        {
-            case 0:
-                m_PrintScript.ExposureScriptList[row] = CurrentCell;
-                ScriptType = "Exposure layer ";
-                break;
-            case 1:
-                m_PrintScript.LEDScriptList[row] = CurrentCell;
-                ScriptType = "LED Intensity layer ";
-                break;
-            case 2:
-                m_PrintScript.DarkTimeScriptList[row] = CurrentCell;
-                ScriptType = "Dark Time layer ";
-                break;
-            case 3:
-                m_PrintScript.LayerThicknessScriptList[row] = CurrentCell;
-                ScriptType = "Layer Thickness layer ";
-                break;
-            case 4:
-                m_PrintScript.StageVelocityScriptList[row] = CurrentCell;
-                ScriptType = "Velocity layer ";
-                break;
-            case 5:
-                m_PrintScript.StageAccelerationScriptList[row] = CurrentCell;
-                ScriptType = "Acceleration layer ";
-                break;
-            case 6:
-                m_PrintScript.PumpHeightScriptList[row] = CurrentCell;
-                ScriptType = "Pump Height layer ";
-                break;
-            case 7:
-                m_PrintScript.InjectionVolumeScriptList[row] = CurrentCell;
-                ScriptType = "Injection Volume layer ";
-                break;
-            case 8:
-                m_PrintScript.InjectionRateScriptList[row] = CurrentCell;
-                ScriptType = "Injection Rate layer ";
-                break;
-            default:
-                break;
-        }
-        PrintToTerminal(ScriptType + QString::number(row+1) + " set to " + CurrentCell);
-    }
-}
-
-static bool EditsActive = true;
-void MainWindow::on_PrintScriptTable_cellPressed(int row, int column)
-{
-    if(EditsActive){
-        QMessageBox confScreen;
-        confScreen.setText("Are you sure you want to manually edit the print script?");
-        QPushButton *YesButton = confScreen.addButton(QMessageBox::Yes);
-        QPushButton *AbortButton = confScreen.addButton(QMessageBox::Abort);
-        confScreen.exec();
-        if (confScreen.clickedButton() == YesButton){
-            EditsActive = false;
-        }
-        else{
-            ui->PrintScriptTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-            //EditsActive = false;
-        }
-    }
 }
 
 /*******************************************Live Value Monitoring********************************************/

@@ -90,10 +90,6 @@ private slots:
 
     void on_SetIntialAdhesionTimeButton_clicked();
 
-    void on_AutoCheckBox_stateChanged(int arg1);
-
-    void on_setPrintSpeed_clicked();
-
     void on_ManualPumpControl_clicked();
 
     void on_PumpConnectButton_clicked();
@@ -101,10 +97,6 @@ private slots:
     void on_GetPosition_clicked();
 
     void on_SetMaxImageUpload_clicked();
-
-    void on_SetPrintHeight_clicked();
-
-    void on_AutoCheckBox_clicked();
 
     void on_UsePrintScript_clicked();
 
@@ -150,17 +142,11 @@ private slots:
 
     void on_SetInjectionDelay_clicked();
 
-    void updatePlot();
-
     void updatePosition(QString CurrentPosition);
 
     void StageConnected();
 
     void PumpConnected();
-
-    void on_PrintScriptTable_cellChanged(int row, int column);
-
-    void on_PrintScriptTable_cellPressed(int row, int column);
 
     void on_SetInitalExposureIntensity_clicked();
 
@@ -193,7 +179,6 @@ private:
     void loadSettings();
     void saveSettings();
     void initSettings();
-    void initPlot();
     QVector<double> qv_x, qv_y;
     void printParameters();
     bool initConfirmationScreen();
@@ -214,9 +199,6 @@ private:
     void StartPrint();
     void PrintProcess2();
     void initConnections();
-    void initPrintScriptTable();
-    void PrintScriptTableEntry(QStringList Script, uint ColNum);
-    void updatePrintScriptTable();
 
     void initPollTimer();
 };
