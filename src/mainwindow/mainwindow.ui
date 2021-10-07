@@ -1160,7 +1160,7 @@
        <number>0</number>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="page_4">
        <property name="geometry">
@@ -1168,7 +1168,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1437,7 +1437,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1696,7 +1696,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1998,7 +1998,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2327,7 +2327,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2447,7 +2447,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2803,6 +2803,16 @@ QPushButton#AbortPrint:hover:!pressed {
      </rect>
     </property>
    </widget>
+   <widget class="printsettings" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>1300</x>
+      <y>30</y>
+      <width>731</width>
+      <height>571</height>
+     </rect>
+    </property>
+   </widget>
    <zorder>PopoutBox</zorder>
    <zorder>DeSimoneLabLogo</zorder>
    <zorder>ProjectionModeBox</zorder>
@@ -2812,6 +2822,7 @@ QPushButton#AbortPrint:hover:!pressed {
    <zorder>tabWidget_2</zorder>
    <zorder>ActiveControlBox</zorder>
    <zorder>graphicWindow</zorder>
+   <zorder>widget</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionManual_Stage_Control">
@@ -2825,6 +2836,12 @@ QPushButton#AbortPrint:hover:!pressed {
    <class>graphics</class>
    <extends>QWidget</extends>
    <header>graphics.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>printsettings</class>
+   <extends>QWidget</extends>
+   <header>printsettings.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

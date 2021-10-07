@@ -21,6 +21,7 @@ SOURCES += \
     src/hardware/SMC100C.cpp \
     src/hardware/dlp9000.cpp \
     src/mainwindow/graphics.cpp \
+    src/mainwindow/printsettings.cpp \
     src/secondary/imagepopout.cpp \
     src/secondary/imageprocessing.cpp \
     src/main.cpp \
@@ -40,6 +41,7 @@ HEADERS += \
     src/hardware/SMC100C.h \
     src/hardware/dlp9000.h \
     src/mainwindow/graphics.h \
+    src/mainwindow/printsettings.h \
     src/secondary/imagepopout.h \
     src/secondary/imageprocessing.h \
     src/mainwindow/mainwindow.h \
@@ -55,6 +57,7 @@ HEADERS += \
 
 FORMS += \
     src/mainwindow/graphics.ui \
+    src/mainwindow/printsettings.ui \
     src/secondary/imagepopout.ui \
     src/secondary/imageprocessing.ui \
     src/mainwindow/mainwindow.ui \

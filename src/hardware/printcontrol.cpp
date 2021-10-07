@@ -29,10 +29,10 @@ void printcontrol::InitializeSystem(QStringList ImageList, PrintSettings m_Print
                                     PrintControls *pPrintControls, PrintScripts m_PrintScript,
                                     InjectionSettings m_InjectionSettings)
 {
-    pc_DLP.PatternDisplay(OFF);
     pc_Stage.initStagePosition(m_PrintSettings);    // Move stage to starting position
     pc_Pump.initPumpParams(m_InjectionSettings);
     if(m_PrintSettings.ProjectionMode != VIDEO){
+       pc_DLP.PatternDisplay(OFF);
        pc_DLP.PatternUpload(ImageList, *pPrintControls, m_PrintSettings, m_PrintScript);
     }
 
@@ -73,7 +73,10 @@ void printcontrol::StartPrint(PrintSettings m_PrintSettings, PrintScripts m_Prin
 
     pc_Stage.initStageStart(m_PrintSettings);       // Validate correct stage parameters are set
     emit GetPositionSignal();                       // Sanity check
-    pc_DLP.startPatSequence();
+
+    if (m_PrintSettings.ProjectionMode != VIDEO){
+        pc_DLP.startPatSequence();
+    }
 
     if (ContinuousInjection == ON){
         pc_Pump.StartInfusion();
