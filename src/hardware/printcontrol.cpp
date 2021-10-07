@@ -135,7 +135,7 @@ void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, uint Initi
         pPrintControls->InitialExposureFlag = false;
         pPrintControls->inMotion = false;
         emit ControlPrintSignal("Exposing Initial Layer " + QString::number(InitialExposure) + "s");
-        emit UpdatePlotSignal();
+        //emit UpdatePlotSignal();
         emit GetPositionSignal();
         pc_Pump.SetTargetVolume(m_InjectionSettings.InfusionVolume);
     }

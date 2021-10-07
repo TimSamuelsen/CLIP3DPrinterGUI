@@ -3,6 +3,7 @@
 
 #include <QStringList>
 #include <string.h>
+#include <QTime>
 
 #define NormalTime
 #define QuickTime
@@ -116,8 +117,10 @@ struct PrintControls
     uint nSlice = 0;
     uint layerCount = 0;
     int remainingImages = 0;
+    double StagePosition = 0;
 
     ExposureType_t ExposureType;
+    QTime PrintStartTime;
     double TotalPrintTime = 0;
     double RemainingPrintTime = 0;
 

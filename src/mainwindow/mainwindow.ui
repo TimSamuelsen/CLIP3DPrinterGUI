@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1266</width>
+    <width>2200</width>
     <height>748</height>
    </rect>
   </property>
@@ -21,7 +21,7 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>1266</width>
+    <width>2200</width>
     <height>748</height>
    </size>
   </property>
@@ -39,7 +39,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -190,16 +190,6 @@ parameters</string>
      <attribute name="title">
       <string>Page</string>
      </attribute>
-     <widget class="liveplot" name="widget" native="true">
-      <property name="geometry">
-       <rect>
-        <x>200</x>
-        <y>140</y>
-        <width>251</width>
-        <height>171</height>
-       </rect>
-      </property>
-     </widget>
     </widget>
    </widget>
    <widget class="QLabel" name="DeSimoneLabLogo">
@@ -1341,7 +1331,7 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>275</height>
+         <height>251</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1610,7 +1600,7 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>275</height>
+         <height>251</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1869,7 +1859,7 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>275</height>
+         <height>251</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2171,7 +2161,7 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>275</height>
+         <height>251</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2500,7 +2490,7 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>275</height>
+         <height>251</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2620,7 +2610,7 @@ parameters</string>
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>275</height>
+         <height>251</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2966,6 +2956,16 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
     </widget>
    </widget>
+   <widget class="graphics" name="graphicWindow" native="true">
+    <property name="geometry">
+     <rect>
+      <x>1280</x>
+      <y>0</y>
+      <width>861</width>
+      <height>501</height>
+     </rect>
+    </property>
+   </widget>
    <zorder>PopoutBox</zorder>
    <zorder>tabWidget</zorder>
    <zorder>DeSimoneLabLogo</zorder>
@@ -2975,6 +2975,7 @@ QPushButton#AbortPrint:hover:!pressed {
    <zorder>PeripheralsBox</zorder>
    <zorder>tabWidget_2</zorder>
    <zorder>ActiveControlBox</zorder>
+   <zorder>graphicWindow</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionManual_Stage_Control">
@@ -2991,9 +2992,9 @@ QPushButton#AbortPrint:hover:!pressed {
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>liveplot</class>
+   <class>graphics</class>
    <extends>QWidget</extends>
-   <header>liveplot.h</header>
+   <header>graphics.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

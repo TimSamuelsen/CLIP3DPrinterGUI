@@ -83,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent) :
     loadSettings(); //load settings from settings file
     initSettings(); //initialize settings by updating ui
     initPlot(); //initiallize the plot window
+    ui->graphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
 }
 
 /*!
@@ -166,7 +167,7 @@ void MainWindow::updatePosition(QString CurrentPosition)
     PrintToTerminal("Stage is currently at: " + CurrentPosition + " mm");
     //PrintToTerminal("GTest: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
     ui->CurrentStagePos->setSliderPosition(CurrentPosition.toDouble());
-    GetPosition = CurrentPosition.toDouble();
+    m_PrintControls.StagePosition = CurrentPosition.toDouble();
 }
 /**********************************Print Process Handling******************************************/
 /**
@@ -211,6 +212,8 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         emit(on_GetPosition_clicked());     //Sanity check for stage starting position
         initPlot();
         updatePlot();
+        ui->graphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
+        ui->graphicWindow->updatePlot(m_PrintControls, m_PrintSettings, m_PrintScript);
         ui->StartPrint->setEnabled(true);
     }
   }
@@ -228,7 +231,7 @@ void MainWindow::on_StartPrint_clicked()
     // If settings are validated successfully and initialization has been completed
     if (ValidateSettings() == true){
         PrintToTerminal("Entering Printing Procedure");
-        PrintStartTime = QTime::currentTime();      // Grabs the current time and saves it
+        m_PrintControls.PrintStartTime = QTime::currentTime();      // Grabs the current time and saves it
 
         if(m_PrintScript.PrintScript){
             LCR_SetLedCurrents(0, 0, m_PrintSettings.InitialIntensity);
@@ -320,6 +323,7 @@ void MainWindow::ExposureTimeSlot(void)
     //Record current time in terminal
     PrintToTerminal("Exp. end: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
     updatePlot(); //update plot early in dark time
+    ui->graphicWindow->updatePlot(m_PrintControls, m_PrintSettings, m_PrintScript);
 
     //Video pattern mode handling
     if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){ //If in video pattern mode
@@ -1938,9 +1942,9 @@ void MainWindow::initPlot()
 void MainWindow::updatePlot()
 {
     QTime updateTime = QTime::currentTime();
-    int TimeElapsed = PrintStartTime.secsTo(updateTime);
+    int TimeElapsed = m_PrintControls.PrintStartTime.secsTo(updateTime);
 
-    double CurrentPos = GetPosition;//StartingPosition - (layerCount*m_PrintSettings.LayerThickness);
+    double CurrentPos = m_PrintControls.StagePosition;//StartingPosition - (layerCount*m_PrintSettings.LayerThickness);
 
     qv_x.append(TimeElapsed);
     qv_y.append(CurrentPos);

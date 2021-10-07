@@ -1,8 +1,7 @@
 #include "dlp9000.h"
 #include "API.h"
 #include "usb.h"
-#include "patternelement.h"
-#include "PtnImage.h"
+#include "src/3rdparty/PtnImage.h"
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>

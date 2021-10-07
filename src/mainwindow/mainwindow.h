@@ -188,8 +188,6 @@ private:
     manualpumpcontrol *ManualPumpUI;
     imageprocessing *ImageProcessUI;
     imagepopout *ImagePopoutUI;
-    QTime PrintStartTime;
-    double GetPosition;
 
     bool ValidateSettings(void);
     void loadSettings();

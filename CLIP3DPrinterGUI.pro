@@ -10,56 +10,57 @@ CONFIG += c++11
 INCLUDEPATH += "src"
 INCLUDEPATH += "src/3rdparty/serialib"
 INCLUDEPATH += "src/3rdparty/qcustomplot"
+INCLUDEPATH += "src/mainwindow"
+INCLUDEPATH += "src/secondary"
+INCLUDEPATH += "src/hardware"
 
 
 RC_ICONS = DeSimoneLogo.ico
 
 SOURCES += \
-    src/SMC100C.cpp \
-    src/dlp9000.cpp \
-    src/imagepopout.cpp \
-    src/imageprocessing.cpp \
-    src/liveplot.cpp \
+    src/hardware/SMC100C.cpp \
+    src/hardware/dlp9000.cpp \
+    src/mainwindow/graphics.cpp \
+    src/secondary/imagepopout.cpp \
+    src/secondary/imageprocessing.cpp \
     src/main.cpp \
-    src/mainwindow.cpp \
-    src/manualpumpcontrol.cpp \
-    src/manualstagecontrol.cpp \
-    src/prinstscriptdialog.cpp \
-    src/printcontrol.cpp \
-    src/pumpcommands.cpp \
+    src/mainwindow/mainwindow.cpp \
+    src/secondary/manualpumpcontrol.cpp \
+    src/secondary/manualstagecontrol.cpp \
+    src/secondary/prinstscriptdialog.cpp \
+    src/hardware/printcontrol.cpp \
+    src/hardware/pumpcommands.cpp \
     src/3rdparty/qcustomplot/qcustomplot.cpp \
     src/3rdparty/serialib/serialib.cpp \
-    src/settings.cpp \
-    src/stagecommands.cpp
+    src/hardware/stagecommands.cpp
 
 HEADERS += \
     src/PrintElements.h \
     src/3rdparty/PtnImage.h \
-    src/SMC100C.h \
-    src/dlp9000.h \
-    src/imagepopout.h \
-    src/imageprocessing.h \
-    src/liveplot.h \
-    src/mainwindow.h \
-    src/manualpumpcontrol.h \
-    src/manualstagecontrol.h \
-    src/patternelement.h \
-    src/prinstscriptdialog.h \
-    src/printcontrol.h \
-    src/pumpcommands.h \
+    src/hardware/SMC100C.h \
+    src/hardware/dlp9000.h \
+    src/mainwindow/graphics.h \
+    src/secondary/imagepopout.h \
+    src/secondary/imageprocessing.h \
+    src/mainwindow/mainwindow.h \
+    src/secondary/manualpumpcontrol.h \
+    src/secondary/manualstagecontrol.h \
+    src/3rdparty/patternelement.h \
+    src/secondary/prinstscriptdialog.h \
+    src/hardware/printcontrol.h \
+    src/hardware/pumpcommands.h \
     src/3rdparty/qcustomplot/qcustomplot.h \
     src/3rdparty/serialib/serialib.h \
-    src/settings.h \
-    src/stagecommands.h
+    src/hardware/stagecommands.h
 
 FORMS += \
-    src/imagepopout.ui \
-    src/imageprocessing.ui \
-    src/liveplot.ui \
-    src/mainwindow.ui \
-    src/manualpumpcontrol.ui \
-    src/manualstagecontrol.ui \
-    src/prinstscriptdialog.ui
+    src/mainwindow/graphics.ui \
+    src/secondary/imagepopout.ui \
+    src/secondary/imageprocessing.ui \
+    src/mainwindow/mainwindow.ui \
+    src/secondary/manualpumpcontrol.ui \
+    src/secondary/manualstagecontrol.ui \
+    src/secondary/prinstscriptdialog.ui
 
 #For Lightcrafter API"
 INCLUDEPATH += "src\\3rdparty\\HiresLib"

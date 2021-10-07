@@ -2,7 +2,7 @@
 #define DLP9000_H
 
 #include <QObject>
-#include "patternelement.h"
+#include "src/3rdparty/patternelement.h"
 #include "PrintElements.h"
 
 #define PTN_WIDTH_WQXGA     2560
