@@ -23,6 +23,9 @@ public:
     void PrintScriptTableEntry(QStringList Script, uint ColNum);
     void updatePrintScriptTable(PrintSettings m_PrintSettings, PrintScripts m_PrintScript);
 
+Q_SIGNALS:
+    void GraphicsPrint(QString);
+
 private slots:
     void on_PrintScriptTable_cellChanged(int row, int column);
 

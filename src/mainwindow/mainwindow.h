@@ -30,6 +30,7 @@ public:
 public slots:
     void showError(QString errMsg);
     void PrintToTerminal(QString StringToPrint);
+    void refreshScript();
 
 private slots:
     void on_ManualStage_clicked();

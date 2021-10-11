@@ -220,7 +220,7 @@ void graphics::on_PrintScriptTable_cellChanged(int row, int column)
             default:
                 break;
         }
-        //PrintToTerminal(ScriptType + QString::number(row+1) + " set to " + CurrentCell); TODO: Fix this
+        emit GraphicsPrint(ScriptType + QString::number(row+1) + " set to " + CurrentCell);
     }
 }
 

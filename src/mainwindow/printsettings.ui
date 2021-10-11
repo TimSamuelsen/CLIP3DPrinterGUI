@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>884</width>
-    <height>589</height>
+    <width>351</width>
+    <height>451</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>351</width>
+    <height>451</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -56,7 +62,7 @@
     <number>0</number>
    </property>
    <property name="currentIndex">
-    <number>5</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="GeneralPrintSettings">
     <property name="geometry">
@@ -438,10 +444,10 @@
        <x>20</x>
        <y>10</y>
        <width>305</width>
-       <height>221</height>
+       <height>211</height>
       </rect>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3" rowstretch="9,8,8">
+     <layout class="QGridLayout" name="gridLayout_3" rowstretch="10,8,8">
       <item row="1" column="0">
        <widget class="QGroupBox" name="StageVelocityBox">
         <property name="title">
@@ -467,52 +473,62 @@
         <property name="title">
          <string>Print Motion Mode</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QRadioButton" name="ContinuousMotionButton">
-           <property name="layoutDirection">
-            <enum>Qt::RightToLeft</enum>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
-           </property>
-           <property name="text">
-            <string>Continuous  </string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>40</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QRadioButton" name="SteppedMotionButton">
-           <property name="layoutDirection">
-            <enum>Qt::RightToLeft</enum>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
-           </property>
-           <property name="text">
-            <string>Stepped  </string>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>40</width>
-             <height>40</height>
-            </size>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QRadioButton" name="ContinuousMotionButton">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>20</y>
+           <width>92</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::RightToLeft</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Continuous  </string>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>40</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="SteppedMotionButton">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>40</y>
+           <width>78</width>
+           <height>18</height>
+          </rect>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::RightToLeft</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Stepped  </string>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>40</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
        </widget>
       </item>
       <item row="1" column="1">
@@ -550,7 +566,7 @@
          <property name="geometry">
           <rect>
            <x>30</x>
-           <y>50</y>
+           <y>40</y>
            <width>91</width>
            <height>31</height>
           </rect>
@@ -638,7 +654,7 @@
        <x>20</x>
        <y>10</y>
        <width>161</width>
-       <height>221</height>
+       <height>231</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_4" rowstretch="6,5">

@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1266</width>
+    <width>2146</width>
     <height>748</height>
    </rect>
   </property>
@@ -1168,7 +1168,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1437,7 +1437,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1696,7 +1696,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1998,7 +1998,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2327,7 +2327,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2447,7 +2447,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>251</height>
+         <height>275</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2793,7 +2793,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </property>
     </widget>
    </widget>
-   <widget class="graphics" name="graphicWindow" native="true">
+   <widget class="graphics" name="GraphicWindow" native="true">
     <property name="geometry">
      <rect>
       <x>400</x>
@@ -2803,7 +2803,7 @@ QPushButton#AbortPrint:hover:!pressed {
      </rect>
     </property>
    </widget>
-   <widget class="printsettings" name="widget" native="true">
+   <widget class="printsettings" name="SettingsWidget" native="true">
     <property name="geometry">
      <rect>
       <x>1290</x>
@@ -2821,8 +2821,8 @@ QPushButton#AbortPrint:hover:!pressed {
    <zorder>PeripheralsBox</zorder>
    <zorder>tabWidget_2</zorder>
    <zorder>ActiveControlBox</zorder>
-   <zorder>graphicWindow</zorder>
-   <zorder>widget</zorder>
+   <zorder>GraphicWindow</zorder>
+   <zorder>SettingsWidget</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionManual_Stage_Control">
@@ -2837,14 +2837,73 @@ QPushButton#AbortPrint:hover:!pressed {
    <extends>QWidget</extends>
    <header>graphics.h</header>
    <container>1</container>
+   <slots>
+    <signal>GraphicsPrint(QString)</signal>
+   </slots>
   </customwidget>
   <customwidget>
    <class>printsettings</class>
    <extends>QWidget</extends>
    <header>printsettings.h</header>
    <container>1</container>
+   <slots>
+    <signal>SettingsPrint(QString)</signal>
+    <signal>updateScript()</signal>
+   </slots>
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>SettingsWidget</sender>
+   <signal>SettingsPrint(QString)</signal>
+   <receiver>ProgramPrints</receiver>
+   <slot>append(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1650</x>
+     <y>275</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>197</x>
+     <y>456</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>GraphicWindow</sender>
+   <signal>GraphicsPrint(QString)</signal>
+   <receiver>ProgramPrints</receiver>
+   <slot>append(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>830</x>
+     <y>250</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>197</x>
+     <y>456</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SettingsWidget</sender>
+   <signal>updateScript()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>refreshScript()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1650</x>
+     <y>275</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1072</x>
+     <y>373</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>refreshScript()</slot>
+ </slots>
 </ui>

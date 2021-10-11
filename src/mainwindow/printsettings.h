@@ -2,6 +2,7 @@
 #define PRINTSETTINGS_H
 
 #include <QWidget>
+#include <QSettings>
 #include "PrintElements.h"
 
 namespace Ui {
@@ -15,10 +16,16 @@ class printsettings : public QWidget
 public:
     explicit printsettings(QWidget *parent = nullptr);
     ~printsettings();
-    void initPrintSettings(PrintSettings *pPrintSettings, PrintControls *pPrintControls, PrintScripts *pPrintScript);
+    void initPrintSettings(PrintSettings *pPrintSettings, PrintControls *pPrintControls,
+                           PrintScripts *pPrintScript, InjectionSettings *pInjectionSettings);
+    void savePrintSettings();
+    void loadPrintSettings();
+    void initPrintSettings();
+
 
 Q_SIGNALS:
     void SettingsPrint(QString);
+    void updateScript();
 
 private slots:
     void on_resinSelect_editTextChanged(const QString &arg1);
@@ -89,12 +96,14 @@ private slots:
 
     void on_ClearImageFiles_clicked();
 
-
 private:
     Ui::printsettings *ui;
     PrintSettings *psPrintSettings;
     PrintControls *psPrintControls;
     PrintScripts *psPrintScript;
+    InjectionSettings *psInjectionSettings;
+
+    void EnableParameter(Parameter_t Parameter, bool State);
 };
 
 #endif // PRINTSETTINGS_H

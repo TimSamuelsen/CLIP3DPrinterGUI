@@ -81,9 +81,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Initialize features
     CurrentDateTime = QDateTime::currentDateTime(); //get current time for startup time
+    ui->SettingsWidget->initPrintSettings(&m_PrintSettings, &m_PrintControls, &m_PrintScript, &m_InjectionSettings);
     loadSettings(); //load settings from settings file
     initSettings(); //initialize settings by updating ui
-    ui->graphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
+    ui->GraphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
 }
 
 /*!
@@ -210,8 +211,8 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         PrintControl.InitializeSystem(ImageList, m_PrintSettings, &m_PrintControls,
                                       m_PrintScript, m_InjectionSettings);
         emit(on_GetPosition_clicked());     //Sanity check for stage starting position
-        ui->graphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
-        ui->graphicWindow->updatePlot(m_PrintControls, m_PrintSettings, m_PrintScript);
+        ui->GraphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
+        ui->GraphicWindow->updatePlot(m_PrintControls, m_PrintSettings, m_PrintScript);
         ui->StartPrint->setEnabled(true);
     }
   }
@@ -320,7 +321,7 @@ void MainWindow::ExposureTimeSlot(void)
     SetDarkTimer();
     //Record current time in terminal
     PrintToTerminal("Exp. end: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
-    ui->graphicWindow->updatePlot(m_PrintControls, m_PrintSettings, m_PrintScript);
+    ui->GraphicWindow->updatePlot(m_PrintControls, m_PrintSettings, m_PrintScript);
 
     //Video pattern mode handling
     if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){ //If in video pattern mode
@@ -875,20 +876,7 @@ void MainWindow::on_SelectPrintScript_clicked()
                 m_PrintScript.InjectionRateScriptList.append(line.split(',').at(8));
             }
     }
-    // Sanity check for user and log
-    for (int i= 0; i < m_PrintScript.ExposureScriptList.size(); i++){
-        QString PrintScriptLine = m_PrintScript.ExposureScriptList.at(i)
-                                  + "," + m_PrintScript.LEDScriptList.at(i)
-                                  + "," + m_PrintScript.DarkTimeScriptList.at(i)
-                                  + "," + m_PrintScript.LayerThicknessScriptList.at(i)
-                                  + "," + m_PrintScript.StageVelocityScriptList.at(i)
-                                  + "," + m_PrintScript.StageAccelerationScriptList.at(i)
-                                  + "," + m_PrintScript.PumpHeightScriptList.at(i);
-        if (m_PrintSettings.PrinterType == ICLIP){
-            PrintScriptLine += "," + m_PrintScript.InjectionVolumeScriptList.at(i)
-                               + "," + m_PrintScript.InjectionRateScriptList.at(i);
-        }
-    }
+
     PrintToTerminal("Print List has: " + QString::number(m_PrintScript.ExposureScriptList.size()) + " exposure time entries");
     PrintToTerminal("Print List has: " + QString::number(m_PrintScript.LEDScriptList.size()) + " LED intensity entries");
     PrintToTerminal("Print List has: " + QString::number(m_PrintScript.DarkTimeScriptList.size()) + " dark time entries");
@@ -916,8 +904,9 @@ void MainWindow::on_SelectPrintScript_clicked()
             }
         }
     }
+
     //initPrintScriptTable();
-    ui->graphicWindow->initPrintScriptTable(m_PrintSettings, &m_PrintScript);
+    ui->GraphicWindow->initPrintScriptTable(m_PrintSettings, &m_PrintScript);
 
 }
 
@@ -1630,6 +1619,7 @@ void MainWindow::saveSettings()
 
     settings.setValue("StageCOM", ui->COMPortSelect->currentIndex());
     settings.setValue("PumpCOM", ui->COMPortSelectPump->currentIndex());
+    ui->SettingsWidget->savePrintSettings();
 }
 
 /**
@@ -1641,6 +1631,7 @@ void MainWindow::loadSettings()
     if (loadSettingsFlag == false) //ensures that this only runs once
     {
         QSettings settings;
+
         m_PrintSettings.ExposureTime = settings.value("ExposureTime", 1000).toDouble();
         m_PrintSettings.DarkTime = settings.value("DarkTime", 1000).toDouble();
         m_PrintSettings.UVIntensity = settings.value("UVIntensity", 12).toDouble();
@@ -1684,6 +1675,8 @@ void MainWindow::loadSettings()
         ui->COMPortSelect->setCurrentIndex(settings.value("StageCOM", 0).toInt());
         ui->COMPortSelectPump->setCurrentIndex(settings.value("PumpCOM", 0).toInt());
         loadSettingsFlag = true;
+
+        ui->SettingsWidget->loadPrintSettings();
     }
 }
 
@@ -1693,6 +1686,7 @@ void MainWindow::loadSettings()
  */
 void MainWindow::initSettings()
 {
+
     ui->ExposureTimeParam->setValue(m_PrintSettings.ExposureTime/1000);
     ui->DarkTimeParam->setValue(m_PrintSettings.DarkTime/1000);
     ui->UVIntensityParam->setValue(m_PrintSettings.UVIntensity);
@@ -1768,6 +1762,8 @@ void MainWindow::initSettings()
     ui->InitialVolumeParam->setValue(m_InjectionSettings.InfusionVolume);
     ui->BaseInfusionParam->setValue(m_InjectionSettings.BaseInjectionRate);
     ui->InjectionDelayParam->setValue(m_InjectionSettings.InjectionDelayParam);
+
+    ui->SettingsWidget->initPrintSettings();
 }
 
 /*******************************************Plot Functions*********************************************/
@@ -1878,10 +1874,6 @@ void MainWindow::EnableParameter(Parameter_t Parameter, bool State)
             ui->InjectionDelayParam->setEnabled(State);
             ui->SetInjectionDelay->setEnabled(State);
             ui->InjectionDelayBox->setEnabled(State);
-            break;
-        case DISPLAY_CABLE:
-            ui->DisplayCableBox->setEnabled(State);
-            ui->DisplayCableList->setEnabled(State);
             break;
         default:
             break;
@@ -2259,3 +2251,27 @@ void MainWindow::on_LogName_textChanged()
 }
 
 
+void MainWindow::refreshScript()
+{
+    if (m_PrintScript.ExposureScriptList.size() > 0)
+    {
+        ui->LiveValueList1->setCurrentIndex(1);
+        ui->LiveValue1->setText(QString::number(m_PrintScript.ExposureScriptList.at(0).toInt()));
+        ui->LiveValueList2->setCurrentIndex(2);
+        ui->LiveValue2->setText(QString::number(m_PrintScript.LEDScriptList.at(0).toInt()));
+        ui->LiveValueList3->setCurrentIndex(3);
+        ui->LiveValue3->setText(QString::number(m_PrintScript.DarkTimeScriptList.at(0).toInt()));
+        if(m_PrintSettings.PrinterType == ICLIP){
+            if (m_PrintScript.InjectionVolumeScriptList.size() > 0 && m_PrintScript.InjectionRateScriptList.size() > 0){
+                PrintToTerminal("Print List has: " + QString::number(m_PrintScript.InjectionVolumeScriptList.size()) + " injection volume entries");
+                PrintToTerminal("Print List has: " + QString::number(m_PrintScript.InjectionRateScriptList.size()) + " injection rate entries");
+                ui->LiveValueList4->setCurrentIndex(4);
+                ui->LiveValue4->setText(QString::number(m_PrintScript.InjectionVolumeScriptList.at(0).toDouble()));
+                ui->LiveValueList5->setCurrentIndex(5);
+                ui->LiveValue5->setText(QString::number(m_PrintScript.InjectionRateScriptList.at(0).toDouble()));
+            }
+        }
+    }
+
+    ui->GraphicWindow->initPrintScriptTable(m_PrintSettings, &m_PrintScript);
+}
