@@ -137,9 +137,9 @@
    <property name="geometry">
     <rect>
      <x>1010</x>
-     <y>210</y>
+     <y>260</y>
      <width>261</width>
-     <height>231</height>
+     <height>181</height>
     </rect>
    </property>
    <property name="title">
@@ -151,7 +151,7 @@
       <x>10</x>
       <y>20</y>
       <width>241</width>
-      <height>201</height>
+      <height>151</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -165,7 +165,7 @@
      <x>1010</x>
      <y>0</y>
      <width>261</width>
-     <height>80</height>
+     <height>51</height>
     </rect>
    </property>
    <property name="title">
@@ -175,9 +175,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
+      <y>20</y>
       <width>241</width>
-      <height>31</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="autoFillBackground">
@@ -221,7 +221,7 @@
    <property name="geometry">
     <rect>
      <x>1010</x>
-     <y>90</y>
+     <y>60</y>
      <width>261</width>
      <height>121</height>
     </rect>
@@ -255,6 +255,142 @@
     <property name="text">
      <string>8-bit prints 
 (8-bit -&gt; 24-bit)</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>1010</x>
+     <y>190</y>
+     <width>261</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Pixel Binning</string>
+   </property>
+   <widget class="QComboBox" name="BinSelect">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>21</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>1x1</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>2x2</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>3x3</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>4x4</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>5x5</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>6x6</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>7x7</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>8x8</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>9x9</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>10x10</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>11x11</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>12x12</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>13x13</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>14x14</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>15x15</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>16x16</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>17x17</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>18x18</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>19x19</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>20x20</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QPushButton" name="BinStart">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>20</y>
+      <width>101</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Start Binning</string>
     </property>
    </widget>
   </widget>

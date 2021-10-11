@@ -310,6 +310,63 @@ int imageprocessing::hexSelect(int imageNum)
     return returnVal;
 }
 
+void imageprocessing::on_BinStart_clicked()
+{
+    QStringList ImageList;
+    //int nIt = ui->InputList->size();
+    for (int i = 0; i < ui->InputList->count(); i ++){
+        QListWidgetItem* filename = ui->InputList->item(i); //Select image
+        QString file_name = filename->text(); //convert to string to read by openCV
+        ImageList.append(file_name);
+    }
+    PixelBinner(ImageList);
+}
+
+void imageprocessing::PixelBinner(QStringList ImageList)
+{
+    for (int i = 0; i < ImageList.size(); i++){
+        QString fileName = ImageList[i];
+        ui->TerminalOut->append(fileName);
+        Mat imageRead = imread(samples::findFile(fileName.toUtf8().constData()), IMREAD_GRAYSCALE);
+        Mat imageBinary;
+        threshold(imageRead, imageBinary, 10, 255, 0); //threshold image to binary
+
+        int binType = ui->BinSelect->currentIndex() + 1; // add 1 to convert from 0 indexed
+        int downRows = imageBinary.rows / binType;
+        int downCols = imageBinary.cols / binType;
+        Mat downSize = imageBinary.clone();
+        Mat upSize = imageBinary.clone();
+        upSize.setTo(Scalar(0));
+        cv::resize(imageBinary, downSize, Size(downCols, downRows), INTER_NEAREST);
+
+        for (int row = 0; row < downSize.rows; row++){
+            for (int col = 0; col < downSize.cols; col++){
+                if (downSize.at<uchar>(row,col) == 255){
+                    for (int downRow = 0; downRow < binType; downRow++){
+                        for (int downCol = 0; downCol < binType; downCol++){
+                            int rowIndex = (binType * row) + downRow;
+                            int colIndex = (binType * col) + downCol;
+                            //printf("%d, %d \r\n");
+                            upSize.at<uchar>(rowIndex, colIndex) = 255;
+                        }
+                    }
+                }
+            }
+        }
+        QPixmap newImage = QPixmap::fromImage(QImage((unsigned char*) upSize.data, upSize.cols, upSize.rows, QImage::Format_Grayscale8));
+        ui->ImageDisplay->setPixmap(newImage.scaled(671,411));
+
+        QString ImageName = TargetDestination + "/" + QString::number(i+1) + ".png";
+        imwrite(ImageName.toUtf8().constData(), upSize);
+        ui->OutputImageList->addItem(ImageName);
+
+        ui->encodeProgress->setValue(i+1);
+        imageprocessing::update();
+        //imshow("down", downSize);
+        //imshow("up", upSize);
+
+    }
+}
 /*
 QStringList imageprocessing::ExposedPixelCount(QStringList ImageList)
 {
@@ -597,4 +654,5 @@ bitEncode8(src3, channel[2]);
 merge(channel,3,ImageOut);
 imshow("Test", ImageOut);
 #endif
+
 

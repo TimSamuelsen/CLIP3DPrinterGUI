@@ -25,6 +25,7 @@
 #include "stagecommands.h"
 #include "pumpcommands.h"
 #include "dlp9000.h"
+#include "printsettings.h"
 
 DLP9000& DLP = DLP9000::Instance();
 StageCommands& Stage = StageCommands::Instance();
@@ -2256,3 +2257,5 @@ void MainWindow::on_LogName_textChanged()
 {
     LogName = ui->LogName->toPlainText();
 }
+
+

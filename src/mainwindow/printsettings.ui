@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>351</width>
-    <height>451</height>
+    <width>884</width>
+    <height>589</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <x>0</x>
      <y>0</y>
      <width>351</width>
-     <height>451</height>
+     <height>431</height>
     </rect>
    </property>
    <property name="font">
@@ -56,7 +56,7 @@
     <number>0</number>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>5</number>
    </property>
    <widget class="QWidget" name="GeneralPrintSettings">
     <property name="geometry">
@@ -64,7 +64,7 @@
       <x>0</x>
       <y>0</y>
       <width>349</width>
-      <height>275</height>
+      <height>255</height>
      </rect>
     </property>
     <attribute name="label">
@@ -73,10 +73,10 @@
     <widget class="QWidget" name="gridLayoutWidget">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>20</x>
        <y>10</y>
-       <width>331</width>
-       <height>221</height>
+       <width>311</width>
+       <height>191</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout">
@@ -85,25 +85,12 @@
         <property name="title">
          <string>Bit Depth</string>
         </property>
-        <widget class="QPushButton" name="SetBitDepth">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
         <widget class="QSpinBox" name="BitDepthParam">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>30</x>
            <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -121,25 +108,12 @@
         <property name="title">
          <string>Starting Position (mm)</string>
         </property>
-        <widget class="QPushButton" name="SetStartingPosButton">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
         <widget class="QDoubleSpinBox" name="StartingPositionParam">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>30</x>
            <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -154,27 +128,14 @@
         <widget class="QSpinBox" name="MaxImageUpload">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>30</x>
            <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
          <property name="maximum">
           <number>399</number>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="SetMaxImageUpload">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
          </property>
         </widget>
        </widget>
@@ -189,7 +150,7 @@
           <rect>
            <x>10</x>
            <y>20</y>
-           <width>141</width>
+           <width>131</width>
            <height>31</height>
           </rect>
          </property>
@@ -217,9 +178,9 @@
         <widget class="QComboBox" name="ResyncRateList">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>30</x>
            <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -248,19 +209,31 @@
            <string>120</string>
           </property>
          </item>
-        </widget>
-        <widget class="QPushButton" name="SetResyncRate">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
+         <item>
+          <property name="text">
+           <string>144</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>168</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>192</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>216</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>240</string>
+          </property>
+         </item>
         </widget>
        </widget>
       </item>
@@ -269,25 +242,12 @@
         <property name="title">
          <string>Layer Thickness (μm)</string>
         </property>
-        <widget class="QPushButton" name="SetSliceThickness">
+        <widget class="QDoubleSpinBox" name="LayerThicknessParam">
          <property name="geometry">
           <rect>
-           <x>100</x>
+           <x>30</x>
            <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
-        <widget class="QDoubleSpinBox" name="SliceThicknessParam">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -309,46 +269,90 @@
       <x>0</x>
       <y>0</y>
       <width>349</width>
-      <height>275</height>
+      <height>255</height>
      </rect>
     </property>
     <attribute name="label">
      <string>                      Light Engine Control</string>
     </attribute>
-    <widget class="QWidget" name="gridLayoutWidget_2">
+    <widget class="QWidget" name="gridLayoutWidget_6">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>20</x>
        <y>10</y>
-       <width>341</width>
-       <height>221</height>
+       <width>307</width>
+       <height>191</height>
       </rect>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="gridLayout_6">
+      <item row="0" column="0">
+       <widget class="QGroupBox" name="InitialExposureBox">
+        <property name="title">
+         <string>Inital Exposure Time (s)</string>
+        </property>
+        <widget class="QDoubleSpinBox" name="InitialExposureParameter">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>20</y>
+           <width>91</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="maximum">
+          <double>999.990000000000009</double>
+         </property>
+        </widget>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QGroupBox" name="InitialDelayBox">
+        <property name="title">
+         <string>Initial Exp Delay (s)</string>
+        </property>
+        <widget class="QSpinBox" name="InitialDelayParam">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>20</y>
+           <width>91</width>
+           <height>31</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QGroupBox" name="InitialIntensityBox">
+        <property name="title">
+         <string>Initial Exp Int (0-255)</string>
+        </property>
+        <widget class="QSpinBox" name="InitialExposureIntensityParam">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>20</y>
+           <width>91</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="maximum">
+          <number>255</number>
+         </property>
+        </widget>
+       </widget>
+      </item>
       <item row="1" column="0">
        <widget class="QGroupBox" name="UVIntensityBox">
         <property name="title">
          <string>UV Intensity (0-255)</string>
         </property>
-        <widget class="QPushButton" name="SetUVIntensity">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
         <widget class="QSpinBox" name="UVIntensityParam">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>30</x>
            <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -367,126 +371,17 @@
         </widget>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QGroupBox" name="InitialIntensityBox">
-        <property name="title">
-         <string>Initial Exp Intensity (0-255)</string>
-        </property>
-        <widget class="QSpinBox" name="InitialExposureIntensityParam">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>81</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="maximum">
-          <number>255</number>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="SetInitalExposureIntensity">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QGroupBox" name="InitialDelayBox">
-        <property name="title">
-         <string>Initial Exp Delay (s)</string>
-        </property>
-        <widget class="QPushButton" name="SetInitialDelay">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
-        <widget class="QSpinBox" name="InitialDelayParam">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>21</y>
-           <width>81</width>
-           <height>31</height>
-          </rect>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QGroupBox" name="InitialExposureBox">
-        <property name="title">
-         <string>Inital Exposure Time (s)</string>
-        </property>
-        <widget class="QPushButton" name="SetIntialAdhesionTimeButton">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
-        <widget class="QDoubleSpinBox" name="InitialAdhesionParameter">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>81</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="maximum">
-          <double>999.990000000000009</double>
-         </property>
-        </widget>
-       </widget>
-      </item>
       <item row="2" column="0">
        <widget class="QGroupBox" name="ExposureTimeBox">
         <property name="title">
          <string>Exposure Time (ms)</string>
         </property>
-        <widget class="QPushButton" name="SetExposureTime">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
         <widget class="QDoubleSpinBox" name="ExposureTimeParam">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>30</x>
            <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -507,9 +402,9 @@
         <widget class="QDoubleSpinBox" name="DarkTimeParam">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>30</x>
            <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -518,19 +413,6 @@
          </property>
          <property name="value">
           <double>500.000000000000000</double>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="SetDarkTime">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
          </property>
         </widget>
        </widget>
@@ -544,7 +426,7 @@
       <x>0</x>
       <y>0</y>
       <width>349</width>
-      <height>275</height>
+      <height>255</height>
      </rect>
     </property>
     <attribute name="label">
@@ -553,37 +435,24 @@
     <widget class="QWidget" name="gridLayoutWidget_3">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>20</x>
        <y>10</y>
-       <width>331</width>
+       <width>305</width>
        <height>221</height>
       </rect>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3" rowstretch="3,2,2">
+     <layout class="QGridLayout" name="gridLayout_3" rowstretch="9,8,8">
       <item row="1" column="0">
        <widget class="QGroupBox" name="StageVelocityBox">
         <property name="title">
          <string>Stage Velocity (mm/s)</string>
         </property>
-        <widget class="QPushButton" name="SetStageVelocity">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
         <widget class="QDoubleSpinBox" name="StageVelocityParam">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>30</x>
            <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -600,7 +469,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QRadioButton" name="ContinuousMotion">
+          <widget class="QRadioButton" name="ContinuousMotionButton">
            <property name="layoutDirection">
             <enum>Qt::RightToLeft</enum>
            </property>
@@ -608,7 +477,7 @@
             <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
            </property>
            <property name="text">
-            <string>Continuous</string>
+            <string>Continuous  </string>
            </property>
            <property name="iconSize">
             <size>
@@ -622,7 +491,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="SteppedMotion">
+          <widget class="QRadioButton" name="SteppedMotionButton">
            <property name="layoutDirection">
             <enum>Qt::RightToLeft</enum>
            </property>
@@ -630,7 +499,7 @@
             <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
            </property>
            <property name="text">
-            <string>Stepped</string>
+            <string>Stepped  </string>
            </property>
            <property name="iconSize">
             <size>
@@ -654,93 +523,17 @@
         <property name="title">
          <string>Max end of run (mm)</string>
         </property>
-        <widget class="QPushButton" name="SetMaxEndOfRun">
+        <widget class="QDoubleSpinBox" name="MaxEndOfRunParam">
          <property name="geometry">
           <rect>
-           <x>100</x>
+           <x>30</x>
            <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
-        <widget class="QDoubleSpinBox" name="MaxEndOfRun">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
          <property name="value">
           <double>65.000000000000000</double>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QGroupBox" name="MinEndOfRunBox">
-        <property name="title">
-         <string>Min end of run (mm)</string>
-        </property>
-        <widget class="QPushButton" name="SetMinEndOfRun">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
-        <widget class="QDoubleSpinBox" name="MinEndOfRunParam">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>81</width>
-           <height>31</height>
-          </rect>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QGroupBox" name="StageAccelerationBox">
-        <property name="title">
-         <string>Stage Accel. (mm/s^2)</string>
-        </property>
-        <widget class="QPushButton" name="SetStageAcceleration">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
-        <widget class="QDoubleSpinBox" name="StageAccelParam">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>81</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="value">
-          <double>3.000000000000000</double>
          </property>
         </widget>
        </widget>
@@ -756,9 +549,9 @@
          </property>
          <property name="geometry">
           <rect>
-           <x>13</x>
-           <y>40</y>
-           <width>81</width>
+           <x>30</x>
+           <y>50</y>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -766,26 +559,10 @@
           <double>5000.000000000000000</double>
          </property>
         </widget>
-        <widget class="QPushButton" name="setPumping">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>104</x>
-           <y>40</y>
-           <width>41</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
         <widget class="QCheckBox" name="pumpingCheckBox">
          <property name="geometry">
           <rect>
-           <x>20</x>
+           <x>10</x>
            <y>20</y>
            <width>121</width>
            <height>20</height>
@@ -803,6 +580,43 @@
         </widget>
        </widget>
       </item>
+      <item row="2" column="1">
+       <widget class="QGroupBox" name="MinEndOfRunBox">
+        <property name="title">
+         <string>Min end of run (mm)</string>
+        </property>
+        <widget class="QDoubleSpinBox" name="MinEndOfRunParam">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>20</y>
+           <width>91</width>
+           <height>31</height>
+          </rect>
+         </property>
+        </widget>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QGroupBox" name="StageAccelerationBox">
+        <property name="title">
+         <string>Stage Accel. (mm/s^2)</string>
+        </property>
+        <widget class="QDoubleSpinBox" name="StageAccelParam">
+         <property name="geometry">
+          <rect>
+           <x>30</x>
+           <y>20</y>
+           <width>91</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="value">
+          <double>3.000000000000000</double>
+         </property>
+        </widget>
+       </widget>
+      </item>
      </layout>
     </widget>
    </widget>
@@ -812,7 +626,7 @@
       <x>0</x>
       <y>0</y>
       <width>349</width>
-      <height>275</height>
+      <height>255</height>
      </rect>
     </property>
     <attribute name="label">
@@ -821,13 +635,13 @@
     <widget class="QWidget" name="gridLayoutWidget_4">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>20</x>
        <y>10</y>
        <width>161</width>
-       <height>231</height>
+       <height>221</height>
       </rect>
      </property>
-     <layout class="QGridLayout" name="gridLayout_4">
+     <layout class="QGridLayout" name="gridLayout_4" rowstretch="6,5">
       <item row="0" column="0">
        <widget class="QGroupBox" name="ContInjectionBox">
         <property name="title">
@@ -898,24 +712,11 @@
         <widget class="QDoubleSpinBox" name="BaseInfusionParam">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>40</x>
            <y>80</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="SetBaseInfusion">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>80</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
          </property>
         </widget>
         <widget class="QLabel" name="BaseInfusionRateTitle">
@@ -943,25 +744,12 @@
         <property name="title">
          <string>Injection Delay (ms)</string>
         </property>
-        <widget class="QPushButton" name="SetInjectionDelay">
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>60</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
         <widget class="QDoubleSpinBox" name="InjectionDelayParam">
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>40</x>
            <y>60</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -972,7 +760,7 @@
         <widget class="QCheckBox" name="PreMovementCheckbox">
          <property name="geometry">
           <rect>
-           <x>20</x>
+           <x>10</x>
            <y>20</y>
            <width>121</width>
            <height>20</height>
@@ -988,7 +776,7 @@
         <widget class="QCheckBox" name="PostMovementCheckbox">
          <property name="geometry">
           <rect>
-           <x>20</x>
+           <x>10</x>
            <y>40</y>
            <width>121</width>
            <height>20</height>
@@ -1008,10 +796,10 @@
     <widget class="QWidget" name="gridLayoutWidget_5">
      <property name="geometry">
       <rect>
-       <x>180</x>
+       <x>191</x>
        <y>10</y>
-       <width>160</width>
-       <height>231</height>
+       <width>141</width>
+       <height>191</height>
       </rect>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
@@ -1020,31 +808,15 @@
         <property name="title">
          <string>Vol/layer (μl)</string>
         </property>
-        <widget class="QPushButton" name="SetVolPerLayer">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
         <widget class="QDoubleSpinBox" name="VolPerLayerParam">
          <property name="enabled">
           <bool>false</bool>
          </property>
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>20</x>
            <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -1056,31 +828,15 @@
         <property name="title">
          <string>Initial Injection Vol (μl)</string>
         </property>
-        <widget class="QPushButton" name="SetInitialVolume">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>100</x>
-           <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
         <widget class="QDoubleSpinBox" name="InitialVolumeParam">
          <property name="enabled">
           <bool>false</bool>
          </property>
          <property name="geometry">
           <rect>
-           <x>10</x>
+           <x>20</x>
            <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -1088,38 +844,22 @@
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QGroupBox" name="InfusionRateBox">
+       <widget class="QGroupBox" name="InjectionRateBox">
         <property name="enabled">
          <bool>true</bool>
         </property>
         <property name="title">
          <string>Injection Rate (μl/s)</string>
         </property>
-        <widget class="QPushButton" name="SetInfuseRate">
+        <widget class="QDoubleSpinBox" name="InjectionRateParam">
          <property name="enabled">
           <bool>false</bool>
          </property>
          <property name="geometry">
           <rect>
-           <x>100</x>
+           <x>20</x>
            <y>20</y>
-           <width>51</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Set</string>
-         </property>
-        </widget>
-        <widget class="QDoubleSpinBox" name="InfuseRateParam">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>81</width>
+           <width>91</width>
            <height>31</height>
           </rect>
          </property>
@@ -1135,7 +875,7 @@
       <x>0</x>
       <y>0</y>
       <width>349</width>
-      <height>275</height>
+      <height>255</height>
      </rect>
     </property>
     <attribute name="label">
@@ -1255,7 +995,7 @@
       <x>0</x>
       <y>0</y>
       <width>349</width>
-      <height>275</height>
+      <height>255</height>
      </rect>
     </property>
     <attribute name="label">
@@ -1265,7 +1005,7 @@
      <property name="geometry">
       <rect>
        <x>180</x>
-       <y>10</y>
+       <y>0</y>
        <width>161</width>
        <height>31</height>
       </rect>
@@ -1287,7 +1027,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>10</y>
+       <y>0</y>
        <width>171</width>
        <height>31</height>
       </rect>
@@ -1309,7 +1049,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>40</y>
+       <y>30</y>
        <width>331</width>
        <height>191</height>
       </rect>
@@ -1329,7 +1069,31 @@
     </widget>
    </widget>
   </widget>
+  <widget class="QWidget" name="gridLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>450</x>
+     <y>350</y>
+     <width>311</width>
+     <height>191</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2"/>
+  </widget>
+  <widget class="QTextBrowser" name="testTerm">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>40</y>
+     <width>256</width>
+     <height>192</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
+ <slots>
+  <signal>SettingsPrint(QString)</signal>
+ </slots>
 </ui>

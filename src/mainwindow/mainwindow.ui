@@ -1168,7 +1168,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>275</height>
+         <height>251</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1437,7 +1437,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>275</height>
+         <height>251</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1696,7 +1696,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>275</height>
+         <height>251</height>
         </rect>
        </property>
        <attribute name="label">
@@ -1998,7 +1998,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>275</height>
+         <height>251</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2327,7 +2327,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>275</height>
+         <height>251</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2447,7 +2447,7 @@
          <x>0</x>
          <y>0</y>
          <width>349</width>
-         <height>275</height>
+         <height>251</height>
         </rect>
        </property>
        <attribute name="label">
@@ -2700,7 +2700,7 @@ p, li { white-space: pre-wrap; }
       <x>400</x>
       <y>510</y>
       <width>141</width>
-      <height>221</height>
+      <height>211</height>
      </rect>
     </property>
     <property name="title">
@@ -2806,10 +2806,10 @@ QPushButton#AbortPrint:hover:!pressed {
    <widget class="printsettings" name="widget" native="true">
     <property name="geometry">
      <rect>
-      <x>1300</x>
-      <y>30</y>
-      <width>731</width>
-      <height>571</height>
+      <x>1290</x>
+      <y>40</y>
+      <width>721</width>
+      <height>471</height>
      </rect>
     </property>
    </widget>

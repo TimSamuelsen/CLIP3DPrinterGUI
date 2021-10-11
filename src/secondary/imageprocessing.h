@@ -34,12 +34,15 @@ private slots:
 
     void on_GreyscaleEncode_clicked();
 
+    void on_BinStart_clicked();
+
 private:
     Ui::imageprocessing *ui;
     cv::Mat mframe;
     void bitEncode24();
     //void bitEncode8(cv::Mat source, cv::Mat& Channel);
     int hexSelect(int imageNum);
+    void PixelBinner(QStringList ImageList);
 
 };
 
