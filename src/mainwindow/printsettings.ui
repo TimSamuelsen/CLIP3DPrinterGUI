@@ -25,7 +25,7 @@
      <x>0</x>
      <y>0</y>
      <width>351</width>
-     <height>431</height>
+     <height>451</height>
     </rect>
    </property>
    <property name="font">
@@ -62,7 +62,7 @@
     <number>0</number>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="GeneralPrintSettings">
     <property name="geometry">
@@ -70,7 +70,7 @@
       <x>0</x>
       <y>0</y>
       <width>349</width>
-      <height>255</height>
+      <height>251</height>
      </rect>
     </property>
     <attribute name="label">
@@ -275,7 +275,7 @@
       <x>0</x>
       <y>0</y>
       <width>349</width>
-      <height>255</height>
+      <height>251</height>
      </rect>
     </property>
     <attribute name="label">
@@ -432,7 +432,7 @@
       <x>0</x>
       <y>0</y>
       <width>349</width>
-      <height>255</height>
+      <height>251</height>
      </rect>
     </property>
     <attribute name="label">
@@ -441,9 +441,9 @@
     <widget class="QWidget" name="gridLayoutWidget_3">
      <property name="geometry">
       <rect>
-       <x>20</x>
+       <x>14</x>
        <y>10</y>
-       <width>305</width>
+       <width>311</width>
        <height>211</height>
       </rect>
      </property>
@@ -476,10 +476,10 @@
         <widget class="QRadioButton" name="ContinuousMotionButton">
          <property name="geometry">
           <rect>
-           <x>30</x>
+           <x>10</x>
            <y>20</y>
-           <width>92</width>
-           <height>18</height>
+           <width>121</width>
+           <height>20</height>
           </rect>
          </property>
          <property name="layoutDirection">
@@ -504,10 +504,10 @@
         <widget class="QRadioButton" name="SteppedMotionButton">
          <property name="geometry">
           <rect>
-           <x>40</x>
+           <x>30</x>
            <y>40</y>
-           <width>78</width>
-           <height>18</height>
+           <width>101</width>
+           <height>20</height>
           </rect>
          </property>
          <property name="layoutDirection">
@@ -642,7 +642,7 @@
       <x>0</x>
       <y>0</y>
       <width>349</width>
-      <height>255</height>
+      <height>251</height>
      </rect>
     </property>
     <attribute name="label">
@@ -651,13 +651,13 @@
     <widget class="QWidget" name="gridLayoutWidget_4">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>10</y>
+       <x>10</x>
+       <y>0</y>
        <width>161</width>
-       <height>231</height>
+       <height>221</height>
       </rect>
      </property>
-     <layout class="QGridLayout" name="gridLayout_4" rowstretch="6,5">
+     <layout class="QGridLayout" name="gridLayout_4" rowstretch="7,6">
       <item row="0" column="0">
        <widget class="QGroupBox" name="ContInjectionBox">
         <property name="title">
@@ -812,9 +812,9 @@
     <widget class="QWidget" name="gridLayoutWidget_5">
      <property name="geometry">
       <rect>
-       <x>191</x>
-       <y>10</y>
-       <width>141</width>
+       <x>190</x>
+       <y>0</y>
+       <width>152</width>
        <height>191</height>
       </rect>
      </property>
@@ -891,7 +891,7 @@
       <x>0</x>
       <y>0</y>
       <width>349</width>
-      <height>255</height>
+      <height>251</height>
      </rect>
     </property>
     <attribute name="label">
@@ -1011,7 +1011,7 @@
       <x>0</x>
       <y>0</y>
       <width>349</width>
-      <height>255</height>
+      <height>251</height>
      </rect>
     </property>
     <attribute name="label">

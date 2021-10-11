@@ -161,12 +161,29 @@ void printsettings::on_MinEndOfRunParam_valueChanged(double arg1)
 /***********************************Injection Control**********************************************/
 void printsettings::on_ContinuousInjection_clicked()
 {
-
+    if (ui->ContinuousInjection->isChecked() == true){
+        ui->SteppedContInjection->setChecked(false);
+        psInjectionSettings->ContinuousInjection = ON;
+        EnableParameter(BASE_INJECTION, ON);
+        emit SettingsPrint("Continuouus injection selected");
+    }
+    else{
+        psInjectionSettings->ContinuousInjection = false;
+        emit SettingsPrint("Continuous injection disabled");
+    }
 }
 
 void printsettings::on_SteppedContInjection_clicked()
 {
-
+    if (ui->SteppedContInjection->isChecked() == true){
+        ui->ContinuousInjection->setChecked(false);
+        psInjectionSettings->SteppedContinuousInjection = ON;
+        EnableParameter(BASE_INJECTION, ON);
+    }
+    else{
+        psInjectionSettings->SteppedContinuousInjection = false;
+        emit SettingsPrint("Stepped continuous injection disabled");
+    }
 }
 
 void printsettings::on_BaseInfusionParam_valueChanged(double arg1)

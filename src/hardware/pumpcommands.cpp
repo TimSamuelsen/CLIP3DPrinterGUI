@@ -346,7 +346,5 @@ void PumpCommands::initPumpParams(InjectionSettings m_InjectionSettings)
         SetInfuseRate(m_InjectionSettings.InfusionRate);
         Sleep(10);
         SetTargetVolume(m_InjectionSettings.InitialVolume);
-
     }
-
 }
