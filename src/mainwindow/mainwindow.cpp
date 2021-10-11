@@ -487,17 +487,17 @@ void MainWindow::on_VideoCheckbox_clicked()
         EnableParameter(MAX_IMAGE, OFF);
         EnableParameter(VP_RESYNC, OFF);
         //EnableParameter(DISPLAY_CABLE, ON);
+        int DisplayCable = ui->DisplayCableList->currentIndex();
+        DLP.setIT6535Mode(DisplayCable); //Set IT6535 reciever to correct display cable
         m_PrintSettings.ProjectionMode = VIDEO;
-        //if(LCR_SetMode(PTN_MODE_DISABLE) < 0){
-        //    PrintToTerminal("Unable to switch to video mode");
-        //    ui->POTFcheckbox->setChecked(true);
-         //   on_POTFcheckbox_clicked();
-        //}
-        //else{
-            int DisplayCable = ui->DisplayCableList->currentIndex();
+        if(LCR_SetMode(PTN_MODE_DISABLE) < 0){
+           PrintToTerminal("Unable to switch to video mode");
+           ui->POTFcheckbox->setChecked(true);
+           on_POTFcheckbox_clicked();
+        }
+        else{
             initImagePopout(); // Open projection window
-            DLP.setIT6535Mode(DisplayCable); //Set IT6535 reciever to correct display cable
-        //}
+        }
     }
 }
 
