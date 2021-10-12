@@ -16,11 +16,15 @@ class printsettings : public QWidget
 public:
     explicit printsettings(QWidget *parent = nullptr);
     ~printsettings();
-    void initPrintSettings(PrintSettings *pPrintSettings, PrintControls *pPrintControls,
+    void initSettingsPointers(PrintSettings *pPrintSettings, PrintControls *pPrintControls,
                            PrintScripts *pPrintScript, InjectionSettings *pInjectionSettings);
     void savePrintSettings();
     void loadPrintSettings();
     void initPrintSettings();
+
+    void EnableParameter(Parameter_t Parameter, bool State);
+    int FileListCount();
+    QString FileListItem(int itemNum);
 
 
 Q_SIGNALS:
@@ -102,8 +106,6 @@ private:
     PrintControls *psPrintControls;
     PrintScripts *psPrintScript;
     InjectionSettings *psInjectionSettings;
-
-    void EnableParameter(Parameter_t Parameter, bool State);
 };
 
 #endif // PRINTSETTINGS_H

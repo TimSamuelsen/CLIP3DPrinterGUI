@@ -81,7 +81,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Initialize features
     CurrentDateTime = QDateTime::currentDateTime(); //get current time for startup time
-    ui->SettingsWidget->initPrintSettings(&m_PrintSettings, &m_PrintControls, &m_PrintScript, &m_InjectionSettings);
+    ui->SettingsWidget->initSettingsPointers(&m_PrintSettings, &m_PrintControls, &m_PrintScript, &m_InjectionSettings);
     loadSettings(); //load settings from settings file
     initSettings(); //initialize settings by updating ui
     ui->GraphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
@@ -180,13 +180,13 @@ void MainWindow::updatePosition(QString CurrentPosition)
 void MainWindow::on_InitializeAndSynchronize_clicked()
 {
   // If the confirmation screen was approved by user
-  if(ui->FileList->count() > 0)
+  if(ui->SettingsWidget->FileListCount() > 0)
   {
     if (initConfirmationScreen())
     {
         if(m_PrintSettings.ProjectionMode == POTF){
             // n slices = n images
-            m_PrintControls.nSlice = ui->FileList->count();
+            m_PrintControls.nSlice = ui->SettingsWidget->FileListCount();
             // remaining number of images is max n images - n images used for initial exposure
             m_PrintControls.remainingImages = m_PrintSettings.MaxImageUpload
                                               - m_PrintSettings.InitialExposure;
@@ -195,15 +195,15 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
         else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
             // n slices = (n bit layers in an image (24) / selected bit depth) * n images
             // i.e. for a 24 bit layer image with a selected bit depth of 4 the
-            m_PrintControls.nSlice = (24/m_PrintSettings.BitMode)*ui->FileList->count();
+            m_PrintControls.nSlice = (24/m_PrintSettings.BitMode)*ui->SettingsWidget->FileListCount();
 
             // Grab first image and display in image popout
-            QString filename = ui->FileList->item(m_PrintControls.layerCount)->text();
+            QString filename = ui->SettingsWidget->FileListItem(m_PrintControls.layerCount);
             QPixmap img(filename);
             ImagePopoutUI->showImage(img);
         }
         else if (m_PrintSettings.ProjectionMode == VIDEO){
-            m_PrintControls.nSlice = ui->FileList->count(); // n slices = n images
+            m_PrintControls.nSlice = ui->SettingsWidget->FileListCount(); // n slices = n images
         }
         QStringList ImageList = GetImageList(m_PrintControls, m_PrintSettings);
 
@@ -272,9 +272,9 @@ void MainWindow::PrintProcess()
             PrintToTerminal("Exiting Reupload: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
         }
         if(m_PrintSettings.ProjectionMode == VIDEO){
-            if(m_PrintControls.layerCount < ui->FileList->count()){
+            if(m_PrintControls.layerCount < ui->SettingsWidget->FileListCount()){
                 QTime StartTime = QTime::currentTime();
-                QPixmap img(ui->FileList->item(m_PrintControls.layerCount)->text());
+                QPixmap img(ui->SettingsWidget->FileListItem(m_PrintControls.layerCount));
                 ImagePopoutUI->showImage(img);
                 LastUploadTime = StartTime.msecsTo(QTime::currentTime());
                 PrintToTerminal("Upload: " + QString::number(LastUploadTime) + " ms");
@@ -310,10 +310,10 @@ void MainWindow::pumpingSlot(void)
 void MainWindow::ExposureTimeSlot(void)
 {
     if (m_PrintSettings.ProjectionMode == VIDEO
-        && m_PrintControls.FrameCount < ui->FileList->count())
+        && m_PrintControls.FrameCount < ui->SettingsWidget->FileListCount())
     {
         PrintToTerminal("LoadTimeImStart: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
-        QPixmap img(ui->FileList->item(m_PrintControls.FrameCount)->text());
+        QPixmap img(ui->SettingsWidget->FileListItem(m_PrintControls.FrameCount));
         ImagePopoutUI->showImage(img);
         PrintToTerminal("LoadTimeImEnd: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
     }
@@ -326,14 +326,14 @@ void MainWindow::ExposureTimeSlot(void)
     //Video pattern mode handling
     if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){ //If in video pattern mode
         if (PrintControl.VPFrameUpdate(&m_PrintControls, m_PrintSettings.BitMode, m_PrintSettings.ResyncVP) == true){
-            if (m_PrintControls.FrameCount < ui->FileList->count()){ //if not at end of file list
-                QPixmap img(ui->FileList->item(m_PrintControls.FrameCount)->text()); //select next image
+            if (m_PrintControls.FrameCount < ui->SettingsWidget->FileListCount()){ //if not at end of file list
+                QPixmap img(ui->SettingsWidget->FileListItem(m_PrintControls.FrameCount)); //select next image
                 ImagePopoutUI->showImage(img); //display next image
             }
         }
     }
     else if(m_PrintSettings.ProjectionMode == VIDEO){
-        if(m_PrintControls.FrameCount < ui->FileList->count()){
+        if(m_PrintControls.FrameCount < ui->SettingsWidget->FileListCount()){
             QPixmap img;
             ImagePopoutUI->showImage(img);
         }
@@ -470,9 +470,9 @@ void MainWindow::on_POTFcheckbox_clicked()
         ui->VP_HDMIcheckbox->setChecked(false);     //Uncheck the Video Pattern checkbox
         ui->VideoCheckbox->setChecked(false);
 
-        EnableParameter(MAX_IMAGE, ON);             //Enable the max image upload parameter
-        EnableParameter(VP_RESYNC, OFF);
-        EnableParameter(INITIAL_DELAY, OFF);
+        ui->SettingsWidget->EnableParameter(MAX_IMAGE, ON);             //Enable the max image upload parameter
+        ui->SettingsWidget->EnableParameter(VP_RESYNC, OFF);
+        ui->SettingsWidget->EnableParameter(INITIAL_DELAY, OFF);
         //EnableParameter(DISPLAY_CABLE, OFF);
         m_PrintSettings.ProjectionMode = POTF;      // Set projection mode to POTF
         DLP.setIT6535Mode(0);                       // Turn off HDMI connection
@@ -485,8 +485,8 @@ void MainWindow::on_VideoCheckbox_clicked()
     if (ui->VideoCheckbox->isChecked()){
         ui->POTFcheckbox->setChecked(false);
         ui->VP_HDMIcheckbox->setChecked(false);
-        EnableParameter(MAX_IMAGE, OFF);
-        EnableParameter(VP_RESYNC, OFF);
+        ui->SettingsWidget->EnableParameter(MAX_IMAGE, OFF);
+        ui->SettingsWidget->EnableParameter(VP_RESYNC, OFF);
         //EnableParameter(DISPLAY_CABLE, ON);
         int DisplayCable = ui->DisplayCableList->currentIndex();
         DLP.setIT6535Mode(DisplayCable); //Set IT6535 reciever to correct display cable
@@ -512,9 +512,9 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
     if (ui->VP_HDMIcheckbox->isChecked()){
         ui->VideoCheckbox->setChecked(false);
         ui->POTFcheckbox->setChecked(false); // Uncheck the Video Pattern checkbox
-        EnableParameter(MAX_IMAGE, OFF);
-        EnableParameter(VP_RESYNC, ON);
-        EnableParameter(INITIAL_DELAY, ON);
+        ui->SettingsWidget->EnableParameter(MAX_IMAGE, OFF);
+        ui->SettingsWidget->EnableParameter(VP_RESYNC, ON);
+        ui->SettingsWidget->EnableParameter(INITIAL_DELAY, ON);
         //EnableParameter(DISPLAY_CABLE, ON);
         m_PrintSettings.ProjectionMode = VIDEOPATTERN; //Set projection mode to video pattern
 
@@ -612,11 +612,8 @@ void MainWindow::initImagePopout()
         // Prep image list for video pattern mode
         QStringList imageList;
         // For every file in the file list, enter it into imageList
-        for(int i = 0; (i < (ui->FileList->count())); i++)
-        {
-            QListWidgetItem * item;
-            item = ui->FileList->item(i);
-            imageList << item->text();
+        for(int i = 0; (i < (ui->SettingsWidget->FileListCount())); i++){
+            imageList << ui->SettingsWidget->FileListItem(i);
         }
     }
     else{
@@ -634,18 +631,18 @@ void MainWindow::on_DICLIPSelect_clicked()
     m_PrintSettings.PrinterType = ICLIP;        // Update printer type
 
     // Enable the injection parameters
-    EnableParameter(CONTINUOUS_INJECTION, ON);
-    EnableParameter(INJECTION_VOLUME, ON);
-    EnableParameter(INJECTION_RATE, ON);
-    EnableParameter(INITIAL_VOLUME, ON);
-    EnableParameter(INJECTION_DELAY, ON);
+    ui->SettingsWidget->EnableParameter(CONTINUOUS_INJECTION, ON);
+    ui->SettingsWidget->EnableParameter(INJECTION_VOLUME, ON);
+    ui->SettingsWidget->EnableParameter(INJECTION_RATE, ON);
+    ui->SettingsWidget->EnableParameter(INITIAL_VOLUME, ON);
+    ui->SettingsWidget->EnableParameter(INJECTION_DELAY, ON);
 
     // Disable the starting position selection
-    EnableParameter(STARTING_POSITION, OFF);
+    ui->SettingsWidget->EnableParameter(STARTING_POSITION, OFF);
 
     // Disable the stage software limits
-    EnableParameter(MAX_END, OFF);
-    EnableParameter(MIN_END, OFF);
+    ui->SettingsWidget->EnableParameter(MAX_END, OFF);
+    ui->SettingsWidget->EnableParameter(MIN_END, OFF);
 }
 
 /*!
@@ -658,131 +655,21 @@ void MainWindow::on_CLIPSelect_clicked()
     m_PrintSettings.PrinterType = CLIP30UM; //Update printer type
 
     //Disable the injection parameters
-    EnableParameter(CONTINUOUS_INJECTION, OFF);
-    EnableParameter(INJECTION_VOLUME, OFF);
-    EnableParameter(INJECTION_RATE, OFF);
-    EnableParameter(INITIAL_VOLUME, OFF);
-    EnableParameter(INJECTION_DELAY, OFF);
+    ui->SettingsWidget->EnableParameter(CONTINUOUS_INJECTION, OFF);
+    ui->SettingsWidget->EnableParameter(INJECTION_VOLUME, OFF);
+    ui->SettingsWidget->EnableParameter(INJECTION_RATE, OFF);
+    ui->SettingsWidget->EnableParameter(INITIAL_VOLUME, OFF);
+    ui->SettingsWidget->EnableParameter(INJECTION_DELAY, OFF);
 
     //Enable the starting position selection
-    EnableParameter(STARTING_POSITION, ON);
+    ui->SettingsWidget->EnableParameter(STARTING_POSITION, ON);
 
     //Enable the stage software limits
-    EnableParameter(MAX_END, ON);
-    EnableParameter(MIN_END, ON);
-}
-
-
-/*!
- * \brief MainWindow::on_SetBitDepth_clicked
- * Sets the module variable BitMode which is used to determine the bit depth of projection that
- * the user wishes to print with
- */
-void MainWindow::on_SetBitDepth_clicked()
-{
-    m_PrintSettings.BitMode = ui->BitDepthParam->value(); //Grab value from GUI bit depth parameter
-    PrintToTerminal("Bit-Depth set to: " + QString::number(m_PrintSettings.BitMode));
-}
-
-/*!
- * \brief MainWindow::on_SteppedMotion_clicked
- * Sets motion mode to stepped, this is the default
- */
-void MainWindow::on_SteppedMotion_clicked()
-{
-    // If the stepped motion checkbox is checked
-    if(ui->SteppedMotion->isChecked() == true)
-    {
-        m_PrintSettings.MotionMode = STEPPED;       // Set MotionMode to STEPPED
-        ui->ContinuousMotion->setChecked(false);    // Updates UI to reflect stepped mode
-        PrintToTerminal("Stepped Motion Selected");
-        EnableParameter(DARK_TIME, ON);             // Enable dark time selection
-    }
-}
-
-/*!
- * \brief MainWindow::on_ContinuousMotion_clicked
- * Sets motion mode to continuous, results in a continuous motion print as opposed to a stepped or
- * pumped motion print.
- */
-void MainWindow::on_ContinuousMotion_clicked()
-{
-    // If the continuos motion checkbox is checked
-    if(ui->ContinuousMotion->isChecked() == true)
-    {
-        m_PrintSettings.MotionMode = CONTINUOUS;    // Set MotionMode to Continuous
-        ui->SteppedMotion->setChecked(false);       // Update UI to reflect continuous mode
-        PrintToTerminal("Continuous Motion Selected");
-
-        // Disable dark time and set it to 0, because there is no dark time in Continuous mode
-        m_PrintSettings.DarkTime = 0;
-        EnableParameter(DARK_TIME, OFF);
-        ui->DarkTimeParam->setValue(0);
-    }
-}
-
-/*!
- * \brief MainWindow::on_pumpingCheckBox_clicked
- * Enables pumping motion motion mode in which an extra stage movement is performed to lift the
- * stage up a set length past the next layer and then moved back down to the next layer height
- */
-void MainWindow::on_pumpingCheckBox_clicked()
-{
-    // If pumping checkbox is checked
-    if(ui->pumpingCheckBox->isChecked() == true){
-        m_PrintSettings.PumpingMode = ON;           // Enable pumping mode
-        EnableParameter(PUMP_HEIGHT, ON);           // Update UI
-        PrintToTerminal("Pumping Enabled");
-    }
-    else{
-        m_PrintSettings.PumpingMode = OFF;          // Disable pumping mode
-        EnableParameter(PUMP_HEIGHT, OFF);          // Update UI
-        PrintToTerminal("Pumping Disabled");
-    }
-}
-
-/*!
- * \brief MainWindow::on_setPumping_clicked
- * Sets the pumping depth parameter which determines the set length that the stages moves past the
- * next layer height to perform the pumped motion
- */
-void MainWindow::on_setPumping_clicked()
-{
-    if(m_PrintSettings.PumpingMode == ON){      // If pumping is currently enabled
-        // Grab value from UI and divide by 1000 to scale from um to mm
-        m_PrintSettings.PumpingParameter = ui->pumpingParameter->value()/1000;
-        PrintToTerminal("Pumping depth set to: " +
-                        QString::number(m_PrintSettings.PumpingParameter*1000) + " μm");
-    }
-    else{       // Pumping is currently disabled
-        PrintToTerminal("Please enable pumping before setting pumping parameter");
-    }
+    ui->SettingsWidget->EnableParameter(MAX_END, ON);
+    ui->SettingsWidget->EnableParameter(MIN_END, ON);
 }
 
 /*********************************************File Handling*********************************************/
-/*!
- * \brief MainWindow::on_SelectFile_clicked
- * Open a file dialog for the user to select their images for printing, opens at same directory
- * files were last selected from
- */
-void MainWindow::on_SelectFile_clicked()
-{
-    // Open files from last directory chosen, limited to bitmapped or tiff image file formats
-    QStringList file_name = QFileDialog::getOpenFileNames(this,"Open Object Image Files",ImageFileDirectory,"*.bmp *.png *.tiff *.tif");
-    if (file_name.count() > 0){ // If images selected
-        QDir ImageDirectory = QFileInfo(file_name.at(0)).absoluteDir();   // Get directory selected
-        ImageFileDirectory = ImageDirectory.filePath(file_name.at(0));    // Save directory
-        // Add each file name to FileList, will be displayed for user
-        for (uint16_t i = 0; i < file_name.count(); i++){
-            ui->FileList->addItem(file_name.at(i));
-        }
-    }
-    else{   // No images were selected
-        PrintToTerminal("Please select more images");
-    }
-    int SliceCount = ui->FileList->count();
-    PrintToTerminal(QString::number(SliceCount) + " Images Currently Selected");
-}
 
 /*!
  * \brief MainWindow::on_LogFileBrowse_clicked
@@ -792,131 +679,6 @@ void MainWindow::on_LogFileBrowse_clicked()
 {
     LogFileDestination = QFileDialog::getExistingDirectory(this, "Open Log File Destination");
     ui->LogFileLocation->setText(LogFileDestination);
-}
-
-/*!
- * \brief MainWindow::on_ClearImageFiles_clicked
- * Clear image files selected
- */
-void MainWindow::on_ClearImageFiles_clicked()
-{
-    ui->FileList->clear();
-}
-
-/*!
- * \brief MainWindow::on_UsePrintScript_clicked
- * Selects whether to use a print script, if the user selects to use a print script then the
- * settings from the print script will supercede the static print parameter set in the UI.
- * Any parameters that are superceded by the print script will be disabled in the UI while print
- * script is selected.
- */
-void MainWindow::on_UsePrintScript_clicked()
-{
-    if (ui->UsePrintScript->checkState())           // If printscript is checked
-    {
-        m_PrintScript.PrintScript = 1;              // Enable print script and print script UI
-        ui->SelectPrintScript->setEnabled(true);
-        ui->ClearPrintScript->setEnabled(true);
-        ui->PrintScriptFile->setEnabled(true);
-
-        EnableParameter(EXPOSURE_TIME, OFF);        // Disable all user inputs for parameters
-        EnableParameter(LED_INTENSITY, OFF);        // that are controlled by the print script
-        EnableParameter(DARK_TIME, OFF);
-        EnableParameter(LAYER_THICKNESS, OFF);
-        EnableParameter(STAGE_VELOCITY, OFF);
-        EnableParameter(STAGE_ACCELERATION, OFF);
-        EnableParameter(PUMP_HEIGHT, OFF);
-        EnableParameter(INJECTION_VOLUME, OFF);
-        EnableParameter(INJECTION_RATE, OFF);
-    }
-    else //printscript is not checked
-    {
-        m_PrintScript.PrintScript = 0;              // Disable print script and print script UI
-        ui->SelectPrintScript->setEnabled(false);
-        ui->ClearPrintScript->setEnabled(false);
-        ui->PrintScriptFile->setEnabled(false);
-
-        EnableParameter(EXPOSURE_TIME, ON);         // Enable all user inputs for parameters that
-        EnableParameter(LED_INTENSITY, ON);         // are not controlled by the print script
-        EnableParameter(DARK_TIME, ON);
-        EnableParameter(LAYER_THICKNESS, ON);
-        EnableParameter(STAGE_VELOCITY, ON);
-        EnableParameter(STAGE_ACCELERATION, ON);
-        EnableParameter(PUMP_HEIGHT, ON);
-        EnableParameter(INJECTION_VOLUME, ON);
-        EnableParameter(INJECTION_RATE, ON);
-    }
-}
-
-/*!
- * \brief MainWindow::on_SelectPrintScript_clicked
- * User selects print script from file, the print script is parsed for print parameters and is
- * stored to program memory in QStringLists, needs some work...
- */
-void MainWindow::on_SelectPrintScript_clicked()
-{
-    QString file_name = QFileDialog::getOpenFileName(this, "Open Print Script", "C://", "*.txt *.csv");
-    ui->PrintScriptFile->setText(file_name);
-    QFile file(file_name);
-    if (!file.open(QIODevice::ReadOnly)){
-        //qDebug() << file.errorString();
-    }
-    QStringList wordList;
-    while (!file.atEnd()){   // Runs until the end of the file
-            QByteArray line = file.readLine();
-            m_PrintScript.ExposureScriptList.append(line.split(',').at(0));
-            m_PrintScript.LEDScriptList.append(line.split(',').at(1));
-            m_PrintScript.DarkTimeScriptList.append(line.split(',').at(2));
-            m_PrintScript.LayerThicknessScriptList.append(line.split(',').at(3));
-            m_PrintScript.StageVelocityScriptList.append(line.split(',').at(4));
-            m_PrintScript.StageAccelerationScriptList.append(line.split(',').at(5));
-            m_PrintScript.PumpHeightScriptList.append(line.split(',').at(6));
-            if(m_PrintSettings.PrinterType == ICLIP){
-                m_PrintScript.InjectionVolumeScriptList.append(line.split(',').at(7));
-                m_PrintScript.InjectionRateScriptList.append(line.split(',').at(8));
-            }
-    }
-
-    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.ExposureScriptList.size()) + " exposure time entries");
-    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.LEDScriptList.size()) + " LED intensity entries");
-    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.DarkTimeScriptList.size()) + " dark time entries");
-    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.LayerThicknessScriptList.size()) + " layer thickness entries");
-    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.StageVelocityScriptList.size()) + " stage velocity entries");
-    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.StageAccelerationScriptList.size()) + " stage acceleration entries");
-    PrintToTerminal("Print List has: " + QString::number(m_PrintScript.PumpHeightScriptList.size()) + + " pump height entries");
-
-    if (m_PrintScript.ExposureScriptList.size() > 0)
-    {
-        ui->LiveValueList1->setCurrentIndex(1);
-        ui->LiveValue1->setText(QString::number(m_PrintScript.ExposureScriptList.at(0).toInt()));
-        ui->LiveValueList2->setCurrentIndex(2);
-        ui->LiveValue2->setText(QString::number(m_PrintScript.LEDScriptList.at(0).toInt()));
-        ui->LiveValueList3->setCurrentIndex(3);
-        ui->LiveValue3->setText(QString::number(m_PrintScript.DarkTimeScriptList.at(0).toInt()));
-        if(m_PrintSettings.PrinterType == ICLIP){
-            if (m_PrintScript.InjectionVolumeScriptList.size() > 0 && m_PrintScript.InjectionRateScriptList.size() > 0){
-                PrintToTerminal("Print List has: " + QString::number(m_PrintScript.InjectionVolumeScriptList.size()) + " injection volume entries");
-                PrintToTerminal("Print List has: " + QString::number(m_PrintScript.InjectionRateScriptList.size()) + " injection rate entries");
-                ui->LiveValueList4->setCurrentIndex(4);
-                ui->LiveValue4->setText(QString::number(m_PrintScript.InjectionVolumeScriptList.at(0).toDouble()));
-                ui->LiveValueList5->setCurrentIndex(5);
-                ui->LiveValue5->setText(QString::number(m_PrintScript.InjectionRateScriptList.at(0).toDouble()));
-            }
-        }
-    }
-
-    //initPrintScriptTable();
-    ui->GraphicWindow->initPrintScriptTable(m_PrintSettings, &m_PrintScript);
-
-}
-
-/*!
- * \brief MainWindow::on_ClearPrintScript_clicked
- * Clears selected print list
- */
-void MainWindow::on_ClearPrintScript_clicked()
-{
-    ui->PrintScriptFile->clear();
 }
 
 /*******************************************Peripheral Connections*********************************************/
@@ -1011,288 +773,12 @@ void MainWindow::PumpConnected()
     ui->PumpConnectionIndicator->setText("Connected");
 }
 /************************************Print Parameters**********************************************/
-void MainWindow::on_resinSelect_activated(const QString &arg1)
-{
-    PrintToTerminal("Resin set to: " + arg1);
-    m_PrintSettings.Resin = arg1;
-}
 
-
-
-/*!
- * \brief MainWindow::on_SetMaxImageUpload_clicked
- * Sets the max image upload, used to avoid large error buildup
- * or large wait times due to large uploads
- */
-void MainWindow::on_SetMaxImageUpload_clicked()
-{
-    uint MaxImageVal = ui->MaxImageUpload->value(); //Grab value from UI
-    if (MaxImageVal < (m_PrintSettings.InitialExposure + 1)) //Verifies that the max image upload is greater than initial exposure time
-    {
-        MaxImageVal = m_PrintSettings.InitialExposure + 1;
-    }
-    else if (MaxImageVal > 395) //Verifies that max image upload is not greater than the storage limit on light engine
-    {
-        MaxImageVal = 395;
-    }
-    else //If MaxImageVal is is an acceptable range
-    {
-        m_PrintSettings.MaxImageUpload = MaxImageVal; //This line might not be needed
-    }
-    m_PrintSettings.MaxImageUpload = MaxImageVal;
-    QString MaxImageUploadString = "Set Max Image Upload to: " + QString::number(m_PrintSettings.MaxImageUpload);
-    PrintToTerminal(MaxImageUploadString);
-}
-
-void MainWindow::on_SetResyncRate_clicked()
-{
-    m_PrintSettings.ResyncVP = ui->ResyncRateList->currentText().toInt();
-    PrintToTerminal("VP Resync rate set to: " + QString::number(m_PrintSettings.ResyncVP));
-}
-
-/*!
- * \brief MainWindow::on_SetIntialAdhesionTimeButton_clicked
- * Sets InitialExposure variable from the value inputted by the user
- */
-void MainWindow::on_SetIntialAdhesionTimeButton_clicked()
-{
-    m_PrintSettings.InitialExposure = (ui->InitialAdhesionParameter->value());
-    PrintToTerminal("Set Initial Exposure to: " + QString::number(m_PrintSettings.InitialExposure) + " s");
-}
-
-/*!
- * \brief MainWindow::on_SetStartingPosButton_clicked
- * Sets Starting Position variable from the value inputted by the user
- * (also doubles as debug tool for GetPosition(), will be removed)
- */
-void MainWindow::on_SetStartingPosButton_clicked()
-{
-    m_PrintSettings.StartingPosition = (ui->StartingPositionParam->value());
-    PrintToTerminal("Set Starting Position to: " + QString::number(m_PrintSettings.StartingPosition) + " mm");
-    QString CurrentPosition = Stage.StageGetPosition(m_PrintSettings.StageType);
-    CurrentPosition = CurrentPosition.remove(0,3);
-    PrintToTerminal("Stage is currently at: " + CurrentPosition + "mm");
-    ui->CurrentPositionIndicator->setText(CurrentPosition);
-}
-
-/*!
- * \brief MainWindow::on_SetSliceThickness_clicked
- * Sets m_PrintSettings.LayerThickness variable from the value inputted by the user
- */
-void MainWindow::on_SetSliceThickness_clicked()
-{
-    m_PrintSettings.LayerThickness = (ui->SliceThicknessParam->value()/1000);
-    PrintToTerminal("Set Slice Thickness to: " + QString::number(m_PrintSettings.LayerThickness*1000) + " μm");
-}
 /*******************************************Stage Parameters********************************************/
-/*!
- * \brief MainWindow::on_SetStageVelocity_clicked
- * Sets StageVelocity variable from the value inputted by the user,
- * also directly sends command to stage to set velocity
- */
-void MainWindow::on_SetStageVelocity_clicked()
-{
-    m_PrintSettings.StageVelocity = (ui->StageVelocityParam->value());
-    Stage.SetStageVelocity(m_PrintSettings.StageVelocity, m_PrintSettings.StageType);
-    PrintToTerminal("Set Stage Velocity to: " + QString::number(m_PrintSettings.StageVelocity) +" mm/s");
-}
-
-/*!
- * \brief MainWindow::on_SetStageAcceleration_clicked
- * Sets StageAcceleration variable from the value inputted by the user,
- * also directly sends command to stage to set acceleration
- */
-void MainWindow::on_SetStageAcceleration_clicked()
-{
-    m_PrintSettings.StageAcceleration = (ui->StageAccelParam->value());
-    Stage.SetStageAcceleration(m_PrintSettings.StageAcceleration, m_PrintSettings.StageType);
-    PrintToTerminal("Set Stage Acceleration to: " + QString::number(m_PrintSettings.StageAcceleration) + " mm/s");
-}
-
-/*!
- * \brief MainWindow::on_SetMaxEndOfRun_clicked
- * Sets MaxEndOfRun variable from the value inputted by the user,
- * also directly sends command to stage to set max end of run
- */
-void MainWindow::on_SetMaxEndOfRun_clicked()
-{
-    m_PrintSettings.MaxEndOfRun = (ui->MaxEndOfRun->value());
-    Stage.SetStagePositiveLimit(m_PrintSettings.MaxEndOfRun, m_PrintSettings.StageType);
-    PrintToTerminal("Set Max End Of Run to: " + QString::number(m_PrintSettings.MaxEndOfRun) + " mm");
-}
-
-/*!
- * \brief MainWindow::on_SetMinEndOfRun_clicked
- * Sets MinEndOfRun variable from the value inputted by the user,
- * also directly sends command to stage to set min end of run
- */
-void MainWindow::on_SetMinEndOfRun_clicked()
-{
-    m_PrintSettings.MinEndOfRun = (ui->MinEndOfRunParam->value());
-    Stage.SetStageNegativeLimit(m_PrintSettings.MinEndOfRun, m_PrintSettings.StageType);
-    PrintToTerminal("Set Min End Of Run to: " + QString::number(m_PrintSettings.MinEndOfRun) + " mm");
-}
 
 /******************************************Light Engine Parameters********************************************/
-/*!
- * \brief MainWindow::on_SetInitialDelay_clicked
- * Sets the post initial exposure delay time, this is used ensure that oxygen has more time to
- * diffuse after the initial prolonged exposure
- */
-void MainWindow::on_SetInitialDelay_clicked()
-{
-    m_PrintSettings.InitialDelay = ui->InitialDelayParam->value();
-    PrintToTerminal("Set Initial Exposure Delay to: " +
-                    QString::number(m_PrintSettings.InitialDelay) + "s");
-}
 
-/*!
- * \brief MainWindow::on_SetInitalExposureIntensity_clicked
- * Sets the initial exposure intensity
- */
-void MainWindow::on_SetInitalExposureIntensity_clicked()
-{
-    m_PrintSettings.InitialIntensity = ui->InitialExposureIntensityParam->value();
-    PrintToTerminal("Set Initial Exposure Intensity to: " +
-                    QString::number(m_PrintSettings.InitialIntensity));
-}
-
-/*!
- * \brief MainWindow::on_SetDarkTime_clicked
- * Sets DarkTime variable from the value selected by the user
- */
-void MainWindow::on_SetDarkTime_clicked()
-{
-    m_PrintSettings.DarkTime = (ui->DarkTimeParam->value()*1000);
-    PrintToTerminal("Set Dark Time to: " + QString::number(m_PrintSettings.DarkTime/1000) + " ms");
-}
-
-/*!
- * \brief MainWindow::on_SetExposureTime_clicked
- * Sets ExposureTime variable from the value selected by the user
- */
-void MainWindow::on_SetExposureTime_clicked()
-{
-    m_PrintSettings.ExposureTime = (ui->ExposureTimeParam->value()*1000);
-    PrintToTerminal("Set Exposure Time to: " + QString::number(m_PrintSettings.ExposureTime/1000) + " ms");
-}
-
-/*!
- * \brief MainWindow::on_SetUVIntensity_clicked
- * Sets UVIntensity from the value selected by the user
- */
-void MainWindow::on_SetUVIntensity_clicked()
-{
-    m_PrintSettings.UVIntensity = (ui->UVIntensityParam->value());
-    PrintToTerminal("Set UV Intensity to: " + QString::number(m_PrintSettings.UVIntensity));
-}
 /*******************************************Pump Parameters********************************************/
-/*!
- * \brief MainWindow::on_ContinuousInjection_clicked
- * Enables continuous injection throughout the print
- */
-void MainWindow::on_ContinuousInjection_clicked()
-{
-    if (ui->ContinuousInjection->isChecked() == true){
-        ui->SteppedContInjection->setChecked(false);
-        Pump.SetTargetVolume(0);
-        m_InjectionSettings.ContinuousInjection = true;
-        PrintToTerminal("Continuous Injection Selected");
-        EnableParameter(BASE_INJECTION, ON);
-    }
-    else{
-        m_InjectionSettings.ContinuousInjection = false;
-        PrintToTerminal("Continuous Injection Disabled");
-    }
-}
-
-void MainWindow::on_SteppedContInjection_clicked()
-{
-    if (ui->SteppedContInjection->isChecked() == true){
-        ui->ContinuousInjection->setChecked(false);
-        Pump.SetTargetVolume(0);
-        m_InjectionSettings.SteppedContinuousInjection = true;
-        PrintToTerminal("Stepped continuous injection enabled");
-        EnableParameter(BASE_INJECTION, ON);
-
-    }
-    else{
-        m_InjectionSettings.SteppedContinuousInjection = false;
-        ui->ContinuousInjection->setChecked(false);
-        PrintToTerminal("Stepped continuous injection disabled");
-    }
-}
-
-void MainWindow::on_SetBaseInfusion_clicked()
-{
-    m_InjectionSettings.BaseInjectionRate = ui->BaseInfusionParam->value();
-    PrintToTerminal("Set Base injection to: " +
-                    QString::number(m_InjectionSettings.BaseInjectionRate) + " ul/s");
-}
-
-
-/*!
- * \brief MainWindow::on_SetInfuseRate_clicked
- * Sets the infuse rate
- */
-void MainWindow::on_SetInfuseRate_clicked()
-{
-    m_InjectionSettings.InfusionRate = ui->InfuseRateParam->value();
-    Pump.SetInfuseRate(m_InjectionSettings.InfusionRate);
-    PrintToTerminal("Set Infusion Rate to: " + QString::number(m_InjectionSettings.InfusionRate) + " μl/s");
-}
-
-/**
- * @brief MainWindow::on_SetVolPerLayer_clicked
- */
-void MainWindow::on_SetVolPerLayer_clicked()
-{
-    m_InjectionSettings.InfusionVolume = ui->VolPerLayerParam->value();
-    Pump.SetTargetVolume(m_InjectionSettings.InfusionVolume);
-    PrintToTerminal("Set Infusion Volume per layer to: " + QString::number(m_InjectionSettings.InfusionVolume) + " ul");
-}
-
-void MainWindow::on_SetInitialVolume_clicked()
-{
-    m_InjectionSettings.InitialVolume = ui->InitialVolumeParam->value();
-    PrintToTerminal("Intial injection volume set to: QString::number(m_InjectionSettings.InitialVolume)");
-}
-
-void MainWindow::on_PreMovementCheckbox_clicked()
-{
-    if (ui->PreMovementCheckbox->isChecked() == true){
-        ui->PostMovementCheckbox->setChecked(false);
-        m_InjectionSettings.InjectionDelayFlag = PRE;
-        PrintToTerminal("Pre-Injection delay enabled");
-    }
-    else{
-        ui->PostMovementCheckbox->setChecked(false);
-        ui->PreMovementCheckbox->setChecked(false);
-        m_InjectionSettings.InjectionDelayFlag = OFF;
-        PrintToTerminal("Injection delay disabled");
-    }
-}
-
-void MainWindow::on_PostMovementCheckbox_clicked()
-{
-    if (ui->PostMovementCheckbox->isChecked() == true){
-        ui->PreMovementCheckbox->setChecked(false);
-        m_InjectionSettings.InjectionDelayFlag = POST;
-        PrintToTerminal("Post-Injection delay enabled");
-    }
-    else{
-        ui->PostMovementCheckbox->setChecked(false);
-        ui->PreMovementCheckbox->setChecked(false);
-        m_InjectionSettings.InjectionDelayFlag = OFF;
-        PrintToTerminal("Injection delay disabled");
-    }
-}
-
-void MainWindow::on_SetInjectionDelay_clicked()
-{
-    m_InjectionSettings.InjectionDelayParam = ui->InjectionDelayParam->value();
-    PrintToTerminal("Injection delay set to: " + QString::number(m_InjectionSettings.InjectionDelayParam));
-}
 
 /*******************************************Helper Functions********************************************/
 /**
@@ -1364,7 +850,6 @@ bool MainWindow::initConfirmationScreen()
         DetailedText += "Printer Type: iCLIP\n";
     }
 
-    m_PrintSettings.Resin = ui->resinSelect->currentText();
     DetailedText += "Resin: " + m_PrintSettings.Resin + "\n";
 
     if(m_PrintSettings.ProjectionMode == POTF){
@@ -1576,46 +1061,17 @@ bool MainWindow::ValidateSettings(void)
 void MainWindow::saveSettings()
 {
     QSettings settings;
-    settings.setValue("ExposureTime", m_PrintSettings.ExposureTime);
-    settings.setValue("DarkTime", m_PrintSettings.DarkTime);
-    settings.setValue("UVIntensity", m_PrintSettings.UVIntensity);
-
-    settings.setValue("StageVelocity", m_PrintSettings.StageVelocity);
-    settings.setValue("StageAcceleration", m_PrintSettings.StageAcceleration);
-    settings.setValue("MaxEndOfRun", m_PrintSettings.MaxEndOfRun);
-    settings.setValue("MinEndOfRun", m_PrintSettings.MinEndOfRun);
-
-    settings.setValue("LayerThickness", m_PrintSettings.LayerThickness);
-    settings.setValue("StartingPosition", m_PrintSettings.StartingPosition);
-    settings.setValue("InitialExposure", m_PrintSettings.InitialExposure);
-    settings.setValue("InitialDelay", m_PrintSettings.InitialDelay);
-    settings.setValue("InitialIntensity", m_PrintSettings.InitialIntensity);
 
     settings.setValue("PrintSpeed", PrintSpeed);
     settings.setValue("PrintHeight", PrintHeight);
-
-    settings.setValue("MaxImageUpload", m_PrintSettings.MaxImageUpload);
-    settings.setValue("ResyncVP", m_PrintSettings.ResyncVP);
     settings.setValue("DisplayCableIndex", ui->DisplayCableList->currentIndex());
 
     settings.setValue("LogFileDestination", LogFileDestination);
     settings.setValue("ImageFileDirectory", ImageFileDirectory);
     settings.setValue("LogName", LogName);
 
-    settings.setValue("Resin", m_PrintSettings.Resin);
     settings.setValue("PrinterType", m_PrintSettings.PrinterType);
     settings.setValue("StageType", m_PrintSettings.StageType);
-
-    settings.setValue("MotionMode", m_PrintSettings.MotionMode);
-    settings.setValue("PumpingMode",m_PrintSettings.PumpingMode);
-    settings.setValue("PumpingParameter", m_PrintSettings.PumpingParameter);
-    settings.setValue("BitMode", m_PrintSettings.BitMode);
-
-    settings.setValue("InfusionRate", m_InjectionSettings.InfusionRate);
-    settings.setValue("InfusionVolume", m_InjectionSettings.InfusionVolume);
-    settings.setValue("InitialVolume", m_InjectionSettings.InfusionVolume);
-    settings.setValue("BaseInjectionRate", m_InjectionSettings.BaseInjectionRate);
-    settings.setValue("InjectionDelay", m_InjectionSettings.InjectionDelayParam);
 
     settings.setValue("StageCOM", ui->COMPortSelect->currentIndex());
     settings.setValue("PumpCOM", ui->COMPortSelectPump->currentIndex());
@@ -1632,26 +1088,9 @@ void MainWindow::loadSettings()
     {
         QSettings settings;
 
-        m_PrintSettings.ExposureTime = settings.value("ExposureTime", 1000).toDouble();
-        m_PrintSettings.DarkTime = settings.value("DarkTime", 1000).toDouble();
-        m_PrintSettings.UVIntensity = settings.value("UVIntensity", 12).toDouble();
-
-        m_PrintSettings.StageVelocity = settings.value("StageVelocity", 10).toDouble();
-        m_PrintSettings.StageAcceleration = settings.value("StageAcceleration", 5).toDouble();
-        m_PrintSettings.MaxEndOfRun = settings.value("MaxEndOfRun", 60).toDouble();
-        m_PrintSettings.MinEndOfRun = settings.value("MinEndOfRun", 0).toDouble();
-
-
-        m_PrintSettings.StartingPosition = settings.value("StartingPosition", 5).toDouble();
-        m_PrintSettings.InitialExposure = settings.value("InitialExposure", 10).toDouble();
-        m_PrintSettings.InitialDelay = settings.value("InitialDelay", 0).toInt();
-        m_PrintSettings.InitialIntensity = settings.value("InitialIntensity", 10).toInt();
-        m_PrintSettings.LayerThickness = settings.value("LayerThickness", 1).toDouble();
         PrintSpeed = settings.value("PrintSpeed", 40).toDouble();
         PrintHeight = settings.value("PrintHeight", 5000).toDouble();
 
-        m_PrintSettings.MaxImageUpload = settings.value("MaxImageUpload", 50).toDouble();
-        m_PrintSettings.ResyncVP = settings.value("ResyncVP", 24).toDouble();
         ui->DisplayCableList->setCurrentIndex(settings.value("DisplayCableIndex").toInt());
 
         LogFileDestination = settings.value("LogFileDestination", "C://").toString();
@@ -1659,18 +1098,6 @@ void MainWindow::loadSettings()
         LogName = settings.value("LogName", "CLIPGUITEST").toString();
 
         m_PrintSettings.PrinterType = settings.value("PrinterType", CLIP30UM).toDouble();
-        m_PrintSettings.Resin = settings.value("Resin", "No resin selected").toString();
-
-        m_PrintSettings.MotionMode = settings.value("MotionMode", STEPPED).toDouble();
-        m_PrintSettings.PumpingMode = settings.value("PumpingMode", 0).toDouble();
-        m_PrintSettings.PumpingParameter = settings.value("PumpingParameter", 0).toDouble();
-        m_PrintSettings.BitMode = settings.value("BitMode", 1).toDouble();
-
-        m_InjectionSettings.InfusionRate = settings.value("InfusionRate", 5).toDouble();
-        m_InjectionSettings.InfusionVolume = settings.value("InfusionVolume", 5).toDouble();
-        m_InjectionSettings.InitialVolume = settings.value("InitialVolume", 0).toDouble();
-        m_InjectionSettings.BaseInjectionRate = settings.value("BaseInjectionRate", 0).toDouble();
-        m_InjectionSettings.InjectionDelayParam = settings.value("InjectionDelay", 0).toDouble();
 
         ui->COMPortSelect->setCurrentIndex(settings.value("StageCOM", 0).toInt());
         ui->COMPortSelectPump->setCurrentIndex(settings.value("PumpCOM", 0).toInt());
@@ -1687,37 +1114,6 @@ void MainWindow::loadSettings()
 void MainWindow::initSettings()
 {
 
-    ui->ExposureTimeParam->setValue(m_PrintSettings.ExposureTime/1000);
-    ui->DarkTimeParam->setValue(m_PrintSettings.DarkTime/1000);
-    ui->UVIntensityParam->setValue(m_PrintSettings.UVIntensity);
-
-    ui->StageVelocityParam->setValue(m_PrintSettings.StageVelocity);
-    ui->StageAccelParam->setValue(m_PrintSettings.StageAcceleration);
-    ui->MaxEndOfRun->setValue(m_PrintSettings.MaxEndOfRun);
-    ui->MinEndOfRunParam->setValue(m_PrintSettings.MinEndOfRun);
-
-    ui->SliceThicknessParam->setValue(m_PrintSettings.LayerThickness*1000);
-    ui->StartingPositionParam->setValue(m_PrintSettings.StartingPosition);
-    ui->InitialAdhesionParameter->setValue(m_PrintSettings.InitialExposure);
-    ui->InitialDelayParam->setValue(m_PrintSettings.InitialDelay);
-    ui->InitialExposureIntensityParam->setValue(m_PrintSettings.InitialIntensity);
-
-    ui->MaxImageUpload->setValue(m_PrintSettings.MaxImageUpload);
-    ui->ResyncRateList->setCurrentIndex((m_PrintSettings.ResyncVP/24)-1);
-
-    bool FoundMatch = false;
-    QStringList itemsInComboBox;
-    for (int index = 0; index < ui->resinSelect->count(); index++){
-        if (m_PrintSettings.Resin == ui->resinSelect->itemText(index)){
-            ui->resinSelect->setCurrentIndex(index);
-            FoundMatch = true;
-            break;
-        }
-    }
-    if(FoundMatch == false){
-        ui->resinSelect->addItem(m_PrintSettings.Resin);
-        ui->resinSelect->setCurrentIndex(ui->resinSelect->count()-1);
-    }
     ui->LogFileLocation->setText(LogFileDestination);
     ui->LogName->setText(LogName);
 
@@ -1732,37 +1128,8 @@ void MainWindow::initSettings()
         on_DICLIPSelect_clicked();
     }
 
-    if(m_PrintSettings.MotionMode == STEPPED){
-        ui->SteppedMotion->setChecked(true);
-        ui->ContinuousMotion->setChecked(false);
-        emit(on_SteppedMotion_clicked());
-    }
-    else if(m_PrintSettings.MotionMode == CONTINUOUS){
-        ui->ContinuousMotion->setChecked(true);
-        ui->SteppedMotion->setChecked(false);
-        emit(on_ContinuousMotion_clicked());
-    }
-
-    if(m_PrintSettings.PumpingMode == ON){
-        ui->pumpingCheckBox->setChecked(true);
-        emit(on_pumpingCheckBox_clicked());
-    }
-    else if(m_PrintSettings.PumpingMode == OFF){
-        ui->pumpingCheckBox->setChecked(false);
-    }
-
-    EnableParameter(VP_RESYNC, OFF); // Always starts in POTF so ResyncVP is disabled from start
-    EnableParameter(INITIAL_DELAY, OFF); // Always starts in POTF so Initial delay is disabled
-
-    ui->pumpingParameter->setValue(m_PrintSettings.PumpingParameter);
-    ui->BitDepthParam->setValue(m_PrintSettings.BitMode);
-
-    ui->InfuseRateParam->setValue(m_InjectionSettings.InfusionRate);
-    ui->VolPerLayerParam->setValue(m_InjectionSettings.InfusionVolume);
-    ui->InitialVolumeParam->setValue(m_InjectionSettings.InfusionVolume);
-    ui->BaseInfusionParam->setValue(m_InjectionSettings.BaseInjectionRate);
-    ui->InjectionDelayParam->setValue(m_InjectionSettings.InjectionDelayParam);
-
+    ui->SettingsWidget->EnableParameter(VP_RESYNC, OFF); // Always starts in POTF so ResyncVP is disabled from start
+    ui->SettingsWidget->EnableParameter(INITIAL_DELAY, OFF); // Always starts in POTF so Initial delay is disabled
     ui->SettingsWidget->initPrintSettings();
 }
 
@@ -1771,115 +1138,6 @@ void MainWindow::initSettings()
 /*************************************************************
  * ********************Development***************************
  * ***********************************************************/
-
-void MainWindow::EnableParameter(Parameter_t Parameter, bool State)
-{
-    switch(Parameter)
-    {
-        case EXPOSURE_TIME:
-            ui->ExposureTimeParam->setEnabled(State);
-            ui->SetExposureTime->setEnabled(State);
-            ui->ExposureTimeBox->setEnabled(State);
-            break;
-        case LED_INTENSITY:
-            ui->UVIntensityParam->setEnabled(State);
-            ui->SetUVIntensity->setEnabled(State);
-            ui->UVIntensityBox->setEnabled(State);
-            break;
-        case DARK_TIME:
-            ui->DarkTimeParam->setEnabled(State);
-            ui->SetDarkTime->setEnabled(State);
-            ui->DarkTimeBox->setEnabled(State);
-            break;
-        case LAYER_THICKNESS:
-            ui->SliceThicknessParam->setEnabled(State);
-            ui->SetSliceThickness->setEnabled(State);
-            ui->LayerThicknessBox->setEnabled(State);
-            break;
-        case STAGE_VELOCITY:
-            ui->StageVelocityParam->setEnabled(State);
-            ui->SetStageVelocity->setEnabled(State);
-            ui->StageVelocityBox->setEnabled(State);
-            break;
-        case STAGE_ACCELERATION:
-            ui->StageAccelParam->setEnabled(State);
-            ui->SetStageAcceleration->setEnabled(State);
-            ui->StageAccelerationBox->setEnabled(State);
-            break;
-        case PUMP_HEIGHT:
-            ui->pumpingParameter->setEnabled(State);
-            ui->setPumping->setEnabled(State);
-            break;
-        case INJECTION_VOLUME:
-            ui->VolPerLayerParam->setEnabled(State);
-            ui->SetVolPerLayer->setEnabled(State);
-            ui->VolPerLayerBox->setEnabled(State);
-            break;
-        case INJECTION_RATE:
-            ui->InfuseRateParam->setEnabled(State);
-            ui->SetInfuseRate->setEnabled(State);
-            ui->InfusionRateBox->setEnabled(State);
-            break;
-        case BASE_INJECTION:
-            ui->BaseInfusionParam->setEnabled(State);
-            ui->BaseInfusionRateTitle->setEnabled(State);
-            ui->SetBaseInfusion->setEnabled(State);
-            break;
-        case MAX_IMAGE:
-            ui->MaxImageUpload->setEnabled(State);
-            ui->SetMaxImageUpload->setEnabled(State);
-            ui->MaxImageUploadBox->setEnabled(State);
-            break;
-        case VP_RESYNC:
-            ui->ResyncRateList->setEnabled(State);
-            ui->SetResyncRate->setEnabled(State);
-            ui->ResyncRateBox->setEnabled(State);
-            break;
-        case INITIAL_VOLUME:
-            ui->InitialVolumeParam->setEnabled(State);
-            ui->SetInitialVolume->setEnabled(State);
-            ui->InitialVolumeBox->setEnabled(State);
-            break;
-        case INITIAL_INTENSITY:
-            ui->InitialExposureIntensityParam->setEnabled(State);
-            ui->SetInitalExposureIntensity->setEnabled(State);
-            ui->InitialIntensityBox->setEnabled(State);
-            break;
-        case INITIAL_DELAY:
-            ui->InitialDelayParam->setEnabled(State);
-            ui->SetInitialDelay->setEnabled(State);
-            ui->InitialDelayBox->setEnabled(State);
-            break;
-        case CONTINUOUS_INJECTION:
-            ui->ContinuousInjection->setEnabled(State);
-            ui->SteppedContInjection->setEnabled(State);
-            ui->ContInjectionBox->setEnabled(State);
-            break;
-        case STARTING_POSITION:
-            ui->StartingPositionParam->setEnabled(State);
-            ui->SetStartingPosButton->setEnabled(State);
-            ui->StartingPositionBox->setEnabled(State);
-            break;
-        case MAX_END:
-            ui->MaxEndOfRun->setEnabled(State);
-            ui->SetMaxEndOfRun->setEnabled(State);
-            ui->MaxEndOfRunBox->setEnabled(State);
-            break;
-        case MIN_END:
-            ui->MinEndOfRunParam->setEnabled(State);
-            ui->SetMinEndOfRun->setEnabled(State);
-            ui->MinEndOfRunBox->setEnabled(State);
-            break;
-        case INJECTION_DELAY:
-            ui->InjectionDelayParam->setEnabled(State);
-            ui->SetInjectionDelay->setEnabled(State);
-            ui->InjectionDelayBox->setEnabled(State);
-            break;
-        default:
-            break;
-    }
-}
-
 /**
  * @brief MainWindow::PrintEnd
  */
@@ -2045,15 +1303,15 @@ bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter
 void MainWindow::VP8bitWorkaround()
 {
     VP8Bit = ON;
-    QListWidgetItem * item;
+    QString item;
     QStringList imageList;
     QStringList ExposureTimeList;
     QStringList DarkTimeList;
     QStringList LEDlist;
     double LayerCount = 0;
-    for (int i = 0; i < ui->FileList->count(); i++)
+    for (int i = 0; i < ui->SettingsWidget->FileListCount(); i++)
     {
-        item = ui->FileList->item(i);
+        item = ui->SettingsWidget->FileListItem(i);
         //if (i > layerCount + MaxImageReupload){
             //break;
         //}
@@ -2076,7 +1334,7 @@ void MainWindow::VP8bitWorkaround()
                 LEDlist.append(m_PrintScript.LEDScriptList.at(i));
                 FrameList.append(QString::number(0));
                 ExpTime -= 33;
-                imageList << item->text();
+                imageList << item;
                 LayerCount++;
                 PrintToTerminal("ET: 33, DT: 0, LED: " + m_PrintScript.LEDScriptList.at(i));
             }
@@ -2086,7 +1344,7 @@ void MainWindow::VP8bitWorkaround()
                 LEDlist.append(m_PrintScript.LEDScriptList.at(i));
                 FrameList.append(QString::number(1));
                 LayerCount++;
-                imageList << item->text();
+                imageList << item;
                 FrameFinished = true;
                 PrintToTerminal("ET: " + QString::number(ExpTime) + ", DT: " + QString::number(DTime) + ", LED: " + m_PrintScript.LEDScriptList.at(i));
             }
@@ -2127,21 +1385,21 @@ void MainWindow::PrintScriptHandler(PrintControls m_PrintControls, PrintSettings
 QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSettings m_PrintSettings)
 {
     QStringList ImageList;
-    QListWidgetItem * item;
+    QString item;
     double InitialExposureCount = m_PrintSettings.InitialExposure;
     if (m_PrintControls.InitialExposureFlag == ON
         && m_PrintSettings.ProjectionMode != VIDEO){ //If in initial POTF upload
-        m_PrintControls.nSlice = ui->FileList->count();
+        m_PrintControls.nSlice = ui->SettingsWidget->FileListCount();
         if (m_PrintControls.nSlice){
-            item = ui->FileList->item(0);
+            item = ui->SettingsWidget->FileListItem(0);
             while (InitialExposureCount > 0){
-                ImageList << item->text();
+                ImageList << item;
                 InitialExposureCount -= 5;
             }
             if (m_PrintSettings.ProjectionMode == POTF){
-                for (int i = 1; i < ui->FileList->count(); i++){
-                    item = ui->FileList->item(i);
-                    ImageList << item->text();
+                for (int i = 1; i < ui->SettingsWidget->FileListCount(); i++){
+                    item = ui->SettingsWidget->FileListItem(i);
+                    ImageList << item;
                     if ((i + m_PrintSettings.InitialExposure) > m_PrintSettings.MaxImageUpload){
                             break;
                         }
@@ -2151,9 +1409,9 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
     }
     else if (m_PrintSettings.ProjectionMode == POTF){
         //else in re-upload
-        for (int i = m_PrintControls.layerCount; i< ui->FileList->count(); i++){
-            item = ui->FileList->item(i);
-            ImageList << item->text();
+        for (int i = m_PrintControls.layerCount; i< ui->SettingsWidget->FileListCount(); i++){
+            item = ui->SettingsWidget->FileListItem(i);
+            ImageList << item;
             if (i > m_PrintControls.layerCount + m_PrintSettings.MaxImageUpload){
                 break;
             }
@@ -2166,9 +1424,9 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
         {
             for (j = 0; j < (24/m_PrintSettings.BitMode); j++)
             {
-                if (i < ui->FileList->count()){
-                    item = ui->FileList->item(i);
-                    ImageList << item->text();
+                if (i < ui->SettingsWidget->FileListCount()){
+                    item = ui->SettingsWidget->FileListItem(i);
+                    ImageList << item;
                 }
                 else{
                     ui->ProgramPrints->append("VP Image segmentation fault");

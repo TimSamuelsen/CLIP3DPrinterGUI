@@ -35,22 +35,6 @@ public slots:
 private slots:
     void on_ManualStage_clicked();
 
-    void on_SetSliceThickness_clicked();
-
-    void on_SetStageVelocity_clicked();
-
-    void on_SetStageAcceleration_clicked();
-
-    void on_SetMaxEndOfRun_clicked();
-
-    void on_SetMinEndOfRun_clicked();
-
-    void on_SetExposureTime_clicked();
-
-    void on_SetUVIntensity_clicked();
-
-    void on_SetDarkTime_clicked();
-
     void on_LiveValueList1_activated(const QString &arg1);
 
     void on_LiveValueList2_activated(const QString &arg1);
@@ -71,10 +55,6 @@ private slots:
 
     void on_LightEngineConnectButton_clicked();
 
-    void on_SelectFile_clicked();
-
-    void on_ClearImageFiles_clicked();
-
     void ExposureTimeSlot();
 
     void DarkTimeSlot();
@@ -85,25 +65,13 @@ private slots:
 
     void on_LogFileBrowse_clicked();
 
-    void on_SetStartingPosButton_clicked();
-
     void on_AbortPrint_clicked();
-
-    void on_SetIntialAdhesionTimeButton_clicked();
 
     void on_ManualPumpControl_clicked();
 
     void on_PumpConnectButton_clicked();
 
     void on_GetPosition_clicked();
-
-    void on_SetMaxImageUpload_clicked();
-
-    void on_UsePrintScript_clicked();
-
-    void on_SelectPrintScript_clicked();
-
-    void on_ClearPrintScript_clicked();
 
     void on_ImageProcess_clicked();
 
@@ -115,51 +83,15 @@ private slots:
 
     void on_DICLIPSelect_clicked();
 
-    void on_SetBitDepth_clicked();
-
-    void on_SteppedMotion_clicked();
-
-    void on_ContinuousMotion_clicked();
-
-    void on_pumpingCheckBox_clicked();
-
-    void on_setPumping_clicked();
-
     void pumpingSlot();
 
     void on_CLIPSelect_clicked();
-
-    void on_SetInfuseRate_clicked();
-
-    void on_SetVolPerLayer_clicked();
-
-    void on_ContinuousInjection_clicked();
-
-    void on_SetInitialVolume_clicked();
-
-    void on_PreMovementCheckbox_clicked();
-
-    void on_PostMovementCheckbox_clicked();
-
-    void on_SetInjectionDelay_clicked();
 
     void updatePosition(QString CurrentPosition);
 
     void StageConnected();
 
     void PumpConnected();
-
-    void on_SetInitalExposureIntensity_clicked();
-
-    void on_SetInitialDelay_clicked();
-
-    void on_SetResyncRate_clicked();
-
-    void on_SetBaseInfusion_clicked();
-
-    void on_SteppedContInjection_clicked();
-
-    void on_resinSelect_activated(const QString &arg1);
 
     void on_LogName_textChanged();
 
@@ -190,7 +122,6 @@ private:
     void VP8bitWorkaround();
     bool PrintScriptApply(uint layerCount, QStringList Script, Parameter_t DynamicParam);
     void PrintComplete();
-    void EnableParameter(Parameter_t Parameter, bool State);
     double CalcPrintEnd(PrintControls m_PrintControls, PrintSettings m_PrintSettings);
     double CalcContinuousVelocity(PrintSettings m_PrintSettings);
     QStringList GetImageList(PrintControls m_PrintControls, PrintSettings m_PrintSettings);

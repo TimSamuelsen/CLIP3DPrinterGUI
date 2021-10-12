@@ -16,8 +16,8 @@ printsettings::~printsettings()
     delete ui;
 }
 
-void printsettings::initPrintSettings(PrintSettings *pPrintSettings, PrintControls *pPrintControls
-                                      ,PrintScripts *pPrintScript, InjectionSettings *pInjectionSettings)
+void printsettings::initSettingsPointers(PrintSettings *pPrintSettings, PrintControls *pPrintControls
+                                         , PrintScripts *pPrintScript, InjectionSettings *pInjectionSettings)
 {
     psPrintSettings = pPrintSettings;
     psPrintControls = pPrintControls;
@@ -56,7 +56,7 @@ void printsettings::on_StartingPositionParam_valueChanged(double arg1)
 
 void printsettings::on_LayerThicknessParam_valueChanged(double arg1)
 {
-    psPrintSettings->LayerThickness = arg1;
+    psPrintSettings->LayerThickness = arg1/1000;
 }
 
 void printsettings::on_ResyncRateList_currentIndexChanged(const QString &arg1)
@@ -333,6 +333,15 @@ void printsettings::on_ClearImageFiles_clicked()
     ui->FileList->clear();
 }
 
+int printsettings::FileListCount()
+{
+    return ui->FileList->count();
+}
+
+QString printsettings::FileListItem(int itemNum)
+{
+    return ui->FileList->item(itemNum)->text();
+}
 /************************************Helper Functions**********************************************/
 void printsettings::EnableParameter(Parameter_t Parameter, bool State)
 {
