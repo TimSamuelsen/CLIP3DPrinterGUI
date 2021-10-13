@@ -31,6 +31,7 @@ void printcontrol::InitializeSystem(QStringList ImageList, PrintSettings m_Print
 {
     pc_Stage.initStagePosition(m_PrintSettings);    // Move stage to starting position
     pc_Pump.initPumpParams(m_InjectionSettings);
+    pc_DLP.SetLEDIntensity(m_PrintSettings.InitialIntensity);
     if(m_PrintSettings.ProjectionMode != VIDEO){
        pc_DLP.PatternDisplay(OFF);
        pc_DLP.PatternUpload(ImageList, *pPrintControls, m_PrintSettings, m_PrintScript);
