@@ -1,0 +1,488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>printmonitoring</class>
+ <widget class="QWidget" name="printmonitoring">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>429</width>
+    <height>225</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Stage Position and Print Monitoring</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout" columnstretch="7,2,1">
+      <item row="0" column="0">
+       <widget class="QSlider" name="CurrentStagePos">
+        <property name="minimum">
+         <number>-5</number>
+        </property>
+        <property name="maximum">
+         <number>65</number>
+        </property>
+        <property name="sliderPosition">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="GetPosition">
+        <property name="text">
+         <string>Get</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="CurrentPositionIndicator">
+        <property name="styleSheet">
+         <string notr="true">background:rgb(255, 255, 255); border: 1px solid black;
+</string>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="3">
+       <layout class="QGridLayout" name="gridLayout_3" columnstretch="3,2,3,2">
+        <item row="1" column="3">
+         <widget class="QLabel" name="LiveValue5">
+          <property name="styleSheet">
+           <string notr="true">background:rgb(255, 255, 255); border: 1px solid black;
+</string>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QComboBox" name="LiveValueList4">
+          <item>
+           <property name="text">
+            <string>None</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Exposure Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>LED Intensity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Dark Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Vol/layer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Injection Rate</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stage Velocity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stage Position</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input A</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input B</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input C</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="LiveValue2">
+          <property name="styleSheet">
+           <string notr="true">background:rgb(255, 255, 255); border: 1px solid black;
+</string>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QComboBox" name="LiveValueList1">
+          <item>
+           <property name="text">
+            <string>None</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Exposure Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>LED Intensity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Dark Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Vol/layer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Injection Rate</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stage Velocity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stage Position</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input A</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input B</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input C</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QComboBox" name="LiveValueList2">
+          <item>
+           <property name="text">
+            <string>None</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Exposure Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>LED Intensity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Dark Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Vol/layer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Injection Rate</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stage Velocity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stage Position</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input A</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input B</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input C</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLabel" name="LiveValue4">
+          <property name="styleSheet">
+           <string notr="true">background:rgb(255, 255, 255); border: 1px solid black;
+</string>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="LiveValue1">
+          <property name="styleSheet">
+           <string notr="true">background:rgb(255, 255, 255); border: 1px solid black;
+</string>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QComboBox" name="LiveValueList5">
+          <item>
+           <property name="text">
+            <string>None</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Exposure Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>LED Intensity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Dark Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Vol/layer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Injection Rate</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stage Velocity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stage Position</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input A</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input B</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input C</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QComboBox" name="LiveValueList3">
+          <item>
+           <property name="text">
+            <string>None</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Exposure Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>LED Intensity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Dark Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Vol/layer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Injection Rate</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stage Velocity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stage Position</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input A</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input B</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input C</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="LiveValue3">
+          <property name="styleSheet">
+           <string notr="true">background:rgb(255, 255, 255); border: 1px solid black;
+</string>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QComboBox" name="LiveValueList6">
+          <item>
+           <property name="text">
+            <string>None</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Exposure Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>LED Intensity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Dark Time</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Vol/layer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Injection Rate</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stage Velocity</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Stage Position</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input A</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input B</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sensor Input C</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QLabel" name="LiveValue6">
+          <property name="styleSheet">
+           <string notr="true">background:rgb(255, 255, 255); border: 1px solid black;
+</string>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

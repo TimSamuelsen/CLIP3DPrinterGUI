@@ -115,16 +115,18 @@ void graphics::updatePlot(PrintControls m_PrintControls, PrintSettings m_PrintSe
     textLabel2->setFont(QFont(font().family(), 12)); // make font a bit larger
     textLabel2->setPen(QPen(Qt::black)); // show black border around text
 
-    if(m_PrintControls.InitialExposureFlag == OFF && m_PrintControls.layerCount == 0){
-        QCPItemText *textLabel3 = new QCPItemText(ui->LivePlot);
-        textLabel3->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
-        textLabel3->position->setType(QCPItemPosition::ptAxisRectRatio);
-        textLabel3->position->setCoords(0.98, 0.14); // place position at center/top of axis rect
-        textLabel3->setText(" Initial Exposure Active");
-        textLabel3->setFont(QFont(font().family(), 12)); // make font a bit larger
-        textLabel3->setPen(QPen(Qt::black)); // show black border around tex
-    }
+    ui->LivePlot->replot(QCustomPlot::rpQueuedReplot);
+}
 
+void graphics::addInitialExpLabel()
+{
+    QCPItemText *textLabel3 = new QCPItemText(ui->LivePlot);
+    textLabel3->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
+    textLabel3->position->setType(QCPItemPosition::ptAxisRectRatio);
+    textLabel3->position->setCoords(0.98, 0.14); // place position at center/top of axis rect
+    textLabel3->setText(" Initial Exposure Active");
+    textLabel3->setFont(QFont(font().family(), 12)); // make font a bit larger
+    textLabel3->setPen(QPen(Qt::black)); // show black border around tex
     ui->LivePlot->replot(QCustomPlot::rpQueuedReplot);
 }
 

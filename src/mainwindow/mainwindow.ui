@@ -22,7 +22,7 @@
   <property name="maximumSize">
    <size>
     <width>2200</width>
-    <height>748</height>
+    <height>1500</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -1257,75 +1257,120 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>Popout Windows</string>
     </property>
-    <widget class="QPushButton" name="ImageProcess">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>111</width>
-       <height>61</height>
-      </rect>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="topMargin">
+      <number>0</number>
      </property>
-     <property name="text">
-      <string>Image 
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="ImageProcess">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Image 
  Processing</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="ManualPumpControl">
-     <property name="geometry">
-      <rect>
-       <x>130</x>
-       <y>20</y>
-       <width>121</width>
-       <height>61</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Manual 
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="ManualPumpControl">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Manual 
  Pump Control</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="ManualStage">
-     <property name="geometry">
-      <rect>
-       <x>260</x>
-       <y>20</y>
-       <width>111</width>
-       <height>61</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Manual
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="ManualStage">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Manual
  Stage Control</string>
-     </property>
-    </widget>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </widget>
    <widget class="QGroupBox" name="ActiveControlBox">
     <property name="geometry">
      <rect>
       <x>400</x>
       <y>510</y>
-      <width>141</width>
+      <width>131</width>
       <height>211</height>
      </rect>
     </property>
     <property name="title">
      <string>Active Controls</string>
     </property>
-    <widget class="QPushButton" name="StartPrint">
-     <property name="enabled">
-      <bool>false</bool>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="leftMargin">
+      <number>5</number>
      </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>121</width>
-       <height>51</height>
-      </rect>
+     <property name="topMargin">
+      <number>0</number>
      </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton#StartPrint {
+     <property name="rightMargin">
+      <number>5</number>
+     </property>
+     <property name="bottomMargin">
+      <number>15</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="StartPrint">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton#StartPrint {
     background-color: rgb(35, 255, 35);
     border-style: outset;
     border-width: 1px;
@@ -1342,39 +1387,51 @@ QPushButton#StartPrint:hover:!pressed {
 }
 
 </string>
-     </property>
-     <property name="text">
-      <string>Start Print</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="InitializeAndSynchronize">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>80</y>
-       <width>121</width>
-       <height>61</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Initialize
+       </property>
+       <property name="text">
+        <string>Start Print</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="InitializeAndSynchronize">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Initialize
  System</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="AbortPrint">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>150</y>
-       <width>121</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton#AbortPrint {
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="AbortPrint">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>50</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton#AbortPrint {
     background-color: red;
     border-style: outset;
     border-width: 1px;
@@ -1393,11 +1450,13 @@ QPushButton#AbortPrint:disabled {
 QPushButton#AbortPrint:hover:!pressed {
     background-color:rgb(215,35,35);
 }</string>
-     </property>
-     <property name="text">
-      <string>Abort</string>
-     </property>
-    </widget>
+       </property>
+       <property name="text">
+        <string>Abort</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
    <widget class="graphics" name="GraphicWindow" native="true">
     <property name="geometry">

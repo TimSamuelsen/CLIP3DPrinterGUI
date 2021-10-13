@@ -235,6 +235,7 @@ void MainWindow::on_StartPrint_clicked()
         if(m_PrintScript.PrintScript){
             LCR_SetLedCurrents(0, 0, m_PrintSettings.InitialIntensity);
         }
+        ui->GraphicWindow->addInitialExpLabel();
         PrintControl.StartPrint(m_PrintSettings, m_PrintScript,
                                 m_InjectionSettings.ContinuousInjection);
         //initPollTimer();
@@ -268,7 +269,7 @@ void MainWindow::PrintProcess()
             int imagesUploaded = PrintControl.ReuploadHandler(ImageList, m_PrintControls,
                                                               m_PrintSettings, m_PrintScript,
                                                               m_InjectionSettings.ContinuousInjection);
-                m_PrintControls.remainingImages = imagesUploaded;
+            m_PrintControls.remainingImages = imagesUploaded;
             PrintToTerminal("Exiting Reupload: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
         }
         if(m_PrintSettings.ProjectionMode == VIDEO){
@@ -332,7 +333,7 @@ void MainWindow::ExposureTimeSlot(void)
             }
         }
     }
-    else if(m_PrintSettings.ProjectionMode == VIDEO){
+    else if(m_PrintSettings.ProjectionMode == VIDEO && m_PrintSettings.MotionMode == STEPPED){
         if(m_PrintControls.FrameCount < ui->SettingsWidget->FileListCount()){
             QPixmap img;
             ImagePopoutUI->showImage(img);
@@ -452,10 +453,13 @@ void MainWindow::SetDarkTimer()
         if (m_PrintControls.inMotion == false){
             Stage.StageAbsoluteMove(m_PrintControls.PrintEnd, m_PrintSettings.StageType);
         }
+        if (m_PrintControls.layerCount == 0 && m_PrintScript.PrintScript == OFF){
+            LCR_SetLedCurrents(0, 0, m_PrintSettings.UVIntensity);
+        }
+
         PrintProcess();
     }
 }
-
 
 /***************************************Mode Selection*********************************************/
 /*!
@@ -491,14 +495,14 @@ void MainWindow::on_VideoCheckbox_clicked()
         int DisplayCable = ui->DisplayCableList->currentIndex();
         DLP.setIT6535Mode(DisplayCable); //Set IT6535 reciever to correct display cable
         m_PrintSettings.ProjectionMode = VIDEO;
-        if(LCR_SetMode(PTN_MODE_DISABLE) < 0){
-           PrintToTerminal("Unable to switch to video mode");
-           ui->POTFcheckbox->setChecked(true);
-           on_POTFcheckbox_clicked();
-        }
-        else{
+        //if(LCR_SetMode(PTN_MODE_DISABLE) < 0){
+           //PrintToTerminal("Unable to switch to video mode");
+           //ui->POTFcheckbox->setChecked(true);
+           //on_POTFcheckbox_clicked();
+        //}
+        //else{
             initImagePopout(); // Open projection window
-        }
+        //}
     }
 }
 
@@ -1133,8 +1137,6 @@ void MainWindow::initSettings()
     ui->SettingsWidget->initPrintSettings();
 }
 
-/*******************************************Plot Functions*********************************************/
-
 /*************************************************************
  * ********************Development***************************
  * ***********************************************************/
@@ -1144,6 +1146,7 @@ void MainWindow::initSettings()
 void MainWindow::PrintComplete()
 {
     PrintToTerminal("Print Complete");
+    LCR_SetMode(PTN_MODE_OTF);   // set to POTF to turn off any projection
     saveText();
     saveSettings();
     Stage.StageStop(m_PrintSettings.StageType);

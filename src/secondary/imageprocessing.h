@@ -36,6 +36,8 @@ private slots:
 
     void on_BinStart_clicked();
 
+    void on_BlurStart_clicked();
+
 private:
     Ui::imageprocessing *ui;
     cv::Mat mframe;
@@ -43,6 +45,7 @@ private:
     //void bitEncode8(cv::Mat source, cv::Mat& Channel);
     int hexSelect(int imageNum);
     void PixelBinner(QStringList ImageList);
+    void Blur(QStringList ImageList);
 
 };
 

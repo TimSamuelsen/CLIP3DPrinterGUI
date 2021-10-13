@@ -19,9 +19,12 @@ public:
                   PrintScripts m_PrintScript);
     void updatePlot(PrintControls m_PrintControls, PrintSettings m_PrintSettings,
                     PrintScripts m_PrintScript);
+    void addInitialExpLabel();
+
     void initPrintScriptTable(PrintSettings m_PrintSettings, PrintScripts *pPrintScript);
     void PrintScriptTableEntry(QStringList Script, uint ColNum);
     void updatePrintScriptTable(PrintSettings m_PrintSettings, PrintScripts m_PrintScript);
+
 
 Q_SIGNALS:
     void GraphicsPrint(QString);

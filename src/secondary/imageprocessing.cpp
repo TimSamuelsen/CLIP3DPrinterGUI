@@ -339,7 +339,7 @@ void imageprocessing::PixelBinner(QStringList ImageList)
         upSize.setTo(Scalar(0));
         cv::resize(imageBinary, downSize, Size(downCols, downRows), INTER_NEAREST);
 
-        for (int row = 0; row < downSize.rows; row++){
+        /*for (int row = 0; row < downSize.rows; row++){
             for (int col = 0; col < downSize.cols; col++){
                 if (downSize.at<uchar>(row,col) == 255){
                     for (int downRow = 0; downRow < binType; downRow++){
@@ -352,7 +352,60 @@ void imageprocessing::PixelBinner(QStringList ImageList)
                     }
                 }
             }
-        }
+        }*/
+
+        cv::resize(downSize, upSize, Size(upSize.cols, upSize.rows), INTER_NEAREST);
+
+        QPixmap newImage = QPixmap::fromImage(QImage((unsigned char*) upSize.data, upSize.cols, upSize.rows, QImage::Format_Grayscale8));
+        ui->ImageDisplay->setPixmap(newImage.scaled(671,411));
+
+        QString ImageName = TargetDestination + "/" + QString::number(i+1) + ".png";
+        imwrite(ImageName.toUtf8().constData(), upSize);
+        ui->OutputImageList->addItem(ImageName);
+
+        ui->encodeProgress->setValue(i+1);
+        imageprocessing::update();
+        imshow("down", downSize);
+        imshow("up", upSize);
+
+
+    }
+}
+
+void imageprocessing::on_BlurStart_clicked()
+{
+    QStringList ImageList;
+    //int nIt = ui->InputList->size();
+    for (int i = 0; i < ui->InputList->count(); i ++){
+        QListWidgetItem* filename = ui->InputList->item(i); //Select image
+        QString file_name = filename->text(); //convert to string to read by openCV
+        ImageList.append(file_name);
+    }
+    Blur(ImageList);
+}
+
+void imageprocessing::Blur(QStringList ImageList)
+{
+    for (int i = 0; i < ImageList.size(); i++){
+        QString fileName = ImageList[i];
+        ui->TerminalOut->append(fileName);
+        Mat imageRead = imread(samples::findFile(fileName.toUtf8().constData()), IMREAD_GRAYSCALE);
+        Mat imageThresh;
+        Mat imageBinary;
+        threshold(imageRead, imageThresh, 10, 255, 0); //threshold image to binary
+        //imageBinary = imageThresh.clone();
+        cv::bitwise_not(imageThresh, imageBinary);
+
+        int binType = ui->BinSelect->currentIndex() + 1; // add 1 to convert from 0 indexed
+        int downRows = imageBinary.rows / binType;
+        int downCols = imageBinary.cols / binType;
+        Mat downSize = imageBinary.clone();
+        Mat upSize = imageBinary.clone();
+        upSize.setTo(Scalar(0));
+        cv::resize(imageBinary, downSize, Size(downCols, downRows), INTER_NEAREST);
+        cv::resize(downSize, upSize, Size(upSize.cols, upSize.rows), INTER_NEAREST);
+
+        cv::bitwise_not(upSize, upSize);
         QPixmap newImage = QPixmap::fromImage(QImage((unsigned char*) upSize.data, upSize.cols, upSize.rows, QImage::Format_Grayscale8));
         ui->ImageDisplay->setPixmap(newImage.scaled(671,411));
 
@@ -364,9 +417,9 @@ void imageprocessing::PixelBinner(QStringList ImageList)
         imageprocessing::update();
         //imshow("down", downSize);
         //imshow("up", upSize);
-
     }
 }
+
 /*
 QStringList imageprocessing::ExposedPixelCount(QStringList ImageList)
 {
@@ -654,5 +707,3 @@ bitEncode8(src3, channel[2]);
 merge(channel,3,ImageOut);
 imshow("Test", ImageOut);
 #endif
-
-

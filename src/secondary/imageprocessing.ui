@@ -275,7 +275,7 @@
      <rect>
       <x>20</x>
       <y>21</y>
-      <width>101</width>
+      <width>71</width>
       <height>31</height>
      </rect>
     </property>
@@ -383,14 +383,27 @@
    <widget class="QPushButton" name="BinStart">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>100</x>
       <y>20</y>
-      <width>101</width>
+      <width>91</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
      <string>Start Binning</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="BlurStart">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>20</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Blur</string>
     </property>
    </widget>
   </widget>
