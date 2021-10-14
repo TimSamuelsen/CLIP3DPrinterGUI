@@ -7,1105 +7,1926 @@
     <x>0</x>
     <y>0</y>
     <width>351</width>
-    <height>451</height>
+    <height>436</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>351</width>
-    <height>451</height>
+    <height>436</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QToolBox" name="toolBox">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>351</width>
-     <height>451</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>MS Shell Dlg 2</family>
-     <pointsize>9</pointsize>
-     <weight>50</weight>
-     <italic>false</italic>
-     <bold>false</bold>
-    </font>
-   </property>
-   <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">alternate-background-color: rgb(230, 230, 230);</string>
-   </property>
-   <property name="inputMethodHints">
-    <set>Qt::ImhNone</set>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::Panel</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Sunken</enum>
-   </property>
-   <property name="lineWidth">
-    <number>1</number>
-   </property>
-   <property name="midLineWidth">
+  <layout class="QGridLayout" name="gridLayout_7">
+   <property name="leftMargin">
     <number>0</number>
    </property>
-   <property name="currentIndex">
+   <property name="topMargin">
     <number>0</number>
    </property>
-   <widget class="QWidget" name="GeneralPrintSettings">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>349</width>
-      <height>251</height>
-     </rect>
-    </property>
-    <attribute name="label">
-     <string>                     General Print Settings</string>
-    </attribute>
-    <widget class="QWidget" name="gridLayoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>10</y>
-       <width>311</width>
-       <height>191</height>
-      </rect>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="1">
-       <widget class="QGroupBox" name="BitDepthBox">
-        <property name="title">
-         <string>Bit Depth</string>
-        </property>
-        <widget class="QSpinBox" name="BitDepthParam">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>8</number>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QGroupBox" name="StartingPositionBox">
-        <property name="title">
-         <string>Starting Position (mm)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="StartingPositionParam">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QGroupBox" name="MaxImageUploadBox">
-        <property name="title">
-         <string>Max Image Upload POTF</string>
-        </property>
-        <widget class="QSpinBox" name="MaxImageUpload">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="maximum">
-          <number>399</number>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QGroupBox" name="resinSelectBox">
-        <property name="title">
-         <string>Select Resin</string>
-        </property>
-        <widget class="QComboBox" name="resinSelect">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>131</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="editable">
-          <bool>true</bool>
-         </property>
-         <item>
-          <property name="text">
-           <string>Resin A</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Resin B</string>
-          </property>
-         </item>
-        </widget>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QGroupBox" name="ResyncRateBox">
-        <property name="title">
-         <string>Resync Rate VP</string>
-        </property>
-        <widget class="QComboBox" name="ResyncRateList">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <item>
-          <property name="text">
-           <string>24</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>48</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>72</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>96</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>120</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>144</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>168</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>192</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>216</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>240</string>
-          </property>
-         </item>
-        </widget>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QGroupBox" name="LayerThicknessBox">
-        <property name="title">
-         <string>Layer Thickness (μm)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="LayerThicknessParam">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="maximum">
-          <double>1000000.000000000000000</double>
-         </property>
-         <property name="value">
-          <double>10.000000000000000</double>
-         </property>
-        </widget>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="LightEngineControl">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>349</width>
-      <height>251</height>
-     </rect>
-    </property>
-    <attribute name="label">
-     <string>                      Light Engine Control</string>
-    </attribute>
-    <widget class="QWidget" name="gridLayoutWidget_6">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>10</y>
-       <width>307</width>
-       <height>191</height>
-      </rect>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_6">
-      <item row="0" column="0">
-       <widget class="QGroupBox" name="InitialExposureBox">
-        <property name="title">
-         <string>Inital Exposure Time (s)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="InitialExposureParameter">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="maximum">
-          <double>999.990000000000009</double>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QGroupBox" name="InitialDelayBox">
-        <property name="title">
-         <string>Initial Exp Delay (s)</string>
-        </property>
-        <widget class="QSpinBox" name="InitialDelayParam">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QGroupBox" name="InitialIntensityBox">
-        <property name="title">
-         <string>Initial Exp Int (0-255)</string>
-        </property>
-        <widget class="QSpinBox" name="InitialExposureIntensityParam">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="maximum">
-          <number>255</number>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QGroupBox" name="UVIntensityBox">
-        <property name="title">
-         <string>UV Intensity (0-255)</string>
-        </property>
-        <widget class="QSpinBox" name="UVIntensityParam">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="minimum">
-          <number>0</number>
-         </property>
-         <property name="maximum">
-          <number>255</number>
-         </property>
-         <property name="value">
-          <number>12</number>
-         </property>
-         <property name="displayIntegerBase">
-          <number>10</number>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QGroupBox" name="ExposureTimeBox">
-        <property name="title">
-         <string>Exposure Time (ms)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="ExposureTimeParam">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="maximum">
-          <double>100000000.000000000000000</double>
-         </property>
-         <property name="value">
-          <double>500.000000000000000</double>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QGroupBox" name="DarkTimeBox">
-        <property name="title">
-         <string>Dark Time (ms)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="DarkTimeParam">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="maximum">
-          <double>100000000.000000000000000</double>
-         </property>
-         <property name="value">
-          <double>500.000000000000000</double>
-         </property>
-        </widget>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="StageControl">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>349</width>
-      <height>251</height>
-     </rect>
-    </property>
-    <attribute name="label">
-     <string>                         Stage Control</string>
-    </attribute>
-    <widget class="QWidget" name="gridLayoutWidget_3">
-     <property name="geometry">
-      <rect>
-       <x>14</x>
-       <y>10</y>
-       <width>311</width>
-       <height>211</height>
-      </rect>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_3" rowstretch="10,8,8">
-      <item row="1" column="0">
-       <widget class="QGroupBox" name="StageVelocityBox">
-        <property name="title">
-         <string>Stage Velocity (mm/s)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="StageVelocityParam">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="value">
-          <double>3.000000000000000</double>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QGroupBox" name="MotionModeBox">
-        <property name="title">
-         <string>Print Motion Mode</string>
-        </property>
-        <widget class="QRadioButton" name="ContinuousMotionButton">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>121</width>
-           <height>20</height>
-          </rect>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Continuous  </string>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>40</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-        </widget>
-        <widget class="QRadioButton" name="SteppedMotionButton">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>40</y>
-           <width>101</width>
-           <height>20</height>
-          </rect>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Stepped  </string>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>40</width>
-           <height>40</height>
-          </size>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QGroupBox" name="MaxEndOfRunBox">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="title">
-         <string>Max end of run (mm)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="MaxEndOfRunParam">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="value">
-          <double>65.000000000000000</double>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QGroupBox" name="PumpingBox">
-        <property name="title">
-         <string>Pumping Depth (μm)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="pumpingParameter">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>40</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="maximum">
-          <double>5000.000000000000000</double>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="pumpingCheckBox">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>121</width>
-           <height>20</height>
-          </rect>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Enable Pumping</string>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QGroupBox" name="MinEndOfRunBox">
-        <property name="title">
-         <string>Min end of run (mm)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="MinEndOfRunParam">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QGroupBox" name="StageAccelerationBox">
-        <property name="title">
-         <string>Stage Accel. (mm/s^2)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="StageAccelParam">
-         <property name="geometry">
-          <rect>
-           <x>30</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="value">
-          <double>3.000000000000000</double>
-         </property>
-        </widget>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="InjectionControl">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>349</width>
-      <height>251</height>
-     </rect>
-    </property>
-    <attribute name="label">
-     <string>                       Injection Control</string>
-    </attribute>
-    <widget class="QWidget" name="gridLayoutWidget_4">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>0</y>
-       <width>161</width>
-       <height>221</height>
-      </rect>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_4" rowstretch="7,6">
-      <item row="0" column="0">
-       <widget class="QGroupBox" name="ContInjectionBox">
-        <property name="title">
-         <string>Continuous Injection</string>
-        </property>
-        <widget class="QCheckBox" name="ContinuousInjection">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>40</x>
-           <y>20</y>
-           <width>81</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <family>MS Shell Dlg 2</family>
-           <pointsize>8</pointsize>
-           <weight>50</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Constant</string>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="SteppedContInjection">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>50</x>
-           <y>40</y>
-           <width>71</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <family>MS Shell Dlg 2</family>
-           <pointsize>8</pointsize>
-           <weight>50</weight>
-           <italic>false</italic>
-           <bold>false</bold>
-          </font>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Stepped</string>
-         </property>
-        </widget>
-        <widget class="QDoubleSpinBox" name="BaseInfusionParam">
-         <property name="geometry">
-          <rect>
-           <x>40</x>
-           <y>80</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-        </widget>
-        <widget class="QLabel" name="BaseInfusionRateTitle">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>60</y>
-           <width>141</width>
-           <height>16</height>
-          </rect>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>6</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Base Infusion Rate (μl/s)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QGroupBox" name="InjectionDelayBox">
-        <property name="title">
-         <string>Injection Delay (ms)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="InjectionDelayParam">
-         <property name="geometry">
-          <rect>
-           <x>40</x>
-           <y>60</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-         <property name="maximum">
-          <double>9999.000000000000000</double>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="PreMovementCheckbox">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>121</width>
-           <height>20</height>
-          </rect>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
-         </property>
-         <property name="text">
-          <string>Pre-Movement</string>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="PostMovementCheckbox">
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>40</y>
-           <width>121</width>
-           <height>20</height>
-          </rect>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::RightToLeft</enum>
-         </property>
-         <property name="text">
-          <string>Post-Movement</string>
-         </property>
-        </widget>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QWidget" name="gridLayoutWidget_5">
-     <property name="geometry">
-      <rect>
-       <x>190</x>
-       <y>0</y>
-       <width>152</width>
-       <height>191</height>
-      </rect>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_5">
-      <item row="1" column="0">
-       <widget class="QGroupBox" name="VolPerLayerBox">
-        <property name="title">
-         <string>Vol/layer (μl)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="VolPerLayerParam">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>20</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QGroupBox" name="InitialVolumeBox">
-        <property name="title">
-         <string>Initial Injection Vol (μl)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="InitialVolumeParam">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>20</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-        </widget>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QGroupBox" name="InjectionRateBox">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="title">
-         <string>Injection Rate (μl/s)</string>
-        </property>
-        <widget class="QDoubleSpinBox" name="InjectionRateParam">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>20</x>
-           <y>20</y>
-           <width>91</width>
-           <height>31</height>
-          </rect>
-         </property>
-        </widget>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="DynamicPrintMode">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>349</width>
-      <height>251</height>
-     </rect>
-    </property>
-    <attribute name="label">
-     <string>                     Dynamic Print Mode</string>
-    </attribute>
-    <widget class="QGroupBox" name="PrintScriptBox">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>10</y>
-       <width>331</width>
-       <height>91</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string>Print Script</string>
-     </property>
-     <widget class="QPushButton" name="ClearPrintScript">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>250</x>
-        <y>20</y>
-        <width>71</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>MS Shell Dlg 2</family>
-        <pointsize>8</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Clear</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="PrintScriptFile">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>51</y>
-        <width>311</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="SelectPrintScript">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>160</x>
-        <y>20</y>
-        <width>91</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>MS Shell Dlg 2</family>
-        <pointsize>8</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Select File</string>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="UsePrintScript">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>141</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>MS Shell Dlg 2</family>
-        <pointsize>8</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
-      </property>
-      <property name="text">
-       <string>Enable Print Script</string>
-      </property>
-     </widget>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="ImageFiles">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>349</width>
-      <height>251</height>
-     </rect>
-    </property>
-    <attribute name="label">
-     <string>                          Image Files</string>
-    </attribute>
-    <widget class="QToolButton" name="ClearImageFiles">
-     <property name="geometry">
-      <rect>
-       <x>180</x>
-       <y>0</y>
-       <width>161</width>
-       <height>31</height>
-      </rect>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QToolBox" name="toolBox">
+     <property name="minimumSize">
+      <size>
+       <width>1</width>
+       <height>436</height>
+      </size>
      </property>
      <property name="font">
       <font>
        <family>MS Shell Dlg 2</family>
-       <pointsize>8</pointsize>
+       <pointsize>9</pointsize>
        <weight>50</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
-     <property name="text">
-      <string>Clear</string>
-     </property>
-    </widget>
-    <widget class="QToolButton" name="SelectFile">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>0</y>
-       <width>171</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>MS Shell Dlg 2</family>
-       <pointsize>8</pointsize>
-       <weight>50</weight>
-       <italic>false</italic>
-       <bold>false</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Select Files</string>
-     </property>
-    </widget>
-    <widget class="QListWidget" name="FileList">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>30</y>
-       <width>331</width>
-       <height>191</height>
-      </rect>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
      </property>
      <property name="autoFillBackground">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(255, 255, 255);</string>
+      <string notr="true">alternate-background-color: rgb(230, 230, 230);</string>
+     </property>
+     <property name="inputMethodHints">
+      <set>Qt::ImhNone</set>
      </property>
      <property name="frameShape">
       <enum>QFrame::Panel</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
+      <enum>QFrame::Sunken</enum>
      </property>
+     <property name="lineWidth">
+      <number>1</number>
+     </property>
+     <property name="midLineWidth">
+      <number>0</number>
+     </property>
+     <property name="currentIndex">
+      <number>3</number>
+     </property>
+     <widget class="QWidget" name="GeneralPrintSettings">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>349</width>
+        <height>236</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>                     General Print Settings</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="1">
+          <widget class="QGroupBox" name="BitDepthBox">
+           <property name="title">
+            <string>Bit Depth</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_37" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_45">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="BitDepthParam">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>8</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_46">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QGroupBox" name="StartingPositionBox">
+           <property name="title">
+            <string>Starting Position (mm)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_36" columnstretch="1,4,1">
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_47">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="StartingPositionParam"/>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_48">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="MaxImageUploadBox">
+           <property name="title">
+            <string>Max Image Upload POTF</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_33" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="MaxImageUpload">
+              <property name="maximum">
+               <number>399</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_41">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_42">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="resinSelectBox">
+           <property name="title">
+            <string>Select Resin</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_32" columnstretch="1,8,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="resinSelect">
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+              <item>
+               <property name="text">
+                <string>Resin A</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Resin B</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_39">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_40">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QGroupBox" name="ResyncRateBox">
+           <property name="title">
+            <string>Resync Rate VP</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_34" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="ResyncRateList">
+              <item>
+               <property name="text">
+                <string>24</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>48</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>72</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>96</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>120</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>144</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>168</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>192</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>216</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>240</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_43">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_44">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QGroupBox" name="LayerThicknessBox">
+           <property name="title">
+            <string>Layer Thickness (μm)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_35" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="LayerThicknessParam">
+              <property name="maximum">
+               <double>1000000.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>10.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_49">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_50">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="LightEngineControl">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>349</width>
+        <height>236</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>                      Light Engine Control</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_8">
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,1">
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="InitialExposureBox">
+           <property name="title">
+            <string>Inital Exposure Time (s)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_26" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_27">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>19</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="InitialExposureParameter">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximum">
+               <double>999.990000000000009</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_28">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>19</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QGroupBox" name="InitialDelayBox">
+           <property name="title">
+            <string>Initial Exp Delay (s)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_29" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_36">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>19</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="InitialDelayParam">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_35">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>19</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QGroupBox" name="InitialIntensityBox">
+           <property name="title">
+            <string>Initial Exp Int (0-255)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_30" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_33">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>52</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="InitialExposureIntensityParam">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximum">
+               <number>255</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_34">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>19</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="UVIntensityBox">
+           <property name="title">
+            <string>UV Intensity (0-255)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_27" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_29">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>19</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="UVIntensityParam">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimum">
+               <number>0</number>
+              </property>
+              <property name="maximum">
+               <number>255</number>
+              </property>
+              <property name="value">
+               <number>12</number>
+              </property>
+              <property name="displayIntegerBase">
+               <number>10</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_30">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>19</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QGroupBox" name="ExposureTimeBox">
+           <property name="title">
+            <string>Exposure Time (ms)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_28" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_32">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>11</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="ExposureTimeParam">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximum">
+               <double>100000000.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>500.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_31">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>11</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QGroupBox" name="DarkTimeBox">
+           <property name="title">
+            <string>Dark Time (ms)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_31" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="DarkTimeParam">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximum">
+               <double>100000000.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>500.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_37">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_38">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="StageControl">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>349</width>
+        <height>236</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>                         Stage Control</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_9">
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout_3" rowstretch="10,8,8" columnstretch="1,1">
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="StageVelocityBox">
+           <property name="title">
+            <string>Stage Velocity (mm/s)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_22" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="StageVelocityParam">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="value">
+               <double>3.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_19">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_20">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="MotionModeBox">
+           <property name="title">
+            <string>Print Motion Mode</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_21" columnstretch="8,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="verticalSpacing">
+             <number>3</number>
+            </property>
+            <item row="1" column="0">
+             <widget class="QRadioButton" name="SteppedMotionButton">
+              <property name="layoutDirection">
+               <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
+              </property>
+              <property name="text">
+               <string>Stepped  </string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>40</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QRadioButton" name="ContinuousMotionButton">
+              <property name="layoutDirection">
+               <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 9pt &quot;MS Shell Dlg 2&quot;;</string>
+              </property>
+              <property name="text">
+               <string>Continuous  </string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>40</width>
+                <height>40</height>
+               </size>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <spacer name="horizontalSpacer_15">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="1">
+             <spacer name="horizontalSpacer_16">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QGroupBox" name="MaxEndOfRunBox">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="title">
+            <string>Max end of run (mm)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_23" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_21">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="MaxEndOfRunParam">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="value">
+               <double>65.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_22">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QGroupBox" name="PumpingBox">
+           <property name="title">
+            <string>Pumping Depth (μm)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_20" rowstretch="3,0,0">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="pumpingCheckBox">
+              <property name="layoutDirection">
+               <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
+              </property>
+              <property name="text">
+               <string>Enable Pumping</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_25">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_26">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="2" column="0" colspan="3">
+             <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,4,1">
+              <item>
+               <spacer name="horizontalSpacer_13">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="pumpingParameter">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="maximum">
+                 <double>5000.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_14">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QGroupBox" name="MinEndOfRunBox">
+           <property name="title">
+            <string>Min end of run (mm)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_24" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="MinEndOfRunParam">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_23">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_24">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QGroupBox" name="StageAccelerationBox">
+           <property name="title">
+            <string>Stage Accel. (mm/s^2)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_25" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_17">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="StageAccelParam">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="value">
+               <double>3.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_18">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="InjectionControl">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>349</width>
+        <height>236</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>                       Injection Control</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_10" columnstretch="1,1">
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>11</number>
+       </property>
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout_4" rowstretch="7,6">
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="ContInjectionBox">
+           <property name="title">
+            <string>Continuous Injection</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_14" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="verticalSpacing">
+             <number>1</number>
+            </property>
+            <item row="6" column="1">
+             <widget class="QDoubleSpinBox" name="BaseInfusionParam">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="ContinuousInjection">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>MS Shell Dlg 2</family>
+                <pointsize>8</pointsize>
+                <weight>50</weight>
+                <italic>false</italic>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
+              </property>
+              <property name="text">
+               <string>Constant</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="3">
+             <widget class="QLabel" name="BaseInfusionRateTitle">
+              <property name="font">
+               <font>
+                <pointsize>6</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Base Infusion Rate (μl/s)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="2">
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="6" column="0">
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="SteppedContInjection">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="font">
+               <font>
+                <family>MS Shell Dlg 2</family>
+                <pointsize>8</pointsize>
+                <weight>50</weight>
+                <italic>false</italic>
+                <bold>false</bold>
+               </font>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
+              </property>
+              <property name="text">
+               <string>Stepped</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="InjectionDelayBox">
+           <property name="title">
+            <string>Injection Delay (ms)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_16" rowstretch="3,0,0,0,0,0,0" columnstretch="0,0,0">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <property name="verticalSpacing">
+             <number>1</number>
+            </property>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="1">
+             <widget class="QCheckBox" name="PostMovementCheckbox">
+              <property name="layoutDirection">
+               <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="text">
+               <string>Post-Movement</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QCheckBox" name="PreMovementCheckbox">
+              <property name="layoutDirection">
+               <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="text">
+               <string>Pre-Movement</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_6">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="2" column="0" colspan="3">
+             <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,4,1">
+              <item>
+               <spacer name="horizontalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="InjectionDelayParam">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximum">
+                 <double>9999.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="1">
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="VolPerLayerBox">
+           <property name="title">
+            <string>Vol/layer (μl)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_18" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>19</width>
+                <height>17</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="VolPerLayerParam">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_10">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QGroupBox" name="InitialVolumeBox">
+           <property name="title">
+            <string>Initial Injection Vol (μl)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_17" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="InitialVolumeParam">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="InjectionRateBox">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="title">
+            <string>Injection Rate (μl/s)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_19" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_11">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>19</width>
+                <height>17</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="InjectionRateParam">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_12">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>19</width>
+                <height>17</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="DynamicPrintMode">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>349</width>
+        <height>236</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>                     Dynamic Print Mode</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_11" rowstretch="5,6">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="PrintScriptBox">
+         <property name="title">
+          <string>Print Script</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_15" rowstretch="2,0,5">
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="SelectPrintScript">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>MS Shell Dlg 2</family>
+              <pointsize>8</pointsize>
+              <weight>50</weight>
+              <italic>false</italic>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Select File</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="UsePrintScript">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>MS Shell Dlg 2</family>
+              <pointsize>8</pointsize>
+              <weight>50</weight>
+              <italic>false</italic>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 8pt &quot;MS Shell Dlg 2&quot;;</string>
+            </property>
+            <property name="text">
+             <string>Enable Script</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="ClearPrintScript">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <family>MS Shell Dlg 2</family>
+              <pointsize>8</pointsize>
+              <weight>50</weight>
+              <italic>false</italic>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Clear</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0" rowspan="2" colspan="3">
+           <widget class="QLineEdit" name="PrintScriptFile">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>9</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="ImageFiles">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>349</width>
+        <height>236</height>
+       </rect>
+      </property>
+      <attribute name="label">
+       <string>                          Image Files</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout_13">
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout_12" rowstretch="2,5">
+         <property name="spacing">
+          <number>3</number>
+         </property>
+         <item row="0" column="1">
+          <widget class="QToolButton" name="ClearImageFiles">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>8</pointsize>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Clear</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QToolButton" name="SelectFile">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="font">
+            <font>
+             <family>MS Shell Dlg 2</family>
+             <pointsize>8</pointsize>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Select Files</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QListWidget" name="FileList">
+           <property name="autoFillBackground">
+            <bool>true</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgb(255, 255, 255);</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Panel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
-   </widget>
-  </widget>
-  <widget class="QWidget" name="gridLayoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>450</x>
-     <y>350</y>
-     <width>311</width>
-     <height>191</height>
-    </rect>
-   </property>
-   <layout class="QGridLayout" name="gridLayout_2"/>
-  </widget>
-  <widget class="QTextBrowser" name="testTerm">
-   <property name="geometry">
-    <rect>
-     <x>440</x>
-     <y>40</y>
-     <width>256</width>
-     <height>192</height>
-    </rect>
-   </property>
-  </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
