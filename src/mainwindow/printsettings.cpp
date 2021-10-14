@@ -442,6 +442,7 @@ void printsettings::savePrintSettings()
     settings.setValue("ResyncVP", psPrintSettings->ResyncVP);
     settings.setValue("LayerThickness", psPrintSettings->LayerThickness);
     settings.setValue("StartingPosition", psPrintSettings->StartingPosition);
+    settings.setValue("PostExposureDelay", psPrintSettings->PostExposureDelay);
 
     settings.setValue("InitialExposure", psPrintSettings->InitialExposure);
     settings.setValue("InitialDelay", psPrintSettings->InitialDelay);
@@ -476,6 +477,7 @@ void printsettings::loadPrintSettings()
     psPrintSettings->ResyncVP = settings.value("ResyncVP", 24).toDouble();
     psPrintSettings->LayerThickness = settings.value("LayerThickness", 1).toDouble();
     psPrintSettings->StartingPosition = settings.value("StartingPosition", 5).toDouble();
+    psPrintSettings->PostExposureDelay = settings.value("PostExposureDelay", 0).toDouble();
 
     psPrintSettings->InitialExposure = settings.value("InitialExposure", 10).toDouble();
     psPrintSettings->InitialDelay = settings.value("InitialDelay", 0).toInt();
@@ -522,6 +524,7 @@ void printsettings::initPrintSettings()
     ui->ResyncRateList->setCurrentIndex((psPrintSettings->ResyncVP/24)-1);
     ui->LayerThicknessParam->setValue(psPrintSettings->LayerThickness*1000);
     ui->StartingPositionParam->setValue(psPrintSettings->StartingPosition);
+    ui->PostExposureDelayParam->setValue(psPrintSettings->PostExposureDelay);
 
     ui->InitialExposureParameter->setValue(psPrintSettings->InitialExposure);
     ui->InitialDelayParam->setValue(psPrintSettings->InitialDelay);
@@ -563,8 +566,16 @@ void printsettings::initPrintSettings()
     EnableParameter(INITIAL_DELAY, OFF); // Always starts in POTF so Initial delay is disabled
 }
 
-
-
 #if 0
 
 #endif
+
+void printsettings::on_PostExposureDelayParam_valueChanged(double arg1)
+{
+    if (arg1 <= psPrintSettings->DarkTime){
+        psPrintSettings->PostExposureDelay = arg1;
+    }
+    else{
+        ui->PostExposureDelayParam->setValue(0);
+    }
+}

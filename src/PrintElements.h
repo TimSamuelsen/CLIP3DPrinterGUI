@@ -88,6 +88,8 @@ struct PrintSettings
 
     int BitMode = 1;
 
+    double PostExposureDelay = 0;
+
     double LayerThickness = 0;
     double StageVelocity = 0;
     double StageAcceleration = 0;

@@ -223,7 +223,14 @@ void printcontrol::DarkTimeHandler(PrintControls m_PrintControls, PrintSettings 
     }
     // If not in iCLIP mode, stage movement is performed directly
     else{
-        StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
+        if (m_PrintSettings.PostExposureDelay == 0){
+            StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
+        }
+        else{
+            QTimer::singleShot(m_PrintSettings.PostExposureDelay, Qt::PreciseTimer, this
+                               ,SLOT(StageMove(m_PrintControls, m_PrintSettings, m_PrintScript)));
+            emit ControlPrintSignal("Post-Exposure delay: " + QString::number(m_PrintSettings.PostExposureDelay));
+        }
         emit GetPositionSignal();
     }
 }

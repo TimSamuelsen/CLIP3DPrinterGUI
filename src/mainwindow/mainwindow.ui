@@ -66,7 +66,7 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="0" column="0">
+          <item row="0" column="1">
            <widget class="printsettings" name="SettingsWidget" native="true"/>
           </item>
          </layout>
