@@ -82,136 +82,30 @@
         <x>0</x>
         <y>0</y>
         <width>349</width>
-        <height>260</height>
+        <height>236</height>
        </rect>
       </property>
       <attribute name="label">
        <string>                     General Print Settings</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_2" rowstretch="7,3">
+      <layout class="QGridLayout" name="gridLayout_2">
        <property name="topMargin">
-        <number>5</number>
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>3</number>
        </property>
        <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QGroupBox" name="resinSelectBox">
-           <property name="title">
-            <string>Select Resin</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_32" columnstretch="1,8,1">
-            <property name="leftMargin">
-             <number>5</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>5</number>
-            </property>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="resinSelect">
-              <property name="editable">
-               <bool>true</bool>
-              </property>
-              <item>
-               <property name="text">
-                <string>Resin A</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Resin B</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <spacer name="horizontalSpacer_39">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="0" column="2">
-             <spacer name="horizontalSpacer_40">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QGroupBox" name="MaxImageUploadBox">
-           <property name="title">
-            <string>Max Image Upload POTF</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_33" columnstretch="1,4,1">
-            <property name="leftMargin">
-             <number>5</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>5</number>
-            </property>
-            <item row="0" column="1">
-             <widget class="QSpinBox" name="MaxImageUpload">
-              <property name="maximum">
-               <number>399</number>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <spacer name="horizontalSpacer_41">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item row="0" column="2">
-             <spacer name="horizontalSpacer_42">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
-         </item>
+        <layout class="QGridLayout" name="gridLayout" rowstretch="1,1,1,1">
+         <property name="verticalSpacing">
+          <number>3</number>
+         </property>
          <item row="2" column="0">
           <widget class="QGroupBox" name="ResyncRateBox">
            <property name="title">
             <string>Resync Rate VP</string>
            </property>
-           <layout class="QGridLayout" name="gridLayout_34" columnstretch="1,0,0">
+           <layout class="QGridLayout" name="gridLayout_34" columnstretch="1,4,1">
             <property name="leftMargin">
              <number>5</number>
             </property>
@@ -219,6 +113,9 @@
              <number>0</number>
             </property>
             <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
              <number>5</number>
             </property>
             <item row="0" column="0">
@@ -319,6 +216,9 @@
             <property name="rightMargin">
              <number>5</number>
             </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
             <item row="0" column="0">
              <spacer name="horizontalSpacer_45">
               <property name="orientation">
@@ -373,6 +273,9 @@
             <property name="rightMargin">
              <number>5</number>
             </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
             <item row="0" column="1">
              <widget class="QDoubleSpinBox" name="LayerThicknessParam">
               <property name="maximum">
@@ -421,6 +324,9 @@
             <property name="topMargin">
              <number>0</number>
             </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
             <item row="0" column="0">
              <spacer name="horizontalSpacer_47">
               <property name="orientation">
@@ -453,27 +359,179 @@
            </layout>
           </widget>
          </item>
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="resinSelectBox">
+           <property name="title">
+            <string>Select Resin</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_32" columnstretch="1,8,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="resinSelect">
+              <property name="editable">
+               <bool>true</bool>
+              </property>
+              <item>
+               <property name="text">
+                <string>Resin A</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Resin B</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_39">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_40">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="MaxImageUploadBox">
+           <property name="title">
+            <string>Max Image Upload POTF</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_33" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="MaxImageUpload">
+              <property name="maximum">
+               <number>399</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_41">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_42">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QGroupBox" name="PostExposureDelayBox">
+           <property name="title">
+            <string>Post Exposure Delay (ms)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_38" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="PostExposureDelayParam">
+              <property name="maximum">
+               <double>10000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_51">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_52">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
         </layout>
-       </item>
-       <item row="1" column="0">
-        <widget class="QGroupBox" name="PostExposureDelayBox">
-         <property name="title">
-          <string>Post Exposure Delay (ms)</string>
-         </property>
-         <widget class="QDoubleSpinBox" name="PostExposureDelayParam">
-          <property name="geometry">
-           <rect>
-            <x>110</x>
-            <y>20</y>
-            <width>101</width>
-            <height>31</height>
-           </rect>
-          </property>
-          <property name="maximum">
-           <double>10000.000000000000000</double>
-          </property>
-         </widget>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -483,7 +541,7 @@
         <x>0</x>
         <y>0</y>
         <width>349</width>
-        <height>260</height>
+        <height>236</height>
        </rect>
       </property>
       <attribute name="label">
@@ -859,7 +917,7 @@
         <x>0</x>
         <y>0</y>
         <width>349</width>
-        <height>260</height>
+        <height>236</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1294,7 +1352,7 @@
         <x>0</x>
         <y>0</y>
         <width>349</width>
-        <height>260</height>
+        <height>236</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1729,7 +1787,7 @@
         <x>0</x>
         <y>0</y>
         <width>349</width>
-        <height>260</height>
+        <height>236</height>
        </rect>
       </property>
       <attribute name="label">
@@ -1865,7 +1923,7 @@
         <x>0</x>
         <y>0</y>
         <width>349</width>
-        <height>260</height>
+        <height>236</height>
        </rect>
       </property>
       <attribute name="label">

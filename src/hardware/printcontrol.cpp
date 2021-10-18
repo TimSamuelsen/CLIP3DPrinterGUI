@@ -11,7 +11,16 @@ PumpCommands& pc_Pump = PumpCommands::Instance();
 
 printcontrol::printcontrol()
 {
+    //QObject::connect(this, SIGNAL(StageMoveSignal(PrintControls, PrintSettings,  PrintScript)),
+    //                 this, SLOT(StageMOve(PrintControls, PrintSettings, PrintScript)));
+}
 
+void printcontrol::getControlPointers(PrintSettings *pPrintSettings, PrintControls *pPrintControls
+                               ,PrintScripts *pPrintScript)
+{
+    pcPrintSettings = pPrintSettings;
+    pcPrintControls = pPrintControls;
+    pcPrintScript = pPrintScript;
 }
 
 /*!
@@ -200,19 +209,19 @@ void printcontrol::DarkTimeHandler(PrintControls m_PrintControls, PrintSettings 
         // For pre injection delay, injection is handled first and stage movement second
         if (m_InjectionSettings.InjectionDelayFlag == PRE){
             PrintInfuse(m_InjectionSettings);
-            QTimer::singleShot(m_InjectionSettings.InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove(m_PrintControls, m_PrintSettings, m_PrintScript)));
+            QTimer::singleShot(m_InjectionSettings.InjectionDelayParam, Qt::PreciseTimer, this, SLOT(StageMove()));
             emit ControlPrintSignal("Pre-Injection Delay: " + QString::number(m_InjectionSettings.InjectionDelayParam));
         }
         // For post injection delay, stage movement is handled first and injection second
         else if (m_InjectionSettings.InjectionDelayFlag == POST){
-            StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
+            StageMove();
             QTimer::singleShot(m_InjectionSettings.InjectionDelayParam, Qt::PreciseTimer, this, SLOT(PrintInfuse(m_InjectionSettings)));
             emit ControlPrintSignal("Post-Injection Delay: " + QString::number(m_InjectionSettings.InjectionDelayParam));
         }
         // If no injection delay is set, injection and movement are handled at the same time
         else{
             PrintInfuse(m_InjectionSettings);
-            StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
+            StageMove();
             emit ControlPrintSignal("No injection delay");
         }
 
@@ -224,12 +233,12 @@ void printcontrol::DarkTimeHandler(PrintControls m_PrintControls, PrintSettings 
     // If not in iCLIP mode, stage movement is performed directly
     else{
         if (m_PrintSettings.PostExposureDelay == 0){
-            StageMove(m_PrintControls, m_PrintSettings, m_PrintScript);
+            StageMove();
         }
         else{
             QTimer::singleShot(m_PrintSettings.PostExposureDelay, Qt::PreciseTimer, this
-                               ,SLOT(StageMove(m_PrintControls, m_PrintSettings, m_PrintScript)));
-            emit ControlPrintSignal("Post-Exposure delay: " + QString::number(m_PrintSettings.PostExposureDelay));
+                               ,SLOT(StageMove()));
+            emit ControlPrintSignal("Post-Exposure delay: " + QString::number(m_PrintSettings.PostExposureDelay) + " ms");
         }
         emit GetPositionSignal();
     }
@@ -319,32 +328,32 @@ ExposureType_t printcontrol::GetExposureType(int PrintScript, int PumpingMode)
 }
 
 //Move layer count out fix docu later
-void printcontrol::StageMove(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript)
+void printcontrol::StageMove()
 {
     //If printscript is active, filter out layerCount = 0 and layerCount is greater than script length
-    if (m_PrintScript.PrintScript == ON){
-        if (m_PrintControls.layerCount > 0){
-            if (m_PrintControls.layerCount < m_PrintScript.LayerThicknessScriptList.size()){
-                double LayerThickness = m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()/1000; //grab layer thickness from script list
-                emit ControlPrintSignal("Moving Stage: " + QString::number(m_PrintScript.LayerThicknessScriptList.at(m_PrintControls.layerCount).toDouble()) + " um");
-                pc_Stage.StageRelativeMove(-LayerThickness, m_PrintSettings.StageType); //Move stage 1 layer thickness
+    if (pcPrintScript->PrintScript == ON){
+        if (pcPrintControls->layerCount > 0){
+            if (pcPrintControls->layerCount < pcPrintScript->LayerThicknessScriptList.size()){
+                double LayerThickness = pcPrintScript->LayerThicknessScriptList.at(pcPrintControls->layerCount).toDouble()/1000; //grab layer thickness from script list
+                emit ControlPrintSignal("Moving Stage: " + QString::number(pcPrintScript->LayerThicknessScriptList.at(pcPrintControls->layerCount).toDouble()) + " um");
+                pc_Stage.StageRelativeMove(-LayerThickness, pcPrintSettings->StageType); //Move stage 1 layer thickness
 
                 //If pumping mode is active, grab pump height from script and move stage Pump height - layer thickness
-                if (m_PrintSettings.PumpingMode == ON){
-                    double PumpParam = m_PrintScript.PumpHeightScriptList.at(m_PrintControls.layerCount).toDouble();
-                    pc_Stage.StageRelativeMove(PumpParam - LayerThickness, m_PrintSettings.StageType);
+                if (pcPrintSettings->PumpingMode == ON){
+                    double PumpParam = pcPrintScript->PumpHeightScriptList.at(pcPrintControls->layerCount).toDouble();
+                    pc_Stage.StageRelativeMove(PumpParam - LayerThickness, pcPrintSettings->StageType);
                 }
             }
         }
     }
     else{
-        if (m_PrintSettings.PumpingMode == ON){
-            pc_Stage.StageRelativeMove(m_PrintSettings.PumpingParameter - m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
-            emit ControlPrintSignal("Pumping active, moving stage: " + QString::number(1000*(m_PrintSettings.PumpingParameter - m_PrintSettings.LayerThickness)) + " um");
+        if (pcPrintSettings->PumpingMode == ON){
+            pc_Stage.StageRelativeMove(pcPrintSettings->PumpingParameter - pcPrintSettings->LayerThickness, pcPrintSettings->StageType);
+            emit ControlPrintSignal("Pumping active, moving stage: " + QString::number(1000*(pcPrintSettings->PumpingParameter - pcPrintSettings->LayerThickness)) + " um");
         }
         else{
-            pc_Stage.StageRelativeMove(-m_PrintSettings.LayerThickness, m_PrintSettings.StageType);
-            emit ControlPrintSignal("Moving Stage: " + QString::number(m_PrintSettings.LayerThickness*1000) + " um");
+            pc_Stage.StageRelativeMove(-pcPrintSettings->LayerThickness, pcPrintSettings->StageType);
+            emit ControlPrintSignal("Moving Stage: " + QString::number(pcPrintSettings->LayerThickness*1000) + " um");
         }
     }
 }

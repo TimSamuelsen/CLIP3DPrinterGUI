@@ -84,6 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->SettingsWidget->initSettingsPointers(&m_PrintSettings, &m_PrintControls, &m_PrintScript, &m_InjectionSettings);
     loadSettings(); //load settings from settings file
     initSettings(); //initialize settings by updating ui
+    PrintControl.getControlPointers(&m_PrintSettings, &m_PrintControls, &m_PrintScript);
     ui->GraphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
 }
 
@@ -1425,7 +1426,7 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
         int nUploadFrames = (m_PrintSettings.ResyncVP/24)*m_PrintSettings.BitMode;
         for(int i = m_PrintControls.FrameCount; i < m_PrintControls.FrameCount + nUploadFrames; i++)
         {
-            for (j = 0; j < (24/m_PrintSettings.BitMode); j++)
+            for (int j = 0; j < (24/m_PrintSettings.BitMode); j++)
             {
                 if (i < ui->SettingsWidget->FileListCount()){
                     item = ui->SettingsWidget->FileListItem(i);

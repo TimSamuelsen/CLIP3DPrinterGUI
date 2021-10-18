@@ -21,6 +21,8 @@ public:
     bool VPFrameUpdate(PrintControls *pPrintControls, int BitMode, int ReSyncRate);
     void DarkTimeHandler(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript, InjectionSettings m_InjectionSettings);
     void StagePumpingHandler(uint layerCount, PrintSettings m_PrintSettings, PrintScripts m_PrintScript);
+    void getControlPointers(PrintSettings *pPrintSettings, PrintControls *pPrintControls, PrintScripts *pPrintScript);
+
 signals:
     /*!
      * \brief ControlPrintSignal Print control terminal printing signal, connected to TerminalPrint function in Main Window.
@@ -40,11 +42,16 @@ signals:
      * \brief UpdatePlotSignal
      */
     void UpdatePlotSignal();
+    void StageMoveSignal(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript);
 private:
+    PrintSettings *pcPrintSettings;
+    PrintControls *pcPrintControls;
+    PrintScripts *pcPrintScript;
+
     double CalcPrintEnd(uint nSlice, PrintSettings m_PrintSettings);
     ExposureType_t GetExposureType(int PrintScript, int PumpingMode);
 private slots:
-    void StageMove(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript);
+    void StageMove();
     void PrintInfuse(InjectionSettings m_InjectionSettings);
 };
 
