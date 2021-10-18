@@ -406,8 +406,8 @@ void imageprocessing::Blur(QStringList ImageList)
         cv::resize(downSize, upSize, Size(upSize.cols, upSize.rows), INTER_NEAREST);
 
         cv::bitwise_not(upSize, upSize);
-        QPixmap newImage = QPixmap::fromImage(QImage((unsigned char*) upSize.data, upSize.cols, upSize.rows, QImage::Format_Grayscale8));
-        ui->ImageDisplay->setPixmap(newImage.scaled(671,411));
+        //QPixmap newImage = QPixmap::fromImage(QImage((unsigned char*) upSize.data, upSize.cols, upSize.rows, QImage::Format_Grayscale8));
+        //ui->ImageDisplay->setPixmap(newImage.scaled(671,411));
 
         QString ImageName = TargetDestination + "/" + QString::number(i+1) + ".png";
         imwrite(ImageName.toUtf8().constData(), upSize);
@@ -416,7 +416,8 @@ void imageprocessing::Blur(QStringList ImageList)
         ui->encodeProgress->setValue(i+1);
         imageprocessing::update();
         //imshow("down", downSize);
-        //imshow("up", upSize);
+        imshow("pre", imageRead);
+        imshow("up", upSize);
     }
 }
 
