@@ -35,18 +35,6 @@ public slots:
 private slots:
     void on_ManualStage_clicked();
 
-    void on_LiveValueList1_activated(const QString &arg1);
-
-    void on_LiveValueList2_activated(const QString &arg1);
-
-    void on_LiveValueList3_activated(const QString &arg1);
-
-    void on_LiveValueList4_activated(const QString &arg1);
-
-    void on_LiveValueList5_activated(const QString &arg1);
-
-    void on_LiveValueList6_activated(const QString &arg1);
-
     void on_InitializeAndSynchronize_clicked();
 
     void on_StartPrint_clicked();

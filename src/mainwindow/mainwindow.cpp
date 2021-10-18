@@ -46,9 +46,6 @@ QTime PrintStartTime;                   // Get start time for log
 int LastUploadTime = 0;
 bool PSTableInitFlag = false;
 
-//For vp8bit workaround
-static int VP8Bit = OFF;
-QStringList FrameList;
 
 /*!
  * \brief MainWindow::MainWindow
@@ -202,6 +199,12 @@ void MainWindow::on_InitializeAndSynchronize_clicked()
             QString filename = ui->SettingsWidget->FileListItem(m_PrintControls.layerCount);
             QPixmap img(filename);
             ImagePopoutUI->showImage(img);
+
+            // VP8bit handling
+            if (m_PrintSettings.BitMode == 8){
+                m_PrintScript.VP8 = ON;
+                VP8bitWorkaround();
+            }
         }
         else if (m_PrintSettings.ProjectionMode == VIDEO){
             m_PrintControls.nSlice = ui->SettingsWidget->FileListCount(); // n slices = n images
@@ -286,7 +289,7 @@ void MainWindow::PrintProcess()
         if (m_PrintSettings.PrinterType == ICLIP){
             on_GetPosition_clicked();
         }
-        PrintControl.PrintProcessHandler(&m_PrintControls, m_PrintSettings.InitialExposure, m_InjectionSettings);
+        PrintControl.PrintProcessHandler(&m_PrintControls, m_PrintSettings, m_InjectionSettings);
     }
     else{
         PrintComplete();
@@ -496,14 +499,14 @@ void MainWindow::on_VideoCheckbox_clicked()
         int DisplayCable = ui->DisplayCableList->currentIndex();
         DLP.setIT6535Mode(DisplayCable); //Set IT6535 reciever to correct display cable
         m_PrintSettings.ProjectionMode = VIDEO;
-        //if(LCR_SetMode(PTN_MODE_DISABLE) < 0){
-           //PrintToTerminal("Unable to switch to video mode");
-           //ui->POTFcheckbox->setChecked(true);
-           //on_POTFcheckbox_clicked();
-        //}
-        //else{
+        if(LCR_SetMode(PTN_MODE_DISABLE) < 0){
+           PrintToTerminal("Unable to switch to video mode");
+           ui->POTFcheckbox->setChecked(true);
+           on_POTFcheckbox_clicked();
+        }
+        else{
             initImagePopout(); // Open projection window
-        //}
+        }
     }
 }
 
@@ -1306,57 +1309,31 @@ bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter
  */
 void MainWindow::VP8bitWorkaround()
 {
-    VP8Bit = ON;
-    QString item;
-    QStringList imageList;
-    QStringList ExposureTimeList;
-    QStringList DarkTimeList;
-    QStringList LEDlist;
-    double LayerCount = 0;
-    for (int i = 0; i < ui->SettingsWidget->FileListCount(); i++)
-    {
-        item = ui->SettingsWidget->FileListItem(i);
-        //if (i > layerCount + MaxImageReupload){
-            //break;
-        //}
-        double ExpTime;
-        double DTime;
-        if(m_PrintScript.PrintScript == ON){
-            ExpTime = m_PrintScript.ExposureScriptList.at(i).toDouble();
-            DTime = m_PrintScript.DarkTimeScriptList.at(i).toDouble();
-        }
-        else{
-            ExpTime = m_PrintSettings.ExposureTime;
-            DTime= m_PrintSettings.DarkTime;
-        }
-        bool FrameFinished = false;
-        while(!FrameFinished){
-            if(ExpTime > 33) //if exposure time > frame time
-            {
-                ExposureTimeList.append(QString::number(33));
-                DarkTimeList.append(QString::number(0));
-                LEDlist.append(m_PrintScript.LEDScriptList.at(i));
-                FrameList.append(QString::number(0));
-                ExpTime -= 33;
-                imageList << item;
-                LayerCount++;
-                PrintToTerminal("ET: 33, DT: 0, LED: " + m_PrintScript.LEDScriptList.at(i));
-            }
-            else{ //frame finished, add remaining exposure time now with dark time
-                ExposureTimeList.append(QString::number(ExpTime));
-                DarkTimeList.append(QString::number(DTime));
-                LEDlist.append(m_PrintScript.LEDScriptList.at(i));
-                FrameList.append(QString::number(1));
-                LayerCount++;
-                imageList << item;
-                FrameFinished = true;
-                PrintToTerminal("ET: " + QString::number(ExpTime) + ", DT: " + QString::number(DTime) + ", LED: " + m_PrintScript.LEDScriptList.at(i));
+    if (m_PrintScript.PrintScript == ON){
+        for (uint i = 0; i < m_PrintControls.nSlice; i++)
+        {
+            double ExpTime = m_PrintScript.ExposureScriptList.at(i).toDouble();
+            double DTime = m_PrintScript.ExposureScriptList.at(i).toDouble();
+            bool FrameFinished = false;
+            while(!FrameFinished){
+                if(ExpTime > 33){ //if exposure time > frame time
+                    m_PrintScript.VP8_ExpList.append(QString::number(33));
+                    m_PrintScript.VP8_DarkList.append(QString::number(0));
+                    ExpTime -= 33;
+                    PrintToTerminal("ET: 33, DT: 0");
+                }
+                else{ //frame finished, add remaining exposure time now with dark time
+                    m_PrintScript.VP8_ExpList.append(QString::number(ExpTime));
+                    m_PrintScript.VP8_DarkList.append(QString::number(DTime));
+                    FrameFinished = true;
+                    PrintToTerminal("ET: " + QString::number(ExpTime) + ", DT: " + QString::number(DTime));
+                }
             }
         }
-        //update nSlice
     }
-    DLP.AddPatterns2(imageList, m_PrintSettings, m_PrintScript, m_PrintControls);
-    PrintToTerminal("Etime: " + QString::number(ExposureTimeList.count()) + ", Dtime: " + QString::number(DarkTimeList.count()) + ", LEDlist: " + QString::number(LEDlist.count()) + ", Images: " + QString::number(imageList.count()));
+    else{
+        showError("VP-8bit for exp. times above 33ms must use a print script");
+    }
 }
 
 /*!
@@ -1424,87 +1401,46 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
     else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
         int j = 0;
         int nUploadFrames = (m_PrintSettings.ResyncVP/24)*m_PrintSettings.BitMode;
-        for(int i = m_PrintControls.FrameCount; i < m_PrintControls.FrameCount + nUploadFrames; i++)
-        {
-            for (int j = 0; j < (24/m_PrintSettings.BitMode); j++)
+        if (m_PrintScript.VP8 == OFF){
+            for(int i = m_PrintControls.FrameCount; i < m_PrintControls.FrameCount + nUploadFrames; i++)
             {
-                if (i < ui->SettingsWidget->FileListCount()){
-                    item = ui->SettingsWidget->FileListItem(i);
-                    ImageList << item;
+                for (int j = 0; j < (24/m_PrintSettings.BitMode); j++)
+                {
+                    if (i < ui->SettingsWidget->FileListCount()){
+                        item = ui->SettingsWidget->FileListItem(i);
+                        ImageList << item;
+                    }
+                    else{
+                        ui->ProgramPrints->append("VP Image segmentation fault");
+                        break;
+                    }
                 }
-                else{
-                    ui->ProgramPrints->append("VP Image segmentation fault");
-                    break;
+                ui->ProgramPrints->append(QString::number(j) + " patterns uploaded");
+            }
+        }
+        else{ // VP8Bit is live
+            for(int i = m_PrintControls.FrameCount; i < m_PrintControls.FrameCount + nUploadFrames; i++){
+                int nCount = 0;
+                while (nCount < (24/m_PrintSettings.BitMode)){
+                    if (i < ui->SettingsWidget->FileListCount()){
+                        item = ui->SettingsWidget->FileListItem(0);
+                        ImageList << item;
+                        if (m_PrintScript.VP8_DarkList.at(m_PrintScript.nPat).toInt() != 0){
+                            nCount++;
+                        }
+                        m_PrintScript.nPat++;
+                    }
+                    else{
+                        nCount = 24/m_PrintSettings.BitMode; // break while loop
+                    }
                 }
             }
-            ui->ProgramPrints->append(QString::number(j) + " patterns uploaded");
         }
     }
-    for (uint i = 0; i < ImageList.count(); i++){
+    for (int i = 0; i < ImageList.count(); i++){
         PrintToTerminal(ImageList.at(i));
     }
     return ImageList;
-}
-
-/*******************************************Live Value Monitoring********************************************/
-/**
- * @brief MainWindow::on_LiveValueList1_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList1_activated(const QString &arg1)
-{
-    PrintToTerminal("LV1: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList2_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList2_activated(const QString &arg1)
-{
-    PrintToTerminal("LV2: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList3_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList3_activated(const QString &arg1)
-{
-    PrintToTerminal("LV3: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList4_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList4_activated(const QString &arg1)
-{
-    PrintToTerminal("LV4: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList5_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList5_activated(const QString &arg1)
-{
-    PrintToTerminal("LV5: " + arg1);
-}
-
-/**
- * @brief MainWindow::on_LiveValueList6_activated
- * @param arg1
- * Currently Not In Use
- */
-void MainWindow::on_LiveValueList6_activated(const QString &arg1)
-{
-    PrintToTerminal("LV6: " + arg1);
 }
 
 void MainWindow::on_LogName_textChanged()

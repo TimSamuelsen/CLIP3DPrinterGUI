@@ -16,7 +16,7 @@ public:
     void InitializeSystem(QStringList ImageList, PrintSettings p_PrintSettings, PrintControls *pPrintControls, PrintScripts m_PrintScript, InjectionSettings m_InjectionSettings);
     void AbortPrint(Stage_t StageType, PrintControls *pPrintControl);
     void StartPrint(PrintSettings m_PrintSettings, PrintScripts m_PrintScript, bool ContinuousInjection);
-    void PrintProcessHandler(PrintControls *pPrintControls, uint InitialExposure, InjectionSettings m_InjectionSettings);
+    void PrintProcessHandler(PrintControls *pPrintControls, PrintSettings m_PrinSettings, InjectionSettings m_InjectionSettings);
     int ReuploadHandler(QStringList ImageList, PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript, bool ContinuousInjection);
     bool VPFrameUpdate(PrintControls *pPrintControls, int BitMode, int ReSyncRate);
     void DarkTimeHandler(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript, InjectionSettings m_InjectionSettings);

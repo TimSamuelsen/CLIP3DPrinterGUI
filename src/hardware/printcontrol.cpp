@@ -132,6 +132,10 @@ int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintCo
     Sleep(625);
     pc_DLP.startPatSequence();      // Restart projection after reupload
 
+    if (m_PrintScript.VP8){
+        UploadedImages = m_PrintSettings.ResyncVP;
+    }
+
     return UploadedImages;
 }
 
@@ -141,14 +145,13 @@ int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintCo
  * \param pPrintControls - From MainWindow, uses InitialExposureFlag, sets inMotion, layerCount, and remainingImages
  * \param InitialExposure - Initial exposure duration in units of seconds
  */
-void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, uint InitialExposure,
+void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, PrintSettings m_PrintSettings,
                                        InjectionSettings m_InjectionSettings)
 {
     if(pPrintControls->InitialExposureFlag == true){
         pPrintControls->InitialExposureFlag = false;
         pPrintControls->inMotion = false;
-        emit ControlPrintSignal("Exposing Initial Layer " + QString::number(InitialExposure) + "s");
-        //emit UpdatePlotSignal();
+        emit ControlPrintSignal("Exposing Initial Layer " + QString::number(m_PrintSettings.InitialExposure) + "s");
         emit GetPositionSignal();
         pc_Pump.SetTargetVolume(m_InjectionSettings.InfusionVolume);
     }
@@ -160,7 +163,7 @@ void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, uint Initi
         }
         pPrintControls->layerCount++;
         pPrintControls->remainingImages--;
-        pPrintControls->BitLayer++;
+        pPrintControls->BitLayer += m_PrintSettings.BitMode;
         emit ControlPrintSignal("Layer " + QString::number(pPrintControls->layerCount));
         emit GetPositionSignal();
     }
@@ -328,6 +331,7 @@ ExposureType_t printcontrol::GetExposureType(int PrintScript, int PumpingMode)
 }
 
 //Move layer count out fix docu later
+//Be very careful when accessing pointers...
 void printcontrol::StageMove()
 {
     //If printscript is active, filter out layerCount = 0 and layerCount is greater than script length

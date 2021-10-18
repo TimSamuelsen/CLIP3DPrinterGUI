@@ -74,6 +74,13 @@ struct PrintScripts
     QStringList PumpHeightScriptList;
     QStringList LayerThicknessScriptList;
 
+    // For VP8bit workaround
+    bool VP8 = false;
+    int nPat = 0;
+    QStringList VP8_ExpList;
+    QStringList VP8_DarkList;
+
+
     //Used to determine which pattern should trigger a frame change in video pattern mode workaround
     QStringList FrameList;
 };
