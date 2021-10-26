@@ -204,6 +204,7 @@ void ManualStageControl::on_SendCustomCommand_clicked()
     const char* CommandToSend = Command.toLatin1().data();
     ms_Stage.StageSerial.writeString(CommandToSend);
     ui->TerminalOut->append("Custom Command: " + ui->CustomCommandLine->text());
+
 }
 
 void ManualStageControl::on_EnableEndStopCheckbox_clicked()

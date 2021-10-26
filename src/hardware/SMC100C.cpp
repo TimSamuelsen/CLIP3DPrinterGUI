@@ -480,6 +480,13 @@ char* SMC100C::GetNegativeLimit()
     char* Read = SerialRead();
     return Read;
 }
+
+char* SMC100C::GetCustom(char* Command)
+{
+    serial.writeString(Command);
+    char* Read = SerialRead();
+    return Read;
+}
 /**************************************************************************************************************************************
 Function:
     SetPositiveLimit
@@ -546,6 +553,7 @@ void SMC100C::SetCommand(CommandType Type, float Parameter, CommandGetSetType Ge
     CommandToPrint.Parameter = Parameter;
     CommandToPrint.GetOrSet = GetOrSet;
 };
+
 /**************************************************************************************************************************************
 Function: 
     SendCurrentCommand

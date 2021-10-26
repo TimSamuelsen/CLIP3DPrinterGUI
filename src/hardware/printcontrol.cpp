@@ -113,29 +113,35 @@ void printcontrol::StartPrint(PrintSettings m_PrintSettings, PrintScripts m_Prin
 int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintControls, PrintSettings m_PrintSettings,
                                   PrintScripts m_PrintScript, bool ContinuousInjection)
 {
-    emit ControlPrintSignal("Entering Reupload: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
-    if(m_PrintSettings.MotionMode == CONTINUOUS){       // Continuous stage movement is stopped
-        pc_Stage.StageStop(m_PrintSettings.StageType);  // during reupload
-        emit ControlPrintSignal("Pausing Continuous Stage Movement");
+    int UploadedImages = 0;
+    if (m_PrintScript.PrintScript == OFF && m_PrintSettings.ProjectionMode == VIDEOPATTERN){
+        Sleep(500); // test how big this delay may need to be...
+        pc_DLP.startPatSequence();
     }
-    if(ContinuousInjection){        // Continuous Injection is stopped during reupload
-        pc_Pump.Stop();
-        emit ControlPrintSignal("Pausing Continuous Injection");
-    }
-    int UploadedImages = pc_DLP.PatternUpload(ImageList, m_PrintControls, m_PrintSettings, m_PrintScript);
-    emit ControlPrintSignal(QString::number(UploadedImages) + " images uploaded");
-    if(ContinuousInjection){        // Restarting continous injection after reupload
-        pc_Pump.SetTargetVolume(0);
-        pc_Pump.StartInfusion();
-        emit ControlPrintSignal("Resuming Continuous Injection");
-    }
-    Sleep(625);
-    pc_DLP.startPatSequence();      // Restart projection after reupload
+    else{
+        emit ControlPrintSignal("Entering Reupload: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
+        if(m_PrintSettings.MotionMode == CONTINUOUS){       // Continuous stage movement is stopped
+            pc_Stage.StageStop(m_PrintSettings.StageType);  // during reupload
+            emit ControlPrintSignal("Pausing Continuous Stage Movement");
+        }
+        if(ContinuousInjection){        // Continuous Injection is stopped during reupload
+            pc_Pump.Stop();
+            emit ControlPrintSignal("Pausing Continuous Injection");
+        }
+        UploadedImages = pc_DLP.PatternUpload(ImageList, m_PrintControls, m_PrintSettings, m_PrintScript);
+        emit ControlPrintSignal(QString::number(UploadedImages) + " images uploaded");
+        if(ContinuousInjection){        // Restarting continous injection after reupload
+            pc_Pump.SetTargetVolume(0);
+            pc_Pump.StartInfusion();
+            emit ControlPrintSignal("Resuming Continuous Injection");
+        }
+        Sleep(625);
+        pc_DLP.startPatSequence();      // Restart projection after reupload
 
-    if (m_PrintScript.VP8){
-        UploadedImages = m_PrintSettings.ResyncVP;
+        if (m_PrintScript.VP8){
+            UploadedImages = m_PrintSettings.ResyncVP;
+        }
     }
-
     return UploadedImages;
 }
 

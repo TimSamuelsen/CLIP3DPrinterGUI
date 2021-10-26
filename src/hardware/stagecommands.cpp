@@ -283,6 +283,16 @@ QString StageCommands::StageGetPosition(Stage_t StageType)
     return "NA";
 }
 
+
+QString StageCommands::SendCustom(Stage_t StageType, QString Command)
+{
+    QString ReturnString;
+    if (StageType == STAGE_SMC){
+        //char* command = qPrintable(Command.toStdString());
+        //char* ReadPosition = SMC.GetCustom(Command.toLocal8bit.constData());
+    }
+    return ReturnString;
+}
 /****************************Helper Functions****************************/
 /*!
  * \brief StageCommands::initStagePosition

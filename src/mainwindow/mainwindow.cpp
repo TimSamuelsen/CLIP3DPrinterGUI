@@ -497,7 +497,7 @@ void MainWindow::on_VideoCheckbox_clicked()
         ui->SettingsWidget->EnableParameter(VP_RESYNC, OFF);
         //EnableParameter(DISPLAY_CABLE, ON);
         int DisplayCable = ui->DisplayCableList->currentIndex();
-        DLP.setIT6535Mode(DisplayCable); //Set IT6535 reciever to correct display cable
+        DLP.setIT6535Mode(DisplayCable); // Set IT6535 reciever to correct display cable
         m_PrintSettings.ProjectionMode = VIDEO;
         if(LCR_SetMode(PTN_MODE_DISABLE) < 0){
            PrintToTerminal("Unable to switch to video mode");

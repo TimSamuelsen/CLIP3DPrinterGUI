@@ -116,6 +116,7 @@ class SMC100C
             void RelativeMove(float CommandParameter);
             void AbsoluteMove(float AbsoluteDistanceToMove);
             char* GetPosition();
+            char* GetCustom(char* Command);
             char* GetVelocity();
             char* GetAcceleration();
             char* GetPositiveLimit();

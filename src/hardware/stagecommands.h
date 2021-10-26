@@ -39,8 +39,10 @@ public:
     int StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageType);
     int StageRelativeMove(float RelativeMoveDistance, Stage_t StageType);
     QString StageGetPosition(Stage_t);
+    QString SendCustom(Stage_t StageType, QString Command);
     void initStagePosition(PrintSettings si_PrintSettings);
     void initStageStart(PrintSettings si_PrintSettings);
+
 
 signals:
     /*!

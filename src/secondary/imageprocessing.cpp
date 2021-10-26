@@ -394,6 +394,7 @@ void imageprocessing::Blur(QStringList ImageList)
         Mat imageBinary;
         threshold(imageRead, imageThresh, 10, 255, 0); //threshold image to binary
         //imageBinary = imageThresh.clone();
+        /*
         cv::bitwise_not(imageThresh, imageBinary);
 
         int binType = ui->BinSelect->currentIndex() + 1; // add 1 to convert from 0 indexed
@@ -416,8 +417,11 @@ void imageprocessing::Blur(QStringList ImageList)
         ui->encodeProgress->setValue(i+1);
         imageprocessing::update();
         //imshow("down", downSize);
+        */
+
+        cv::GaussianBlur(imageThresh, imageBinary, Size(3,3), 0, 0);
         imshow("pre", imageRead);
-        imshow("up", upSize);
+        imshow("up", imageBinary);
     }
 }
 
