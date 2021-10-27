@@ -199,6 +199,15 @@ int StageCommands::SetStageNegativeLimit(float NegativeLimit, Stage_t StageType)
     return returnVal;
 }
 
+int StageCommands::SetStageJerkTime(float JerkTime, Stage_t StageType)
+{
+    int returnVal = 0;
+    if (StageType == STAGE_SMC){
+        SMC.SetJerkTime(JerkTime);
+    }
+    return returnVal;
+}
+
 /*!
  * \brief StageCommands::StageAbsoluteMove
  * \param AbsoluteMovePosition
@@ -386,6 +395,7 @@ void StageCommands::fineMovement()
 void StageCommands::verifyStageParams(PrintSettings s_PrintSettings)
 {
     emit StagePrintSignal("Verifying Stage Parameters");
+    SetStageJerkTime(s_PrintSettings.JerkTime, s_PrintSettings.StageType);
     Sleep(20);
     SetStageAcceleration(s_PrintSettings.StageAcceleration, s_PrintSettings.StageType);
     Sleep(20);

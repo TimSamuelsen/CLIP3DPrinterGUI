@@ -102,6 +102,8 @@ private slots:
 
     void on_PostExposureDelayParam_valueChanged(double arg1);
 
+    void on_JerkTimeParam_valueChanged(double arg1);
+
 private:
     Ui::printsettings *ui;
     PrintSettings *psPrintSettings;

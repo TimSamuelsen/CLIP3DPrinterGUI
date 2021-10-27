@@ -64,6 +64,20 @@ void printsettings::on_ResyncRateList_currentIndexChanged(const QString &arg1)
     psPrintSettings->ResyncVP = arg1.toInt();
 }
 
+void printsettings::on_PostExposureDelayParam_valueChanged(double arg1)
+{
+    if (arg1 <= psPrintSettings->DarkTime){
+        psPrintSettings->PostExposureDelay = arg1;
+    }
+    else{
+        ui->PostExposureDelayParam->setValue(0);
+    }
+}
+
+void printsettings::on_JerkTimeParam_valueChanged(double arg1)
+{
+    psPrintSettings->JerkTime = arg1 / 1000; // convert from ms to s
+}
 /*********************************Light Engine Control*********************************************/
 void printsettings::on_InitialExposureParameter_valueChanged(double arg1)
 {
@@ -443,6 +457,7 @@ void printsettings::savePrintSettings()
     settings.setValue("LayerThickness", psPrintSettings->LayerThickness);
     settings.setValue("StartingPosition", psPrintSettings->StartingPosition);
     settings.setValue("PostExposureDelay", psPrintSettings->PostExposureDelay);
+    settings.setValue("JerkTime", psPrintSettings->JerkTime);
 
     settings.setValue("InitialExposure", psPrintSettings->InitialExposure);
     settings.setValue("InitialDelay", psPrintSettings->InitialDelay);
@@ -478,6 +493,7 @@ void printsettings::loadPrintSettings()
     psPrintSettings->LayerThickness = settings.value("LayerThickness", 1).toDouble();
     psPrintSettings->StartingPosition = settings.value("StartingPosition", 5).toDouble();
     psPrintSettings->PostExposureDelay = settings.value("PostExposureDelay", 0).toDouble();
+    psPrintSettings->JerkTime = settings.value("JerkTime", 0.04).toDouble();
 
     psPrintSettings->InitialExposure = settings.value("InitialExposure", 10).toDouble();
     psPrintSettings->InitialDelay = settings.value("InitialDelay", 0).toInt();
@@ -525,6 +541,7 @@ void printsettings::initPrintSettings()
     ui->LayerThicknessParam->setValue(psPrintSettings->LayerThickness*1000);
     ui->StartingPositionParam->setValue(psPrintSettings->StartingPosition);
     ui->PostExposureDelayParam->setValue(psPrintSettings->PostExposureDelay);
+    ui->JerkTimeParam->setValue(psPrintSettings->JerkTime * 1000); // convert from s to ms
 
     ui->InitialExposureParameter->setValue(psPrintSettings->InitialExposure);
     ui->InitialDelayParam->setValue(psPrintSettings->InitialDelay);
@@ -569,13 +586,3 @@ void printsettings::initPrintSettings()
 #if 0
 
 #endif
-
-void printsettings::on_PostExposureDelayParam_valueChanged(double arg1)
-{
-    if (arg1 <= psPrintSettings->DarkTime){
-        psPrintSettings->PostExposureDelay = arg1;
-    }
-    else{
-        ui->PostExposureDelayParam->setValue(0);
-    }
-}

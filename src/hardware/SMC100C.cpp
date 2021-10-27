@@ -527,6 +527,13 @@ void SMC100C::SetNegativeLimit(float Limit)
     SetCommand(CommandType::NegativeSoftwareLim, Limit, CommandGetSetType::Set);
     SendCurrentCommand();
 }
+
+void SMC100C::SetJerkTime(float JerkTime)
+{
+    printf("Set Jerk Time: %.2f", JerkTime);
+    SetCommand(CommandType::JerkTime, JerkTime, CommandGetSetType::Set);
+    SendCurrentCommand();
+}
 /**************************************************************************************************************************************
                             private functions
  *************************************************************************************************************************************/

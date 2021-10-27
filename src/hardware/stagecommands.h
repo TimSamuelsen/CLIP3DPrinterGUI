@@ -36,6 +36,7 @@ public:
     int SetStageAcceleration(float AccelerationToSet, Stage_t StageType);
     int SetStagePositiveLimit(float PositiveLimit, Stage_t StageType);
     int SetStageNegativeLimit(float NegativeLimit, Stage_t StageType);
+    int SetStageJerkTime(float JerkTime, Stage_t StageType);
     int StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageType);
     int StageRelativeMove(float RelativeMoveDistance, Stage_t StageType);
     QString StageGetPosition(Stage_t);

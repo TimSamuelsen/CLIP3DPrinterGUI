@@ -74,7 +74,7 @@
       <number>0</number>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="GeneralPrintSettings">
       <property name="geometry">
@@ -517,6 +517,56 @@
             </item>
             <item row="0" column="0">
              <spacer name="horizontalSpacer_52">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QGroupBox" name="JerkTimeBox">
+           <property name="title">
+            <string>Jerk Time (ms)</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_39" columnstretch="1,4,1">
+            <property name="leftMargin">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>5</number>
+            </property>
+            <property name="bottomMargin">
+             <number>5</number>
+            </property>
+            <item row="0" column="0">
+             <spacer name="horizontalSpacer_53">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QDoubleSpinBox" name="JerkTimeParam"/>
+            </item>
+            <item row="0" column="2">
+             <spacer name="horizontalSpacer_54">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>

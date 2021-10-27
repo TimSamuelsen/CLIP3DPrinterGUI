@@ -97,6 +97,7 @@ struct PrintSettings
 
     double PostExposureDelay = 0;
 
+    double JerkTime = 0.04;
     double LayerThickness = 0;
     double StageVelocity = 0;
     double StageAcceleration = 0;
