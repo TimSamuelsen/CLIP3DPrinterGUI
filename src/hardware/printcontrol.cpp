@@ -116,7 +116,8 @@ int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintCo
     int UploadedImages = 0;
     if (m_PrintScript.PrintScript == OFF && m_PrintSettings.ProjectionMode == VIDEOPATTERN
             && m_PrintControls.layerCount > 1){
-        Sleep(200); // test how big this delay may need to be...
+        UploadedImages = m_PrintSettings.ResyncVP;
+        //Sleep(200); // test how big this delay may need to be...
         pc_DLP.startPatSequence();
     }
     else{
