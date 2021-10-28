@@ -526,10 +526,10 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
         //EnableParameter(DISPLAY_CABLE, ON);
         m_PrintSettings.ProjectionMode = VIDEOPATTERN; //Set projection mode to video pattern
 
-        //Set video display off
+        // Set video display off
         if (LCR_SetMode(PTN_MODE_DISABLE) < 0){
             PrintToTerminal("Unable to switch to video mode");
-            ui->POTFcheckbox->setChecked(true);
+           ui->POTFcheckbox->setChecked(true);
             on_POTFcheckbox_clicked();
             // add a close image popout
         }

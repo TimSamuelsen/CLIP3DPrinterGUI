@@ -101,6 +101,32 @@ void printcontrol::StartPrint(PrintSettings m_PrintSettings, PrintScripts m_Prin
     }
 }
 
+bool printcontrol::CheckReupload(PrintSettings m_PrintSettings, PrintControls m_PrintControls
+                                 ,PrintScripts m_PrintScript)
+{
+    bool returnVal = true;
+    if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
+        if (m_PrintScript.PrintScript == OFF){
+            returnVal = false;
+        }
+        else{
+            // check for
+            if (m_PrintControls.layerCount > 1 && (m_PrintControls.layerCount + m_PrintSettings.ResyncVP < m_PrintScript.ExposureScriptList.size()) ){
+                returnVal = false; // Default to false if all match
+                for (int i = m_PrintControls.layerCount; i < m_PrintControls.layerCount + m_PrintSettings.ResyncVP; i++){
+                     double Last = m_PrintScript.ExposureScriptList.at(i - m_PrintSettings.ResyncVP).toDouble();
+                     double Current = m_PrintScript.ExposureScriptList.at(i).toDouble();
+                     if (Last != Current){
+                         returnVal = true;
+                         break;
+                     }
+                }
+            }
+        }
+    }
+    return returnVal;
+}
+
 /*!
  * \brief printcontrol::ReuploadHandler
  * Handles the reupload, stops stage if in continuous print mode
@@ -114,8 +140,11 @@ int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintCo
                                   PrintScripts m_PrintScript, bool ContinuousInjection)
 {
     int UploadedImages = 0;
-    if (m_PrintScript.PrintScript == OFF && m_PrintSettings.ProjectionMode == VIDEOPATTERN
-            && m_PrintControls.layerCount > 1){
+    //CheckReupload(m_PrintSettings, m_PrintControls, m_PrintScript);
+    //if (m_PrintScript.PrintScript == OFF && m_PrintSettings.ProjectionMode == VIDEOPATTERN
+    //        && m_PrintControls.layerCount > 1){
+    bool Reupload = CheckReupload(m_PrintSettings, m_PrintControls, m_PrintScript);
+    if (Reupload == false){
         UploadedImages = m_PrintSettings.ResyncVP;
         //Sleep(200); // test how big this delay may need to be...
         pc_DLP.startPatSequence();
