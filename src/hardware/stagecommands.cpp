@@ -368,7 +368,8 @@ void StageCommands::fineMovement()
     double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
     emit StageGetPositionSignal(QString::number(CurrentPosition));
     //If stage has not reached it's final starting position
-    if (CurrentPosition > s_PrintSettings.StartingPosition-0.01 && CurrentPosition < s_PrintSettings.StartingPosition+0.01){
+    if (CurrentPosition > s_PrintSettings.StartingPosition-0.05 && CurrentPosition < s_PrintSettings.StartingPosition+0.05){
+        StageAbsoluteMove(s_PrintSettings.StartingPosition, s_PrintSettings.StageType);
         verifyStageParams(s_PrintSettings);
     }
     else{
