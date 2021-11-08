@@ -9,6 +9,7 @@
 #include "imagepopout.h"
 #include "PrintElements.h"
 #include "printcontrol.h"
+#include "focuscal.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -85,6 +86,8 @@ private slots:
 
     void on_VideoCheckbox_clicked();
 
+    void on_FocusCal_clicked();
+
 private:
     Ui::MainWindow *ui;
     PrintScripts m_PrintScript;
@@ -95,6 +98,7 @@ private:
     manualpumpcontrol *ManualPumpUI;
     imageprocessing *ImageProcessUI;
     imagepopout *ImagePopoutUI;
+    FocusCal *FocusCalUI;
 
     bool ValidateSettings(void);
     void loadSettings();

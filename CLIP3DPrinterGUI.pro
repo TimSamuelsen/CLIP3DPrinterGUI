@@ -10,6 +10,9 @@ CONFIG += c++11
 INCLUDEPATH += "src"
 INCLUDEPATH += "src/3rdparty/serialib"
 INCLUDEPATH += "src/3rdparty/qcustomplot"
+INCLUDEPATH += "src/3rdparty/ThorLabs/include"
+INCLUDEPATH += "src/3rdparty/Thorlabs/load_dll_helpers"
+
 INCLUDEPATH += "src/mainwindow"
 INCLUDEPATH += "src/secondary"
 INCLUDEPATH += "src/hardware"
@@ -18,11 +21,13 @@ INCLUDEPATH += "src/hardware"
 RC_ICONS = DeSimoneLogo.ico
 
 SOURCES += \
+    src/3rdparty/ThorLabs/load_dll_helpers/tl_camera_sdk_load.c \
     src/hardware/SMC100C.cpp \
     src/hardware/dlp9000.cpp \
     src/mainwindow/graphics.cpp \
     src/mainwindow/printmonitoring.cpp \
     src/mainwindow/printsettings.cpp \
+    src/secondary/focuscal.cpp \
     src/secondary/imagepopout.cpp \
     src/secondary/imageprocessing.cpp \
     src/main.cpp \
@@ -37,6 +42,8 @@ SOURCES += \
     src/hardware/stagecommands.cpp
 
 HEADERS += \
+    src/3rdparty/ThorLabs/include/tl_camera_sdk.h \
+    src/3rdparty/ThorLabs/load_dll_helpers/tl_camera_sdk_load.h \
     src/PrintElements.h \
     src/3rdparty/PtnImage.h \
     src/hardware/SMC100C.h \
@@ -44,6 +51,7 @@ HEADERS += \
     src/mainwindow/graphics.h \
     src/mainwindow/printmonitoring.h \
     src/mainwindow/printsettings.h \
+    src/secondary/focuscal.h \
     src/secondary/imagepopout.h \
     src/secondary/imageprocessing.h \
     src/mainwindow/mainwindow.h \
@@ -61,6 +69,7 @@ FORMS += \
     src/mainwindow/graphics.ui \
     src/mainwindow/printmonitoring.ui \
     src/mainwindow/printsettings.ui \
+    src/secondary/focuscal.ui \
     src/secondary/imagepopout.ui \
     src/secondary/imageprocessing.ui \
     src/mainwindow/mainwindow.ui \
@@ -124,3 +133,9 @@ win32: LIBS += -L$$PWD/src/3rdparty/OpenCV/install/x64/mingw/lib/ -llibopencv_co
 win32: LIBS += -L$$PWD/src/3rdparty/OpenCV/install/x64/mingw/lib/ -llibopencv_imgcodecs401.dll
 win32: LIBS += -L$$PWD/src/3rdparty/OpenCV/install/x64/mingw/lib/ -llibopencv_imgproc401.dll
 win32: LIBS += -L$$PWD/src/3rdparty/OpenCV/install/x64/mingw/lib/ -llibopencv_highgui401.dll
+
+#libs for ThorLabs
+#INCLUDEPATH += $$PWD/src/3rdparty/ThorLabs/include
+#DEPENDPATH += $$PWD/src/3rdparty/ThorLabs/include
+
+#INCLUDEPATH += $$PWD/src/3rdparty/Thorlabs/include

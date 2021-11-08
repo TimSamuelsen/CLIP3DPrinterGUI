@@ -144,6 +144,14 @@ void MainWindow::on_ImageProcess_clicked()
     PrintToTerminal("Opening Image Processing");
 }
 
+void MainWindow::on_FocusCal_clicked()
+{
+    FocusCalUI = new FocusCal();
+    FocusCalUI->show();
+    PrintToTerminal("Opening Focus Calibration");
+}
+
+
 /*!
  * \brief MainWindow::on_GetPosition_clicked
  * Gets position, saves it in module level variable GetPosition,
