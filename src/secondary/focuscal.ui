@@ -6,64 +6,241 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>784</width>
-    <height>411</height>
+    <width>992</width>
+    <height>547</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Focus Calibration</string>
   </property>
-  <widget class="QLabel" name="label">
-   <property name="geometry">
-    <rect>
-     <x>520</x>
-     <y>0</y>
-     <width>241</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Focus Calibration</string>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="ImagePreviewBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>481</width>
-     <height>381</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Image Preview</string>
-   </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QLabel" name="ImagePreview">
-      <property name="styleSheet">
-       <string notr="true">background: white;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QPushButton" name="initTest">
-   <property name="geometry">
-    <rect>
-     <x>590</x>
-     <y>150</y>
-     <width>151</width>
-     <height>111</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>InitTest</string>
-   </property>
-  </widget>
+  <layout class="QGridLayout" name="gridLayout_4">
+   <item row="0" column="0">
+    <layout class="QGridLayout" name="gridLayout_5" rowstretch="8,10,12,8,25" columnstretch="5,0,0">
+     <item row="4" column="1" colspan="2">
+      <widget class="QGroupBox" name="TerminalBox">
+       <property name="title">
+        <string>Terminal</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QTextBrowser" name="Terminal">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(255, 255, 255);</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="0" rowspan="5">
+      <widget class="QGroupBox" name="ImagePreviewBox">
+       <property name="title">
+        <string>Image Preview</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="ImagePreview">
+          <property name="styleSheet">
+           <string notr="true">background: white;</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QGroupBox" name="SharpnessBox">
+       <property name="title">
+        <string>Sharpness Score</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_6">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>11</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="SharpnessIndicator">
+          <property name="styleSheet">
+           <string notr="true">background:rgb(255, 255, 255); border: 1px solid black;</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QGroupBox" name="StagePositionBox">
+       <property name="title">
+        <string>Stage Position (mm)</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>11</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="StagePositionIndicator">
+          <property name="styleSheet">
+           <string notr="true">background:rgb(255, 255, 255); border: 1px solid black;</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="1" colspan="2">
+      <widget class="QGroupBox" name="ModeBox">
+       <property name="title">
+        <string>Mode</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_7" columnstretch="0,0">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="1">
+         <widget class="QRadioButton" name="AutoMode">
+          <property name="text">
+           <string>Auto Calibrate</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QRadioButton" name="ManualMode">
+          <property name="text">
+           <string>Manual Calibration</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="2" column="1" colspan="2">
+      <widget class="QGroupBox" name="AutoSettingsBox">
+       <property name="title">
+        <string>Auto Mode Settings</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_8">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="StartingStepBox">
+          <property name="title">
+           <string>Starting Step (um)</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_9">
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QDoubleSpinBox" name="StartStepParam"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QGroupBox" name="MinStepBox">
+          <property name="title">
+           <string>Min Step (um)</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_10">
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QDoubleSpinBox" name="MinStepParam"/>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="1" column="1" colspan="2">
+      <widget class="QGroupBox" name="StageConnectionBox">
+       <property name="title">
+        <string>Stage Connection</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_11" columnstretch="3,4,4">
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QComboBox" name="COMPortSelect">
+          <item>
+           <property name="text">
+            <string>COM3</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>COM4</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>COM5</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>COM6</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>COM7</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>COM8</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="StageConnectionIndicator">
+          <property name="styleSheet">
+           <string notr="true">background:rgb(255, 0, 0); border: 1px solid black;</string>
+          </property>
+          <property name="text">
+           <string>Disconnected</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="StageConnectButton">
+          <property name="text">
+           <string>Connect(test)</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>
