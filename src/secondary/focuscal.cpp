@@ -33,17 +33,21 @@ volatile int is_first_frame_finished = 0;
 
 void FocusCal::initCamera()
 {
+    int nErrors = 0;
     if(initialize_camera_resources())
         return;
     // Set the camera connect event callback. This is used to register for run time camera connect events.
     if (tl_camera_set_camera_connect_callback(camera_connect_callback, 0))
-        ;//return report_error_and_cleanup_resources(tl_camera_get_last_error());
+        nErrors += report_error_and_cleanup_resources(tl_camera_get_last_error());
 
     // Set the camera disconnect event callback. This is used to register for run time camera disconnect events.
     if (tl_camera_set_camera_disconnect_callback(camera_disconnect_callback, 0))
-        ;//return report_error_and_cleanup_resources(tl_camera_get_last_error());
-    setExposure(10*1000);
-    setGain(6.0, camera_handle);
+        nErrors += report_error_and_cleanup_resources(tl_camera_get_last_error());
+    nErrors += setExposure(10*1000);
+    nErrors += setGain(6.0, camera_handle);
+    nErrors += SoftwareTrigger();
+    printf("nErrors = %d", nErrors);
+    ui->Terminal->append("nErrors = " + QString::number(nErrors));
 }
 
 int FocusCal::setExposure(long long Exposure)
@@ -89,8 +93,9 @@ int FocusCal::SoftwareTrigger()
             printf("Waiting for an image...\n");
             for (;;)
             {
+                break;
         #ifdef _WIN32
-                WaitForSingleObject(frame_acquired_event, INFINITE);
+                //WaitForSingleObject(frame_acquired_event, 5);//INFINITE);
         #elif defined __linux__
                 if(pthread_mutex_lock(&lock))
                     return report_error_and_cleanup_resources("Unable to lock pthread mutex");
@@ -99,7 +104,7 @@ int FocusCal::SoftwareTrigger()
                 if(pthread_mutex_unlock(&lock))
                     return report_error_and_cleanup_resources("Unable to unlock pthread mutex");
         #endif
-                if (is_first_frame_finished) break;
+                //if (is_first_frame_finished) break;
             }
 
     return returnVal;
