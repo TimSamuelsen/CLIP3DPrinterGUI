@@ -23,7 +23,7 @@ private:
     void initCamera();
     int setExposure(long long Exposure);
     int setGain(double Gain, void* camera_handle);
-    void SoftwareTrigger();
+    int SoftwareTrigger();
 };
 
 #endif // FOCUSCAL_H

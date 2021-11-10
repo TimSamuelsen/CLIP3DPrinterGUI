@@ -49,7 +49,9 @@ void FocusCal::initCamera()
 int FocusCal::setExposure(long long Exposure)
 {
     int returnVal = 0;
-
+    if (tl_camera_set_exposure_time(camera_handle, Exposure))
+            return report_error_and_cleanup_resources(tl_camera_get_last_error());
+        printf("Camera exposure set to %lld\n", Exposure);
     return returnVal;
 }
 
@@ -71,9 +73,36 @@ int FocusCal::setGain(double Gain, void* camera_handle)
     return returnVal;
 }
 
-void FocusCal::SoftwareTrigger()
+int FocusCal::SoftwareTrigger()
 {
+    int returnVal = 0;
 
+    if (tl_camera_arm(camera_handle, 2))
+            return report_error_and_cleanup_resources(tl_camera_get_last_error());
+        printf("Camera armed\n");
+
+        if (tl_camera_issue_software_trigger(camera_handle))
+                return report_error_and_cleanup_resources(tl_camera_get_last_error());
+            printf("Software trigger sent\n");
+
+            // Wait to get an image from the frame available callback
+            printf("Waiting for an image...\n");
+            for (;;)
+            {
+        #ifdef _WIN32
+                WaitForSingleObject(frame_acquired_event, INFINITE);
+        #elif defined __linux__
+                if(pthread_mutex_lock(&lock))
+                    return report_error_and_cleanup_resources("Unable to lock pthread mutex");
+                if(pthread_cond_wait(&frame_acquired_event, &lock))
+                    return report_error_and_cleanup_resources("Unable to wait for frame_acquired_event condition variable");
+                if(pthread_mutex_unlock(&lock))
+                    return report_error_and_cleanup_resources("Unable to unlock pthread mutex");
+        #endif
+                if (is_first_frame_finished) break;
+            }
+
+    return returnVal;
 }
 
 
