@@ -34,8 +34,10 @@ volatile int is_first_frame_finished = 0;
 void FocusCal::initCamera()
 {
     int nErrors = 0;
-    if(initialize_camera_resources())
+    if(initialize_camera_resources()){
+        ui->Terminal->append("Failed to init camera resources");
         return;
+    }
     // Set the camera connect event callback. This is used to register for run time camera connect events.
     if (tl_camera_set_camera_connect_callback(camera_connect_callback, 0))
         nErrors += report_error_and_cleanup_resources(tl_camera_get_last_error());

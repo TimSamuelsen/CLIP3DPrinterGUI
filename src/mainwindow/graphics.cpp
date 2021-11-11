@@ -39,9 +39,9 @@ void graphics::initPlot(PrintControls m_PrintControls, PrintSettings m_PrintSett
     if(m_PrintSettings.ProjectionMode == POTF){
         TotalPrintTime += m_PrintControls.nSlice * 0.15;
     }
-    else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
-        TotalPrintTime += (m_PrintControls.nSlice / m_PrintSettings.ResyncVP) * 1.8;
-    }
+    //else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
+        //TotalPrintTime += (m_PrintControls.nSlice / m_PrintSettings.ResyncVP) * 1.8;
+    //}
 
     ui->LivePlot->xAxis->setRange(0, TotalPrintTime*1.1);
     RemainingPrintTime = TotalPrintTime;
@@ -70,7 +70,7 @@ void graphics::updatePlot(PrintControls m_PrintControls, PrintSettings m_PrintSe
     ui->LivePlot->graph(0)->setData(qv_x, qv_y);
     ui->LivePlot->clearItems();
 
-    //Update Layer label
+    // Update Layer label
     QString Layer = " Layer: " + QString::number(m_PrintControls.layerCount) + "/" + QString::number(m_PrintControls.nSlice);
     QCPItemText *textLabel1 = new QCPItemText(ui->LivePlot);
     textLabel1->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
@@ -100,7 +100,7 @@ void graphics::updatePlot(PrintControls m_PrintControls, PrintSettings m_PrintSe
         RemainingPrintTime -= 0.15;
     }
     else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
-        RemainingPrintTime -= 1.8/m_PrintSettings.ResyncVP;
+        //RemainingPrintTime -= 1.8/m_PrintSettings.ResyncVP;
     }
     if (RemainingPrintTime <  0){
         RemainingPrintTime = 0;
