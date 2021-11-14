@@ -83,12 +83,16 @@ int FocusCal::SoftwareTrigger()
 {
     int returnVal = 0;
 
-    if (tl_camera_arm(camera_handle, 2))
-            return report_error_and_cleanup_resources(tl_camera_get_last_error());
+    if (tl_camera_arm(camera_handle, 2)){
+        //TerminalPrint("Camera armed");
+        return report_error_and_cleanup_resources(tl_camera_get_last_error());
+    }
         printf("Camera armed\n");
 
-        if (tl_camera_issue_software_trigger(camera_handle))
+        if (tl_camera_issue_software_trigger(camera_handle)){
+          //      TerminalPrint("Software Trigger Error");
                 return report_error_and_cleanup_resources(tl_camera_get_last_error());
+        }
             printf("Software trigger sent\n");
 
             // Wait to get an image from the frame available callback
@@ -111,6 +115,8 @@ int FocusCal::SoftwareTrigger()
 
     return returnVal;
 }
+
+//void FocusCal:
 
 
 void FocusCal::on_StageConnectButton_clicked()

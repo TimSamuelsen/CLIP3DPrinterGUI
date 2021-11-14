@@ -24,7 +24,8 @@ public:
     void initPrintScriptTable(PrintSettings m_PrintSettings, PrintScripts *pPrintScript);
     void PrintScriptTableEntry(QStringList Script, uint ColNum);
     void updatePrintScriptTable(PrintSettings m_PrintSettings, PrintScripts m_PrintScript);
-
+    double calcPrintTime(PrintSettings m_PrintSettings, PrintControls m_PrintControls, PrintScripts m_PrintScript);
+    int calcReuploads(PrintScripts m_PrintScript);
 
 Q_SIGNALS:
     void GraphicsPrint(QString);

@@ -14,6 +14,60 @@ graphics::~graphics()
 }
 
 /***************************************Plot Handling*********************************************/
+double graphics::calcPrintTime(PrintSettings m_PrintSettings, PrintControls m_PrintControls, PrintScripts m_PrintScript)
+{
+    double printTime = 0;
+    printTime += m_PrintSettings.InitialExposure + m_PrintSettings.InitialDelay;
+    if (m_PrintScript.PrintScript == ON){
+        for (int i = 0; i < m_PrintScript.ExposureScriptList.size(); i++){
+            printTime += m_PrintScript.ExposureScriptList.at(i).toDouble()/1000;
+            printTime += m_PrintScript.DarkTimeScriptList.at(i).toDouble()/1000;
+        }
+    }
+    else{
+        printTime += m_PrintSettings.ExposureTime * m_PrintControls.nSlice / (1000*1000);
+        printTime += m_PrintSettings.ExposureTime * m_PrintControls.nSlice / (1000*1000);
+    }
+
+    if(m_PrintSettings.ProjectionMode == POTF){
+        printTime += m_PrintControls.nSlice * 0.15;
+    }
+    else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
+        int nReuploads = 0;
+        if (m_PrintScript.PrintScript == ON){
+            nReuploads = calcReuploads(m_PrintScript);
+        }
+        else{
+            nReuploads = m_PrintScript.ExposureScriptList.size() / m_PrintSettings.ResyncVP;
+        }
+        printTime += nReuploads * 1.8;
+    }
+    return printTime;
+}
+
+int graphics::calcReuploads(PrintScripts m_PrintScript)
+{
+    int nReuploads = 1;     // default to 1
+    if (m_PrintScript.PrintScript == ON){
+        for(int i = 0; i < m_PrintScript.ExposureScriptList.size()/24; i++){
+        }
+    }
+#if 0
+    if (m_PrintControls.layerCount > 1 && (m_PrintControls.layerCount + m_PrintSettings.ResyncVP < m_PrintScript.ExposureScriptList.size()) ){
+        returnVal = false; // Default to false if all match
+        for (int i = m_PrintControls.layerCount; i < m_PrintControls.layerCount + m_PrintSettings.ResyncVP; i++){
+             double Last = m_PrintScript.ExposureScriptList.at(i - m_PrintSettings.ResyncVP).toDouble();
+             double Current = m_PrintScript.ExposureScriptList.at(i).toDouble();
+             if (Last != Current){
+                 returnVal = true;
+                 break;
+             }
+        }
+    }
+#endif
+    return nReuploads;
+}
+
 
 void graphics::initPlot(PrintControls m_PrintControls, PrintSettings m_PrintSettings,
                         PrintScripts m_PrintScript)
@@ -23,26 +77,7 @@ void graphics::initPlot(PrintControls m_PrintControls, PrintSettings m_PrintSett
     ui->LivePlot->xAxis->setLabel("Time (s)");
     ui->LivePlot->yAxis->setLabel("Position (mm)");
 
-    double TotalPrintTime = 0;
-    if (m_PrintScript.PrintScript == ON){
-        for (int i = 0; i < m_PrintScript.ExposureScriptList.size(); i++){
-            TotalPrintTime += m_PrintScript.ExposureScriptList.at(i).toDouble()/1000;
-            TotalPrintTime += m_PrintScript.DarkTimeScriptList.at(i).toDouble()/1000;
-        }
-    }
-    else{
-        TotalPrintTime += m_PrintSettings.ExposureTime * m_PrintControls.nSlice / (1000*1000);
-        TotalPrintTime += m_PrintSettings.DarkTime * m_PrintControls.nSlice / (1000*1000);
-    }
-    TotalPrintTime += m_PrintSettings.InitialExposure + m_PrintSettings.InitialDelay;
-    // Reupload handling
-    if(m_PrintSettings.ProjectionMode == POTF){
-        TotalPrintTime += m_PrintControls.nSlice * 0.15;
-    }
-    //else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
-        //TotalPrintTime += (m_PrintControls.nSlice / m_PrintSettings.ResyncVP) * 1.8;
-    //}
-
+    double TotalPrintTime = calcPrintTime(m_PrintSettings, m_PrintControls, m_PrintScript);
     ui->LivePlot->xAxis->setRange(0, TotalPrintTime*1.1);
     RemainingPrintTime = TotalPrintTime;
     double upper = 0;
