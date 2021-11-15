@@ -14,6 +14,7 @@ class FocusCal : public QWidget
 public:
     explicit FocusCal(QWidget *parent = nullptr);
     ~FocusCal();
+    void TerminalPrint(QString stringToPrint);
 
 private slots:
     void on_StageConnectButton_clicked();
@@ -24,6 +25,10 @@ private:
     int setExposure(long long Exposure);
     int setGain(double Gain, void* camera_handle);
     int SoftwareTrigger();
+
+    int initialize_camera_resources();
+    int report_error_and_cleanup_resources(const char* error_string);
+    //void frame_available_callback(void* sender, unsigned short* image_buffer, int frame_count, unsigned char* metadata, int metadata_size_in_bytes, void* context);
 };
 
 #endif // FOCUSCAL_H

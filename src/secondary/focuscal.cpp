@@ -3,6 +3,11 @@
 #include "tl_camera_sdk.h"
 #include "tl_camera_sdk_load.h"
 
+#include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui.hpp>
+
 #include "windows.h"
 
 FocusCal::FocusCal(QWidget *parent) :
@@ -47,6 +52,16 @@ void FocusCal::initCamera()
         nErrors += report_error_and_cleanup_resources(tl_camera_get_last_error());
     nErrors += setExposure(10*1000);
     nErrors += setGain(6.0, camera_handle);
+
+    // Configure camera for continuous acquisition by setting the number of frames to 0.
+    // This project only waits for the first frame before exiting
+    if (tl_camera_set_frames_per_trigger_zero_for_unlimited(camera_handle, 1))
+            nErrors += report_error_and_cleanup_resources(tl_camera_get_last_error());
+
+    // Set the frame available callback
+    if (tl_camera_set_frame_available_callback(camera_handle, frame_available_callback, 0))
+        nErrors += report_error_and_cleanup_resources(tl_camera_get_last_error());
+
     nErrors += SoftwareTrigger();
     printf("nErrors = %d", nErrors);
     ui->Terminal->append("nErrors = " + QString::number(nErrors));
@@ -97,11 +112,11 @@ int FocusCal::SoftwareTrigger()
 
             // Wait to get an image from the frame available callback
             printf("Waiting for an image...\n");
+            ui->Terminal->append("Waiting for an image...");
             for (;;)
             {
-                break;
         #ifdef _WIN32
-                //WaitForSingleObject(frame_acquired_event, 5);//INFINITE);
+                WaitForSingleObject(frame_acquired_event, 5);//INFINITE);
         #elif defined __linux__
                 if(pthread_mutex_lock(&lock))
                     return report_error_and_cleanup_resources("Unable to lock pthread mutex");
@@ -110,7 +125,7 @@ int FocusCal::SoftwareTrigger()
                 if(pthread_mutex_unlock(&lock))
                     return report_error_and_cleanup_resources("Unable to unlock pthread mutex");
         #endif
-                //if (is_first_frame_finished) break;
+                if (is_first_frame_finished) break;
             }
 
     return returnVal;
@@ -123,13 +138,17 @@ void FocusCal::on_StageConnectButton_clicked()
 {
     //USED FOR TESTING RIGHT NOW
     initCamera();
+}
 
+void FocusCal::TerminalPrint(QString stringToPrint)
+{
+    ui->Terminal->append(stringToPrint);
 }
 /*********************************Code from ThorLabs example***************************************/
 /*
     Reports the given error string if it is not null and closes any opened resources. Returns the number of errors that occured during cleanup, +1 if error string was not null.
  */
-int report_error_and_cleanup_resources(const char* error_string)
+int FocusCal::report_error_and_cleanup_resources(const char* error_string)
 {
     int num_errors = 0;
 
@@ -198,7 +217,7 @@ int report_error_and_cleanup_resources(const char* error_string)
     Initializes camera sdk and opens the first available camera.
     Returns a nonzero value to indicate failure.
  */
-int initialize_camera_resources()
+int FocusCal::initialize_camera_resources()
 {
     // Initializes camera dll
     if (tl_camera_sdk_dll_initialize())
@@ -256,10 +275,18 @@ void frame_available_callback(void* sender, unsigned short* image_buffer, int fr
     printf("frame_count = %d\n", frame_count);
     printf("meta data buffer = 0x%p\n", metadata);
     printf("metadata size in bytes = %d\n", metadata_size_in_bytes);
-
     is_first_frame_finished = 1;
     // If you need to save the image data for application specific purposes, this would be the place to copy it into separate buffer.
-
+    //imageData = *image_buffer;
+    int nSize = sizeof(image_buffer);
+    cv::Mat rawData(1, nSize, CV_8UC1, (void*)image_buffer);
+    cv::Mat decodedImage  =  cv::imdecode(rawData, cv::IMREAD_COLOR);
+    if ( decodedImage.data == NULL )
+    {
+        // Error reading raw image data
+    }
+    cv::imshow("test", decodedImage);
+    cv::waitKey(0);
 #ifdef _WIN32
     SetEvent(frame_acquired_event);
 #elif defined __linux__
@@ -271,10 +298,26 @@ void frame_available_callback(void* sender, unsigned short* image_buffer, int fr
 
 void camera_connect_callback(char* cameraSerialNumber, enum TL_CAMERA_USB_PORT_TYPE usb_bus_speed, void* context)
 {
-    printf("camera %s connected with bus speed = %d!\n", cameraSerialNumber, usb_bus_speed);
+    //ui->Terminal->append(sprintf("camera %s connected with bus speed = %d!\n", cameraSerialNumber, usb_bus_speed));
 }
 
 void camera_disconnect_callback(char* cameraSerialNumber, void* context)
 {
     printf("camera %s disconnected!\n", cameraSerialNumber);
+}
+
+void readImage()
+{
+    //int    nSize = ...       // Size of buffer
+    //uchar* pcBuffer = ...    // Raw buffer data
+
+
+    // Create a Size(1, nSize) Mat object of 8-bit, single-byte elements
+    //Mat rawData( 1, nSize, CV_8UC1, (void*)pcBuffer );
+
+    //Mat decodedImage  =  imdecode( rawData /*, flags */ );
+    //if ( //decodedImage.data == NULL )
+    //{
+        // Error reading raw image data
+    //}
 }
