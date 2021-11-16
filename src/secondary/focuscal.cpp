@@ -282,9 +282,17 @@ void frame_available_callback(void* sender, unsigned short* image_buffer, int fr
     is_first_frame_finished = 1;
     // If you need to save the image data for application specific purposes, this would be the place to copy it into separate buffer.
     //imageData = *image_buffer;
+
+    int w, h, d;
+    tl_camera_get_image_width(camera_handle, &w);
+    tl_camera_get_image_height(camera_handle, &h);
+    tl_camera_get_sensor_pixel_size_bytes(camera_handle, &d);
+
+
     int nSize = sizeof(*image_buffer);
-    cv::Mat rawData(1, nSize, CV_8UC1, (void*)image_buffer);
-    cv::Mat decodedImage  =  cv::imdecode(rawData, cv::IMREAD_COLOR);
+    cv::Mat rawData(1, w*h, CV_8UC1, (void*)image_buffer);
+    cv::Mat decodedImage  =  cv::imdecode(rawData, cv::IMREAD_GRAYSCALE);
+    //cv::imdecode(image_buffer, 0);
     if ( decodedImage.data == NULL )
     {
         // Error reading raw image data
