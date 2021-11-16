@@ -50,6 +50,10 @@ void FocusCal::initCamera()
     // Set the camera disconnect event callback. This is used to register for run time camera disconnect events.
     if (tl_camera_set_camera_disconnect_callback(camera_disconnect_callback, 0))
         nErrors += report_error_and_cleanup_resources(tl_camera_get_last_error());
+
+    if (tl_camera_disarm(camera_handle))
+            printf("Failed to stop the camera!\n");
+
     nErrors += setExposure(10*1000);
     nErrors += setGain(6.0, camera_handle);
 
@@ -278,7 +282,7 @@ void frame_available_callback(void* sender, unsigned short* image_buffer, int fr
     is_first_frame_finished = 1;
     // If you need to save the image data for application specific purposes, this would be the place to copy it into separate buffer.
     //imageData = *image_buffer;
-    int nSize = sizeof(image_buffer);
+    int nSize = sizeof(*image_buffer);
     cv::Mat rawData(1, nSize, CV_8UC1, (void*)image_buffer);
     cv::Mat decodedImage  =  cv::imdecode(rawData, cv::IMREAD_COLOR);
     if ( decodedImage.data == NULL )
