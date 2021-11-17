@@ -61,6 +61,7 @@ void printcontrol::AbortPrint(Stage_t StageType, PrintControls *pPrintControl)
 {
     pc_DLP.PatternDisplay(OFF);                 // Turn projection off
     pc_Stage.StageStop(StageType);              // Stop stage movement
+    pc_Stage.StageClose(StageType);             // Close stage connection
     pc_Pump.Stop();                             // Stop injection
     pPrintControl->layerCount = 0xFFFFFF;       // End print process loop
 }

@@ -427,4 +427,10 @@ void StageCommands::initStageStart(PrintSettings si_PrintSettings)
     }
     Sleep(10);
 }
+/*
+void StageCommands::StageAbort(PrintSettings si_PrintSettings)
+{
+    StageStop(si_PrintSettings.StageType);
 
+}
+*/

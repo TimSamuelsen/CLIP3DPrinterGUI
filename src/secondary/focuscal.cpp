@@ -289,7 +289,7 @@ void frame_available_callback(void* sender, unsigned short* image_buffer, int fr
     tl_camera_get_sensor_pixel_size_bytes(camera_handle, &d);
 
 
-    int nSize = sizeof(*image_buffer);
+    //int nSize = sizeof(*image_buffer);
     cv::Mat rawData(1, w*h, CV_8UC1, (void*)image_buffer);
     cv::Mat decodedImage  =  cv::imdecode(rawData, cv::IMREAD_GRAYSCALE);
     //cv::imdecode(image_buffer, 0);
