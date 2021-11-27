@@ -1091,6 +1091,7 @@ void MainWindow::saveSettings()
 
     settings.setValue("StageCOM", ui->COMPortSelect->currentIndex());
     settings.setValue("PumpCOM", ui->COMPortSelectPump->currentIndex());
+
     ui->SettingsWidget->savePrintSettings();
 }
 

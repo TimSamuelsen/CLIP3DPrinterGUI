@@ -3,6 +3,7 @@
 #include <QFileDialog>
 
 QString ImageFileDirectory2;
+QString PrintScriptDirectory;
 
 printsettings::printsettings(QWidget *parent) :
     QWidget(parent),
@@ -285,8 +286,15 @@ void printsettings::on_UsePrintScript_clicked()
 
 void printsettings::on_SelectPrintScript_clicked()
 {
-    QString file_name = QFileDialog::getOpenFileName(this, "Open Print Script", "C://", "*.txt *.csv");
+    QString file_name = QFileDialog::getOpenFileName(this, "Open Print Script", PrintScriptDirectory, "*.txt *.csv");
+    initPrintScript(file_name);
+}
+
+void printsettings::initPrintScript(QString file_name){
     ui->PrintScriptFile->setText(file_name);
+    QDir Directory = QFileInfo(file_name.at(0)).absoluteDir();   // Get directory selected
+    PrintScriptDirectory = Directory.filePath(file_name.at(0));    // Save directory
+
     QFile file(file_name);
     if (!file.open(QIODevice::ReadOnly)){
         //qDebug() << file.errorString();
@@ -320,19 +328,35 @@ void printsettings::on_SelectPrintScript_clicked()
 void printsettings::on_ClearPrintScript_clicked()
 {
     ui->PrintScriptFile->clear();
+    psPrintScript->ExposureScriptList.clear();
+    psPrintScript->LEDScriptList.clear();
+    psPrintScript->DarkTimeScriptList.clear();
+    psPrintScript->LayerThicknessScriptList.clear();
+    psPrintScript->StageVelocityScriptList.clear();
+    psPrintScript->StageAccelerationScriptList.clear();
+    psPrintScript->PumpHeightScriptList.clear();
+    if(psPrintSettings->PrinterType == ICLIP){
+        psPrintScript->InjectionVolumeScriptList.clear();
+        psPrintScript->InjectionRateScriptList.clear();
+    }
+    emit updateScript();
 }
 
 /**********************************Image File Selection********************************************/
 void printsettings::on_SelectFile_clicked()
 {
     // Open files from last directory chosen, limited to bitmapped or tiff image file formats
-    QStringList file_name = QFileDialog::getOpenFileNames(this,"Open Object Image Files",ImageFileDirectory2,"*.bmp *.png *.tiff *.tif");
-    if (file_name.count() > 0){ // If images selected
-        QDir ImageDirectory = QFileInfo(file_name.at(0)).absoluteDir();   // Get directory selected
-        ImageFileDirectory2 = ImageDirectory.filePath(file_name.at(0));    // Save directory
+    QStringList file_names = QFileDialog::getOpenFileNames(this,"Open Object Image Files",ImageFileDirectory2,"*.bmp *.png *.tiff *.tif");
+    initImageFiles(file_names);
+}
+
+void printsettings::initImageFiles(QStringList file_names){
+    if (file_names.count() > 0){ // If images selected
+        QDir ImageDirectory = QFileInfo(file_names.at(0)).absoluteDir();   // Get directory selected
+        ImageFileDirectory2 = ImageDirectory.filePath(file_names.at(0));    // Save directory
         // Add each file name to FileList, will be displayed for user
-        for (uint16_t i = 0; i < file_name.count(); i++){
-            ui->FileList->addItem(file_name.at(i));
+        for (int i = 0; i < file_names.count(); i++){
+            ui->FileList->addItem(file_names.at(i));
         }
     }
     else{   // No images were selected
@@ -480,7 +504,17 @@ void printsettings::savePrintSettings()
     settings.setValue("BaseInjectionRate", psInjectionSettings->BaseInjectionRate);
     settings.setValue("InjectionDelay", psInjectionSettings->InjectionDelayParam);
 
+    settings.setValue("PrintScriptActive", psPrintScript->PrintScript);
+    settings.setValue("PrintScript", ui->PrintScriptFile->text());
+    settings.setValue("PrintScriptDirectory", PrintScriptDirectory);
     settings.setValue("ImageFileDirectory", ImageFileDirectory2);
+    QStringList ImageList;
+    QListWidgetItem * item;
+    for(int i = 0; i < ui->FileList->count(); i++){
+        item = ui->FileList->item(i);
+        ImageList << item->text();
+    }
+    settings.setValue("ImageFiles", ImageList);
 }
 
 void printsettings::loadPrintSettings()
@@ -517,6 +551,18 @@ void printsettings::loadPrintSettings()
     psInjectionSettings->InjectionDelayParam = settings.value("InjectionDelay", 0).toDouble();
 
     ImageFileDirectory2 = settings.value("ImageFileDirectory", "C://").toString();
+    PrintScriptDirectory = settings.value("PrintScriptDirectory", "C://").toString();
+    psPrintScript->PrintScript = settings.value("PrintScriptActive", 0).toInt();
+
+    // These are initialized here because they are not stored in variables only ui
+    QString PrintScriptFile = settings.value("PrintScript", "").toString();
+    if(PrintScriptFile != "" && psPrintScript->PrintScript == ON){
+        initPrintScript(PrintScriptFile);
+    }
+    QStringList ImageFiles = settings.value("ImageFiles", "").toStringList();
+    if (ImageFiles.at(0) != ""){
+        initImageFiles(ImageFiles);
+    }
 }
 
 void printsettings::initPrintSettings()
@@ -579,6 +625,10 @@ void printsettings::initPrintSettings()
     ui->BaseInfusionParam->setValue(psInjectionSettings->BaseInjectionRate);
     ui->InjectionDelayParam->setValue(psInjectionSettings->InjectionDelayParam);
 
+    ui->UsePrintScript->setChecked(psPrintScript->PrintScript);
+    if (psPrintScript->PrintScript == ON){
+        on_UsePrintScript_clicked();   // turn on print script
+    }
     EnableParameter(VP_RESYNC, OFF); // Always starts in POTF so ResyncVP is disabled from start
     EnableParameter(INITIAL_DELAY, OFF); // Always starts in POTF so Initial delay is disabled
 }

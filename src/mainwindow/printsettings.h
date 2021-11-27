@@ -110,6 +110,9 @@ private:
     PrintControls *psPrintControls;
     PrintScripts *psPrintScript;
     InjectionSettings *psInjectionSettings;
+
+    void initImageFiles(QStringList file_names);
+    void initPrintScript(QString file_name);
 };
 
 #endif // PRINTSETTINGS_H
