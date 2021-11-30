@@ -73,6 +73,7 @@ void graphics::initPlot(PrintControls m_PrintControls, PrintSettings m_PrintSett
                         PrintScripts m_PrintScript)
 {
     ui->LivePlot->addGraph();
+    ui->LivePlot->clearItems();     // Clear any previous items in reset case
     ui->LivePlot->graph(0)->setName("Print Progress");
     ui->LivePlot->xAxis->setLabel("Time (s)");
     ui->LivePlot->yAxis->setLabel("Position (mm)");

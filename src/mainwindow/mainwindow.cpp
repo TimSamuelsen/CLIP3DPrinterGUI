@@ -1482,3 +1482,48 @@ void MainWindow::refreshScript()
 
     ui->GraphicWindow->initPrintScriptTable(m_PrintSettings, &m_PrintScript);
 }
+
+void MainWindow::on_resetButton_clicked()
+{
+    if (initResetConfirmation() == true){
+        saveSettings();
+        Sleep(20);
+
+        // Clear all data structures (how do?)
+        PrintControls tempControls;
+        m_PrintControls = tempControls;
+        // Clear terminal
+        ui->ProgramPrints->clear();
+
+
+        // Re initialize features
+        CurrentDateTime = QDateTime::currentDateTime();
+        loadSettings();
+        initSettings();
+        ui->GraphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
+        PrintToTerminal("Reset Successful");
+    }
+}
+
+bool MainWindow::initResetConfirmation()
+{
+    bool retVal = false;
+    QMessageBox confScreen;
+    QPushButton *cancelButton = confScreen.addButton(QMessageBox::Cancel);
+    QPushButton *okButton = confScreen.addButton(QMessageBox::Ok);
+    confScreen.setText("Please Confirm Reset Request");
+    confScreen.exec();
+    if (confScreen.clickedButton() == cancelButton){
+        PrintToTerminal("Reset Cancelled");
+    }
+    else if (confScreen.clickedButton() == okButton){
+        retVal = true;
+        PrintToTerminal("Reset Confirmed");
+    }
+    else{
+        PrintToTerminal("Reset Conf. Screen Error");
+    }
+    return retVal;
+}
+
+

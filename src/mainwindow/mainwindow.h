@@ -88,6 +88,8 @@ private slots:
 
     void on_FocusCal_clicked();
 
+    void on_resetButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     PrintScripts m_PrintScript;
@@ -123,6 +125,7 @@ private:
     void StartPrint();
     void PrintProcess2();
     void initConnections();
+    bool initResetConfirmation();
 
     void initPollTimer();
 };
