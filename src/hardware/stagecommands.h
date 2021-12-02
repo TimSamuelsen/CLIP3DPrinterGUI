@@ -43,6 +43,7 @@ public:
     QString SendCustom(Stage_t StageType, QString Command);
     void initStagePosition(PrintSettings si_PrintSettings);
     void initStageStart(PrintSettings si_PrintSettings);
+    void resetStageInit();
 
 
 signals:

@@ -1494,6 +1494,7 @@ void MainWindow::on_resetButton_clicked()
         m_PrintControls = tempControls;
         // Clear terminal
         ui->ProgramPrints->clear();
+        Stage.resetStageInit();
 
 
         // Re initialize features

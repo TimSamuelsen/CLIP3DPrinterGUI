@@ -287,7 +287,9 @@ void printsettings::on_UsePrintScript_clicked()
 void printsettings::on_SelectPrintScript_clicked()
 {
     QString file_name = QFileDialog::getOpenFileName(this, "Open Print Script", PrintScriptDirectory, "*.txt *.csv");
-    initPrintScript(file_name);
+    if (file_name != ""){
+        initPrintScript(file_name);
+    }
 }
 
 void printsettings::initPrintScript(QString file_name){

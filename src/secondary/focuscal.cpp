@@ -290,7 +290,7 @@ void frame_available_callback(void* sender, unsigned short* image_buffer, int fr
 
 
     //int nSize = sizeof(*image_buffer);
-    cv::Mat rawData(1, w*h, CV_8UC1, (void*)image_buffer);
+    cv::Mat rawData(w, h, CV_8UC1, (void*)image_buffer);
     cv::Mat decodedImage  =  cv::imdecode(rawData, cv::IMREAD_GRAYSCALE);
     //cv::imdecode(image_buffer, 0);
     if ( decodedImage.data == NULL )

@@ -316,6 +316,8 @@ void StageCommands::initStagePosition(PrintSettings si_PrintSettings)
     SMC.serial.flushReceiver();
 }
 
+
+static int MovementAttempts = 0;
 /*!
  * \brief StageCommands::initStageSlot
  * Starts process of lowering stage down to it's starting position,
@@ -325,7 +327,6 @@ void StageCommands::initStagePosition(PrintSettings si_PrintSettings)
  */
 void StageCommands::initStageSlot()
 {
-    static int MovementAttempts = 0;
     if (s_PrintSettings.StageType == STAGE_SMC){
         double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
         emit StageGetPositionSignal(QString::number(CurrentPosition));
@@ -434,3 +435,9 @@ void StageCommands::StageAbort(PrintSettings si_PrintSettings)
 
 }
 */
+void StageCommands::resetStageInit()
+{
+    StagePrep1 = false;
+    StagePrep2 = false;
+    MovementAttempts = 0;
+}
