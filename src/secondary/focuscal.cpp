@@ -297,7 +297,7 @@ void frame_available_callback(void* sender, unsigned short* image_buffer, int fr
     {
         // Error reading raw image data
     }
-    cv::imshow("test", decodedImage);
+    cv::imshow("test", rawData);
     cv::waitKey(0);
 #ifdef _WIN32
     SetEvent(frame_acquired_event);
