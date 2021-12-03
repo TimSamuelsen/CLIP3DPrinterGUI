@@ -54,8 +54,8 @@ void FocusCal::initCamera()
     if (tl_camera_disarm(camera_handle))
             printf("Failed to stop the camera!\n");
 
-    nErrors += setExposure(10*1000);
-    nErrors += setGain(6.0, camera_handle);
+    nErrors += setExposure(28);
+    nErrors += setGain(33.0, camera_handle);
 
     // Configure camera for continuous acquisition by setting the number of frames to 0.
     // This project only waits for the first frame before exiting
@@ -288,9 +288,11 @@ void frame_available_callback(void* sender, unsigned short* image_buffer, int fr
     tl_camera_get_image_height(camera_handle, &h);
     tl_camera_get_sensor_pixel_size_bytes(camera_handle, &d);
 
+    //unsigned char pixels[w*h*d];
+    //memcpy(pixels, image_buffer, w * h * d);
 
     //int nSize = sizeof(*image_buffer);
-    cv::Mat rawData(w, h, CV_8UC1, (void*)image_buffer);
+    cv::Mat rawData(h, w, CV_16UC1, (void*)image_buffer);
     cv::Mat decodedImage  =  cv::imdecode(rawData, cv::IMREAD_GRAYSCALE);
     //cv::imdecode(image_buffer, 0);
     if ( decodedImage.data == NULL )

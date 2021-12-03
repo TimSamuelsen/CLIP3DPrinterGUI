@@ -562,8 +562,10 @@ void printsettings::loadPrintSettings()
         initPrintScript(PrintScriptFile);
     }
     QStringList ImageFiles = settings.value("ImageFiles", "").toStringList();
-    if (ImageFiles.at(0) != ""){
-        initImageFiles(ImageFiles);
+    if (ImageFiles.isEmpty() == false){             // Needs to be nested to avoid segmentation fault
+        if (ImageFiles.at(0) != ""){
+            initImageFiles(ImageFiles);
+        }
     }
 }
 
