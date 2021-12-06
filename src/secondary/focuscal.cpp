@@ -2,6 +2,8 @@
 #include "ui_focuscal.h"
 #include "tl_camera_sdk.h"
 #include "tl_camera_sdk_load.h"
+#include <QtDebug>
+#include "string.h"
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -54,7 +56,7 @@ void FocusCal::initCamera()
     if (tl_camera_disarm(camera_handle))
             printf("Failed to stop the camera!\n");
 
-    nErrors += setExposure(28);
+    nErrors += setExposure(1000);
     nErrors += setGain(33.0, camera_handle);
 
     // Configure camera for continuous acquisition by setting the number of frames to 0.
@@ -275,24 +277,48 @@ void frame_available_callback(void* sender, unsigned short* image_buffer, int fr
     if (is_first_frame_finished)
         return;
 
-    printf("image buffer = 0x%p\n", image_buffer);
-    printf("frame_count = %d\n", frame_count);
-    printf("meta data buffer = 0x%p\n", metadata);
-    printf("metadata size in bytes = %d\n", metadata_size_in_bytes);
+    qDebug("image buffer = %p\n", image_buffer);
+    qDebug("image buffer size = %d\n", sizeof image_buffer);
+    qDebug("frame_count = %d\n", frame_count);
+    qDebug("meta data buffer = %p\n", metadata);
+    qDebug("metadata size in bytes = %d\n", metadata_size_in_bytes);
     is_first_frame_finished = 1;
     // If you need to save the image data for application specific purposes, this would be the place to copy it into separate buffer.
     //imageData = *image_buffer;
+
+
+    // call get_pending_frame_or_null()
+    if (metadata){
+        int metadata_index = 0; // index (in bytes) into metadata
+        while (metadata_index < metadata_size_in_bytes)
+        {
+            unsigned char* metadata_entry = metadata + metadata_index; // byte pointer to the tag / value pair
+            unsigned long value = *(unsigned long*)(metadata_entry + 4);
+            qDebug("%.4s: %lu \n", metadata_entry, value);
+        // check for any desired tags and operate on value accordingly
+        metadata_index += 8; // there are 8 bytes per tag / value pair
+        }
+    }
+
 
     int w, h, d;
     tl_camera_get_image_width(camera_handle, &w);
     tl_camera_get_image_height(camera_handle, &h);
     tl_camera_get_sensor_pixel_size_bytes(camera_handle, &d);
+    //unsigned short *output_buffer = 0;
+    //output_buffer = (unsigned short *)malloc(sizeof(unsigned short) * h * w); // color image size will be 3x the size of a mono image
+    //memcpy(output_buffer, image_buffer, (sizeof(unsigned short) * h * w));
+
 
     //unsigned char pixels[w*h*d];
     //memcpy(pixels, image_buffer, w * h * d);
+    //cv::Mat mat(h, w, CV_MAKETYPE(cv::DataType<short>::type, 1));
+    //memcpy(mat.data, output_buffer, h*w*1 * sizeof(short));
 
     //int nSize = sizeof(*image_buffer);
-    cv::Mat rawData(h, w, CV_16UC1, (void*)image_buffer);
+    cv::Mat rawData(cv::Size(w,h), CV_16UC1, image_buffer);
+    //ushort* pointer_to_data_start = rawData.ptr<ushort>();
+    //memcpy(pointer_to_data_start, image_buffer, h * w * sizeof(unsigned short));
     cv::Mat decodedImage  =  cv::imdecode(rawData, cv::IMREAD_GRAYSCALE);
     //cv::imdecode(image_buffer, 0);
     if ( decodedImage.data == NULL )
