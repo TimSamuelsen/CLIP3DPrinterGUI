@@ -406,6 +406,9 @@ void StageCommands::verifyStageParams(PrintSettings s_PrintSettings)
     SetStagePositiveLimit(s_PrintSettings.MaxEndOfRun, s_PrintSettings.StageType);
     Sleep(20);
     SetStageVelocity(s_PrintSettings.StageVelocity, s_PrintSettings.StageType);
+    Sleep(20);
+    double StagePosition  = StageGetPosition(STAGE_SMC).toDouble();
+    emit StageGetPositionSignal(QString::number(StagePosition));
 }
 
 /*!
@@ -432,7 +435,6 @@ void StageCommands::initStageStart(PrintSettings si_PrintSettings)
 void StageCommands::StageAbort(PrintSettings si_PrintSettings)
 {
     StageStop(si_PrintSettings.StageType);
-
 }
 */
 void StageCommands::resetStageInit()
