@@ -1488,6 +1488,9 @@ void MainWindow::on_resetButton_clicked()
     if (initResetConfirmation() == true){
         saveSettings();
         Sleep(20);
+        updatePosition(Stage.StageGetPosition(m_PrintSettings.StageType));  // Repeated to make sure buffer is cleared
+        updatePosition(Stage.StageGetPosition(m_PrintSettings.StageType));
+        updatePosition(Stage.StageGetPosition(m_PrintSettings.StageType));
 
         // Clear all data structures (how do?)
         PrintControls tempControls;

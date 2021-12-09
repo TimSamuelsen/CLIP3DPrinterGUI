@@ -26,7 +26,7 @@ double graphics::calcPrintTime(PrintSettings m_PrintSettings, PrintControls m_Pr
     }
     else{
         printTime += m_PrintSettings.ExposureTime * m_PrintControls.nSlice / (1000*1000);
-        printTime += m_PrintSettings.ExposureTime * m_PrintControls.nSlice / (1000*1000);
+        printTime += m_PrintSettings.DarkTime * m_PrintControls.nSlice / (1000*1000);
     }
 
     if(m_PrintSettings.ProjectionMode == POTF){
@@ -74,7 +74,10 @@ void graphics::initPlot(PrintControls m_PrintControls, PrintSettings m_PrintSett
 {
     ui->LivePlot->addGraph();
     ui->LivePlot->clearItems();     // Clear any previous items in reset case
+    qv_x.clear();
+    qv_y.clear();
     ui->LivePlot->graph(0)->setName("Print Progress");
+    ui->LivePlot->graph(0)->data()->clear();
     ui->LivePlot->xAxis->setLabel("Time (s)");
     ui->LivePlot->yAxis->setLabel("Position (mm)");
 
