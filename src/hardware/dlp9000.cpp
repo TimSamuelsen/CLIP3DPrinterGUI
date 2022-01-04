@@ -13,17 +13,16 @@
 /*!
  * \brief DLP9000::InitProjector
  * Initializes connection to the projector.
- * \return - Returns true if connection was successful, false otherwise
+ * \return Returns true if connection was successful, false otherwise
  */
 bool DLP9000::InitProjector(void)
 {
-    if (USB_Open() == 0)
-    {
+    // If connection was successful: enter POTF mode and return true
+    if (USB_Open() == 0){
         LCR_SetMode(PTN_MODE_OTF);
         return true;
     }
-    else
-    {
+    else{ //emit error and return false
         emit DLPError("Light Engine Connection Failed");
         return false;
     }
@@ -32,111 +31,131 @@ bool DLP9000::InitProjector(void)
 /*!
  * \brief DLP9000::AddPatterns2
  * Prepares patterns and stores them in program memory prior to upload.
- * \param fileNames - A list of file locations for images to be uploaded
- * \param m_PrintSettings - Module print settings, using BitMode, ProjectionMode, ExposureTime, and DarkTime
- * \param m_PrintScripts - Module print scripts, using ExposureTimeScript and DarkTimeScript
- * \param m_PrintControls - Module print controls, using layerCount and InitialExposureFlag
+ * \param fileNames A list of file locations for images to be uploaded
+ * \param m_PrintSettings Module print settings, using BitMode, ProjectionMode, ExposureTime, and DarkTime
+ * \param m_PrintScripts Module print scripts, using ExposureTimeScript and DarkTimeScript
+ * \param m_PrintControls Module print controls, using layerCount and InitialExposureFlag
  */
 void DLP9000::AddPatterns2(QStringList fileNames, PrintSettings m_PrintSettings, PrintScripts m_PrintScripts, PrintControls m_PrintControls)
 {
-    if(m_PrintSettings.BitMode == 0){
-        m_PrintSettings.BitMode = 1; //Default bitmode to 1 if it somehow gets passed in undefined
+    // If no image files were found -> emit error and return
+    if(fileNames.isEmpty()){
+        emit DLPError("No image files found");
+        return;
     }
+
+    // Default bitmode to 1 if it somehow gets passed in undefined
+    if(m_PrintSettings.BitMode == 0){
+        m_PrintSettings.BitMode = 1;
+    }
+
+    // If in initial exposure set the initial exposure count to settings value
     double InitialExposureCount = 0;
     if(m_PrintControls.InitialExposureFlag){
         InitialExposureCount = m_PrintSettings.InitialExposure;
     }
-    uint CurrentImage = m_PrintControls.layerCount;
-    int i;
+
+    int CurrentImage = m_PrintControls.layerCount;
     int BitPos = 0;
-    int numPatAdded = 0;
-
-    if(fileNames.isEmpty())
-    {
-        emit DLPError("No image files found");
-        return;
-    }
-    QDir dir = QFileInfo(QFile(fileNames.at(0))).absoluteDir();     //TODO: Make sure this doesn't interfere
-    m_ptnImagePath = dir.absolutePath();                            //      with Video Pattern mode
-
-    for(i = 0; i < fileNames.size(); i++){
+    QDir dir = QFileInfo(QFile(fileNames.at(0))).absoluteDir();
+    m_ptnImagePath = dir.absolutePath();
+    for(int i = 0; i < fileNames.size(); i++){    // Iterate over each image file
         PatternElement pattern;
+        pattern.name = fileNames.at(CurrentImage);
+        qDebug(pattern.name.toLatin1(), "\r\n");
+        initPattern(pattern, m_PrintSettings);
 
-        pattern.bits = m_PrintSettings.BitMode;
-        pattern.color = PatternElement::BLUE;
-        if(InitialExposureCount > 0){
-            if (InitialExposureCount > 5){
-                pattern.exposure = 5*1000*1000;     // 5s = 5 000 000 us, don't want to go above 5s!
-                InitialExposureCount -= 5;
-            }
-            else{
-                pattern.exposure = InitialExposureCount*1000*1000;
-                InitialExposureCount = 0;
-            }
-            pattern.darkPeriod = 0;
-            printf("iexp: %d, dt: %d", pattern.exposure, pattern.darkPeriod);
-
-        }
-        else if (m_PrintScripts.PrintScript == ON){
-            if (CurrentImage < m_PrintScripts.ExposureScriptList.count()){
-                pattern.exposure = m_PrintScripts.ExposureScriptList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
-                pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(CurrentImage).toInt() * 1000;
-            }
-            else{
-                int LastEntry = m_PrintScripts.ExposureScriptList.count()-1;
-                pattern.exposure = m_PrintScripts.ExposureScriptList.at(LastEntry).toInt() * 1000; //*1000 to get from ms to us
-                pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(LastEntry).toInt() * 1000;
-            }
-            printf("exp: %d, dt: %d \r\n", pattern.exposure, pattern.darkPeriod);
-            CurrentImage++; //Should this be done before?
+        if(InitialExposureCount > 0){             // If in initial exposure mode
+            InitialExposurePattern(pattern, InitialExposureCount);
         }
         else{
-            pattern.exposure = m_PrintSettings.ExposureTime;
-            pattern.darkPeriod = m_PrintSettings.DarkTime;
+            if (m_PrintScripts.PrintScript == ON){
+                PrintScriptPattern(pattern, CurrentImage, m_PrintScripts);
+            }
+            CurrentImage++;
         }
-        pattern.trigIn = false;
-        pattern.trigOut2 = true;
-        pattern.clear = true;
 
         if(m_PrintSettings.ProjectionMode == POTF){
             if (m_elements.size() != 0){
                 pattern.splashImageIndex = m_elements[m_elements.size()-1].splashImageIndex;
                 pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos;
             }
-            pattern.name = fileNames.at(i);
-            printf(pattern.name.toLatin1());
-            printf("\r\n");
         }
         else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
-            pattern.splashImageIndex = 0;
-            if (m_elements.size() == 0){
-                BitPos += m_PrintSettings.BitMode;
-                pattern.splashImageBitPos = 0;
-            }
-            else{
-                if(m_PrintControls.InitialExposureFlag){
-                    pattern.splashImageBitPos = 0;
-                }
-                else{
-                    pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos
-                                                + m_elements[m_elements.size()-1].bits;
-                    if (BitPos > 23){
-                        BitPos = 0;
-                    }
-                    printf(",BP: %d,", BitPos);
-                    pattern.splashImageBitPos = BitPos;
-                    BitPos += m_PrintSettings.BitMode;
-                    printf("BitPos: %d \r\n", pattern.splashImageBitPos);
-                }
-            }
-
+            VPBitPos(pattern, BitPos, m_PrintControls.InitialExposureFlag, m_PrintSettings.BitMode);
         }
-        pattern.selected = true;
+        qDebug("exp: %d, dt: %d, BP: %d \r\n", pattern.exposure, pattern.darkPeriod, pattern.splashImageBitPos);
         m_elements.append(pattern);
-        numPatAdded++;
-
     }
-    printf("%d Patterns Added",numPatAdded);
+}
+
+// Helper function for initializing pattern to standard settings
+void DLP9000::initPattern(PatternElement& pattern, PrintSettings m_PrintSettings)
+{
+    pattern.bits = m_PrintSettings.BitMode;   // Set to settings bit mode
+    pattern.color = PatternElement::BLUE;     // Blue is the only valid color
+    pattern.trigIn = false;                   // Input triggering disabled
+    pattern.trigOut2 = true;                  // Output triggering enabled
+    pattern.clear = true;                     // Clear after
+
+    pattern.exposure = m_PrintSettings.ExposureTime;
+    pattern.darkPeriod = m_PrintSettings.DarkTime;
+    pattern.selected = true;
+}
+
+// Helper function for setting exp and dark time for initial exposure patterns
+void DLP9000::InitialExposurePattern(PatternElement& pattern, double& InitialExposureCount)
+{
+    // If initial exposure is above 5 seconds set current to 5 and move to next pattern
+    // repeats until initial exposure count is < 5
+    if (InitialExposureCount > 5){
+        pattern.exposure = 5*1000*1000;   // 5s = 5 000 000 us, don't want to go above 5s!
+        InitialExposureCount -= 5;
+    }
+    else{
+        pattern.exposure = InitialExposureCount*1000*1000;
+        InitialExposureCount = 0;
+    }
+    pattern.darkPeriod = 0;
+}
+
+// Helper function for setting exp and dark time from print script
+void DLP9000::PrintScriptPattern(PatternElement& pattern, int CurrentImage, PrintScripts m_PrintScripts)
+{
+    if (CurrentImage < m_PrintScripts.ExposureScriptList.count()){
+        pattern.exposure = m_PrintScripts.ExposureScriptList.at(CurrentImage).toInt() * 1000; //*1000 to get from ms to us
+        pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(CurrentImage).toInt() * 1000;
+    }
+    else{   // TODO: Check if this can be removed now, maybe something with VP mode?
+        int LastEntry = m_PrintScripts.ExposureScriptList.count()-1;
+        pattern.exposure = m_PrintScripts.ExposureScriptList.at(LastEntry).toInt() * 1000; //*1000 to get from ms to us
+        pattern.darkPeriod = m_PrintScripts.DarkTimeScriptList.at(LastEntry).toInt() * 1000;
+    }
+}
+
+// Helper function for setting the image bit position during video pattern mode
+void DLP9000::VPBitPos(PatternElement& pattern, int& BitPos, bool InitialExposureFlag, int BitMode)
+{
+    pattern.splashImageIndex = 0;
+    if (m_elements.size() == 0){    // first pattern
+        BitPos += BitMode;
+        pattern.splashImageBitPos = 0;
+    }
+    else{
+        if(InitialExposureFlag){    // Initial exposure is first bit layer
+            pattern.splashImageBitPos = 0;
+        }
+        else{
+            // TODO: check if this can be removed
+            pattern.splashImageBitPos = m_elements[m_elements.size()-1].splashImageBitPos
+                                        + m_elements[m_elements.size()-1].bits;
+            if (BitPos > 23){
+                BitPos = 0;
+            }
+            pattern.splashImageBitPos = BitPos;
+            BitPos += BitMode;
+        }
+    }
 }
 
 /***************Helper Functions**************************/
@@ -168,13 +187,13 @@ int DLP9000::UpdatePatternMemory(int totalSplashImages)
             if(ei != splashImageCount)
                 continue;
             int bitpos = m_elements[i].splashImageBitPos;
-            printf("UPbp: %d ", m_elements[i].splashImageBitPos);
+            qDebug("UPbp: %d ", m_elements[i].splashImageBitPos);
             int bitdepth = m_elements[i].bits;
             PtnImage image(m_elements[i].name);
             merge_image.merge(image,bitpos,bitdepth);
 
         }
-        printf("\r\n");
+        qDebug("\r\n");
         merge_image.swapColors(PTN_COLOR_RED, PTN_COLOR_BLUE, PTN_COLOR_GREEN);
         uint08* splash_block = NULL;
 
@@ -279,7 +298,6 @@ int DLP9000::uploadPatternToEVM(bool master, int splashImageCount, int splash_si
     imgDataDownload.close();
 
     return 0;
-
 }
 
 /*!
@@ -336,18 +354,14 @@ void DLP9000::updateLUT(int ProjectionMode)
         return;
     }
 
-    //if (ui->patternMemory_radioButton->isChecked() && m_patternImageChange)
-    //{
-        if(UpdatePatternMemory(totalSplashImages) == 0)
-        {
-              printf("Total splash images: %d",totalSplashImages);
-      //      m_patternImageChange = false;
-        }
-        else
-        {
-            printf("UpdatePatternMemory Failed");
-        }
-    //}
+    if(UpdatePatternMemory(totalSplashImages) == 0)
+    {
+        printf("Total splash images: %d",totalSplashImages);
+    }
+    else
+    {
+        printf("UpdatePatternMemory Failed");
+    }
 }
 
 /*!
@@ -381,10 +395,10 @@ void DLP9000::clearElements(void)
 void DLP9000::setIT6535Mode(int Mode)
 {
     unsigned int dataPort, pixelClock, dataEnable, syncSelect;
-    dataPort = 0; //Select data port 1
-    pixelClock = 0; //Select pixelClock 1
-    dataEnable = 0; //Select dataEnable 1
-    syncSelect = 0;  //Select port 1 sync
+    dataPort = 0;       // Select data port 1
+    pixelClock = 0;     // Select pixelClock 1
+    dataEnable = 0;     // Select dataEnable 1
+    syncSelect = 0;     // Select port 1 sync
 
     if(LCR_SetPortConfig(dataPort,pixelClock,dataEnable,syncSelect)<0)
       emit DLPError("Unable to set port configuration!");
@@ -512,13 +526,6 @@ int DLP9000::calculateSplashImageDetails(int *totalSplashImages, bool firmware, 
 void DLP9000::SetLEDIntensity(int InitialIntensity)
 {
     LCR_SetLedCurrents(0, 0, InitialIntensity);
-/*    //Set LED currents to 0 red, 0 green, set blue to chosen UVIntensity
-    if (PrintScript == ON){ //If printscript is on
-        LCR_SetLedCurrents(0,0,(LEDScriptList.at(0).toInt())); //Set LED intensity to first value in printscript
-    }
-    else{ //if printscript is off
-        LCR_SetLedCurrents(0, 0, UVIntensity); //set static LED intensity
-    }*/
 }
 
 

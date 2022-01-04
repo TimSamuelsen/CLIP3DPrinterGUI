@@ -27,17 +27,12 @@ public:
     DLP9000& operator=(DLP9000 &&) = delete;        //Move assign
 
     bool InitProjector(void);
-    void AddPatterns(QStringList fileNames, PrintSettings m_PrintSettings, PrintScripts m_PrintScripts, PrintControls m_PrintControls);
-    int UpdatePatternMemory(int totalSplashImages);
-    int uploadPatternToEVM(bool master, int splashImageCount, int splash_size, uint8_t* splash_block);
-    void updateLUT(int ProjectionMode);
     void startPatSequence(void);
     void clearElements(void);
     void setIT6535Mode(int Mode);
     void SetLEDIntensity(int InitialIntensity);
     int PatternUpload(QStringList ImageList, PrintControls dlp_PrintControls, PrintSettings dlp_PrintSettings, PrintScripts dlp_PrintScript);
     void PatternDisplay(int DisplaySetting);
-    void AddPatterns2(QStringList fileNames, PrintSettings m_PrintSettings, PrintScripts m_PrintScripts, PrintControls m_PrintControls);
 
 signals:
     /*!
@@ -57,7 +52,17 @@ private:
     uint32_t m_ptnHeight = PTN_HEIGHT_WQXGA;
     QString m_ptnImagePath;
     QList<PatternElement> m_elements;
+
+    void AddPatterns2(QStringList fileNames, PrintSettings m_PrintSettings, PrintScripts m_PrintScripts, PrintControls m_PrintControls);
+    void initPattern(PatternElement& Pattern, PrintSettings m_PrintSettings);
+    void InitialExposurePattern(PatternElement& pattern, double& InitialExposureCount);
+    void PrintScriptPattern(PatternElement& pattern, int CurrentImage, PrintScripts m_PrintScripts);
+    void VPBitPos(PatternElement& pattern, int& BitPos, bool InitialExposureFlag, int BitMode);
+
+    int UpdatePatternMemory(int totalSplashImages);
+    int uploadPatternToEVM(bool master, int splashImageCount, int splash_size, uint8_t* splash_block);
     int calculateSplashImageDetails(int *totalSplashImages, bool firmware, int ProjectionMode);
+    void updateLUT(int ProjectionMode);
 
 protected:
     DLP9000() {

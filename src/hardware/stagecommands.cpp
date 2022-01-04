@@ -292,7 +292,6 @@ QString StageCommands::StageGetPosition(Stage_t StageType)
     return "NA";
 }
 
-
 QString StageCommands::SendCustom(Stage_t StageType, QString Command)
 {
     QString ReturnString;
@@ -315,7 +314,6 @@ void StageCommands::initStagePosition(PrintSettings si_PrintSettings)
     initStageSlot();
     SMC.serial.flushReceiver();
 }
-
 
 static int MovementAttempts = 0;
 /*!

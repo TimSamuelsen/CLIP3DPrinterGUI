@@ -94,9 +94,7 @@ struct PrintSettings
     bool PumpingMode = 0;
 
     int BitMode = 1;
-
     double PostExposureDelay = 0;
-
     double JerkTime = 0.04;
     double LayerThickness = 0;
     double StageVelocity = 0;
@@ -129,7 +127,7 @@ struct PrintControls
     int remainingImages = 0;
     double StagePosition = 0;
 
-    ExposureType_t ExposureType;
+    ExposureType_t ExposureType = EXPOSURE_NORM;
     QTime PrintStartTime;
     double TotalPrintTime = 0;
     double RemainingPrintTime = 0;

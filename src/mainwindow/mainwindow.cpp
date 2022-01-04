@@ -535,17 +535,17 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
         m_PrintSettings.ProjectionMode = VIDEOPATTERN; //Set projection mode to video pattern
 
         // Set video display off
-        if (LCR_SetMode(PTN_MODE_DISABLE) < 0){
+        /*if (LCR_SetMode(PTN_MODE_DISABLE) < 0){
             PrintToTerminal("Unable to switch to video mode");
-           ui->POTFcheckbox->setChecked(true);
+            ui->POTFcheckbox->setChecked(true);
             on_POTFcheckbox_clicked();
             // add a close image popout
         }
-        else{
+        else{*/
             initImagePopout(); // Open projection window
             DLP.setIT6535Mode(1); //Set IT6535 reciever to HDMI input
             Check4VideoLock();
-        }
+        //}
     }
 }
 
