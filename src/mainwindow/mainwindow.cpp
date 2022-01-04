@@ -358,7 +358,7 @@ void MainWindow::ExposureTimeSlot(void)
     }
 
     //Dark time handling
-    PrintControl.DarkTimeHandler(m_PrintControls, m_PrintSettings, m_PrintScript, m_InjectionSettings);
+    PrintControl.DarkTimeHandler(m_PrintSettings, m_PrintScript, m_InjectionSettings);
 }
 
 /**

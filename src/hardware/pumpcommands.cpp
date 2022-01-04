@@ -1,6 +1,8 @@
 #include "pumpcommands.h"
 #include "PrintElements.h"
-
+// There probably exists a cleaner implementation for this using
+// a command libary instead of individual functions, but the
+// functions keep it simple for future users
 /******************************************Active Commands******************************************/
 bool PumpCommands::PumpInitConnection(const char* COMport)
 {
@@ -21,10 +23,8 @@ bool PumpCommands::PumpInitConnection(const char* COMport)
  */
 int PumpCommands::StartInfusion()
 {
-    QString Command = "0irun\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    int returnval = PumpSerial.writeString(CommandToSend);
-    return returnval;
+    QString command = "0irun\r";
+    return PumpSerial.writeString(command.toLatin1().data());
 }
 
 /*!
@@ -33,10 +33,8 @@ int PumpCommands::StartInfusion()
  */
 int PumpCommands::StartWithdraw()
 {
-    QString Command = "0wrun\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    int returnval = PumpSerial.writeString(CommandToSend);
-    return returnval;
+    QString command = "0wrun\r";
+    return PumpSerial.writeString(command.toLatin1().data());
 }
 
 /*!
@@ -46,10 +44,8 @@ int PumpCommands::StartWithdraw()
  */
 int PumpCommands::Stop()
 {
-    QString Command = "0stop\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    int returnval = PumpSerial.writeString(CommandToSend);
-    return returnval;
+    QString command = "0stop\r";
+    return PumpSerial.writeString(command.toLatin1().data());
 }
 /******************************************Set Commands******************************************/
 /*!
@@ -61,10 +57,8 @@ int PumpCommands::Stop()
  */
 int PumpCommands::SetTargetTime(double T_Time)
 {
-    QString Command = "0ttime " + QString::number(T_Time) + " s\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    int returnval = PumpSerial.writeString(CommandToSend);
-    return returnval;
+    QString command = "0ttime " + QString::number(T_Time) + " s\r";
+    return PumpSerial.writeString(command.toLatin1().data());
 }
 
 /*!
@@ -75,10 +69,8 @@ int PumpCommands::SetTargetTime(double T_Time)
  */
 int PumpCommands::SetTargetVolume(double T_Vol)
 {
-    QString Command = "0tvol " + QString::number(T_Vol) + " ul\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    int returnval = PumpSerial.writeString(CommandToSend);
-    return returnval;
+    QString command = "0tvol " + QString::number(T_Vol) + " ul\r";
+    return PumpSerial.writeString(command.toLatin1().data());
 }
 
 /*!
@@ -89,10 +81,8 @@ int PumpCommands::SetTargetVolume(double T_Vol)
  */
 int PumpCommands::SetSyringeVolume(double S_Vol)
 {
-    QString Command;
-    const char* CommandToSend = Command.toLatin1().data();
-    int returnval = PumpSerial.writeString(CommandToSend);
-    return returnval;
+    QString command;    // TODO: make this functional
+    return PumpSerial.writeString(command.toLatin1().data());
 }
 
 /*!
@@ -103,10 +93,8 @@ int PumpCommands::SetSyringeVolume(double S_Vol)
  */
 int PumpCommands::SetInfuseRate(double I_Rate)
 {
-    QString Command = "0irate " + QString::number(I_Rate) + " ul/s\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    int returnval = PumpSerial.writeString(CommandToSend);
-    return returnval;
+    QString command = "0irate " + QString::number(I_Rate) + " ul/s\r";
+    return PumpSerial.writeString(command.toLatin1().data());
 }
 
 /*!
@@ -117,10 +105,8 @@ int PumpCommands::SetInfuseRate(double I_Rate)
  */
 int PumpCommands::SetWithdrawRate(double W_Rate)
 {
-    QString Command = "0wrate " + QString::number(W_Rate) + " ul/s\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    int returnval = PumpSerial.writeString(CommandToSend);
-    return returnval;
+    QString command = "0wrate " + QString::number(W_Rate) + " ul/s\r";
+    return PumpSerial.writeString(command.toLatin1().data());
 }
 /******************************************Get Commands******************************************/
 /*!
@@ -129,18 +115,8 @@ int PumpCommands::SetWithdrawRate(double W_Rate)
  */
 QString PumpCommands::GetTargetTime()
 {
-    QString TargetTime;
-
-    QString Command = "0ttime\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    PumpSerial.writeString(CommandToSend);
-
-    char* ReadTargetTime = SerialRead();
-    if (strnlen(ReadTargetTime,50) > 1)
-    {
-        TargetTime = ReadTargetTime;
-    }
-    return TargetTime;
+    QString command = "0ttime\r";
+    return getCommand(command);
 }
 
 /*!
@@ -150,19 +126,8 @@ QString PumpCommands::GetTargetTime()
  */
 QString PumpCommands::GetTargetVolume()
 {
-    QString TargetVolume;
-
-    QString Command = "0tvolume\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    PumpSerial.writeString(CommandToSend);
-
-    char* ReadTargetVolume = SerialRead();
-    if (strnlen(ReadTargetVolume,50) > 1)
-    {
-        TargetVolume = ReadTargetVolume;
-    }
-
-    return TargetVolume;
+    QString command = "0tvolume\r";
+    return getCommand(command);
 }
 
 /*!
@@ -172,19 +137,8 @@ QString PumpCommands::GetTargetVolume()
  */
 QString PumpCommands::GetSyringeVolume()
 {
-    QString SyringeVolume;
-
-    QString Command = "";
-    const char* CommandToSend = Command.toLatin1().data();
-    PumpSerial.writeString(CommandToSend);
-
-    char* ReadSyringeVolume= SerialRead();
-    if (strnlen(ReadSyringeVolume,50) > 1)
-    {
-        SyringeVolume = ReadSyringeVolume;
-    }
-
-    return SyringeVolume;
+    QString command = "";   // TODO: make this work
+    return getCommand(command);
 }
 
 /*!
@@ -193,19 +147,8 @@ QString PumpCommands::GetSyringeVolume()
  */
 QString PumpCommands::GetInfuseRate()
 {
-    QString InfuseRate;
-
-    QString Command = "0irate\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    PumpSerial.writeString(CommandToSend);
-
-    char* ReadInfuseRate = SerialRead();
-    if (strnlen(ReadInfuseRate, 50) > 0)
-    {
-        InfuseRate = ReadInfuseRate;
-    }
-
-    return InfuseRate;
+    QString command = "0irate\r";
+    return getCommand(command);
 }
 
 /*!
@@ -214,19 +157,8 @@ QString PumpCommands::GetInfuseRate()
  */
 QString PumpCommands::GetWithdrawRate()
 {
-    QString WithdrawRate;
-
-    QString Command = "0wrate\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    PumpSerial.writeString(CommandToSend);
-
-    char* ReadWithdrawRate = SerialRead();
-    if (strnlen(ReadWithdrawRate, 50) > 1)
-    {
-        WithdrawRate = ReadWithdrawRate;
-    }
-
-    return WithdrawRate;
+    QString command = "0wrate\r";
+    return getCommand(command);
 }
 /******************************************Other Commands******************************************/
 /*!
@@ -241,10 +173,8 @@ QString PumpCommands::GetWithdrawRate()
  */
 int PumpCommands::ClearTime()
 {
-    QString Command = "0ctime\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    int returnval = PumpSerial.writeString(CommandToSend);
-    return returnval;
+    QString command = "0ctime\r";
+    return PumpSerial.writeString(command.toLatin1().data());
 }
 
 /*!
@@ -259,10 +189,8 @@ int PumpCommands::ClearTime()
  */
 int PumpCommands::ClearVolume()
 {
-    QString Command = "0cvolume\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    int returnval = PumpSerial.writeString(CommandToSend);
-    return returnval;
+    QString command = "0cvolume\r";
+    return PumpSerial.writeString(command.toLatin1().data());
 }
 
 /*!
@@ -274,10 +202,8 @@ int PumpCommands::ClearVolume()
  */
 int PumpCommands::CustomCommand(QString NewCommand)
 {
-    QString Command = "0" + NewCommand + "\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    int returnval = PumpSerial.writeString(CommandToSend);
-    return returnval;
+    QString command = "0" + NewCommand + "\r";
+    return PumpSerial.writeString(command.toLatin1().data());
 }
 
 /*!
@@ -287,10 +213,8 @@ int PumpCommands::CustomCommand(QString NewCommand)
  */
 int PumpCommands::IndefiniteRun()
 {
-    QString Command;
-    const char* CommandToSend = Command.toLatin1().data();
-    int returnVal = PumpSerial.writeString(CommandToSend);
-    return returnVal;
+    QString command;    //TODO: make this work?
+    return PumpSerial.writeString(command.toLatin1().data());
 }
 /******************************************Helper Functions******************************************/
 /*
@@ -304,31 +228,23 @@ char* PumpCommands::SerialRead()
     unsigned int maxNbBytes = 30;
     int ReadStatus;
     ReadStatus = PumpSerial.readString(receivedString,finalChar,maxNbBytes,10);
-    //printf("at serialread: %s, status: %d\r\n", receivedString, ReadStatus);
 
-    //char* outputString = '\0';
-    if (ReadStatus > 0)
-    {
+    if (ReadStatus > 0){
         return receivedString;
     }
-    else if(ReadStatus == 0)
-    {
+    else if(ReadStatus == 0){
         //Error timeout reached
         return "A";
-        //return  receivedString;
     }
-    else if(ReadStatus == -1)
-    {
+    else if(ReadStatus == -1){
         //Error setting timeout
         return  "B";
     }
-    else if(ReadStatus == -2)
-    {
+    else if(ReadStatus == -2){
         //Error while reading byte
         return "C";
     }
-    else if(ReadStatus == -3)
-    {
+    else if(ReadStatus == -3){
         //Max N bytes reached, return receivedstring
         return  receivedString;
     }
@@ -347,4 +263,17 @@ void PumpCommands::initPumpParams(InjectionSettings m_InjectionSettings)
         Sleep(10);
         SetTargetVolume(m_InjectionSettings.InitialVolume);
     }
+}
+
+QString PumpCommands::getCommand(QString command){
+    QString returnString = "NA";
+    // If sending command was succesful
+    if (PumpSerial.writeString(command.toLatin1().data())){
+        char* read = SerialRead();
+        // Check to make sure read string isn't empty
+        if (strnlen(read, 50) > 1){
+            returnString = read;
+        }
+    }
+    return returnString;
 }

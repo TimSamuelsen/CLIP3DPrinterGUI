@@ -71,6 +71,8 @@ signals:
 private:
     char* SerialRead();
     void CommandBufferUpdate();
+    QString getCommand(QString);
+
 
 protected:
     PumpCommands(){

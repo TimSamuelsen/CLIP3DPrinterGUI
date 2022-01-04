@@ -13,16 +13,15 @@ class printcontrol: public QObject
 
 public:
     printcontrol();
+    void getControlPointers(PrintSettings *pPrintSettings, PrintControls *pPrintControls, PrintScripts *pPrintScript);
     void InitializeSystem(QStringList ImageList, PrintSettings p_PrintSettings, PrintControls *pPrintControls, PrintScripts m_PrintScript, InjectionSettings m_InjectionSettings);
     void AbortPrint(Stage_t StageType, PrintControls *pPrintControl);
     void StartPrint(PrintSettings m_PrintSettings, PrintScripts m_PrintScript, bool ContinuousInjection);
-    void PrintProcessHandler(PrintControls *pPrintControls, PrintSettings m_PrinSettings, InjectionSettings m_InjectionSettings);
-    bool CheckReupload(PrintSettings m_PrintSettings, PrintControls m_PrintControls, PrintScripts m_PrintScript);
     int ReuploadHandler(QStringList ImageList, PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript, bool ContinuousInjection);
+    void PrintProcessHandler(PrintControls *pPrintControls, PrintSettings m_PrinSettings, InjectionSettings m_InjectionSettings);
     bool VPFrameUpdate(PrintControls *pPrintControls, int BitMode, int ReSyncRate);
-    void DarkTimeHandler(PrintControls m_PrintControls, PrintSettings m_PrintSettings, PrintScripts m_PrintScript, InjectionSettings m_InjectionSettings);
-    void StagePumpingHandler(uint layerCount, PrintSettings m_PrintSettings, PrintScripts m_PrintScript);
-    void getControlPointers(PrintSettings *pPrintSettings, PrintControls *pPrintControls, PrintScripts *pPrintScript);
+    void DarkTimeHandler(PrintSettings m_PrintSettings, PrintScripts m_PrintScript, InjectionSettings m_InjectionSettings);
+    void StagePumpingHandler(int layerCount, PrintSettings m_PrintSettings, PrintScripts m_PrintScript);
 
 signals:
     /*!
@@ -52,6 +51,7 @@ private:
     double CalcPrintEnd(uint nSlice, PrintSettings m_PrintSettings);
     ExposureType_t GetExposureType(int PrintScript, int PumpingMode);
 private slots:
+    bool CheckReupload(PrintSettings m_PrintSettings, PrintControls m_PrintControls, PrintScripts m_PrintScript);
     void StageMove();
     void PrintInfuse(InjectionSettings m_InjectionSettings);
 };

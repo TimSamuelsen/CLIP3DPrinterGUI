@@ -9,12 +9,13 @@ DLP9000& pc_DLP = DLP9000::Instance();
 StageCommands& pc_Stage = StageCommands::Instance();
 PumpCommands& pc_Pump = PumpCommands::Instance();
 
+// Constructor
 printcontrol::printcontrol()
 {
-    //QObject::connect(this, SIGNAL(StageMoveSignal(PrintControls, PrintSettings,  PrintScript)),
-    //                 this, SLOT(StageMOve(PrintControls, PrintSettings, PrintScript)));
+
 }
 
+// Pointers stored for future use
 void printcontrol::getControlPointers(PrintSettings *pPrintSettings, PrintControls *pPrintControls
                                ,PrintScripts *pPrintScript)
 {
@@ -45,14 +46,13 @@ void printcontrol::InitializeSystem(QStringList ImageList, PrintSettings m_Print
        pc_DLP.PatternDisplay(OFF);
        pc_DLP.PatternUpload(ImageList, *pPrintControls, m_PrintSettings, m_PrintScript);
     }
-
     pPrintControls->PrintEnd = CalcPrintEnd(pPrintControls->nSlice, m_PrintSettings);
     pPrintControls->ExposureType = GetExposureType(m_PrintScript.PrintScript, m_PrintSettings.PumpingMode);
 }
 
 /*!
  * \brief printcontrol::AbortPrint
- * Aborts the print, stop projection, stops stage movement, stops pump, ends print process
+ * Aborts the print, stops projection, stops stage movement, stops pump, ends print process
  * by setting layerCount to 0xFFFFFF
  * \param StageType  Select stage type between STAGE_SMC or STAGE_GCODE
  * \param pPrintControl  Pointer to PrintControls from MainWindow, sets layerCount
@@ -79,13 +79,10 @@ void printcontrol::AbortPrint(Stage_t StageType, PrintControls *pPrintControl)
 void printcontrol::StartPrint(PrintSettings m_PrintSettings, PrintScripts m_PrintScript,
                               bool ContinuousInjection)
 {
-    //pc_DLP.SetLEDIntensity(m_PrintSettings.UVIntensity, m_PrintScript.PrintScript,
-                          // m_PrintScript.LEDScriptList);
-
     pc_Stage.initStageStart(m_PrintSettings);       // Validate correct stage parameters are set
     emit GetPositionSignal();                       // Sanity check
 
-    if (m_PrintSettings.ProjectionMode != VIDEO){
+    if (m_PrintSettings.ProjectionMode != VIDEO){   // No pattern sequences in video mode
         pc_DLP.startPatSequence();
     }
 
@@ -102,75 +99,53 @@ void printcontrol::StartPrint(PrintSettings m_PrintSettings, PrintScripts m_Prin
     }
 }
 
-bool printcontrol::CheckReupload(PrintSettings m_PrintSettings, PrintControls m_PrintControls
-                                 ,PrintScripts m_PrintScript)
-{
-    bool returnVal = true;
-    if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
-        if (m_PrintScript.PrintScript == OFF){
-            returnVal = false;
-        }
-        else{
-            // check for
-            if (m_PrintControls.layerCount > 1 && (m_PrintControls.layerCount + m_PrintSettings.ResyncVP < m_PrintScript.ExposureScriptList.size()) ){
-                returnVal = false; // Default to false if all match
-                for (int i = m_PrintControls.layerCount; i < m_PrintControls.layerCount + m_PrintSettings.ResyncVP; i++){
-                     double Last = m_PrintScript.ExposureScriptList.at(i - m_PrintSettings.ResyncVP).toDouble();
-                     double Current = m_PrintScript.ExposureScriptList.at(i).toDouble();
-                     if (Last != Current){
-                         returnVal = true;
-                         break;
-                     }
-                }
-            }
-        }
-    }
-    return returnVal;
-}
-
 /*!
  * \brief printcontrol::ReuploadHandler
  * Handles the reupload, stops stage if in continuous print mode
  * \param ImageList  From MainWindow, passed to PatternUpload
- * \param m_PrintControls  From MainWindow, passed to PatternUpload
- * \param m_PrintSettings  From MainWindow, passed to PatternUpload, StageType passed to StageStop
- * \param m_PrintScript    From MainWindow, passed to PatternUpload
+ * \param m_PrintControls  From MainWindow, passed to PatternUpload, CheckReupload
+ * \param m_PrintSettings  From MainWindow, passed to PatternUpload, StageType passed to StageStop,
+ *                         CheckReupload
+ * \param m_PrintScript    From MainWindow, passed to PatternUpload, CheckReupload
  * \return  Returns the number of patterns uploaded
  */
 int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintControls, PrintSettings m_PrintSettings,
                                   PrintScripts m_PrintScript, bool ContinuousInjection)
 {
     int UploadedImages = 0;
-    //CheckReupload(m_PrintSettings, m_PrintControls, m_PrintScript);
-    //if (m_PrintScript.PrintScript == OFF && m_PrintSettings.ProjectionMode == VIDEOPATTERN
-    //        && m_PrintControls.layerCount > 1){
-    bool Reupload = CheckReupload(m_PrintSettings, m_PrintControls, m_PrintScript);
-    if (Reupload == false){
+    bool VPReupload = CheckReupload(m_PrintSettings, m_PrintControls, m_PrintScript);
+    if (VPReupload == false){
         UploadedImages = m_PrintSettings.ResyncVP;
-        //Sleep(200); // test how big this delay may need to be...
         pc_DLP.startPatSequence();
     }
     else{
         emit ControlPrintSignal("Entering Reupload: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
-        if(m_PrintSettings.MotionMode == CONTINUOUS){       // Continuous stage movement is stopped
-            pc_Stage.StageStop(m_PrintSettings.StageType);  // during reupload
+
+        // If in continuous motion mode, pause stage movement during the reupload
+        if(m_PrintSettings.MotionMode == CONTINUOUS){
+            pc_Stage.StageStop(m_PrintSettings.StageType);
             emit ControlPrintSignal("Pausing Continuous Stage Movement");
         }
-        if(ContinuousInjection){        // Continuous Injection is stopped during reupload
+
+        // If in continuous injection mode, pause injection during the reupload
+        if(ContinuousInjection){
             pc_Pump.Stop();
             emit ControlPrintSignal("Pausing Continuous Injection");
         }
+
         UploadedImages = pc_DLP.PatternUpload(ImageList, m_PrintControls, m_PrintSettings, m_PrintScript);
         emit ControlPrintSignal(QString::number(UploadedImages) + " images uploaded");
-        if(ContinuousInjection){        // Restarting continous injection after reupload
+
+        // Restarting continous injection after reupload
+        if(ContinuousInjection){
             pc_Pump.SetTargetVolume(0);
             pc_Pump.StartInfusion();
             emit ControlPrintSignal("Resuming Continuous Injection");
         }
-        Sleep(625);
+        Sleep(625);                     // Necessary delay for DLP to process reupload
         pc_DLP.startPatSequence();      // Restart projection after reupload
 
-        if (m_PrintScript.VP8){
+        if (m_PrintScript.VP8){         // TODO: validate this
             UploadedImages = m_PrintSettings.ResyncVP;
         }
     }
@@ -180,8 +155,8 @@ int printcontrol::ReuploadHandler(QStringList ImageList, PrintControls m_PrintCo
 /*!
  * \brief printcontrol::PrintProcessHandler
  * Ensures that initial exposure only happens once, also handles layerCount and remainingImages.
- * \param pPrintControls - From MainWindow, uses InitialExposureFlag, sets inMotion, layerCount, and remainingImages
- * \param InitialExposure - Initial exposure duration in units of seconds
+ * \param pPrintControls From MainWindow, uses InitialExposureFlag, sets inMotion, layerCount, and remainingImages
+ * \param InitialExposure Initial exposure duration in units of seconds
  */
 void printcontrol::PrintProcessHandler(PrintControls *pPrintControls, PrintSettings m_PrintSettings,
                                        InjectionSettings m_InjectionSettings)
@@ -221,7 +196,7 @@ bool printcontrol::VPFrameUpdate(PrintControls *pPrintControls, int BitMode, int
     if (pPrintControls->BitLayer > 24){     // If exceeded max bit layers for 1 image
         pPrintControls->FrameCount++;
         emit ControlPrintSignal("New Frame: " + QString::number(pPrintControls->FrameCount));
-        pPrintControls->BitLayer = 1;       // reset BitLayer counter to 0
+        pPrintControls->BitLayer = 1;       // reset BitLayer counter to 1; TODO: Validate this
         pPrintControls->ReSyncCount++;
 
         // If 120 frames have been reached, prepare for resync
@@ -243,8 +218,8 @@ bool printcontrol::VPFrameUpdate(PrintControls *pPrintControls, int BitMode, int
  * \param m_InjectionSettings  Injection settings from MainWindow, using InjectionDelayFlag,
  *                              ContinuousInjection, InjectionDelayParam
  */
-void printcontrol::DarkTimeHandler(PrintControls m_PrintControls, PrintSettings m_PrintSettings,
-                                   PrintScripts m_PrintScript, InjectionSettings m_InjectionSettings)
+void printcontrol::DarkTimeHandler(PrintSettings m_PrintSettings, PrintScripts m_PrintScript,
+                                   InjectionSettings m_InjectionSettings)
 {
     if(m_PrintSettings.PrinterType == ICLIP){
         // For pre injection delay, injection is handled first and stage movement second
@@ -276,7 +251,7 @@ void printcontrol::DarkTimeHandler(PrintControls m_PrintControls, PrintSettings 
         if (m_PrintSettings.PostExposureDelay == 0){
             StageMove();
         }
-        else{
+        else{       // QTimer is used to create a delay before the stage movement
             QTimer::singleShot(m_PrintSettings.PostExposureDelay, Qt::PreciseTimer, this
                                ,SLOT(StageMove()));
             emit ControlPrintSignal("Post-Exposure delay: " + QString::number(m_PrintSettings.PostExposureDelay) + " ms");
@@ -293,7 +268,7 @@ void printcontrol::DarkTimeHandler(PrintControls m_PrintControls, PrintSettings 
  * \param m_PrintSettings - Print settings from MainWindow, using PumpingParameter and StageType
  * \param m_PrintScript - Print script from MainWindow, using PrintScript and PumpHeightScriptList
  */
-void printcontrol::StagePumpingHandler(uint layerCount, PrintSettings m_PrintSettings, PrintScripts m_PrintScript)
+void printcontrol::StagePumpingHandler(int layerCount, PrintSettings m_PrintSettings, PrintScripts m_PrintScript)
 {
     // If in printscript mode grab pump height from PumpHeightScriptList
     if(m_PrintScript.PrintScript == ON){
@@ -311,6 +286,33 @@ void printcontrol::StagePumpingHandler(uint layerCount, PrintSettings m_PrintSet
     }
 }
 /***************************************Helpers*********************************************/
+// Helper function to determine whether a reupload is needed
+bool printcontrol::CheckReupload(PrintSettings m_PrintSettings, PrintControls m_PrintControls
+                                 ,PrintScripts m_PrintScript)
+{
+    bool returnVal = true;
+    if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){
+        if (m_PrintScript.PrintScript == OFF){
+            returnVal = false;
+        }
+        else{
+            // check not at end or beginning of print to avoid sig segv when accessing scripts
+            if (m_PrintControls.layerCount + m_PrintSettings.ResyncVP < m_PrintScript.ExposureScriptList.size()
+                    && m_PrintControls.layerCount > 1){
+                returnVal = false; // Default to false if all match
+                for (uint i = m_PrintControls.layerCount; i < m_PrintControls.layerCount + m_PrintSettings.ResyncVP; i++){
+                     double Last = m_PrintScript.ExposureScriptList.at(i - m_PrintSettings.ResyncVP).toDouble();
+                     double Current = m_PrintScript.ExposureScriptList.at(i).toDouble();
+                     if (Last != Current){
+                         returnVal = true;
+                         break;
+                     }
+                }
+            }
+        }
+    }
+    return returnVal;
+}
 
 /*!
  * \brief printcontrol::CalcPrintEnd
@@ -349,8 +351,8 @@ double printcontrol::CalcPrintEnd(uint nSlice, PrintSettings m_PrintSettings)
 ExposureType_t printcontrol::GetExposureType(int PrintScript, int PumpingMode)
 {
     ExposureType_t ExposureType;
-    if (PrintScript == 1){
-        if (PumpingMode == 1){
+    if (PrintScript == ON){
+        if (PumpingMode == ON){
             ExposureType = EXPOSURE_PS_PUMP;
         }
         else{
@@ -358,7 +360,7 @@ ExposureType_t printcontrol::GetExposureType(int PrintScript, int PumpingMode)
         }
     }
     else{
-        if (PumpingMode == 1){
+        if (PumpingMode == ON){
             ExposureType = EXPOSURE_PUMP;
         }
         else{
@@ -373,25 +375,25 @@ ExposureType_t printcontrol::GetExposureType(int PrintScript, int PumpingMode)
 void printcontrol::StageMove()
 {
     //If printscript is active, filter out layerCount = 0 and layerCount is greater than script length
-    if (pcPrintScript->PrintScript == ON){
-        if (pcPrintControls->layerCount > 0){
-            if (pcPrintControls->layerCount < pcPrintScript->LayerThicknessScriptList.size()){
-                double LayerThickness = pcPrintScript->LayerThicknessScriptList.at(pcPrintControls->layerCount).toDouble()/1000; //grab layer thickness from script list
-                emit ControlPrintSignal("Moving Stage: " + QString::number(pcPrintScript->LayerThicknessScriptList.at(pcPrintControls->layerCount).toDouble()) + " um");
-                pc_Stage.StageRelativeMove(-LayerThickness, pcPrintSettings->StageType); //Move stage 1 layer thickness
+    if (pcPrintScript->PrintScript == ON && pcPrintControls->layerCount){
+        uint lenScript = pcPrintScript->LayerThicknessScriptList.size();
+        if (pcPrintControls->layerCount > 0 && pcPrintControls->layerCount < lenScript){
+            double LayerThickness = pcPrintScript->LayerThicknessScriptList.at(pcPrintControls->layerCount).toDouble()/1000; //grab layer thickness from script list
+            emit ControlPrintSignal("Moving Stage: " + QString::number(LayerThickness) + " um");
+            pc_Stage.StageRelativeMove(-LayerThickness, pcPrintSettings->StageType); //Move stage 1 layer thickness
 
-                //If pumping mode is active, grab pump height from script and move stage Pump height - layer thickness
-                if (pcPrintSettings->PumpingMode == ON){
-                    double PumpParam = pcPrintScript->PumpHeightScriptList.at(pcPrintControls->layerCount).toDouble();
-                    pc_Stage.StageRelativeMove(PumpParam - LayerThickness, pcPrintSettings->StageType);
-                }
+            // If pumping mode is active, grab pump height from script and move stage (Pump height - layer thickness)
+            if (pcPrintSettings->PumpingMode == ON){
+                double PumpParam = pcPrintScript->PumpHeightScriptList.at(pcPrintControls->layerCount).toDouble();
+                pc_Stage.StageRelativeMove(PumpParam - LayerThickness, pcPrintSettings->StageType);
             }
         }
     }
     else{
         if (pcPrintSettings->PumpingMode == ON){
-            pc_Stage.StageRelativeMove(pcPrintSettings->PumpingParameter - pcPrintSettings->LayerThickness, pcPrintSettings->StageType);
-            emit ControlPrintSignal("Pumping active, moving stage: " + QString::number(1000*(pcPrintSettings->PumpingParameter - pcPrintSettings->LayerThickness)) + " um");
+            double pumpDistance = pcPrintSettings->PumpingParameter - pcPrintSettings->LayerThickness;
+            pc_Stage.StageRelativeMove(pumpDistance, pcPrintSettings->StageType);
+            emit ControlPrintSignal("Pumping active, moving stage: " + QString::number(1000*(pumpDistance)) + " um");
         }
         else{
             pc_Stage.StageRelativeMove(-pcPrintSettings->LayerThickness, pcPrintSettings->StageType);
@@ -410,7 +412,7 @@ void printcontrol::PrintInfuse(InjectionSettings m_InjectionSettings)
 {
     if (m_InjectionSettings.ContinuousInjection == OFF){
         pc_Pump.ClearVolume();
-        Sleep(10);
+        Sleep(10);              // delay because pump firmware is bad
         pc_Pump.StartInfusion();
         emit ControlPrintSignal("Injecting resin");
     }
