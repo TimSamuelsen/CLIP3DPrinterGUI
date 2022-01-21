@@ -51,7 +51,8 @@ bool PSTableInitFlag = false;
  * \brief MainWindow::MainWindow
  * \param parent
  * Creates the mainwindow, gets current time for print log,
- * loads and initializes saved settings and initializes plot
+ * loads and initializes saved settings and initializes plot,
+ * Also initializing signal and slot connections for hardware
  */
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -88,20 +89,12 @@ MainWindow::MainWindow(QWidget *parent) :
 /*!
  * \brief MainWindow::~MainWindow
  * Called when the main window is closed
- * Saves settings up
+ * Saves settings
  */
 MainWindow::~MainWindow()
 {
     saveSettings();     //Save settings upon closing application main window
     delete ui;
-}
-
-void MainWindow::initPollTimer()
-{
-    //QTimer *timer = new QTimer(this);
-    //timer->setInterval(100);
-    //connect(timer, SIGNAL(timeout()), this, SLOT(on_GetPosition_clicked()));
-    //timer->start();
 }
 
 /*!
@@ -113,8 +106,6 @@ void MainWindow::on_ManualStage_clicked()
 {
     ManualStageUI = new ManualStageControl();
     ManualStageUI->show();
-
-    // Update Terminal and Stage Connection Indicator
     PrintToTerminal("Manual Stage Control Entered");
 }
 
@@ -125,10 +116,8 @@ void MainWindow::on_ManualStage_clicked()
  */
 void MainWindow::on_ManualPumpControl_clicked()
 {
-    // Create new manual pump control window
     ManualPumpUI = new manualpumpcontrol();
     ManualPumpUI->show();
-
     PrintToTerminal("Manual Pump Control Entered"); //Print to terminal
 }
 
@@ -138,7 +127,6 @@ void MainWindow::on_ManualPumpControl_clicked()
  */
 void MainWindow::on_ImageProcess_clicked()
 {
-    // Create new image processing window
     ImageProcessUI = new imageprocessing();
     ImageProcessUI->show();
     PrintToTerminal("Opening Image Processing");
@@ -161,11 +149,6 @@ void MainWindow::on_GetPosition_clicked()
 {
     QString CurrentPosition = Stage.StageGetPosition(m_PrintSettings.StageType);
     updatePosition(CurrentPosition);
-
-    if (m_PrintSettings.PrinterType == CLIP30UM){
-    }
-    else if(m_PrintSettings.PrinterType == ICLIP){
-    }
 }
 
 void MainWindow::updatePosition(QString CurrentPosition)
@@ -186,47 +169,44 @@ void MainWindow::updatePosition(QString CurrentPosition)
 void MainWindow::on_InitializeAndSynchronize_clicked()
 {
   // If the confirmation screen was approved by user
-  if(ui->SettingsWidget->FileListCount() > 0)
+  if(ui->SettingsWidget->FileListCount() > 0 && initConfirmationScreen())
   {
-    if (initConfirmationScreen())
-    {
-        if(m_PrintSettings.ProjectionMode == POTF){
-            // n slices = n images
-            m_PrintControls.nSlice = ui->SettingsWidget->FileListCount();
-            // remaining number of images is max n images - n images used for initial exposure
-            m_PrintControls.remainingImages = m_PrintSettings.MaxImageUpload
-                                              - m_PrintSettings.InitialExposure;
-            QStringList ImageList = GetImageList(m_PrintControls, m_PrintSettings);
-            }
-        else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
-            // n slices = (n bit layers in an image (24) / selected bit depth) * n images
-            // i.e. for a 24 bit layer image with a selected bit depth of 4 the
-            m_PrintControls.nSlice = (24/m_PrintSettings.BitMode)*ui->SettingsWidget->FileListCount();
-
-            // Grab first image and display in image popout
-            QString filename = ui->SettingsWidget->FileListItem(m_PrintControls.layerCount);
-            QPixmap img(filename);
-            ImagePopoutUI->showImage(img);
-
-            // VP8bit handling
-            if (m_PrintSettings.BitMode == 8){
-                m_PrintScript.VP8 = ON;
-                VP8bitWorkaround();
-            }
-        }
-        else if (m_PrintSettings.ProjectionMode == VIDEO){
-            m_PrintControls.nSlice = ui->SettingsWidget->FileListCount(); // n slices = n images
-        }
+    if(m_PrintSettings.ProjectionMode == POTF){
+        // n slices = n images
+        m_PrintControls.nSlice = ui->SettingsWidget->FileListCount();
+        // remaining number of images is max n images - n images used for initial exposure
+        m_PrintControls.remainingImages = m_PrintSettings.MaxImageUpload
+                                          - m_PrintSettings.InitialExposure;
         QStringList ImageList = GetImageList(m_PrintControls, m_PrintSettings);
+        }
+    else if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
+        // n slices = (n bit layers in an image (24) / selected bit depth) * n images
+        // i.e. for a 24 bit layer image with a selected bit depth of 4 the
+        m_PrintControls.nSlice = (24/m_PrintSettings.BitMode)*ui->SettingsWidget->FileListCount();
 
-        // Initialize system hardware
-        PrintControl.InitializeSystem(ImageList, m_PrintSettings, &m_PrintControls,
-                                      m_PrintScript, m_InjectionSettings);
-        emit(on_GetPosition_clicked());     //Sanity check for stage starting position
-        ui->GraphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
-        ui->GraphicWindow->updatePlot(m_PrintControls, m_PrintSettings, m_PrintScript);
-        ui->StartPrint->setEnabled(true);
+        // Grab first image and display in image popout
+        QString filename = ui->SettingsWidget->FileListItem(m_PrintControls.layerCount);
+        QPixmap img(filename);
+        ImagePopoutUI->showImage(img);
+
+        // VP8bit handling
+        if (m_PrintSettings.BitMode == 8){
+            m_PrintScript.VP8 = ON;
+            VP8bitWorkaround();
+        }
     }
+    else if (m_PrintSettings.ProjectionMode == VIDEO){
+        m_PrintControls.nSlice = ui->SettingsWidget->FileListCount(); // n slices = n images
+    }
+    QStringList ImageList = GetImageList(m_PrintControls, m_PrintSettings);
+
+    // Initialize system hardware
+    PrintControl.InitializeSystem(ImageList, m_PrintSettings, &m_PrintControls,
+                                  m_PrintScript, m_InjectionSettings);
+    emit(on_GetPosition_clicked());     //Sanity check for stage starting position
+    ui->GraphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
+    ui->GraphicWindow->updatePlot(m_PrintControls, m_PrintSettings, m_PrintScript);
+    ui->StartPrint->setEnabled(true);
   }
   else{
       showError("No image files selected");
@@ -242,15 +222,14 @@ void MainWindow::on_StartPrint_clicked()
     // If settings are validated successfully and initialization has been completed
     if (ValidateSettings() == true){
         PrintToTerminal("Entering Printing Procedure");
-        m_PrintControls.PrintStartTime = QTime::currentTime();      // Grabs the current time and saves it
+        m_PrintControls.PrintStartTime = QTime::currentTime();   // Start time is current time
 
-        if(m_PrintScript.PrintScript){
+        if(m_PrintScript.PrintScript == ON){
             LCR_SetLedCurrents(0, 0, m_PrintSettings.InitialIntensity);
         }
         ui->GraphicWindow->addInitialExpLabel();
         PrintControl.StartPrint(m_PrintSettings, m_PrintScript,
                                 m_InjectionSettings.ContinuousInjection);
-        //initPollTimer();
         PrintProcess();
     }
 }
@@ -278,25 +257,21 @@ void MainWindow::PrintProcess()
             && m_PrintControls.InitialExposureFlag == false
             && m_PrintSettings.ProjectionMode != VIDEO){
             QStringList ImageList =  GetImageList(m_PrintControls, m_PrintSettings);
-            int imagesUploaded = PrintControl.ReuploadHandler(ImageList, m_PrintControls,
+            m_PrintControls.remainingImages = PrintControl.ReuploadHandler(ImageList, m_PrintControls,
                                                               m_PrintSettings, m_PrintScript,
                                                               m_InjectionSettings.ContinuousInjection);
-            m_PrintControls.remainingImages = imagesUploaded;
             PrintToTerminal("Exiting Reupload: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
         }
-        if(m_PrintSettings.ProjectionMode == VIDEO){
-            if(m_PrintControls.layerCount < ui->SettingsWidget->FileListCount()){
-                QTime StartTime = QTime::currentTime();
-                QPixmap img(ui->SettingsWidget->FileListItem(m_PrintControls.layerCount));
-                ImagePopoutUI->showImage(img);
-                LastUploadTime = StartTime.msecsTo(QTime::currentTime());
-                PrintToTerminal("Upload: " + QString::number(LastUploadTime) + " ms");
-            }
+        if(m_PrintSettings.ProjectionMode == VIDEO
+           && m_PrintControls.layerCount < ui->SettingsWidget->FileListCount()){
+            QTime StartTime = QTime::currentTime();
+            QPixmap img(ui->SettingsWidget->FileListItem(m_PrintControls.layerCount));
+            ImagePopoutUI->showImage(img);
+            LastUploadTime = StartTime.msecsTo(QTime::currentTime());
+            PrintToTerminal("Upload: " + QString::number(LastUploadTime) + " ms");
         }
         SetExposureTimer();
-        if (m_PrintSettings.PrinterType == ICLIP){
-            on_GetPosition_clicked();
-        }
+        on_GetPosition_clicked();
         PrintControl.PrintProcessHandler(&m_PrintControls, m_PrintSettings, m_InjectionSettings);
     }
     else{
@@ -323,27 +298,23 @@ void MainWindow::pumpingSlot(void)
 void MainWindow::ExposureTimeSlot(void)
 {
     if (m_PrintSettings.ProjectionMode == VIDEO
-        && m_PrintControls.FrameCount < ui->SettingsWidget->FileListCount())
-    {
+    && m_PrintControls.FrameCount < ui->SettingsWidget->FileListCount()){
         PrintToTerminal("LoadTimeImStart: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
         QPixmap img(ui->SettingsWidget->FileListItem(m_PrintControls.FrameCount));
         ImagePopoutUI->showImage(img);
         PrintToTerminal("LoadTimeImEnd: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
     }
-    //Set dark timer first for most accurate timing
+    // Set dark timer first for most accurate timing
     SetDarkTimer();
-    //Record current time in terminal
     PrintToTerminal("Exp. end: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
     ui->GraphicWindow->updatePlot(m_PrintControls, m_PrintSettings, m_PrintScript);
 
-    //Video pattern mode handling
-    if (m_PrintSettings.ProjectionMode == VIDEOPATTERN){ //If in video pattern mode
-        if (PrintControl.VPFrameUpdate(&m_PrintControls, m_PrintSettings.BitMode, m_PrintSettings.ResyncVP) == true){
-            if (m_PrintControls.FrameCount < ui->SettingsWidget->FileListCount()){ //if not at end of file list
-                QPixmap img(ui->SettingsWidget->FileListItem(m_PrintControls.FrameCount)); //select next image
-                ImagePopoutUI->showImage(img); //display next image
-            }
-        }
+    // Video pattern mode handling
+    if (m_PrintSettings.ProjectionMode == VIDEOPATTERN //If in video pattern mode
+    &&  PrintControl.VPFrameUpdate(&m_PrintControls, m_PrintSettings.BitMode, m_PrintSettings.ResyncVP)
+    &&  m_PrintControls.FrameCount < ui->SettingsWidget->FileListCount()){
+        QPixmap img(ui->SettingsWidget->FileListItem(m_PrintControls.FrameCount)); //select next image
+        ImagePopoutUI->showImage(img); //display next image
     }
     else if(m_PrintSettings.ProjectionMode == VIDEO && m_PrintSettings.MotionMode == STEPPED){
         if(m_PrintControls.FrameCount < ui->SettingsWidget->FileListCount()){
@@ -363,10 +334,11 @@ void MainWindow::ExposureTimeSlot(void)
 
 /**
  * @brief MainWindow::DarkTimeSlot
- * Dummy slot, may be removed
+ * Enters the print process after the end of dark time
  */
 void MainWindow::DarkTimeSlot(void)
 {
+    // Allows for a unique initial exposure layer
     if (m_PrintControls.layerCount == 0){
         if (m_PrintScript.PrintScript == ON){
             PrintScriptHandler(m_PrintControls, m_PrintSettings, m_PrintScript);
@@ -376,7 +348,7 @@ void MainWindow::DarkTimeSlot(void)
         }
     }
     PrintProcess();
-    ui->ProgramPrints->append("Dark end: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
+    PrintToTerminal("Dark end: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
     if (m_PrintSettings.PrinterType == ICLIP){
         on_GetPosition_clicked();
     }
@@ -390,48 +362,31 @@ void MainWindow::DarkTimeSlot(void)
  */
 void MainWindow::SetExposureTimer()
 {
-  if (m_PrintControls.InitialExposureFlag == 1){
+  if (m_PrintControls.InitialExposureFlag == ON){
       int InitialExpMs = m_PrintSettings.InitialExposure*1000;
-      if(m_PrintSettings.ProjectionMode == ON){ // TODO: why is this like this??
+      if(m_PrintSettings.ProjectionMode == VIDEOPATTERN){
         InitialExpMs += (m_PrintSettings.InitialDelay)*1000;
       }
       QTimer::singleShot(InitialExpMs, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
   }
   else{
     float ExposureTime = 0;
-    switch (m_PrintControls.ExposureType){
-      case EXPOSURE_NORM:
-        QTimer::singleShot(m_PrintSettings.ExposureTime/1000, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
-        PrintToTerminal("Exposure: " + QString::number(m_PrintSettings.ExposureTime/1000) + " ms");
-        break;
-      case EXPOSURE_PUMP:
-        ExposureTime = m_PrintSettings.ExposureTime/1000;   //Convert from us to ms
-        QTimer::singleShot(ExposureTime/1000, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
-        PrintToTerminal("Exposure: " + QString::number(ExposureTime/1000) + " ms");
-        PrintToTerminal("Preparing for pumping");
-        break;
-      case EXPOSURE_PS:
-        if (m_PrintControls.layerCount < m_PrintScript.ExposureScriptList.count()){
-            ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble();
-        }
-        else{
-            ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintScript.ExposureScriptList.count()-1).toDouble();
-        }
+    // if print script is enabled, select exposure time from script
+    if (m_PrintControls.ExposureType == EXPOSURE_PS || m_PrintControls.ExposureType == EXPOSURE_PS_PUMP){
+        setScriptParam(ExposureTime, m_PrintScript.ExposureScriptList, m_PrintControls.layerCount);
+    }
+    else{   // else grab from settings struct
+        ExposureTime = m_PrintSettings.ExposureTime / 1000; // convert from us to ms
+    }
+
+    // if pumping is not enabled, go to exposure time slot
+    if (m_PrintControls.ExposureType == EXPOSURE_NORM || m_PrintControls.ExposureType == EXPOSURE_PS){
         QTimer::singleShot(ExposureTime, Qt::PreciseTimer, this, SLOT(ExposureTimeSlot()));
         PrintToTerminal("Exposure: " + QString::number(ExposureTime) + " ms");
-        break;
-      case EXPOSURE_PS_PUMP:
-        if (m_PrintControls.layerCount < m_PrintScript.ExposureScriptList.count()){
-            ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintControls.layerCount).toDouble();
-        }
-        else{
-            ExposureTime = m_PrintScript.ExposureScriptList.at(m_PrintScript.ExposureScriptList.count()-1).toDouble();
-        }
+    }
+    else{   // if pumping is enabled, go to pumping slot
         QTimer::singleShot(ExposureTime, Qt::PreciseTimer, this, SLOT(pumpingSlot()));
-        PrintToTerminal("Exposure: " + QString::number(ExposureTime) + " ms, preparing for pumping");
-        break;
-      default:
-        break;
+        PrintToTerminal("Exposure: " + QString::number(ExposureTime) + " ms, prep for pumping");
     }
   }
 }
@@ -442,34 +397,39 @@ void MainWindow::SetExposureTimer()
  */
 void MainWindow::SetDarkTimer()
 {
-    double DarkTimeSelect = m_PrintSettings.DarkTime/1000;
+    float DarkTimeSelect = m_PrintSettings.DarkTime/1000;
     if (m_PrintSettings.MotionMode == STEPPED){
+        // if using a print script
         if (m_PrintScript.PrintScript == ON){
-            if(m_PrintControls.layerCount < m_PrintScript.DarkTimeScriptList.size()){
-                DarkTimeSelect = m_PrintScript.DarkTimeScriptList.at(m_PrintControls.layerCount).toDouble();
-            }
-            else{
-                DarkTimeSelect = m_PrintScript.DarkTimeScriptList.at(m_PrintScript.DarkTimeScriptList.count()-2).toDouble();
-            }
+            setScriptParam(DarkTimeSelect, m_PrintScript.DarkTimeScriptList, m_PrintControls.layerCount);
         }
-        if(m_PrintSettings.ProjectionMode == VIDEO && DarkTimeSelect > 0.5 * LastUploadTime){
-            QTimer::singleShot(DarkTimeSelect-LastUploadTime, Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
-        }
-        else{
-            QTimer::singleShot(DarkTimeSelect,  Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
-        }
-        PrintToTerminal("Dark Time: " + QString::number(DarkTimeSelect) + " ms");
 
+        // accounts for frame update time
+        if(m_PrintSettings.ProjectionMode == VIDEO && DarkTimeSelect > 0.5 * LastUploadTime){
+            DarkTimeSelect -= LastUploadTime;
+        }
+        QTimer::singleShot(DarkTimeSelect,  Qt::PreciseTimer, this, SLOT(DarkTimeSlot()));
+        PrintToTerminal("Dark Time: " + QString::number(DarkTimeSelect) + " ms");
     }
-    else{
+    else{   // continuous motion
         if (m_PrintControls.inMotion == false){
             Stage.StageAbsoluteMove(m_PrintControls.PrintEnd, m_PrintSettings.StageType);
         }
         if (m_PrintControls.layerCount == 0 && m_PrintScript.PrintScript == OFF){
             LCR_SetLedCurrents(0, 0, m_PrintSettings.UVIntensity);
         }
-
         PrintProcess();
+    }
+}
+
+// Helper function to grab a parameter from a script
+void MainWindow::setScriptParam(float &param, QStringList script, int layerCount)
+{
+    if (m_PrintControls.layerCount < script.size()){
+        param = script.at(layerCount).toDouble();
+    }
+    else{   // TODO: verify if the -2 was required for dark time
+        param = script.at(layerCount - 1).toDouble();
     }
 }
 
@@ -513,7 +473,7 @@ void MainWindow::on_VideoCheckbox_clicked()
            on_POTFcheckbox_clicked();
         }
         else{
-            initImagePopout(); // Open projection window
+           initImagePopout(); // Open projection window
         }
     }
 }
@@ -552,16 +512,17 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
 /*!
  * \brief MainWindow::Check4VideoLock
  * Validates that the video source is locked, this is needed for Video Pattern Mode
- */
+ */ //TODO: check this function
 void MainWindow::Check4VideoLock()
 {
-    QMessageBox VlockPopup; //prep video popout
-    static uint8_t repeatCount = 0; //start repeatCount at 0
-    unsigned char HWStatus, SysStatus, MainStatus; //Prep variables for LCR_GetStatus
+    QMessageBox VlockPopup;                         // prep video popout
+    static uint8_t repeatCount = 0;                 // start repeatCount at 0
+    unsigned char HWStatus, SysStatus, MainStatus;  // prep variables for LCR_GetStatus
 
     //If first attempt
-    if (repeatCount == 0)
+    if (repeatCount == 0){
         PrintToTerminal("Attempting to Lock to Video Source");
+    }
 
     //if attempt to get status is successful
     if (LCR_GetStatus(&HWStatus, &SysStatus, &MainStatus) == 0)
@@ -619,6 +580,7 @@ void MainWindow::Check4VideoLock()
  */
 void MainWindow::initImagePopout()
 {
+    // Make sure that an external screen is connected
     if (QGuiApplication::screens().count() > 1){
         ImagePopoutUI = new imagepopout;    // prep new image popout window
         ImagePopoutUI->show();              // Display new window
@@ -667,8 +629,8 @@ void MainWindow::on_DICLIPSelect_clicked()
  */
 void MainWindow::on_CLIPSelect_clicked()
 {
-    m_PrintSettings.StageType = STAGE_SMC; //Set stage to SMC100CC for the 30 um CLIP printer
-    m_PrintSettings.PrinterType = CLIP30UM; //Update printer type
+    m_PrintSettings.StageType = STAGE_SMC;  // Set stage to SMC100CC for the 30 um CLIP printer
+    m_PrintSettings.PrinterType = CLIP30UM; // Update printer type
 
     //Disable the injection parameters
     ui->SettingsWidget->EnableParameter(CONTINUOUS_INJECTION, OFF);

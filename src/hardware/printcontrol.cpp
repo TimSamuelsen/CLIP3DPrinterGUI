@@ -276,7 +276,7 @@ void printcontrol::StagePumpingHandler(int layerCount, PrintSettings m_PrintSett
         if (layerCount < m_PrintScript.PumpHeightScriptList.size()){
             double PumpHeight = m_PrintScript.PumpHeightScriptList.at(layerCount).toDouble();
             pc_Stage.StageRelativeMove(-PumpHeight, m_PrintSettings.StageType);
-            emit ControlPrintSignal("Pumping " + QString::number(PumpHeight*1000) +" um");
+            emit ControlPrintSignal("Pumping " + QString::number(PumpHeight) +" um");
         }
     }
     // If not in print script mode use static pumping parameter

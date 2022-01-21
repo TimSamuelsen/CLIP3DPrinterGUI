@@ -2,8 +2,8 @@
 #include <QTimer>
 
 static float FeedRate = 60;
-static bool StagePrep1 = false;
-static bool StagePrep2 = false;
+//static bool StagePrep1 = false;
+//static bool StagePrep2 = false;
 static PrintSettings s_PrintSettings;
 
 /*!
@@ -17,8 +17,7 @@ int StageCommands::StageInit(const char* COMPort, Stage_t StageType)
 {
     int returnVal = 0;
     if(StageType == STAGE_SMC){
-        SMC.SMC100CInit(COMPort); //Call SMC init function to connect to stage
-        returnVal = 1; //Set returnVal to 1 for successful connection
+        returnVal = SMC.SMC100CInit(COMPort);
     }
     else if (StageType == STAGE_GCODE){
         if(StageSerial.openDevice(COMPort,115200) == 1){ //If serial connection was successful
@@ -45,6 +44,7 @@ int StageCommands::StageInit(const char* COMPort, Stage_t StageType)
             if (StepperReturn < 0) //if command failed
                 returnVal = -1; //return -1 for failed command
             Sleep(500);
+            // TODO: can this be replaced by flushing the receiver??
             for (uint8_t i = 0; i < 25; i++){
                 static char receivedString[] = "ThisIsMyTest";
                 char finalChar = '\n';
@@ -96,7 +96,7 @@ int StageCommands::StageHome(Stage_t StageType)
         returnVal = SMC.Home();
     }
     else if (StageType == STAGE_GCODE){
-        //Is there a use for a stage home command for Gcode stage?
+        //TODO: is there a use for a stage home command for Gcode stage?
         returnVal = 1;
     }
     return returnVal;
@@ -109,15 +109,13 @@ int StageCommands::StageHome(Stage_t StageType)
  */
 int StageCommands::StageStop(Stage_t StageType)
 {
-    int returnVal = 0; //default 0 is an error
+    int returnVal = 1; //default 1 is success
     if(StageType == STAGE_SMC){
         SMC.StopMotion();
     }
     else if (StageType == STAGE_GCODE){
         QString STOP = "M0\r";
-        int STOPreturn = StageSerial.writeString(STOP.toLatin1().data());
-        if (STOPreturn)
-            returnVal = -1;
+        returnVal = StageSerial.writeString(STOP.toLatin1().data());
     }
     return returnVal;
 }
@@ -158,7 +156,7 @@ int StageCommands::SetStageAcceleration(float AccelerationToSet, Stage_t StageTy
         /*QString AccelCommand = "M201 Z" + QString::number(AccelerationToSet) + "\r\n";
         int AccelReturn = StageSerial.writeString(AccelCommand.toLatin1().data());
         if (AccelReturn < 0)
-            returnVal = -1;*/
+            returnVal = -1;*/ // TODO: Check if accel works
     }
     return returnVal;
 }
@@ -176,7 +174,7 @@ int StageCommands::SetStagePositiveLimit(float PositiveLimit, Stage_t StageType)
         SMC.SetPositiveLimit(PositiveLimit);
     }
     else if (StageType == STAGE_GCODE){
-
+        // not applicable
     }
     return returnVal;
 }
@@ -194,7 +192,7 @@ int StageCommands::SetStageNegativeLimit(float NegativeLimit, Stage_t StageType)
         SMC.SetNegativeLimit(NegativeLimit);
     }
     else if (StageType == STAGE_GCODE){
-
+        // not applicable
     }
     return returnVal;
 }
@@ -223,9 +221,7 @@ int StageCommands::StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageTy
     else if (StageType == STAGE_GCODE){
         //Set stage to do absolute move
         QString AbsMoveCommand = "G92\r\nG1 Z" + QString::number(AbsoluteMovePosition) + " F" + QString::number(FeedRate) + "\r\n";
-        int AbsMoveReturn = StageSerial.writeString(AbsMoveCommand.toLatin1().data());
-        if (AbsMoveReturn < 0) //if command failed
-            returnVal = -1; //return -1 for failed command
+        returnVal = StageSerial.writeString(AbsMoveCommand.toLatin1().data());
     }
     return returnVal;
 }
@@ -245,9 +241,7 @@ int StageCommands::StageRelativeMove(float RelativeMoveDistance, Stage_t StageTy
     }
     else if (StageType == STAGE_GCODE){
         QString RelMoveCommand = "G91\r\nG1 Z" + QString::number(-RelativeMoveDistance) + " F" + QString::number(FeedRate) + "\r\n";
-        int RelMoveReturn = StageSerial.writeString(RelMoveCommand.toLatin1().data());
-        if (RelMoveReturn < 0)
-            returnVal = 1;
+        returnVal = StageSerial.writeString(RelMoveCommand.toLatin1().data());
     }
     return returnVal;
 }
@@ -272,12 +266,10 @@ QString StageCommands::StageGetPosition(Stage_t StageType)
     else if (StageType == STAGE_GCODE){ //Test if
         QString GetPositionCommand = "M114 R\r\n";
         StageSerial.flushReceiver(); //Flush receiver to get rid of readout we don't need
-        //Sleep(5); // Testing removal of delay
         StageSerial.writeString(GetPositionCommand.toLatin1().data());
         static char receivedString[] = "ThisIsMyPositionTest";
         char finalChar = '\n';
         uint maxNbBytes = 100;//make sure to validate this
-        //Sleep(10);
         StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
         printf(receivedString);
         QString CurrentPosition = QString::fromUtf8(receivedString);
@@ -329,22 +321,11 @@ void StageCommands::initStageSlot()
         double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
         emit StageGetPositionSignal(QString::number(CurrentPosition));
         if (CurrentPosition < (s_PrintSettings.StartingPosition - 3.2)){
-            if (StagePrep1 == false){
-                SetStageVelocity(3, s_PrintSettings.StageType);
-                Sleep(20);
-                StageAbsoluteMove(s_PrintSettings.StartingPosition-3, s_PrintSettings.StageType);
-                Sleep(20);
-                StagePrep1 = true;
-                emit StagePrintSignal("Performing Rough Stage Move to: " + QString::number(s_PrintSettings.StartingPosition-3));
-                //Main.PrintToTerminal("Performing Rough Stage Movement");
-            }
-            if(MovementAttempts < 30){
-                QTimer::singleShot(1000, this, SLOT(initStageSlot()));
-                MovementAttempts++;
-            }
-            else{
-                emit StagePrintSignal("Could not move stage to starting position");
-            }
+            SetStageVelocity(3, s_PrintSettings.StageType);
+            Sleep(20);
+            StageAbsoluteMove(s_PrintSettings.StartingPosition-3, s_PrintSettings.StageType);
+            emit StagePrintSignal("Performing Rough Stage Move to: " + QString::number(s_PrintSettings.StartingPosition-3));
+            repeatRoughSlot();
         }
         else{
             fineMovement();
@@ -366,21 +347,51 @@ void StageCommands::fineMovement()
 {
     double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
     emit StageGetPositionSignal(QString::number(CurrentPosition));
+    MovementAttempts = 0;
     //If stage has not reached it's final starting position
     if (CurrentPosition > s_PrintSettings.StartingPosition-0.05 && CurrentPosition < s_PrintSettings.StartingPosition+0.05){
         StageAbsoluteMove(s_PrintSettings.StartingPosition, s_PrintSettings.StageType);
         verifyStageParams(s_PrintSettings);
     }
     else{
-        if (StagePrep2 == false){
-            Sleep(20);
-            SetStageVelocity(0.3, s_PrintSettings.StageType);
-            Sleep(20);
-            StageAbsoluteMove(s_PrintSettings.StartingPosition, s_PrintSettings.StageType);
-            emit StagePrintSignal("Fine Stage Movement to: " + QString::number(s_PrintSettings.StartingPosition));
-            StagePrep2 = true;
+        SetStageVelocity(0.3, s_PrintSettings.StageType);
+        Sleep(20);
+        StageAbsoluteMove(s_PrintSettings.StartingPosition, s_PrintSettings.StageType);
+        emit StagePrintSignal("Fine Stage Movement to: " + QString::number(s_PrintSettings.StartingPosition));
+        repeatFineSlot();
+    }
+}
+
+void StageCommands::repeatRoughSlot(){
+    double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
+    if (CurrentPosition > s_PrintSettings.StartingPosition-3.2 && CurrentPosition < s_PrintSettings.StartingPosition+3.2){
+        StageAbsoluteMove(s_PrintSettings.StartingPosition, s_PrintSettings.StageType);
+        verifyStageParams(s_PrintSettings);
+    }
+    else{
+        if (MovementAttempts < 30){
+            QTimer::singleShot(1000, this, SLOT(repeatRoughSlot));
         }
-        QTimer::singleShot(1000, this, SLOT(fineMovement()));
+        else{
+            emit StagePrintSignal("Could not move stage to starting position");
+        }
+    }
+
+}
+
+void StageCommands::repeatFineSlot(){
+    double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
+    if (CurrentPosition > s_PrintSettings.StartingPosition-0.05 && CurrentPosition < s_PrintSettings.StartingPosition+0.05){
+        StageAbsoluteMove(s_PrintSettings.StartingPosition, s_PrintSettings.StageType);
+        verifyStageParams(s_PrintSettings);
+    }
+    else{
+        if (MovementAttempts < 30){
+            QTimer::singleShot(1000, this, SLOT(repeatFineSlot));
+        }
+        else{
+            emit StagePrintSignal("Could not move stage to starting position");
+        }
     }
 }
 
@@ -437,7 +448,5 @@ void StageCommands::StageAbort(PrintSettings si_PrintSettings)
 */
 void StageCommands::resetStageInit()
 {
-    StagePrep1 = false;
-    StagePrep2 = false;
     MovementAttempts = 0;
 }

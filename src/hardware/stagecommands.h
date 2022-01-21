@@ -72,8 +72,10 @@ private:
 
 private slots:
     void initStageSlot();
-
     void fineMovement();
+    void repeatRoughSlot();
+    void repeatFineSlot();
+
 protected:
     StageCommands() {
 

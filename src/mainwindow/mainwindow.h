@@ -127,6 +127,6 @@ private:
     void initConnections();
     bool initResetConfirmation();
 
-    void initPollTimer();
+    void setScriptParam(float &param, QStringList script, int layerCount);
 };
 #endif // MAINWINDOW_H

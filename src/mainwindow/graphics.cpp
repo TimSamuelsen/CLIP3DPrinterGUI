@@ -1,6 +1,9 @@
 #include "graphics.h"
 #include "ui_graphics.h"
 
+QCPItemText *timeLabel;
+QCPItemText *layerLabel;
+
 graphics::graphics(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::graphics)
@@ -45,6 +48,7 @@ double graphics::calcPrintTime(PrintSettings m_PrintSettings, PrintControls m_Pr
     return printTime;
 }
 
+// TODO: review this to make it functional again
 int graphics::calcReuploads(PrintScripts m_PrintScript)
 {
     int nReuploads = 1;     // default to 1
@@ -80,6 +84,8 @@ void graphics::initPlot(PrintControls m_PrintControls, PrintSettings m_PrintSett
     ui->LivePlot->graph(0)->data()->clear();
     ui->LivePlot->xAxis->setLabel("Time (s)");
     ui->LivePlot->yAxis->setLabel("Position (mm)");
+    ui->LivePlot->setInteraction(QCP::iRangeDrag, true);
+    ui->LivePlot->setInteraction(QCP::iRangeZoom, true);
 
     double TotalPrintTime = calcPrintTime(m_PrintSettings, m_PrintControls, m_PrintScript);
     ui->LivePlot->xAxis->setRange(0, TotalPrintTime*1.1);
@@ -95,10 +101,12 @@ void graphics::initPlot(PrintControls m_PrintControls, PrintSettings m_PrintSett
         upper = 1.1 * (m_PrintControls.nSlice * m_PrintSettings.LayerThickness);
         lower = 0;
     }
+
     ui->LivePlot->yAxis->setRange(lower, upper);
     ui->LivePlot->replot();
 }
 
+// TODO: change this to edit labels instead of creating new ones??
 void graphics::updatePlot(PrintControls m_PrintControls, PrintSettings m_PrintSettings,
                           PrintScripts m_PrintScript)
 {
@@ -109,6 +117,7 @@ void graphics::updatePlot(PrintControls m_PrintControls, PrintSettings m_PrintSe
     ui->LivePlot->graph(0)->setData(qv_x, qv_y);
     ui->LivePlot->clearItems();
 
+
     // Update Layer label
     QString Layer = " Layer: " + QString::number(m_PrintControls.layerCount) + "/" + QString::number(m_PrintControls.nSlice);
     QCPItemText *textLabel1 = new QCPItemText(ui->LivePlot);
@@ -117,7 +126,7 @@ void graphics::updatePlot(PrintControls m_PrintControls, PrintSettings m_PrintSe
     textLabel1->position->setCoords(0.98, 0.07); // place position at center/top of axis rect
     textLabel1->setText(Layer);
     textLabel1->setFont(QFont(font().family(), 12)); // make font a bit larger
-    textLabel1->setPen(QPen(Qt::black)); // show black border around text
+    textLabel1->setPen(QPen(Qt::black)); // show black border around text */
 
     // Update remaining time variable
     if (m_PrintControls.layerCount == 1){
@@ -145,7 +154,6 @@ void graphics::updatePlot(PrintControls m_PrintControls, PrintSettings m_PrintSe
         RemainingPrintTime = 0;
     }
     QString RemainingTime = "Est. Remaining Time: " + QString::number(RemainingPrintTime) + "s";
-
     QCPItemText *textLabel2 = new QCPItemText(ui->LivePlot);
     textLabel2->setPositionAlignment(Qt::AlignTop|Qt::AlignRight);
     textLabel2->position->setType(QCPItemPosition::ptAxisRectRatio);
@@ -284,6 +292,8 @@ void graphics::on_PrintScriptTable_cellPressed(int row, int column)
     }
 }
 
+// This code is for deprecated functionality, however in case of future need for these features they
+// are stored here temporarily
 #if 0
 
 /*!
