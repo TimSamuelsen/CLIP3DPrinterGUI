@@ -441,15 +441,16 @@ void MainWindow::setScriptParam(float &param, QStringList script, int layerCount
 void MainWindow::on_POTFcheckbox_clicked()
 {
     //Make sure that the checkbox is checked before proceeding
-    if (ui->POTFcheckbox->isChecked())
-    {
-        ui->VP_HDMIcheckbox->setChecked(false);     //Uncheck the Video Pattern checkbox
+    if (ui->POTFcheckbox->isChecked()){
+        // Disable other projection modes
+        ui->VP_HDMIcheckbox->setChecked(false);
         ui->VideoCheckbox->setChecked(false);
 
-        ui->SettingsWidget->EnableParameter(MAX_IMAGE, ON);             //Enable the max image upload parameter
+        // Enable/disable relevant parameters
+        ui->SettingsWidget->EnableParameter(MAX_IMAGE, ON);
         ui->SettingsWidget->EnableParameter(VP_RESYNC, OFF);
         ui->SettingsWidget->EnableParameter(INITIAL_DELAY, OFF);
-        //EnableParameter(DISPLAY_CABLE, OFF);
+
         m_PrintSettings.ProjectionMode = POTF;      // Set projection mode to POTF
         DLP.setIT6535Mode(0);                       // Turn off HDMI connection
         LCR_SetMode(PTN_MODE_OTF);                  // Set light engine to POTF mode
@@ -459,17 +460,21 @@ void MainWindow::on_POTFcheckbox_clicked()
 void MainWindow::on_VideoCheckbox_clicked()
 {
     if (ui->VideoCheckbox->isChecked()){
+        // Disable other projection modes
         ui->POTFcheckbox->setChecked(false);
         ui->VP_HDMIcheckbox->setChecked(false);
+
+        // Enable/disable relevant parameters
         ui->SettingsWidget->EnableParameter(MAX_IMAGE, OFF);
         ui->SettingsWidget->EnableParameter(VP_RESYNC, OFF);
-        //EnableParameter(DISPLAY_CABLE, ON);
+
         int DisplayCable = ui->DisplayCableList->currentIndex();
-        DLP.setIT6535Mode(DisplayCable); // Set IT6535 reciever to correct display cable
+        DLP.setIT6535Mode(DisplayCable);    // Set IT6535 reciever to correct display cable
         m_PrintSettings.ProjectionMode = VIDEO;
-        if(LCR_SetMode(PTN_MODE_DISABLE) < 0){
+
+        if(LCR_SetMode(PTN_MODE_DISABLE) < 0){      // light engine connection failed
            PrintToTerminal("Unable to switch to video mode");
-           ui->POTFcheckbox->setChecked(true);
+           ui->POTFcheckbox->setChecked(true);      // default back to POTF mode
            on_POTFcheckbox_clicked();
         }
         else{
@@ -486,8 +491,11 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
 {
     // Make sure that the checkbox is checked before proceeding
     if (ui->VP_HDMIcheckbox->isChecked()){
+        // Disable other porject
         ui->VideoCheckbox->setChecked(false);
         ui->POTFcheckbox->setChecked(false); // Uncheck the Video Pattern checkbox
+
+        // Enable/disable relevant parameters
         ui->SettingsWidget->EnableParameter(MAX_IMAGE, OFF);
         ui->SettingsWidget->EnableParameter(VP_RESYNC, ON);
         ui->SettingsWidget->EnableParameter(INITIAL_DELAY, ON);
@@ -495,17 +503,18 @@ void MainWindow::on_VP_HDMIcheckbox_clicked()
         m_PrintSettings.ProjectionMode = VIDEOPATTERN; //Set projection mode to video pattern
 
         // Set video display off
-        /*if (LCR_SetMode(PTN_MODE_DISABLE) < 0){
+        if (LCR_SetMode(PTN_MODE_DISABLE) < 0){
             PrintToTerminal("Unable to switch to video mode");
             ui->POTFcheckbox->setChecked(true);
             on_POTFcheckbox_clicked();
-            // add a close image popout
+            // TODO: this needs validation...
+            ImagePopoutUI->close();
         }
-        else{*/
+        else{
             initImagePopout(); // Open projection window
             DLP.setIT6535Mode(1); //Set IT6535 reciever to HDMI input
             Check4VideoLock();
-        //}
+        }
     }
 }
 
@@ -671,8 +680,9 @@ void MainWindow::on_LightEngineConnectButton_clicked()
         PrintToTerminal("Light Engine Connected");
         ui->LightEngineIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
         ui->LightEngineIndicator->setText("Connected");
+
+        // Check for light engine errors
         uint Code;
-        //Their GUI does not call reader Errorcode
         if (LCR_ReadErrorCode(&Code) >= 0){
             PrintToTerminal("Last Error Code: " + QString::number(Code));
         }
@@ -694,7 +704,7 @@ void MainWindow::on_LightEngineConnectButton_clicked()
  */
 void MainWindow::on_StageConnectButton_clicked()
 {
-    Stage.StageClose(m_PrintSettings.StageType);
+    Stage.StageClose(m_PrintSettings.StageType);            // close any prev connect
     QString COMSelect = ui->COMPortSelect->currentText();
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
