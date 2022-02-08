@@ -370,7 +370,7 @@ void StageCommands::repeatRoughSlot(){
     }
     else{
         if (MovementAttempts < 30){
-            QTimer::singleShot(1000, this, SLOT(repeatRoughSlot));
+            QTimer::singleShot(1000, this, SLOT(repeatRoughSlot()));
         }
         else{
             emit StagePrintSignal("Could not move stage to starting position");

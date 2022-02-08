@@ -9,6 +9,7 @@
 #include <QTime>
 #include <QTimer>
 #include <QProgressDialog>
+#include <windows.h>
 
 /*!
  * \brief DLP9000::InitProjector
@@ -310,6 +311,7 @@ void DLP9000::updateLUT(int ProjectionMode)
     int totalSplashImages = 0;
     int ret;
     char errStr[255];
+    bool errRepeatFlag = true;
 
     if(m_elements.size() <= 0)
     {
@@ -341,8 +343,18 @@ void DLP9000::updateLUT(int ProjectionMode)
 
     if (LCR_SendPatLut() < 0)
     {
-        emit DLPError("Sending pattern LUT failed!");
-        //printf("Sending pattern LUT failed");
+        // Attempt to recover from error
+        if (errRepeatFlag){
+            errRepeatFlag = false;
+            // dump pattern data
+            patternDataDump();
+            Sleep(500);
+            updateLUT(ProjectionMode);
+        }
+        else{
+            patternDataDump();
+            emit DLPError("Sending pattern LUT failed!");
+        }
         return;
     }
 
@@ -559,4 +571,15 @@ int DLP9000::PatternUpload(QStringList ImageList, PrintControls dlp_PrintControl
 void DLP9000::PatternDisplay(int DisplaySetting)
 {
     LCR_PatternDisplay(DisplaySetting);
+}
+
+void DLP9000::patternDataDump()
+{
+    for(int i = 0; i < m_elements.size(); i++){
+        qDebug("Name: %s \nIndex: %d, Exposure: %d, Dark: %d, Bits: %d, SplashIndex: %d, "
+               "SplashBitPos: %d, TrigIn: %d, TrigOut2: %d, Clear: %d, \n",
+               m_elements[i].name.toLatin1().constData(), i, m_elements[i].exposure, m_elements[i].darkPeriod,
+               m_elements[i].bits, m_elements[i].splashImageIndex, m_elements[i].splashImageBitPos,
+               m_elements[i].trigIn, m_elements[i].trigOut2, m_elements[i].clear);
+    }
 }

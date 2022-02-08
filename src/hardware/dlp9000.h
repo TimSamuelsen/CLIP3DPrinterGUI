@@ -63,6 +63,7 @@ private:
     int uploadPatternToEVM(bool master, int splashImageCount, int splash_size, uint8_t* splash_block);
     int calculateSplashImageDetails(int *totalSplashImages, bool firmware, int ProjectionMode);
     void updateLUT(int ProjectionMode);
+    void patternDataDump();
 
 protected:
     DLP9000() {

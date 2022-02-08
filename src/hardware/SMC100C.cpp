@@ -72,7 +72,7 @@ const SMC100C::CommandStruct SMC100C::CommandLibrary[] =
     {CommandType::StageIdentifier,"ID",CommandParameterType::Float,CommandGetSetType::GetSet},
     {CommandType::LeaveJoggingState,"JD",CommandParameterType::None,CommandGetSetType::None},
     {CommandType::KeypadEnable,"JM",CommandParameterType::Int,CommandGetSetType::GetSet},
-    {CommandType::JerkTime,"JM",CommandParameterType::Float,CommandGetSetType::GetSet},
+    {CommandType::JerkTime,"JR",CommandParameterType::Float,CommandGetSetType::GetSet},
     {CommandType::DerivativeGain,"KD",CommandParameterType::Float,CommandGetSetType::GetSet},
     {CommandType::IntegralGain,"KI",CommandParameterType::Float,CommandGetSetType::GetSet},
     {CommandType::ProportionalGain,"KP",CommandParameterType::Float,CommandGetSetType::GetSet},

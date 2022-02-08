@@ -234,21 +234,27 @@ int LCR_SetOutputBufferIndex(int index)
 
 int LCR_Write(BOOL ackRequired)
 {
-    if (!ackRequired)
+    if (!ackRequired){
+        printf("ERROR LCR_Write: ackRequired = false\n");
         return USB_Write(OutputBuffer);
+    }
 
     int ret = USB_Write(OutputBuffer);
     if (ret > 0)
     {
-        if(USB_Read(InputBuffer) <= 0)
+        if(USB_Read(InputBuffer) <= 0){
+            printf("ERROR LCR_Write: inputBuffer\n");
             return -2;
-
+        }
         hidMessageStruct *pMsg = (hidMessageStruct *)InputBuffer;
-        if (pMsg->head.flags.nack)
+        if (pMsg->head.flags.nack){
+            printf("ERROR LCR_Write: pMsg->head.flags.nack\n");
             return -2;
+        }
 
         return ret;
     }
+    printf("ERROR LCR_Write: ret <= 0\n");
     return -1;
 }
 
