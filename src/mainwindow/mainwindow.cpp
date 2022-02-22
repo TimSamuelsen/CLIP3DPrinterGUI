@@ -656,8 +656,7 @@ void MainWindow::on_CLIPSelect_clicked()
     ui->SettingsWidget->EnableParameter(MIN_END, ON);
 }
 
-/*********************************************File Handling*********************************************/
-
+/*************************************File Handling************************************************/
 /*!
  * \brief MainWindow::on_LogFileBrowse_clicked
  * Select the directory to store log files
@@ -668,7 +667,7 @@ void MainWindow::on_LogFileBrowse_clicked()
     ui->LogFileLocation->setText(LogFileDestination);
 }
 
-/*******************************************Peripheral Connections*********************************************/
+/**************************************Peripheral Connections**************************************/
 /*!
  * \brief MainWindow::on_LightEngineConnectButton_clicked
  * Connect to light engine, gets last error code to validate that
@@ -708,6 +707,7 @@ void MainWindow::on_StageConnectButton_clicked()
     QString COMSelect = ui->COMPortSelect->currentText();
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
+    // if successful connection and home
     if (Stage.StageInit(COM, m_PrintSettings.StageType) == true
         && Stage.StageHome(m_PrintSettings.StageType) == true){
         ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0);border: 1px solid black;");
@@ -803,8 +803,7 @@ void MainWindow::saveText()
                         + LogTime + ".txt";
      PrintToTerminal(LogTitle);
      QFile file(LogTitle);
-     if (file.open(QIODevice::WriteOnly | QFile::Text))
-     {
+     if (file.open(QIODevice::WriteOnly | QFile::Text)){
          QTextStream out(&file);
          out << Log;
          file.flush();
