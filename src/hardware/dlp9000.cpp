@@ -311,7 +311,7 @@ void DLP9000::updateLUT(int ProjectionMode)
     int totalSplashImages = 0;
     int ret;
     char errStr[255];
-    bool errRepeatFlag = true;
+    static bool errRepeatFlag = true;
 
     if(m_elements.size() <= 0)
     {
@@ -344,7 +344,7 @@ void DLP9000::updateLUT(int ProjectionMode)
     if (LCR_SendPatLut() < 0)
     {
         // Attempt to recover from error
-        if (errRepeatFlag){
+        if (errRepeatFlag == true){
             errRepeatFlag = false;
             // dump pattern data
             patternDataDump();

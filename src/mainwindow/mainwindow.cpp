@@ -263,7 +263,7 @@ void MainWindow::PrintProcess()
             PrintToTerminal("Exiting Reupload: " + QTime::currentTime().toString("hh.mm.ss.zzz"));
         }
         if(m_PrintSettings.ProjectionMode == VIDEO
-           && m_PrintControls.layerCount < ui->SettingsWidget->FileListCount()){
+           && (int)m_PrintControls.layerCount < ui->SettingsWidget->FileListCount()){
             QTime StartTime = QTime::currentTime();
             QPixmap img(ui->SettingsWidget->FileListItem(m_PrintControls.layerCount));
             ImagePopoutUI->showImage(img);
@@ -425,7 +425,7 @@ void MainWindow::SetDarkTimer()
 // Helper function to grab a parameter from a script
 void MainWindow::setScriptParam(float &param, QStringList script, int layerCount)
 {
-    if (m_PrintControls.layerCount < script.size()){
+    if ((int)m_PrintControls.layerCount < script.size()){
         param = script.at(layerCount).toDouble();
     }
     else{   // TODO: verify if the -2 was required for dark time
@@ -762,13 +762,13 @@ void MainWindow::PumpConnected()
 }
 /************************************Print Parameters**********************************************/
 
-/*******************************************Stage Parameters********************************************/
+/**************************************Stage Parameters********************************************/
 
-/******************************************Light Engine Parameters********************************************/
+/************************************Light Engine Parameters***************************************/
 
-/*******************************************Pump Parameters********************************************/
+/***************************************Pump Parameters********************************************/
 
-/*******************************************Helper Functions********************************************/
+/**************************************Helper Functions********************************************/
 /**
  * @brief MainWindow::showError
  * helper function to show the appropriate API Error message
@@ -777,10 +777,8 @@ void MainWindow::PumpConnected()
 void MainWindow::showError(QString errMsg)
 {
     PrintToTerminal("ERROR: " + errMsg);
-
     QMessageBox errMsgBox;
     char errStr[128];
-
     if(LCR_ReadErrorString(errStr)<0)
         errMsgBox.setText("Error: " + errMsg);
     else
@@ -915,8 +913,7 @@ bool MainWindow::initConfirmationScreen()
     else{
         DetailedText += "Auto Mode Not Active\n";
     }
-    if (m_PrintScript.PrintScript == 1)
-    {
+    if (m_PrintScript.PrintScript == ON){
         DetailedText += "Print Script: enabled\n";
         DetailedText += "Exposure Time: print script\n";
         DetailedText += "UV Intensity: print script\n";
@@ -934,8 +931,7 @@ bool MainWindow::initConfirmationScreen()
             DetailedText += "Injection Rate: print script\n";
         }
     }
-    else
-    {
+    else{
         DetailedText += "Print Script: disabled\n";
         DetailedText += "Exposure Time: " + QString::number(m_PrintSettings.ExposureTime/1000) + " ms\n";
         DetailedText += "UV Intensity: " + QString::number(m_PrintSettings.UVIntensity) + "\n";
@@ -955,7 +951,6 @@ bool MainWindow::initConfirmationScreen()
     }
 
     confScreen.setDetailedText(DetailedText);
-
     confScreen.exec();
 
     if (confScreen.clickedButton() == cancelButton){
@@ -977,15 +972,14 @@ bool MainWindow::initConfirmationScreen()
 /**
  * @brief MainWindow::ValidateSettings
  * @return bool: true if settings are valid, false otherwise
- *
  */
 bool MainWindow::ValidateSettings(void)
 {
     if (m_PrintSettings.InitialExposure < 0 || m_PrintSettings.InitialExposure > 400){
         showError("Invalid initial exposure time");
         PrintToTerminal("InvalidSliceThickness");
+        return false;
     }
-
     //Validate m_PrintSettings.LayerThickness
     if (m_PrintSettings.LayerThickness <= 0){
         showError("Invalid Slice Thickness");
@@ -1072,25 +1066,20 @@ void MainWindow::saveSettings()
  */
 void MainWindow::loadSettings()
 {
-    if (loadSettingsFlag == false) //ensures that this only runs once
-    {
-        QSettings settings;
+    if (loadSettingsFlag == false){ //ensures that this only runs once
+        loadSettingsFlag = true;
 
+        QSettings settings;
         PrintSpeed = settings.value("PrintSpeed", 40).toDouble();
         PrintHeight = settings.value("PrintHeight", 5000).toDouble();
-
-        ui->DisplayCableList->setCurrentIndex(settings.value("DisplayCableIndex").toInt());
-
         LogFileDestination = settings.value("LogFileDestination", "C://").toString();
         ImageFileDirectory = settings.value("ImageFileDirectory", "C://").toString();
         LogName = settings.value("LogName", "CLIPGUITEST").toString();
 
         m_PrintSettings.PrinterType = settings.value("PrinterType", CLIP30UM).toDouble();
-
+        ui->DisplayCableList->setCurrentIndex(settings.value("DisplayCableIndex").toInt());
         ui->COMPortSelect->setCurrentIndex(settings.value("StageCOM", 0).toInt());
         ui->COMPortSelectPump->setCurrentIndex(settings.value("PumpCOM", 0).toInt());
-        loadSettingsFlag = true;
-
         ui->SettingsWidget->loadPrintSettings();
     }
 }
@@ -1101,7 +1090,6 @@ void MainWindow::loadSettings()
  */
 void MainWindow::initSettings()
 {
-
     ui->LogFileLocation->setText(LogFileDestination);
     ui->LogName->setText(LogName);
 
@@ -1113,9 +1101,8 @@ void MainWindow::initSettings()
     else if(m_PrintSettings.PrinterType == ICLIP){
         ui->DICLIPSelect->setChecked(true);
         ui->CLIPSelect->setChecked(false);
-        on_DICLIPSelect_clicked();
+        emit(on_DICLIPSelect_clicked());
     }
-
     ui->SettingsWidget->EnableParameter(VP_RESYNC, OFF); // Always starts in POTF so ResyncVP is disabled from start
     ui->SettingsWidget->EnableParameter(INITIAL_DELAY, OFF); // Always starts in POTF so Initial delay is disabled
     ui->SettingsWidget->initPrintSettings();
@@ -1126,6 +1113,7 @@ void MainWindow::initSettings()
  * ***********************************************************/
 /**
  * @brief MainWindow::PrintEnd
+ * Sleeps are added in to ensure proper stage movement
  */
 void MainWindow::PrintComplete()
 {
@@ -1162,121 +1150,65 @@ void MainWindow::PrintComplete()
 bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter_t DynamicVar)
 {
     bool returnVal = false; //set default to be false
-    if (layerCount > 0){
-        if (layerCount < Script.size()){
-            if (Script.at(layerCount).toDouble() == Script.at(layerCount - 1).toDouble()){
-                //do nothing to avoid spamming
-                if (layerCount == 1 && DynamicVar == LED_INTENSITY){
-                    LCR_SetLedCurrents(0, 0, Script.at(0).toInt());
-                }
-            }
-            else{
-                returnVal = true;
-                switch(DynamicVar)
-                {
-                    case EXPOSURE_TIME:
-                        //don't need to account for this atm
-                        ui->LiveValue1->setText(QString::number(m_PrintScript.ExposureScriptList.at(layerCount).toInt()));
-                        break;
-                    case LED_INTENSITY:
-                        LCR_SetLedCurrents(0, 0, (Script.at(layerCount).toInt()));
-                        ui->LiveValue2->setText(QString::number(Script.at(layerCount).toInt()));
-                        PrintToTerminal("LED Intensity set to: " + QString::number(Script.at(layerCount).toInt()));
-                        break;
-                    case DARK_TIME:
-                        PrintToTerminal("Dark Time set to: " + QString::number(Script.at(layerCount).toDouble()));
-                        ui->LiveValue3->setText(QString::number(Script.at(layerCount).toInt()));
-                        break;
-                    case LAYER_THICKNESS:
-                        //Currently handled by StageMove() function
-                        break;
-                    case STAGE_VELOCITY:
-                        Stage.SetStageVelocity(Script.at(layerCount).toDouble(), m_PrintSettings.StageType);
-                        PrintToTerminal("New stage velocity set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
-                        Sleep(10); //delay for stage com
-                        break;
-                    case STAGE_ACCELERATION:
-                        Stage.SetStageAcceleration(Script.at(layerCount).toDouble(), m_PrintSettings.StageType);
-                        PrintToTerminal("New stage acceleration set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
-                        Sleep(10); //delay for stage com
-                        break;
-                    case PUMP_HEIGHT:
-                        //currently handled by StageMove function
-                        break;
-                    case INJECTION_VOLUME:
-                        if (m_InjectionSettings.ContinuousInjection == OFF && m_InjectionSettings.SteppedContinuousInjection == OFF){
-                            Pump.SetTargetVolume(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble());
-                            ui->LiveValue4->setText(QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
-                            PrintToTerminal("Injection Volume set to : " + QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
-                        }
-                        break;
-                    case INJECTION_RATE:
-                        if (m_InjectionSettings.SteppedContinuousInjection == ON || m_InjectionSettings.ContinuousInjection){
-                            m_InjectionSettings.InfusionRate = m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble();
-                        }
-                        else{
-                            Pump.SetInfuseRate(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble());
-                            PrintToTerminal("Injection Rate set to: " + QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
-                        }
-                        ui->LiveValue5->setText(QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
-                        break;
-                    default:
-                        break;
-                }
+    if ((int)layerCount < Script.size()){
+        if (layerCount > 0 && Script.at(layerCount).toDouble() == Script.at(layerCount - 1).toDouble()){
+            // do nothing if param same as last layer param to avoid spamming
+            if (layerCount == 1 && DynamicVar == LED_INTENSITY){
+                LCR_SetLedCurrents(0, 0, Script.at(0).toInt());
             }
         }
-    }
-    else{ //If layercount = 0, or first layer
-        switch(DynamicVar) // TO DO: Fix this mess
-        {
-            case EXPOSURE_TIME:
-                //don't need to account for this atm
-                ui->LiveValue1->setText(QString::number(m_PrintScript.ExposureScriptList.at(layerCount).toInt()));
-                break;
-            case LED_INTENSITY:
-                LCR_SetLedCurrents(0, 0, (Script.at(layerCount).toInt()));
-                ui->LiveValue2->setText(QString::number(Script.at(layerCount).toInt()));
-                PrintToTerminal("LED Intensity set to: " + QString::number(Script.at(layerCount).toInt()));
-                break;
-            case DARK_TIME:
-                PrintToTerminal("Dark Time set to: " + QString::number(Script.at(layerCount).toDouble()));
-                ui->LiveValue3->setText(QString::number(Script.at(layerCount).toInt()));
-                break;
-            case LAYER_THICKNESS:
-                //Currently handled by StageMove() function
-                break;
-            case STAGE_VELOCITY:
-                Stage.SetStageVelocity(Script.at(layerCount).toDouble(), m_PrintSettings.StageType);
-                PrintToTerminal("New stage velocity set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
-                Sleep(10); //delay for stage com
-                break;
-            case STAGE_ACCELERATION:
-                Stage.SetStageAcceleration(Script.at(layerCount).toDouble(), m_PrintSettings.StageType);
-                PrintToTerminal("New stage acceleration set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
-                Sleep(10); //delay for stage com
-                break;
-            case PUMP_HEIGHT:
-                //currently handled by StageMove function
-                break;
-            case INJECTION_VOLUME:
-                if (m_InjectionSettings.ContinuousInjection == OFF && m_InjectionSettings.SteppedContinuousInjection == OFF){
-                    Pump.SetTargetVolume(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble());
-                    ui->LiveValue4->setText(QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
-                    PrintToTerminal("Injection Volume set to : " + QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
-                }
-                break;
-            case INJECTION_RATE:
-                if (m_InjectionSettings.SteppedContinuousInjection == ON || m_InjectionSettings.ContinuousInjection){
-                    m_InjectionSettings.InfusionRate = m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble();
-                }
-                else{
-                    Pump.SetInfuseRate(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble());
-                    PrintToTerminal("Injection Rate set to: " + QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
-                }
-                ui->LiveValue5->setText(QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
-                break;
-            default:
-                break;
+        else{
+            returnVal = true;
+            switch(DynamicVar){
+                case EXPOSURE_TIME:
+                    //don't need to account for this atm
+                    ui->LiveValue1->setText(QString::number(m_PrintScript.ExposureScriptList.at(layerCount).toInt()));
+                    break;
+                case LED_INTENSITY:
+                    LCR_SetLedCurrents(0, 0, (Script.at(layerCount).toInt()));
+                    ui->LiveValue2->setText(QString::number(Script.at(layerCount).toInt()));
+                    PrintToTerminal("LED Intensity set to: " + QString::number(Script.at(layerCount).toInt()));
+                    break;
+                case DARK_TIME:
+                    PrintToTerminal("Dark Time set to: " + QString::number(Script.at(layerCount).toDouble()));
+                    ui->LiveValue3->setText(QString::number(Script.at(layerCount).toInt()));
+                    break;
+                case LAYER_THICKNESS:
+                    //Currently handled by StageMove() function
+                    break;
+                case STAGE_VELOCITY:
+                    Stage.SetStageVelocity(Script.at(layerCount).toDouble(), m_PrintSettings.StageType);
+                    PrintToTerminal("New stage velocity set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
+                    Sleep(10); //delay for stage com
+                    break;
+                case STAGE_ACCELERATION:
+                    Stage.SetStageAcceleration(Script.at(layerCount).toDouble(), m_PrintSettings.StageType);
+                    PrintToTerminal("New stage acceleration set to: " + QString::number(Script.at(layerCount).toDouble()) + " mm/s");
+                    Sleep(10); //delay for stage com
+                    break;
+                case PUMP_HEIGHT:
+                    //currently handled by StageMove function
+                    break;
+                case INJECTION_VOLUME:
+                    if (m_InjectionSettings.ContinuousInjection == OFF && m_InjectionSettings.SteppedContinuousInjection == OFF){
+                        Pump.SetTargetVolume(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble());
+                        ui->LiveValue4->setText(QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
+                        PrintToTerminal("Injection Volume set to : " + QString::number(m_PrintScript.InjectionVolumeScriptList.at(layerCount).toDouble()));
+                    }
+                    break;
+                case INJECTION_RATE:
+                    if (m_InjectionSettings.SteppedContinuousInjection == ON || m_InjectionSettings.ContinuousInjection){
+                        m_InjectionSettings.InfusionRate = m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble();
+                    }
+                    else{
+                        Pump.SetInfuseRate(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble());
+                        PrintToTerminal("Injection Rate set to: " + QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
+                    }
+                    ui->LiveValue5->setText(QString::number(m_PrintScript.InjectionRateScriptList.at(layerCount).toDouble()));
+                    break;
+                default:
+                    break;
+            }
         }
     }
     return returnVal;
@@ -1290,8 +1222,7 @@ bool MainWindow::PrintScriptApply(uint layerCount, QStringList Script, Parameter
 void MainWindow::VP8bitWorkaround()
 {
     if (m_PrintScript.PrintScript == ON){
-        for (uint i = 0; i < m_PrintControls.nSlice; i++)
-        {
+        for (uint i = 0; i < m_PrintControls.nSlice; i++){
             double ExpTime = m_PrintScript.ExposureScriptList.at(i).toDouble();
             double DTime = m_PrintScript.ExposureScriptList.at(i).toDouble();
             bool FrameFinished = false;
@@ -1373,7 +1304,7 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
         for (int i = m_PrintControls.layerCount; i< ui->SettingsWidget->FileListCount(); i++){
             item = ui->SettingsWidget->FileListItem(i);
             ImageList << item;
-            if (i > m_PrintControls.layerCount + m_PrintSettings.MaxImageUpload){
+            if (i > (int)m_PrintControls.layerCount + m_PrintSettings.MaxImageUpload){
                 break;
             }
         }
@@ -1427,7 +1358,6 @@ void MainWindow::on_LogName_textChanged()
 {
     LogName = ui->LogName->toPlainText();
 }
-
 
 void MainWindow::refreshScript()
 {
