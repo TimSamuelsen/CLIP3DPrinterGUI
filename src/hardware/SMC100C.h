@@ -128,6 +128,7 @@ class SMC100C
             void SetNegativeLimit(float Limit);
             void SetAcceleration(float AccelerationToSet);
             void SetJerkTime(float JerkTime);
+            int Available();
             serialib serial;
 
     private:

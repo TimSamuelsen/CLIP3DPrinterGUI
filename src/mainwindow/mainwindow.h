@@ -126,6 +126,7 @@ private:
     void PrintProcess2();
     void initConnections();
     bool initResetConfirmation();
+    void autoConnect();
 
     void setScriptParam(float &param, QStringList script, int layerCount);
 };

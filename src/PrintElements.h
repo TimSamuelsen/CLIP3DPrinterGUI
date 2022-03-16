@@ -141,6 +141,11 @@ struct PrintControls
     //Motion Specific
     bool inMotion = 0;
     double PrintEnd = 0;
+
+    // Connection flags
+    int stageConnect1 = 0;
+    int stageConnect2 = 0;
+    int lightConnect = 0;
 };
 
 struct InjectionSettings

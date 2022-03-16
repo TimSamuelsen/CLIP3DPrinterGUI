@@ -28,22 +28,16 @@ History:
 
 ***************************************************************************************************************************************/
 
-/*---------------------------------------------------------- Include Files -----------------------------------------------------------*/
+/*------------------------------------ Include Files ---------------------------------------------*/
 #include "SMC100C.h"
 #include "serialib.h"
 #include <stdio.h>
 #include <string.h>
-/*-------------------------------------------------- Module Variables and Libraries---------------------------------------------------*/
+/*----------------------------- Module Variables and Libraries------------------------------------*/
 //Change if you need to use a different Controller Adress
 static const char* ControllerAdress = "1";
-static SMC100C::StatusType Status;
-static char* HardwareError;
 static char LastError;
 const char* SelectedCOM;
-static bool initFlag;
-//May convert these to int or float eventually
-static char* MotionTime;
-static char* CurrentPosition;
 serialib serial;
 
 //Many of these functions will likely not be needed and can be removed at a later date after testing
@@ -223,18 +217,20 @@ const char* SMC100C::ConvertToErrorString(char ErrorChar)
 bool SMC100C::SMC100CInit(const char* COMPORT)
 {
     //serialib serial;
-   if (serial.openDevice(COMPORT,57600) == 1)
-   {
+   if (serial.openDevice(COMPORT,57600) == 1){
        SelectedCOM = COMPORT;
        //initFlag = true;
        printf("Serial Port initiated");
        return true;
    }
-   else
-   {
+   else{
         return false;
    }
 };
+
+int SMC100C::Available(){
+    return serial.available();
+}
 
 void SMC100C::SMC100CClose()
 {
@@ -256,20 +252,10 @@ Author:
 ***************************************************************************************************************************************/
 bool SMC100C::Home()
 {
-    bool returnVal;
     printf("Request For Home \r\n");
-    //Set command to home
+    // Set command to home
     SetCommand(CommandType::HomeSearch, 0.0, CommandGetSetType::None);
-    //Send command
-    if (SendCurrentCommand() == true)
-    {
-        returnVal = true;
-    }
-    else
-    {
-        returnVal = false;
-    }
-    return returnVal;
+    return SendCurrentCommand();
 };
 /**************************************************************************************************************************************
 Function: 
@@ -287,9 +273,6 @@ Author:
 ***************************************************************************************************************************************/
 void SMC100C::SetVelocity(float VelocityToSet)
 {
-    char CommandParam[25];
-    sprintf(CommandParam,"Set Velocity : %f \r\n",VelocityToSet);
-    printf(CommandParam);
     SetCommand(CommandType::Velocity, VelocityToSet, CommandGetSetType::Set);
     SendCurrentCommand();
 };
@@ -309,9 +292,6 @@ Author:
 ***************************************************************************************************************************************/
 void SMC100C::SetAcceleration(float AccelerationToSet)
 {
-    char CommandParam[25];
-    //sprintf(CommandParam,"Set Velocity : %f \r\n",AccelerationToSet);
-    //printf(CommandParam);
     SetCommand(CommandType::Acceleration, AccelerationToSet, CommandGetSetType::Set);
     SendCurrentCommand();
 };
@@ -331,9 +311,6 @@ Author:
 ***************************************************************************************************************************************/
 void SMC100C::RelativeMove(float DistanceToMove)
 { 
-    char CommandParam[25];
-    //sprintf(CommandParam,"Relative Move : %f \r\n",DistanceToMove);
-    //printf(CommandParam);
     SetCommand(CommandType::MoveRel, DistanceToMove, CommandGetSetType::Set);
     SendCurrentCommand();
 };
@@ -443,49 +420,49 @@ Author:
 ***************************************************************************************************************************************/
 char* SMC100C::GetPosition()
 { 
-    SetCommand(CommandType::PositionReal, 0.0, CommandGetSetType::Get);
-    SendCurrentCommand();
-    char* Read = SerialRead();
+   SetCommand(CommandType::PositionReal, 0.0, CommandGetSetType::Get);
+   SendCurrentCommand();
+   char* Read = SerialRead();
    return Read;
 };
 
 char* SMC100C::GetVelocity()
 {
-    SetCommand(CommandType::Velocity, 0.0, CommandGetSetType::Get);
-    SendCurrentCommand();
-    char* Read = SerialRead();
-    return Read;
+   SetCommand(CommandType::Velocity, 0.0, CommandGetSetType::Get);
+   SendCurrentCommand();
+   char* Read = SerialRead();
+   return Read;
 }
 
 char* SMC100C::GetAcceleration()
 {
-    SetCommand(CommandType::Acceleration, 0.0, CommandGetSetType::Get);
-    SendCurrentCommand();
-    char* Read = SerialRead();
-    return Read;
+   SetCommand(CommandType::Acceleration, 0.0, CommandGetSetType::Get);
+   SendCurrentCommand();
+   char* Read = SerialRead();
+   return Read;
 }
 
 char* SMC100C::GetPositiveLimit()
 {
-    SetCommand(CommandType::PositiveSoftwareLim, 0.0, CommandGetSetType::Get);
-    SendCurrentCommand();
-    char* Read = SerialRead();
-    return Read;
+   SetCommand(CommandType::PositiveSoftwareLim, 0.0, CommandGetSetType::Get);
+   SendCurrentCommand();
+   char* Read = SerialRead();
+   return Read;
 }
 
 char* SMC100C::GetNegativeLimit()
 {
-    SetCommand(CommandType::NegativeSoftwareLim, 0.0, CommandGetSetType::Get);
-    SendCurrentCommand();
-    char* Read = SerialRead();
-    return Read;
+   SetCommand(CommandType::NegativeSoftwareLim, 0.0, CommandGetSetType::Get);
+   SendCurrentCommand();
+   char* Read = SerialRead();
+   return Read;
 }
 
 char* SMC100C::GetCustom(char* Command)
 {
-    serial.writeString(Command);
-    char* Read = SerialRead();
-    return Read;
+   serial.writeString(Command);
+   char* Read = SerialRead();
+   return Read;
 }
 /**************************************************************************************************************************************
 Function:
@@ -555,7 +532,6 @@ Author:
 ***************************************************************************************************************************************/
 void SMC100C::SetCommand(CommandType Type, float Parameter, CommandGetSetType GetOrSet)
 {
-    //printf("Setting Command \r\n");
     CommandToPrint.Command = &CommandLibrary[static_cast<int>(Type)];
     CommandToPrint.Parameter = Parameter;
     CommandToPrint.GetOrSet = GetOrSet;
@@ -577,79 +553,29 @@ Author:
 ***************************************************************************************************************************************/
 bool SMC100C::SendCurrentCommand()
 {
-    //printf("Sending Command \r\n");
-    //serialib serial;
-    //Will move GetCharacter, CarriageReturnChar and NewLineChar out of this function eventually
-    //static const char* CarriageReturnChar = "\r";
-    //static const char* NewLineChar = "\n";
-    //Establishing Status Variable
-    bool Status = true;
-    //Reading the parameter and GetOrSet type from CommandToPrint (This step may not be needed)
-    CurrentCommandParameter = CommandToPrint.Parameter;
-    CurrentCommandGetOrSet = CommandToPrint.GetOrSet;
-    //Open Serial Port
-    if (initFlag)
-    {
-
+    bool status = true;
+    if (serial.writeString(ControllerAdress) != '1'){
+        return false;
     }
-    else
-    {
-
-    }
-    //Write Adress
-    serial.writeString(ControllerAdress);
-    //Write ASCII characters to Serial (Also printed to output)
-    printf(&CommandToPrint.Command->CommandChar[0]);
-    printf("\r\n");
+    printf(&CommandToPrint.Command->CommandChar[0], "\r\n");        // write command
     serial.writeString(&CommandToPrint.Command->CommandChar[0]);
-    //If the GetOrSet command type is Get, print the Get character ("?") 
-    if (CurrentCommandGetOrSet == CommandGetSetType::Get)
-	{
-        //Write Get Character to Serial
+
+    if (CommandToPrint.GetOrSet == CommandGetSetType::Get){
         serial.writeString("?");
-	}
-    //If the GetOrSet command type is Set 
-    else if (CurrentCommandGetOrSet == CommandGetSetType::Set)
-    {
-        //If the CommandParameterType is Int
-        if (CommandToPrint.Command->SendType == CommandParameterType::Int)
-        {
-            printf("Setting Int");
-            //Create target char array for int
-            char IntParam[10];
-            //Populate target char array with converted int
-            sprintf(IntParam, "%f" , CurrentCommandParameter);
-            //Write IntParam to Serial
-            serial.writeString(IntParam);
+	} 
+    else{
+        char param[10];
+        if (CommandToPrint.Command->SendType == CommandParameterType::Int){
+            sprintf(param, "%f" , CommandToPrint.Parameter);
         }
         //If the CommandParameterType is Float
-        else if (CommandToPrint.Command->SendType == CommandParameterType::Float)
-        {
-            //Create target char array for float
-            char FloatParam[10];
-            //Populate target char array with converted float
-            sprintf(FloatParam, "%f", CurrentCommandParameter);
-            //Write FloatParam to Serial
-            serial.writeString(FloatParam);
+        else if (CommandToPrint.Command->SendType == CommandParameterType::Float){
+            sprintf(param, "%f", CommandToPrint.Parameter);
         }
-        else
-        {
-            //Error check
-            Status = false;
-        };
-    }
-    //Else if the GetSetType is None or GetAlways do nothing, else error
-    else if ( (CommandToPrint.Command->GetSetType == CommandGetSetType::None) || (CommandToPrint.Command->GetSetType == CommandGetSetType::GetAlways) )
-    {
-
-    }
-    else
-    {
-        //Error Check
-        Status = false;
+        serial.writeString(param);
     }
     serial.writeString("\r\n");
-    return Status;
+    return status;
 };
 /**************************************************************************************************************************************
 Function: 
@@ -667,10 +593,8 @@ Author:
 ***************************************************************************************************************************************/
 SMC100C::StatusType SMC100C::ConvertStatus(char* StatusChar)
 {
-    for (int Index = 0; Index < 21; ++Index)
-	{
-		if ( strcmp( StatusChar, StatusLibrary[Index].Code ) == 0)
-		{
+    for (int Index = 0; Index < 21; ++Index){
+		if ( strcmp( StatusChar, StatusLibrary[Index].Code ) == 0){
 			return StatusLibrary[Index].Type;
 		}
 	}
@@ -700,36 +624,23 @@ char* SMC100C::SerialRead()
     int ReadStatus;
     ReadStatus = serial.readString(receivedString,finalChar,maxNbBytes,10);
 
-    //char* outputString = '\0';
-
-
-    if (ReadStatus > 0)
-    {
+    if (ReadStatus > 0){
         return receivedString;
     }
-    else if(ReadStatus == 0)
-    {
-        //Error timeout reached
-        return "A";
+    else if(ReadStatus == 0){       // error timeout reached
+        return (char*)"A";
     }
-    else if(ReadStatus == -1)
-    {
-        //Error setting timeout
-        return  "B";
+    else if(ReadStatus == -1){      // error setting timeout
+        return  (char*)"B";
     }
-    else if(ReadStatus == -2)
-    {
-        //Error while reading byte
-        return "C";
+    else if(ReadStatus == -2){      // error while reading byte
+        return (char*)"C";
     }
-    else if(ReadStatus == -3)
-    {
-        //Max N bytes was reached, still return recievedstring
+    else if(ReadStatus == -3){      // max n bytes reached
         return  receivedString;
     }
-    else
-    {
-        char* errString = "Unknown Error";
+    else{
+        char* errString = (char*)"Unknown Error";
         return errString;
     }
 }

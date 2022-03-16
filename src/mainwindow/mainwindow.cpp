@@ -84,6 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
     initSettings(); //initialize settings by updating ui
     PrintControl.getControlPointers(&m_PrintSettings, &m_PrintControls, &m_PrintScript);
     ui->GraphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
+    autoConnect();
 }
 
 /*!
@@ -169,8 +170,7 @@ void MainWindow::updatePosition(QString CurrentPosition)
 void MainWindow::on_InitializeAndSynchronize_clicked()
 {
   // If the confirmation screen was approved by user
-  if(ui->SettingsWidget->FileListCount() > 0 && initConfirmationScreen())
-  {
+  if(ui->SettingsWidget->FileListCount() > 0 && initConfirmationScreen()){
     if(m_PrintSettings.ProjectionMode == POTF){
         // n slices = n images
         m_PrintControls.nSlice = ui->SettingsWidget->FileListCount();
@@ -679,6 +679,7 @@ void MainWindow::on_LightEngineConnectButton_clicked()
         PrintToTerminal("Light Engine Connected");
         ui->LightEngineIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
         ui->LightEngineIndicator->setText("Connected");
+        m_PrintControls.lightConnect = ON;
 
         // Check for light engine errors
         uint Code;
@@ -705,8 +706,10 @@ void MainWindow::on_StageConnectButton_clicked()
 {
     Stage.StageClose(m_PrintSettings.StageType);            // close any prev connect
     QString COMSelect = ui->COMPortSelect->currentText();
+    m_PrintControls.stageConnect1 = COMSelect.toInt();
     QByteArray array = COMSelect.toLocal8Bit();
     char* COM = array.data();
+
     // if successful connection and home
     if (Stage.StageInit(COM, m_PrintSettings.StageType) == true
         && Stage.StageHome(m_PrintSettings.StageType) == true){
@@ -1431,4 +1434,109 @@ bool MainWindow::initResetConfirmation()
     return retVal;
 }
 
+// Attempts to connect to peripherals upon startup
+void MainWindow::autoConnect()
+{
+    PrintToTerminal("Attempting to connect to Light Engine");
+    on_LightEngineConnectButton_clicked();
+    PrintToTerminal("Attempting to connect to Stage");
+    on_StageConnectButton_clicked();
+    PrintToTerminal("Attempting to connect to Pump");
+    on_PumpConnectButton_clicked();
+}
 
+#if 0
+/*!
+ * \brief MainWindow::on_LightEngineConnectButton_clicked
+ * Connect to light engine, gets last error code to validate that
+ * no errors have occured and connection is working
+ */
+void MainWindow::on_LightEngineConnectButton_clicked()
+{
+    if (DLP.InitProjector()){   // if connection was succesful
+        PrintToTerminal("Light Engine Connected");
+        ui->LightEngineIndicator->setStyleSheet("background:rgb(0, 255, 0); border: 1px solid black;");
+        ui->LightEngineIndicator->setText("Connected");
+
+        // Check for light engine errors
+        uint Code;
+        if (LCR_ReadErrorCode(&Code) >= 0){
+            PrintToTerminal("Last Error Code: " + QString::number(Code));
+        }
+        else{
+            PrintToTerminal("Failed to get last error code");
+        }
+    }
+    else{
+        PrintToTerminal("Light Engine Connection Failed");
+        ui->LightEngineIndicator->setStyleSheet("background:rgb(255, 0, 0); border: 1px solid black;");
+        ui->LightEngineIndicator->setText("Disconnected");
+    }
+}
+
+/*!
+ * \brief MainWindow::on_StageConnectButton_clicked
+ * Connects to stage, if successful gets position, sends
+ * home commands and gets position
+ */
+void MainWindow::on_StageConnectButton_clicked()
+{
+    Stage.StageClose(m_PrintSettings.StageType);            // close any prev connect
+    QString COMSelect = ui->COMPortSelect->currentText();
+    QByteArray array = COMSelect.toLocal8Bit();
+    char* COM = array.data();
+    // if successful connection and home
+    if (Stage.StageInit(COM, m_PrintSettings.StageType) == true
+        && Stage.StageHome(m_PrintSettings.StageType) == true){
+        ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0);border: 1px solid black;");
+        ui->StageConnectionIndicator->setText("Connected");
+        Sleep(10);
+        emit(on_GetPosition_clicked());
+    }
+    else {
+        PrintToTerminal("Stage Connection Failed");
+        ui->StageConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0);border: 1px solid black;");
+        ui->StageConnectionIndicator->setText("Disconnected");
+    }
+}
+
+void MainWindow::StageConnected()
+{
+    PrintToTerminal("Stage Connected");
+    ui->StageConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0);"
+                                                "border: 1px solid black;");
+    ui->StageConnectionIndicator->setText("Connected");
+    emit(on_GetPosition_clicked());
+}
+
+/*!
+ * \brief MainWindow::on_PumpConnectButton_clicked
+ * Connects to pump
+ */
+void MainWindow::on_PumpConnectButton_clicked()
+{
+    QString COMSelect = ui->COMPortSelectPump->currentText();
+    QByteArray array = COMSelect.toLocal8Bit();
+    char* COM = array.data();
+    if (Pump.PumpInitConnection(COM)){
+        ui->PumpConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0);"
+                                                   "border: 1px solid black;");
+        ui->PumpConnectionIndicator->setText("Connected");
+    }
+    else{
+        PrintToTerminal("Pump Connection Failed");
+        ui->PumpConnectionIndicator->setStyleSheet("background:rgb(255, 0, 0);"
+                                                   "border: 1px solid black;");
+        ui->PumpConnectionIndicator->setText("Disconnected");
+    }
+}
+
+void MainWindow::PumpConnected()
+{
+    PrintToTerminal("Pump Connected");
+    ui->PumpConnectionIndicator->setStyleSheet("background:rgb(0, 255, 0);"
+                                               "border: 1px solid black;");
+    ui->PumpConnectionIndicator->setText("Connected");
+}
+
+#endif
