@@ -194,15 +194,14 @@ void ManualStageControl::on_SetPositionValue_clicked()
 {
     double PositionVal = ui->SetPositionParam->value();
     QString SetPositionCommand = "G92 Z" + QString::number(PositionVal) + "\r\n";
-    ms_Stage.StageSerial.writeString(SetPositionCommand.toLatin1().data());
+    ms_Stage.SendCustom(StageType, SetPositionCommand);
     ui->TerminalOut->append("Set current position to: " + QString::number(PositionVal));
 }
 
 void ManualStageControl::on_SendCustomCommand_clicked()
 {
     QString Command = ui->CustomCommandLine->text() + "\r";
-    const char* CommandToSend = Command.toLatin1().data();
-    ms_Stage.StageSerial.writeString(CommandToSend);
+    ms_Stage.SendCustom(StageType, Command);
     ui->TerminalOut->append("Custom Command: " + ui->CustomCommandLine->text());
 
 }
@@ -214,7 +213,7 @@ void ManualStageControl::on_EnableEndStopCheckbox_clicked()
         ui->DisableEndstopCheckbox->setChecked(false);
         EndStopState = ON;
         QString Command = "M121\r\n";
-        int returnVal = ms_Stage.StageSerial.writeString(Command.toLatin1().data());
+        int returnVal = ms_Stage.SendCustom(StageType, Command);
         if (returnVal >= 0){
             ui->TerminalOut->append("Endstop enabled");
         }
@@ -231,7 +230,7 @@ void ManualStageControl::on_DisableEndstopCheckbox_clicked()
         ui->EnableEndStopCheckbox->setChecked(false);
         EndStopState = OFF;
         QString Command = "M120\r\n";
-        int returnVal = ms_Stage.StageSerial.writeString(Command.toLatin1().data());
+        int returnVal = ms_Stage.SendCustom(StageType, Command);
         if (returnVal >= 0){
             ui->TerminalOut->append("Endstops disabled");
         }

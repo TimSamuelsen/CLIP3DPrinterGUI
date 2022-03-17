@@ -4,7 +4,8 @@
 static float FeedRate = 60;
 //static bool StagePrep1 = false;
 //static bool StagePrep2 = false;
-static PrintSettings s_PrintSettings;
+PrintSettings s_PrintSettings;
+serialib StageSerial;
 
 /*!
  * \brief StageCommands::StageInit
@@ -44,14 +45,15 @@ int StageCommands::StageInit(const char* COMPort, Stage_t StageType)
             if (StepperReturn < 0) //if command failed
                 returnVal = -1; //return -1 for failed command
             Sleep(500);
+            StageSerial.flushReceiver();
             // TODO: can this be replaced by flushing the receiver??
-            for (uint8_t i = 0; i < 25; i++){
+            /*for (uint8_t i = 0; i < 25; i++){
                 static char receivedString[] = "ThisIsMyTest";
                 char finalChar = '\n';
                 uint maxNbBytes = 100;//make sure to validate this
                 int ReadStatus = StageSerial.readString(receivedString, finalChar, maxNbBytes, 10);
                 Sleep(10);
-            }
+            }*/
         }
         else{ //Serial connection failed
             returnVal = -1;
@@ -284,14 +286,16 @@ QString StageCommands::StageGetPosition(Stage_t StageType)
     return "NA";
 }
 
-QString StageCommands::SendCustom(Stage_t StageType, QString Command)
+int StageCommands::SendCustom(Stage_t StageType, QString Command)
 {
-    QString ReturnString;
     if (StageType == STAGE_SMC){
         //char* command = qPrintable(Command.toStdString());
         //char* ReadPosition = SMC.GetCustom(Command.toLocal8bit.constData());
     }
-    return ReturnString;
+    else if (StageType == STAGE_GCODE){
+        return StageSerial.writeString(Command.toLatin1().data());
+    }
+    return 0;
 }
 /****************************Helper Functions****************************/
 /*!

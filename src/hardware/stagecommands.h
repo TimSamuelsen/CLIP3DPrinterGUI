@@ -24,9 +24,8 @@ public:
     StageCommands& operator=(StageCommands const&) = delete;    //Copy assign
     StageCommands& operator=(StageCommands &&) = delete;        //Move assign
 
-    bool isConnected;
+    bool isConnected = false;
     SMC100C SMC;
-    serialib StageSerial;
 
     int StageInit(const char* COMPort,Stage_t StageType);
     int StageClose(Stage_t StageType);
@@ -40,7 +39,7 @@ public:
     int StageAbsoluteMove(float AbsoluteMovePosition, Stage_t StageType);
     int StageRelativeMove(float RelativeMoveDistance, Stage_t StageType);
     QString StageGetPosition(Stage_t);
-    QString SendCustom(Stage_t StageType, QString Command);
+    int SendCustom(Stage_t StageType, QString Command);
     void initStagePosition(PrintSettings si_PrintSettings);
     void initStageStart(PrintSettings si_PrintSettings);
     void resetStageInit();

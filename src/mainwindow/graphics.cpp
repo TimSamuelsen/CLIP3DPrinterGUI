@@ -280,7 +280,7 @@ void graphics::on_PrintScriptTable_cellPressed(int row, int column)
         QMessageBox confScreen;
         confScreen.setText("Are you sure you want to manually edit the print script?");
         QPushButton *YesButton = confScreen.addButton(QMessageBox::Yes);
-        QPushButton *AbortButton = confScreen.addButton(QMessageBox::Abort);
+        confScreen.addButton(QMessageBox::Abort);
         confScreen.exec();
         if (confScreen.clickedButton() == YesButton){
             EditsActive = false;

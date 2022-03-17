@@ -22,8 +22,7 @@ public:
     PumpCommands& operator=(PumpCommands const&) = delete;    //Copy assign
     PumpCommands& operator=(PumpCommands &&) = delete;        //Move assign
 
-    serialib PumpSerial;
-    bool isConnected;
+    bool isConnected = false;
 
     bool PumpInitConnection(const char* COMport);
     void initPumpParams(InjectionSettings m_InjectionSettings);

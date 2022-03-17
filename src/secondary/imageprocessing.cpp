@@ -232,22 +232,20 @@ void imageprocessing::bitEncode8(Mat source, Mat& Channel)
         }
         else
         {
-            uint Mask;
-            if(MaskFlag)
-            {
+            uint Mask = 0;
+            if(MaskFlag){
                 MaskFlag = false;
                 Mask = pow(2, (i)) - 1;
                 ui->TerminalOut->append("No more images remaining, Mask: " + QString::number(Mask));
             }
-            else
-            {
+            else{
                 ui->TerminalOut->append("No more images remaining");
             }
             for (int row = 0; row < workingChannel.rows; row++)
             {
                for (int col = 0; col < workingChannel.cols; col++)
                {
-                       workingChannel.at<uchar>(row,col) = workingChannel.at<uchar>(row,col) & Mask;
+                    workingChannel.at<uchar>(row,col) = workingChannel.at<uchar>(row,col) & Mask;
                }
             }
         }

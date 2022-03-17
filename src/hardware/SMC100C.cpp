@@ -209,7 +209,7 @@ const char* SMC100C::ConvertToErrorString(char ErrorChar)
 		case 'X':
 			return "Command not allowed for CC";
 		default:
-			return "Unknown error character";
+            return "0";
 	};
 };
 
@@ -221,19 +221,21 @@ bool SMC100C::SMC100CInit(const char* COMPORT)
        SelectedCOM = COMPORT;
        //initFlag = true;
        printf("Serial Port initiated");
-       return true;
+       if (strcmp(GetError(), "0")){                // if no error is found TODO: validate this
+           serial.~serialib();
+       }
+       else{
+           return true;
+       }
    }
-   else{
-        return false;
-   }
+   return false;
 };
 
 int SMC100C::Available(){
     return serial.available();
 }
 
-void SMC100C::SMC100CClose()
-{
+void SMC100C::SMC100CClose(){
     serial.closeDevice();
 }
 /**************************************************************************************************************************************
@@ -371,7 +373,7 @@ Notes:
 Author:
     TimS, 1/20/21
 ***************************************************************************************************************************************/
-void SMC100C::GetError()
+const char* SMC100C::GetError()
 { 
     SetCommand(CommandType::LastCommandErr, 0.0, CommandGetSetType::Get);
     SendCurrentCommand();
@@ -379,7 +381,7 @@ void SMC100C::GetError()
     char* ErrorChar = SerialRead();
     //Output from GetError command will be in format 1TEA where the last character is the error char
     LastError = ErrorChar[3];
-    ConvertToErrorString(ErrorChar[3]);
+    return ConvertToErrorString(ErrorChar[3]);
 };
 /**************************************************************************************************************************************
 Function: 

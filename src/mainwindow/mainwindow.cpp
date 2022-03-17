@@ -542,8 +542,7 @@ void MainWindow::Check4VideoLock()
             VlockPopup.close();
 
             //If attempt to set to Video pattern mode is not successful
-            if (LCR_SetMode(PTN_MODE_VIDEO) < 0)
-            {
+            if (LCR_SetMode(PTN_MODE_VIDEO) < 0){
                 showError("Unable to switch to video pattern mode");
                 ui->VP_HDMIcheckbox->setChecked(false); //Uncheck video pattern mode
 
@@ -1441,8 +1440,8 @@ void MainWindow::autoConnect()
     on_LightEngineConnectButton_clicked();
     PrintToTerminal("Attempting to connect to Stage");
     on_StageConnectButton_clicked();
-    PrintToTerminal("Attempting to connect to Pump");
-    on_PumpConnectButton_clicked();
+    //PrintToTerminal("Attempting to connect to Pump");   TODO: Find good validation command for pump
+    //on_PumpConnectButton_clicked();
 }
 
 #if 0

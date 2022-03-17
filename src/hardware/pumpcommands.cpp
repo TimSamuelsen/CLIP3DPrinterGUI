@@ -3,6 +3,7 @@
 // There probably exists a cleaner implementation for this using
 // a command libary instead of individual functions, but the
 // functions keep it simple for future users
+serialib PumpSerial;
 /******************************************Active Commands******************************************/
 bool PumpCommands::PumpInitConnection(const char* COMport)
 {
