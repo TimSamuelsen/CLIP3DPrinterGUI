@@ -7,16 +7,15 @@ namespace Ui {
 class prinstscriptdialog;
 }
 
-class prinstscriptdialog : public QDialog
-{
-    Q_OBJECT
+class prinstscriptdialog : public QDialog {
+  Q_OBJECT
 
-public:
-    explicit prinstscriptdialog(QWidget *parent = nullptr);
-    ~prinstscriptdialog();
+ public:
+  explicit prinstscriptdialog(QWidget* parent = nullptr);
+  ~prinstscriptdialog();
 
-private:
-    Ui::prinstscriptdialog *ui;
+ private:
+  Ui::prinstscriptdialog* ui;
 };
 
 #endif // PRINSTSCRIPTDIALOG_H

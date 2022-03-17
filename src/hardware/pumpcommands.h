@@ -8,78 +8,77 @@
 /*!
  * \brief The PumpCommands class handles injection pump operation
  */
-class PumpCommands: public QObject
-{
-    Q_OBJECT
+class PumpCommands: public QObject {
+  Q_OBJECT
 
-public:
-    static PumpCommands& Instance() {
-        static PumpCommands myInstance;
-        return myInstance;
-    }
-    PumpCommands(PumpCommands const&) = delete;               //Copy construct
-    PumpCommands(PumpCommands&&) = delete;                    //Move contstruct
-    PumpCommands& operator=(PumpCommands const&) = delete;    //Copy assign
-    PumpCommands& operator=(PumpCommands &&) = delete;        //Move assign
+ public:
+  static PumpCommands& Instance() {
+    static PumpCommands myInstance;
+    return myInstance;
+  }
+  PumpCommands(PumpCommands const&) = delete;               //Copy construct
+  PumpCommands(PumpCommands&&) = delete;                    //Move contstruct
+  PumpCommands& operator=(PumpCommands const&) = delete;    //Copy assign
+  PumpCommands& operator=(PumpCommands&&) = delete;         //Move assign
 
-    bool isConnected = false;
+  bool isConnected = false;
 
-    bool PumpInitConnection(const char* COMport);
-    void initPumpParams(InjectionSettings m_InjectionSettings);
+  bool PumpInitConnection(const char* COMport);
+  void initPumpParams(InjectionSettings m_InjectionSettings);
 
-    int StartInfusion();
-    int StartWithdraw();
-    int Stop();
+  int StartInfusion();
+  int StartWithdraw();
+  int Stop();
 
-    int SetTargetTime(double T_Time);
-    int SetTargetVolume(double T_Vol);
-    int SetSyringeVolume(double S_Vol);
-    int SetInfuseRate(double I_Rate);
-    int SetWithdrawRate(double W_Rate);
+  int SetTargetTime(double T_Time);
+  int SetTargetVolume(double T_Vol);
+  int SetSyringeVolume(double S_Vol);
+  int SetInfuseRate(double I_Rate);
+  int SetWithdrawRate(double W_Rate);
 
-    int ClearTime();
-    int ClearVolume();
-    int CustomCommand(QString NewCommand);
-    int IndefiniteRun();
+  int ClearTime();
+  int ClearVolume();
+  int CustomCommand(QString NewCommand);
+  int IndefiniteRun();
 
-    QString GetTargetTime();
-    QString GetTargetVolume();
-    QString GetSyringeVolume();
-    QString GetInfuseRate();
-    QString GetWithdrawRate();
+  QString GetTargetTime();
+  QString GetTargetVolume();
+  QString GetSyringeVolume();
+  QString GetInfuseRate();
+  QString GetWithdrawRate();
 
-signals:
-    /*!
-     * \brief PumpPrintSignal Injection pump terminal printing  signal,
-     * connected to TerminalPrint function in Main Window.
-     * \param StringToPrint String to be printed
-     */
-    void PumpPrintSignal(QString StringToPrint);
-    /*!
-     * \brief PumpError Light engine error signal,
-     * connected to showError function in Main Window.
-     * \param ErrorString Error string to be shown
-     */
-    void PumpError(QString ErrorString);
-    /*!
-     * \brief StageConnected
-     * Signals to main window that a connection to the pump was initiated
-     */
-    void PumpConnect();
+ signals:
+  /*!
+   * \brief PumpPrintSignal Injection pump terminal printing  signal,
+   * connected to TerminalPrint function in Main Window.
+   * \param StringToPrint String to be printed
+   */
+  void PumpPrintSignal(QString StringToPrint);
+  /*!
+   * \brief PumpError Light engine error signal,
+   * connected to showError function in Main Window.
+   * \param ErrorString Error string to be shown
+   */
+  void PumpError(QString ErrorString);
+  /*!
+   * \brief StageConnected
+   * Signals to main window that a connection to the pump was initiated
+   */
+  void PumpConnect();
 
-private:
-    char* SerialRead();
-    void CommandBufferUpdate();
-    QString getCommand(QString);
+ private:
+  char* SerialRead();
+  void CommandBufferUpdate();
+  QString getCommand(QString);
 
 
-protected:
-    PumpCommands(){
+ protected:
+  PumpCommands() {
 
-    }
-    ~PumpCommands(){
+  }
+  ~PumpCommands() {
 
-    }
+  }
 };
 
 #endif // PUMPCOMMANDS_H

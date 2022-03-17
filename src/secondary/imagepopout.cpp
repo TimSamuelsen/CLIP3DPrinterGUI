@@ -3,26 +3,22 @@
 
 QStringList ImageList;
 
-imagepopout::imagepopout(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::imagepopout)
-{
-    ui->setupUi(this);
+imagepopout::imagepopout(QWidget* parent) :
+  QWidget(parent),
+  ui(new Ui::imagepopout) {
+  ui->setupUi(this);
 }
 
-imagepopout::~imagepopout()
-{
-    delete ui;
+imagepopout::~imagepopout() {
+  delete ui;
 }
 
-void imagepopout::getImageList(QStringList Images)
-{
-    ImageList = Images;
+void imagepopout::getImageList(QStringList Images) {
+  ImageList = Images;
 }
 
-void imagepopout::showImage(QPixmap imagename)
-{
-    //QPixmap img(imagename);
-    ui->Image->setPixmap(imagename);
-    //printf("ShowingImage");
+void imagepopout::showImage(QPixmap imagename) {
+  //QPixmap img(imagename);
+  ui->Image->setPixmap(imagename);
+  //printf("ShowingImage");
 }

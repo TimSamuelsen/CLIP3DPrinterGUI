@@ -9,43 +9,42 @@ namespace Ui {
 class imageprocessing;
 }
 
-class imageprocessing : public QWidget
-{
-    Q_OBJECT
+class imageprocessing : public QWidget {
+  Q_OBJECT
 
-public:
-    explicit imageprocessing(QWidget *parent = nullptr);
-    ~imageprocessing();
-    QStringList ExposedPixelCount(QStringList ImageList);
-    QStringList ExposedPixelCountVP(QStringList ImageList);
-    QStringList GetDeepestPixels(QStringList ImageList);
+ public:
+  explicit imageprocessing(QWidget* parent = nullptr);
+  ~imageprocessing();
+  QStringList ExposedPixelCount(QStringList ImageList);
+  QStringList ExposedPixelCountVP(QStringList ImageList);
+  QStringList GetDeepestPixels(QStringList ImageList);
 
 
-private slots:
-    void on_SelectImageFiles_clicked();
+ private slots:
+  void on_SelectImageFiles_clicked();
 
-    void on_ClearImageFiles_clicked();
+  void on_ClearImageFiles_clicked();
 
-    void on_EncodeTest_clicked();
+  void on_EncodeTest_clicked();
 
-    void on_BrowseTargetDir_clicked();
+  void on_BrowseTargetDir_clicked();
 
-    void bitEncode8(cv::Mat source, cv::Mat& Channel);
+  void bitEncode8(cv::Mat source, cv::Mat& Channel);
 
-    void on_GreyscaleEncode_clicked();
+  void on_GreyscaleEncode_clicked();
 
-    void on_BinStart_clicked();
+  void on_BinStart_clicked();
 
-    void on_BlurStart_clicked();
+  void on_BlurStart_clicked();
 
-private:
-    Ui::imageprocessing *ui;
-    cv::Mat mframe;
-    void bitEncode24();
-    //void bitEncode8(cv::Mat source, cv::Mat& Channel);
-    int hexSelect(int imageNum);
-    void PixelBinner(QStringList ImageList);
-    void Blur(QStringList ImageList);
+ private:
+  Ui::imageprocessing* ui;
+  cv::Mat mframe;
+  void bitEncode24();
+  //void bitEncode8(cv::Mat source, cv::Mat& Channel);
+  int hexSelect(int imageNum);
+  void PixelBinner(QStringList ImageList);
+  void Blur(QStringList ImageList);
 
 };
 
