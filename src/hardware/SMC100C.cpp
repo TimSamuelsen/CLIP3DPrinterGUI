@@ -211,8 +211,13 @@ const char* SMC100C::ConvertToErrorString(char ErrorChar) {
 
 //Serial Port initialization (May be removed)
 bool SMC100C::SMC100CInit(const char* COMPORT) {
+  //serialib serial;
   if (serial.openDevice(COMPORT, 57600) == 1) {
     SelectedCOM = COMPORT;
+    //initFlag = true;
+    printf("Serial Port initiated");
+    const char* error = GetError();
+
     if (strcmp(GetError(), "0")) {               // if no error is found TODO: validate this
       return true;
     } else {
@@ -359,10 +364,8 @@ Author:
     TimS, 1/20/21
 ***************************************************************************************************************************************/
 const char* SMC100C::GetError() {
-  serial.flushReceiver();
   SetCommand(CommandType::LastCommandErr, 0.0, CommandGetSetType::Get);
   SendCurrentCommand();
-  Sleep(10);
   //Store serial read to ErrorChar variable
   char* ErrorChar = SerialRead();
   //Output from GetError command will be in format 1TEA where the last character is the error char
@@ -530,7 +533,7 @@ Author:
 ***************************************************************************************************************************************/
 bool SMC100C::SendCurrentCommand() {
   bool status = true;
-  if (serial.writeString(ControllerAdress) != 1) {
+  if (serial.writeString(ControllerAdress) != '1') {
     return false;
   }
   printf(&CommandToPrint.Command->CommandChar[0], "\r\n");        // write command
