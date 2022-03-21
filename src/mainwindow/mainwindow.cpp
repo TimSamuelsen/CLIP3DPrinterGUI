@@ -1031,6 +1031,11 @@ void MainWindow::initSettings() {
   ui->SettingsWidget->EnableParameter(VP_RESYNC, OFF); // Always starts in POTF so ResyncVP is disabled from start
   ui->SettingsWidget->EnableParameter(INITIAL_DELAY, OFF); // Always starts in POTF so Initial delay is disabled
   ui->SettingsWidget->initPrintSettings();
+
+  // Init into video pattern mode
+  if (m_PrintSettings.ProjectionMode == VIDEOPATTERN && m_PrintControls.lightConnect == ON) {
+    on_VP_HDMIcheckbox_clicked();
+  }
 }
 
 /*************************************************************

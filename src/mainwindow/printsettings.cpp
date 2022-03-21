@@ -432,6 +432,7 @@ void printsettings::savePrintSettings() {
   settings.setValue("PostExposureDelay", psPrintSettings->PostExposureDelay);
   settings.setValue("JerkTime", psPrintSettings->JerkTime);
 
+  settings.setValue("ProjectionMode", psPrintSettings->ProjectionMode);
   settings.setValue("InitialExposure", psPrintSettings->InitialExposure);
   settings.setValue("InitialDelay", psPrintSettings->InitialDelay);
   settings.setValue("InitialIntensity", psPrintSettings->InitialIntensity);
@@ -477,6 +478,7 @@ void printsettings::loadPrintSettings() {
   psPrintSettings->PostExposureDelay = settings.value("PostExposureDelay", 0).toDouble();
   psPrintSettings->JerkTime = settings.value("JerkTime", 0.04).toDouble();
 
+  psPrintSettings->ProjectionMode = settings.value("ProjectionMode", POTF).toInt();
   psPrintSettings->InitialExposure = settings.value("InitialExposure", 10).toDouble();
   psPrintSettings->InitialDelay = settings.value("InitialDelay", 0).toInt();
   psPrintSettings->InitialIntensity = settings.value("InitialIntensity", 10).toInt();
