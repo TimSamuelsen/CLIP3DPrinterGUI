@@ -18,6 +18,7 @@
 #include <QSettings>
 #include <QHeaderView>
 #include <QWindow>
+#include <qdebug.h>
 
 #include "API.h"
 #include "mainwindow.h"
@@ -79,11 +80,11 @@ MainWindow::MainWindow(QWidget* parent) :
   //Initialize features
   CurrentDateTime = QDateTime::currentDateTime(); //get current time for startup time
   ui->SettingsWidget->initSettingsPointers(&m_PrintSettings, &m_PrintControls, &m_PrintScript, &m_InjectionSettings);
-  loadSettings(); //load settings from settings file
-  initSettings(); //initialize settings by updating ui
   PrintControl.getControlPointers(&m_PrintSettings, &m_PrintControls, &m_PrintScript);
-  ui->GraphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
+  loadSettings(); //load settings from settings file
   autoConnect();
+  initSettings(); //initialize settings by updating ui
+  ui->GraphicWindow->initPlot(m_PrintControls, m_PrintSettings, m_PrintScript);
 }
 
 /*!
@@ -1033,7 +1034,9 @@ void MainWindow::initSettings() {
   ui->SettingsWidget->initPrintSettings();
 
   // Init into video pattern mode
+  qDebug() << "proj mode: " << m_PrintSettings.ProjectionMode << ", connect: " << m_PrintControls.lightConnect;
   if (m_PrintSettings.ProjectionMode == VIDEOPATTERN && m_PrintControls.lightConnect == ON) {
+    ui->VP_HDMIcheckbox->setChecked(true);
     on_VP_HDMIcheckbox_clicked();
   }
 }
