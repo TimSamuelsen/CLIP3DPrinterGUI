@@ -216,10 +216,12 @@ bool SMC100C::SMC100CInit(const char* COMPORT) {
     SelectedCOM = COMPORT;
     //initFlag = true;
     printf("Serial Port initiated");
+    const char* error = GetError();
+
     if (strcmp(GetError(), "0")) {               // if no error is found TODO: validate this
-      serial.~serialib();
-    } else {
       return true;
+    } else {
+      serial.~serialib();
     }
   }
   return false;

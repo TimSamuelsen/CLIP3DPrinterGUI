@@ -42,7 +42,7 @@ double graphics::calcPrintTime(PrintSettings m_PrintSettings, PrintControls m_Pr
   return printTime;
 }
 
-// TODO: review this to make it functional again
+// TODO: review this to make it functional again, improves estimated time
 int graphics::calcReuploads(PrintScripts m_PrintScript) {
   int nReuploads = 1;     // default to 1
   if (m_PrintScript.PrintScript == ON) {
