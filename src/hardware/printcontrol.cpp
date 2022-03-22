@@ -188,7 +188,7 @@ bool printcontrol::VPFrameUpdate(PrintControls* pPrintControls, int BitMode, int
     pPrintControls->BitLayer = 1;       // reset BitLayer counter to 1; TODO: Validate this
     pPrintControls->ReSyncCount++;
 
-    // If 120 frames have been reached, prepare for resync
+    // If n resync count frames have been reached, prepare for resync
     if(pPrintControls->ReSyncCount > (ReSyncRate - 24) / (24 / BitMode)) {
       pPrintControls->ReSyncFlag = ON;
       pPrintControls->ReSyncCount = 0;
@@ -281,7 +281,7 @@ bool printcontrol::CheckReupload(PrintSettings m_PrintSettings, PrintControls m_
       returnVal = false;
     } else {
       // check not at end or beginning of print to avoid sig segv when accessing scripts
-      if (m_PrintControls.layerCount + m_PrintSettings.ResyncVP < m_PrintScript.ExposureScriptList.size()
+      if ((int)m_PrintControls.layerCount + m_PrintSettings.ResyncVP < m_PrintScript.ExposureScriptList.size()
           && m_PrintControls.layerCount > 1) {
         returnVal = false; // Default to false if all match
         for (uint i = m_PrintControls.layerCount; i < m_PrintControls.layerCount + m_PrintSettings.ResyncVP; i++) {

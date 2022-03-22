@@ -25,7 +25,7 @@ class DLP9000: public QObject {
   DLP9000& operator=(DLP9000 const&) = delete;    //Copy assign
   DLP9000& operator=(DLP9000&&) = delete;         //Move assign
 
-  bool InitProjector(void);
+  bool InitProjector();
   void startPatSequence(void);
   void clearElements(void);
   void setIT6535Mode(int Mode);

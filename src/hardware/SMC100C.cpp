@@ -384,11 +384,11 @@ Author:
     TimS, 1/23/21
 ***************************************************************************************************************************************/
 char* SMC100C::GetMotionTime() {
+  serial.flushReceiver();
   SetCommand(CommandType::MoveEstimate, 0.0, CommandGetSetType::Get);
   SendCurrentCommand();
-  char* MotionOutput;
-  MotionOutput = SerialRead();
-  return MotionOutput;
+  Sleep(10);
+  return SerialRead();
 };
 /**************************************************************************************************************************************
 Function:
@@ -406,44 +406,50 @@ Author:
     TimS, 1/25/21
 ***************************************************************************************************************************************/
 char* SMC100C::GetPosition() {
+  serial.flushReceiver();
   SetCommand(CommandType::PositionReal, 0.0, CommandGetSetType::Get);
   SendCurrentCommand();
-  char* Read = SerialRead();
-  return Read;
+  Sleep(10);
+  return SerialRead();
 };
 
 char* SMC100C::GetVelocity() {
+  serial.flushReceiver();
   SetCommand(CommandType::Velocity, 0.0, CommandGetSetType::Get);
   SendCurrentCommand();
-  char* Read = SerialRead();
-  return Read;
+  Sleep(10);
+  return SerialRead();
 }
 
 char* SMC100C::GetAcceleration() {
+  serial.flushReceiver();
   SetCommand(CommandType::Acceleration, 0.0, CommandGetSetType::Get);
   SendCurrentCommand();
-  char* Read = SerialRead();
-  return Read;
+  Sleep(10);
+  return SerialRead();
 }
 
 char* SMC100C::GetPositiveLimit() {
+  serial.flushReceiver();
   SetCommand(CommandType::PositiveSoftwareLim, 0.0, CommandGetSetType::Get);
   SendCurrentCommand();
-  char* Read = SerialRead();
-  return Read;
+  Sleep(10);
+  return SerialRead();
 }
 
 char* SMC100C::GetNegativeLimit() {
+  serial.flushReceiver();
   SetCommand(CommandType::NegativeSoftwareLim, 0.0, CommandGetSetType::Get);
   SendCurrentCommand();
-  char* Read = SerialRead();
-  return Read;
+  Sleep(10);
+  return SerialRead();
 }
 
 char* SMC100C::GetCustom(char* Command) {
+  serial.flushReceiver();
   serial.writeString(Command);
-  char* Read = SerialRead();
-  return Read;
+  Sleep(10);
+  return SerialRead();
 }
 /**************************************************************************************************************************************
 Function:

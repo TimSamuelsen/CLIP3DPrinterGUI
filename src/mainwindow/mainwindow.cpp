@@ -200,6 +200,7 @@ void MainWindow::on_InitializeAndSynchronize_clicked() {
   } else {
     showError("No image files selected");
   }
+
 }
 
 /**
@@ -1306,6 +1307,9 @@ void MainWindow::on_resetButton_clicked() {
 
     // Clear all data structures (how do?)
     PrintControls tempControls;
+    tempControls.stageConnect1 = m_PrintControls.stageConnect1;     // don't reset connections
+    tempControls.stageConnect2 = m_PrintControls.stageConnect2;
+    tempControls.lightConnect = m_PrintControls.lightConnect;
     m_PrintControls = tempControls;
     // Clear terminal
     ui->ProgramPrints->clear();
@@ -1343,6 +1347,9 @@ bool MainWindow::initResetConfirmation() {
 void MainWindow::autoConnect() {
   PrintToTerminal("Attempting to connect to Light Engine");
   on_LightEngineConnectButton_clicked();
+  if (m_PrintControls.lightConnect == OFF) {
+    m_PrintSettings.ProjectionMode = POTF;
+  }
   PrintToTerminal("Attempting to connect to Stage");
   on_StageConnectButton_clicked();
   //PrintToTerminal("Attempting to connect to Pump");   TODO: Find good validation command for pump
