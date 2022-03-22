@@ -278,7 +278,9 @@ bool printcontrol::CheckReupload(PrintSettings m_PrintSettings, PrintControls m_
   bool returnVal = true;
   if (m_PrintSettings.ProjectionMode == VIDEOPATTERN) {
     if (m_PrintScript.PrintScript == OFF) {
-      returnVal = false;
+      if (m_PrintControls.layerCount != 0) {
+        returnVal = false;
+      }
     } else {
       // check not at end or beginning of print to avoid sig segv when accessing scripts
       if ((int)m_PrintControls.layerCount + m_PrintSettings.ResyncVP < m_PrintScript.ExposureScriptList.size()
