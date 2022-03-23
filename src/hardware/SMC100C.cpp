@@ -406,10 +406,10 @@ Author:
     TimS, 1/25/21
 ***************************************************************************************************************************************/
 char* SMC100C::GetPosition() {
-  serial.flushReceiver();
+  //serial.flushReceiver();
   SetCommand(CommandType::PositionReal, 0.0, CommandGetSetType::Get);
   SendCurrentCommand();
-  Sleep(10);
+  Sleep(3);
   return SerialRead();
 };
 
@@ -539,7 +539,7 @@ bool SMC100C::SendCurrentCommand() {
   if (serial.writeString(ControllerAdress) != 1) {
     return false;
   }
-  printf(&CommandToPrint.Command->CommandChar[0], "\r\n");        // write command
+  //printf(&CommandToPrint.Command->CommandChar[0], "\r\n");        // write command
   serial.writeString(&CommandToPrint.Command->CommandChar[0]);
 
   if (CommandToPrint.GetOrSet == CommandGetSetType::Get) {

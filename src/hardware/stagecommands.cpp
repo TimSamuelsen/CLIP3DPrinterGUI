@@ -336,9 +336,9 @@ void StageCommands::fineMovement() {
 
 void StageCommands::repeatRoughSlot() {
   double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
+  emit StageGetPositionSignal(QString::number(CurrentPosition));
   if (CurrentPosition > s_PrintSettings.StartingPosition - 3.2 && CurrentPosition < s_PrintSettings.StartingPosition + 3.2) {
-    StageAbsoluteMove(s_PrintSettings.StartingPosition, s_PrintSettings.StageType);
-    verifyStageParams(s_PrintSettings);
+    fineMovement();
   } else {
     if (MovementAttempts < 30) {
       QTimer::singleShot(1000, this, SLOT(repeatRoughSlot()));
@@ -351,12 +351,13 @@ void StageCommands::repeatRoughSlot() {
 
 void StageCommands::repeatFineSlot() {
   double CurrentPosition = StageGetPosition(STAGE_SMC).toDouble();
+  emit StageGetPositionSignal(QString::number(CurrentPosition));
   if (CurrentPosition > s_PrintSettings.StartingPosition - 0.05 && CurrentPosition < s_PrintSettings.StartingPosition + 0.05) {
     StageAbsoluteMove(s_PrintSettings.StartingPosition, s_PrintSettings.StageType);
     verifyStageParams(s_PrintSettings);
   } else {
     if (MovementAttempts < 30) {
-      QTimer::singleShot(1000, this, SLOT(repeatFineSlot));
+      QTimer::singleShot(1000, this, SLOT(repeatFineSlot()));
     } else {
       emit StagePrintSignal("Could not move stage to starting position");
     }
