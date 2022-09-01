@@ -283,18 +283,18 @@ bool printcontrol::CheckReupload(PrintSettings m_PrintSettings, PrintControls m_
       }
     } else {
       // check not at end or beginning of print to avoid sig segv when accessing scripts
-      if ((int)m_PrintControls.layerCount + m_PrintSettings.ResyncVP < m_PrintScript.ExposureScriptList.size()
-          && m_PrintControls.layerCount > 1) {
-        returnVal = false; // Default to false if all match
-        for (uint i = m_PrintControls.layerCount; i < m_PrintControls.layerCount + m_PrintSettings.ResyncVP; i++) {
-          double Last = m_PrintScript.ExposureScriptList.at(i - m_PrintSettings.ResyncVP).toDouble();
-          double Current = m_PrintScript.ExposureScriptList.at(i).toDouble();
-          if (Last != Current) {
+//      if ((int)m_PrintControls.layerCount + m_PrintSettings.ResyncVP < m_PrintScript.ExposureScriptList.size()
+//          && m_PrintControls.layerCount > 1) {
+//        returnVal = false; // Default to false if all match
+//        for (uint i = m_PrintControls.layerCount; i < m_PrintControls.layerCount + m_PrintSettings.ResyncVP; i++) {
+//          double Last = m_PrintScript.ExposureScriptList.at(i - m_PrintSettings.ResyncVP).toDouble();
+//          double Current = m_PrintScript.ExposureScriptList.at(i).toDouble();
+//          if (Last != Current) {
             returnVal = true;
-            break;
-          }
-        }
-      }
+//            break;
+//          }
+//        }
+//      }
     }
   }
   return returnVal;

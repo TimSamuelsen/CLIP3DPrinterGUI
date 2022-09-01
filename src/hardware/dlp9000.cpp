@@ -64,7 +64,7 @@ void DLP9000::AddPatterns2(QStringList fileNames, PrintSettings m_PrintSettings,
   m_ptnImagePath = dir.absolutePath();
   for(int i = 0; i < fileNames.size(); i++) {   // Iterate over each image file
     PatternElement pattern;
-    pattern.name = fileNames.at(CurrentImage);
+    pattern.name = fileNames.at(i);
     qDebug(pattern.name.toLatin1(), "\r\n");
     initPattern(pattern, m_PrintSettings);
 
