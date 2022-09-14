@@ -166,9 +166,9 @@ void MainWindow::on_InitializeAndSynchronize_clicked() {
     if (m_PrintSettings.ProjectionMode == POTF) {
       // n slices = n images
       m_PrintControls.nSlice = ui->SettingsWidget->FileListCount();
-      // remaining number of images is max n images - n images used for initial exposure
-      m_PrintControls.remainingImages = m_PrintSettings.MaxImageUpload
-                                        - m_PrintSettings.InitialExposure;
+      // remaining number of images is max n images //- n images used for initial exposure
+      m_PrintControls.remainingImages = m_PrintSettings.MaxImageUpload;
+                                       // - m_PrintSettings.InitialExposure;
       QStringList ImageList = GetImageList(m_PrintControls, m_PrintSettings);
     } else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN) {
       // n slices = (n bit layers in an image (24) / selected bit depth) * n images
@@ -1212,12 +1212,13 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
         InitialExposureCount -= 5;
       }
       if (m_PrintSettings.ProjectionMode == POTF) {
-        for (int i = 1; i < ui->SettingsWidget->FileListCount(); i++) {
+        for (int i = 3; i < ui->SettingsWidget->FileListCount(); i++) {
           item = ui->SettingsWidget->FileListItem(i);
-          ImageList << item;
-          if ((i + m_PrintSettings.InitialExposure) > m_PrintSettings.MaxImageUpload) {
+          //if ((i + m_PrintSettings.InitialExposure) > m_PrintSettings.MaxImageUpload) {
+          if (( i > m_PrintSettings.MaxImageUpload)){
             break;
           }
+          ImageList << item;
         }
       }
     }
@@ -1225,10 +1226,10 @@ QStringList MainWindow::GetImageList(PrintControls m_PrintControls, PrintSetting
     //else in re-upload
     for (int i = m_PrintControls.layerCount; i < ui->SettingsWidget->FileListCount(); i++) {
       item = ui->SettingsWidget->FileListItem(i);
-      ImageList << item;
-      if (i > (int)m_PrintControls.layerCount + m_PrintSettings.MaxImageUpload) {
-        break;
+      if (i > (int)m_PrintControls.layerCount + m_PrintSettings.MaxImageUpload -1) {
+          break;
       }
+        ImageList << item;
     }
   } else if (m_PrintSettings.ProjectionMode == VIDEOPATTERN) {
     int j = 0;

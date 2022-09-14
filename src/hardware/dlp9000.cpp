@@ -450,7 +450,7 @@ int DLP9000::calculateSplashImageDetails(int* totalSplashImages, bool firmware, 
         break;
       }
     }
-
+    //i = elemCount;
     /* Match found. use the same splash image */
     if(i < elemCount) {
       m_elements[elemCount].splashImageIndex = m_elements[i].splashImageIndex;
